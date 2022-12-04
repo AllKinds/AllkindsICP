@@ -1,0 +1,29 @@
+/* Write your global styles here, in PostCSS syntax */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .brand-gradient-r {
+     @apply bg-gradient-to-r from-DF-blue via-DF-red to-DF-yellow;
+  }
+  .brand-gradient-br {
+    @apply bg-gradient-to-br from-DF-blue via-DF-red to-DF-yellow;
+ }
+ .trans-300 {
+    @apply transition-all ease-in-out duration-300;
+ }
+ 
+}
+
+@layer base {
+  h1 {
+  @apply text-7xl md:text-9xl font-semibold py-4 md:py-10;
+ }
+ h2 {
+  @apply text-3xl md:text-5xl font-semibold py-4 md:py-10;
+ }
+ p {
+  @apply text-xl py-4 font-montserrat max-w-2xl font-semibold;
+ }
+}
