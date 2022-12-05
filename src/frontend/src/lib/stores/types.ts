@@ -21,6 +21,10 @@ export enum RootState {
 	Register,
 	App
 }
+
+//Others
+
+
 // export const ProfileSchema = z.object({
 //   created: z.bigint(),
 //   connect:

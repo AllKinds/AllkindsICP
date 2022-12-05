@@ -5,8 +5,6 @@ import { get, writable } from 'svelte/store';
 import { idlFactory } from '../../../../../declarations/backend';
 import { AuthState, type BackendActor } from '../types';
 
-
-
 export const authStore = writable<AuthState>();
 export let actor = writable<BackendActor>();
 export let user = writable<User>();

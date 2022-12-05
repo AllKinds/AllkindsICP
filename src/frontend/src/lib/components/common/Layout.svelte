@@ -15,7 +15,7 @@
 		</header>
 
 		<!-- main content -->
-		<main class="mx-auto pt-8">
+		<main class="mx-auto w-full pt-8">
 			<slot name="main" />
 		</main>
 	</content>
