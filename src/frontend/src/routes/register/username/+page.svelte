@@ -1,9 +1,10 @@
 <script lang="ts">
-	import { logout, actor, syncAuth } from '$lib/stores/auth';
 	import Button from '$lib/components/common/Button.svelte';
-	import { goto } from '$app/navigation';
 	import BorderBox from '$lib/components/common/BorderBox.svelte';
-	import { RegiState, regiStore } from '$lib/stores/stores';
+
+	import { regiStore, actor } from '$lib/stores';
+	import { syncAuth } from '$lib/stores/tasks';
+	import { RegiState } from '$lib/stores/types';
 
 	let username: string;
 

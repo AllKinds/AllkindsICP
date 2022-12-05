@@ -1,15 +1,16 @@
 <script lang="ts">
 	import BorderBox from '$lib/components/common/BorderBox.svelte';
-	import { logout, actor, user, syncAuth, authStore } from '$lib/stores/auth';
+	import { logout } from '$lib/stores/tasks';
+
 	import Button from '$lib/components/common/Button.svelte';
-	import { apiCall } from '$lib/stores/api';
+	import { user, actor, authStore } from '$lib/stores';
 
 	// function test() {
 	//   apiCall({getUser}, {}).then(res => (
 
 	//   ))
 	// }
-	console.log('u', $user);
+	console.log('u', $user); 
 </script>
 
 <div class="pt-10 flex flex-col justify-center items-center">

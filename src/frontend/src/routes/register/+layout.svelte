@@ -2,10 +2,10 @@
 	import Layout from '$lib/components/common/Layout.svelte';
 	import DropdownNav from '$lib/components/header/DropdownNav.svelte';
 	import NavButton from '$lib/components/header/NavButton.svelte';
-	import { logout } from '$lib/stores/auth';
-	import { goto } from '$app/navigation';
-	import { RegiState, regiStore } from '$lib/stores/stores';
-	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';	
+	import { logout } from '$lib/stores/tasks';
+	import { regiStore } from '$lib/stores';
+	import { RegiState  } from '$lib/stores/types';
 
 	regiStore.set(RegiState.Username);
 

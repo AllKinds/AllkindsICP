@@ -3,11 +3,11 @@
 	import Layout from '$lib/components/common/Layout.svelte';
 	import DropdownNav from '$lib/components/header/DropdownNav.svelte';
 	import NavButton from '$lib/components/header/NavButton.svelte';
-
+	import { logout } from '$lib/stores/tasks';
+	
 	export let data: LayoutData;
 
-	import { logout, syncAuth } from '$lib/stores/auth';
-	import { onDestroy } from 'svelte';
+
 
 	// if ($authStore !== AuthState.Registered) {
 	// 	goto("/");

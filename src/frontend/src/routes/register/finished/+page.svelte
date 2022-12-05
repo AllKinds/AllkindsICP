@@ -1,9 +1,7 @@
 <script lang="ts">
-	import { logout, actor, syncAuth } from '$lib/stores/auth';
 	import Button from '$lib/components/common/Button.svelte';
-	import { goto } from '$app/navigation';
-	import BorderBox from '$lib/components/common/BorderBox.svelte';
-	import { RootState, rootStore } from '$lib/stores/stores';
+	import { rootStore } from '$lib/stores';
+	import { RootState } from '$lib/stores/types';
 
 	//import update profile call from +page.ts?
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { login, syncAuth } from '$lib/stores/auth';
+	import { login } from '$lib/stores/tasks';
 	import Layout from '$lib/components/common/Layout.svelte';
 	import type { LayoutData } from './$types';
 	import DropdownNav from '$lib/components/header/DropdownNav.svelte';
