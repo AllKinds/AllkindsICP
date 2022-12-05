@@ -1,4 +1,5 @@
-<div class="
+<div
+	class="
   brand-gradient-r 
   font-semibold 
   p-0.5 
@@ -8,8 +9,10 @@
   md:mx-0
   rounded-full 
   cursor-pointer
-">
-  <button class="
+"
+>
+	<button
+		class="
   trans-300 
   rounded-full 
   p-2 
@@ -20,8 +23,8 @@
   dark:text-slate-100 
   dark:bg-slate-800/80
   dark:hover:bg-transparent"
-    on:click
-  > 
-    <slot/>
-  </button>
+		on:click
+	>
+		<slot />
+	</button>
 </div>

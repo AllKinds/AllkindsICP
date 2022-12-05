@@ -6,7 +6,6 @@
 	import { onDestroy } from 'svelte';
 	import { RegiState, regiStore, RootState, rootStore } from '$lib/stores/stores';
 
-
 	$: {
 		//can be changed in future to make landing accessible while being logged in
 		if ($rootStore === RootState.Landing || $authStore === AuthState.LoggedOut) {
@@ -19,12 +18,12 @@
 		}
 	}
 
-	console.log('user:', {$user})
+	console.log('user:', { $user });
 
-// // make user logout onDestroy component
-// 	onDestroy( () => {
-// 		logout()
-// 	})
+	// // make user logout onDestroy component
+	// 	onDestroy( () => {
+	// 		logout()
+	// 	})
 </script>
 
 {#if browser}
@@ -39,8 +38,8 @@
 		{goto("/register")}
 	{:else if $authStore === AuthState.Registered}
 		{goto("/app/questions")}
-	{/if} -->	
-		<slot />
+	{/if} -->
+	<slot />
 {:else}
 	{console.error('Not in a browser!')}
 {/if}

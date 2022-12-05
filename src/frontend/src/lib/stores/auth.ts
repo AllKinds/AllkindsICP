@@ -3,7 +3,6 @@ import { AuthClient } from '@dfinity/auth-client';
 import type { User, _SERVICE } from 'src/declarations/backend/backend.did';
 import { get, writable } from 'svelte/store';
 import { idlFactory } from '../../../../declarations/backend';
-import { RegiState, regiStore, RootState, rootStore } from './stores';
 
 export enum AuthState {
 	LoggedOut,
@@ -16,7 +15,6 @@ type BackendActor = ActorSubclass<_SERVICE>;
 export const authStore = writable<AuthState>();
 export let actor = writable<BackendActor>();
 export let user = writable<User>();
-
 
 let authClient: AuthClient = await AuthClient.create();
 

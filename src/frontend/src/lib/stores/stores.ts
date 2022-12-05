@@ -1,16 +1,15 @@
-import { get, writable } from 'svelte/store';
+import { writable } from 'svelte/store';
 
 export enum RootState {
-  Landing,
-  Register,
-  App
+	Landing,
+	Register,
+	App
 }
 export const rootStore = writable<RootState>();
 
 export enum RegiState {
-  Username,
-  Profile,
-  Finished
+	Username,
+	Profile,
+	Finished
 }
 export const regiStore = writable<RegiState>();
-

@@ -6,7 +6,7 @@ export const load: LayoutLoad = () => {
 			{ slug: 'home', title: 'Home' },
 			{ slug: 'people', title: 'People' },
 			{ slug: 'profile', title: 'Profile' },
-			{ slug: 'dev', title: 'Dev'}
+			{ slug: 'dev', title: 'Dev' }
 		]
 	};
 };

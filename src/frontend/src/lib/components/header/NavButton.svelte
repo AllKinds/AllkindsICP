@@ -1,4 +1,5 @@
-<a class="
+<a
+	class="
 						hover:bg-gray-300 
 						dark:hover:bg-slate-600 
 							w-fit decoration-transparent 
@@ -7,7 +8,8 @@
 							font-semibold 
 							cursor-pointer 
 						"
-						href={null}
-						on:click>
-					<slot />
-        </a>
+	href={null}
+	on:click
+>
+	<slot />
+</a>

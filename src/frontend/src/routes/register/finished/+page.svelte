@@ -5,24 +5,23 @@
 	import BorderBox from '$lib/components/common/BorderBox.svelte';
 	import { RootState, rootStore } from '$lib/stores/stores';
 
-
 	//import update profile call from +page.ts?
 
 	async function submit() {
-		rootStore.set(RootState.App)
+		rootStore.set(RootState.App);
 	}
 
 	// const updateProfile = async () => {
-  //   let gender: Gender = { Male: null }
-  //     let user: User = {
-  //       created: BigInt(0),
-  //       connect: [["email@mail.com"], true],
-  //       about: [[a], true],
-  //       username: "shiqqqqt",
-  //       gender: [[gender], false],
-  //       birth: [[BigInt(0)], true]
-  //     }
-  //   await $actor.updateProfile(user).then((res) => console.log('res', res))
+	//   let gender: Gender = { Male: null }
+	//     let user: User = {
+	//       created: BigInt(0),
+	//       connect: [["email@mail.com"], true],
+	//       about: [[a], true],
+	//       username: "shiqqqqt",
+	//       gender: [[gender], false],
+	//       birth: [[BigInt(0)], true]
+	//     }
+	//   await $actor.updateProfile(user).then((res) => console.log('res', res))
 </script>
 
 <div class="flex flex-col justify-center items-center">

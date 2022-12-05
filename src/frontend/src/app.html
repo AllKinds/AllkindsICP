@@ -6,13 +6,20 @@
 		%sveltekit.head%
 		<link rel="icon" href="#" />
 		<!-- trying to disable favicon temporary -->
-		<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@500&display=swap" rel="stylesheet">
-		<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet"> 
-		<link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet"> 
-		<link href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates&display=swap" rel="stylesheet"> 
+		<link
+			href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@500&display=swap"
+			rel="stylesheet"
+		/>
+		<link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet" />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap"
+			rel="stylesheet"
+		/>
+		<link
+			href="https://fonts.googleapis.com/css2?family=Montserrat+Alternates&display=swap"
+			rel="stylesheet"
+		/>
 		<!-- some fonts might are unused -->
-
-	
 
 		<!-- <script lang="ts">
 			 if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -20,46 +27,32 @@
 		}
 		</script> -->
 		<script>
-			
-
 			try {
-				const isDarkPreferred = window.matchMedia(
-					"(prefers-color-scheme: dark)"
-				).matches;
-		
+				const isDarkPreferred = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
 				const currentTheme =
 					localStorage.nnsTheme === null ||
 					localStorage.nnsTheme === undefined ||
-					localStorage.nnsTheme === ""
+					localStorage.nnsTheme === ''
 						? undefined
 						: JSON.parse(localStorage.nnsTheme);
-		
-					document.documentElement.classList.add(currentTheme ?? (isDarkPreferred ? "dark" : ""));
+
+				document.documentElement.classList.add(currentTheme ?? (isDarkPreferred ? 'dark' : ''));
 				// document.documentElement.classList.add(currentTheme ?? (isDarkPreferred ? "dark" : ""));
 			} catch (error) {
-				console.error("Error initializing theme", error);
+				console.error('Error initializing theme', error);
 			}
-				
 		</script>
-			<!-- dark:bg-gradient-to-r dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 
+		<!-- dark:bg-gradient-to-r dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 
 	bg-gradient-to-r from-stone-50 via-white to-stone-50 
 	
 	transition ease-in-out duration-500
 	dark:text-stone-200
 	text-slate-800 -->
-	
 	</head>
-	<body class="
-		font-sans
-		dark:text-slate-100
-		text-slate-900
-		dark:bg-gradient-to-r dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 
-		bg-gradient-to-r from-slate-100 via-slate-50 to-slate-100
-		trans-300
-	">
-		
+	<body
+		class="font-sans dark:text-slate-100 text-slate-900 dark:bg-gradient-to-r dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 bg-gradient-to-r from-slate-100 via-slate-50 to-slate-100 trans-300"
+	>
 		<div>%sveltekit.body%</div>
 	</body>
 </html>
-
-
