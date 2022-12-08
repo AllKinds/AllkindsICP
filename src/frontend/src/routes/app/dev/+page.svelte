@@ -8,51 +8,36 @@
 	import type { Gender, User } from 'src/declarations/backend/backend.did';
 
 	import { updateProfile } from '$lib/stores/tasks/updateProfile';
+	import { stringify } from 'postcss';
 	//^^^this import is temporary
 
-// function toggleEdit() {
-// 		edit = !edit;
-// 	}
-// const handle = () => {
-// 	  let gender = { Male: null }
-// 		const userw: User = {
-// 			created: BigInt(0),
-// 			connect: [[connect], true],
-// 			about: [[about], true],
-// 			username: username,
-// 			gender: [[gender], false],
-// 			birth: [[BigInt(0)], true]
-		
-// 		}
-//  console.log('userw', userw);
-
-// }
-type Time = bigint;
-
-export const toTimestamp = (value: Date): Time => {
-  return BigInt(value.getTime() * 1000 * 1000);
-};
-
-export const fromTimestamp = (value: Time): Date => {
-  return new Date(Number(value) / (1000 * 1000));
-};
 
 const toNullable = <T>(value?: T): [] | [T] => {
   return value ? [value] : [];
-};
+}
 const fromNullable = <T>(value: [] | [T]): T | undefined => {
   return value?.[0];
+}
+
+function fromBigInt(utc: bigint) { 
+		utc /= BigInt(1000000)
+     return new Date(Number(utc)).toISOString(). slice(0,10) 
+ }
+
+function toBigInt(date: string) {  
+  return BigInt(Number(new Date(date)) * 1000000)
+}
+
+
+export const toNullableDate = (value?: string): [] | [bigint] | undefined => {
+  return value && !isNaN(parseInt(`${value?.[0]}`)) ? [toBigInt(value)] : [];
 };
 
-export const toNullableTimestamp = (value?: Date): [] | [Time] => {
-  const time: number | undefined = value?.getTime();
-  return value && !isNaN(time) ? [toTimestamp(value)] : [];
-};
-export const fromNullableTimestamp = 
-       (value?: [] | [Time]): Date | undefined => {
-  return !isNaN(parseInt(`${value?.[0]}`)) ? 
-            fromTimestamp(value[0]) : undefined;
-};
+const fromNullableDate = (value?: [] | [bigint]): string | undefined => {
+  const m = !isNaN(parseInt(`${value?.[0]}`)) ? value?.[0] : undefined;
+	return m !== undefined ? fromBigInt(m) : m
+}; 	
+
 
 let publicMode: boolean = false
 let publicAbout: boolean = $user.about[1]
@@ -67,12 +52,14 @@ let userObj = {
 	about: fromNullable($user.about[0]),
 	username: $user.username,//ez
 	gender: $user.gender, //biiitch
-	birth: fromNullableTimestamp($user.birth[0])
+	birth: fromNullableDate(($user.birth[0]))
 }
+
+
 
 $: { //temptest
 	console.log('update userObj:',  userObj)
-	console.log('toBigInt', userObj.birth)
+	//console.log('fromBigIntBirth', fromBigInt(userObj.birth))
 }
 
 
@@ -82,9 +69,9 @@ const handle = () => {
 			created: $user.created,
 			connect: [toNullable(userObj.connect), publicConnect],
 			about: [toNullable(userObj.about), publicAbout],
-			username: $user.username,
+			username: userObj.username,
 			gender: $user.gender,
-			birth: [toNullableTimestamp(userObj.birth), publicBirth]
+			birth: [toNullableDate(userObj.birth), publicBirth]
 				// birth needs a date to bigint transform
 		}
 
@@ -117,7 +104,7 @@ const handle = () => {
 	<div class="dark:bg-slate-800 w-auto flex flex-col align-items-center justify-between bg-slate-100 rounded-md p-2">
 		<strong>User data</strong><br />
 		username: {$user.username}<br />
-		created: {$user.created}<br />
+		created: {fromBigInt($user.created)}<br />
 		gender: {$user.gender[1]} {$user.gender[0]}<br />
 		birth: {$user.birth[1]} {$user.birth[0]}<br />
 		connect: {$user.connect[1]} {$user.connect[0]}<br />
