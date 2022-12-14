@@ -4,11 +4,12 @@
 
 	import Button from '$lib/components/common/Button.svelte';
 	import { user, actor, authStore } from '$lib/stores';
-	import { nullable, string, z } from 'zod';
+	import { nullable, object, string, z } from 'zod';
 	import type { Gender, User } from 'src/declarations/backend/backend.did';
 
 	import { updateProfile } from '$lib/stores/tasks/updateProfile';
 	import { stringify } from 'postcss';
+	import { attr, is_empty, is_void, null_to_empty, onMount } from 'svelte/internal';
 	//^^^this import is temporary
 
 
@@ -29,7 +30,7 @@ function toBigInt(date: string) {
 }
 
 
-export const toNullableDate = (value?: string): [] | [bigint] | undefined => {
+export const toNullableDate = (value?: string): [] | [bigint] => {
   return value && !isNaN(parseInt(`${value?.[0]}`)) ? [toBigInt(value)] : [];
 };
 
@@ -43,6 +44,7 @@ let publicMode: boolean = false
 let publicAbout: boolean = $user.about[1]
 let publicConnect: boolean = $user.connect[1]
 let publicBirth: boolean = $user.birth[1]
+let publicGender: boolean = $user.gender[1]
 	// const updateProfile = async () => {
 
 // this would need typesafety
@@ -51,31 +53,50 @@ let userObj = {
 	connect: fromNullable($user.connect[0]),
 	about: fromNullable($user.about[0]),
 	username: $user.username,//ez
-	gender: $user.gender, //biiitch
+	gender: fromNullable($user.gender[0]), //biiitch
 	birth: fromNullableDate(($user.birth[0]))
 }
+ let genders = [
+	{ name: 'undefined', gender : undefined},
+	{ name: 'Male', gender : {Male : null}  },
+	{ name: 'Female', gender: {Female : null} },
+	{ name: 'Other', gender: {Other : null} },
+	{ name: 'Queer', gender: {Queer : null} }
+ ]
 
+
+
+//  let keys = Object.keys(genders)
+ 
 
 
 $: { //temptest
-	console.log('update userObj:',  userObj)
+	console.log('update userObj.gender:',  userObj.gender)
+	console.log('gender from user' , $user.gender[0][0])
+
 	//console.log('fromBigIntBirth', fromBigInt(userObj.birth))
+
 }
+onMount(() => {
+	
+});
 
 
 const handle = () => {
+
+	//let newGender: Gender = {}
 
 	const newUser: User = {
 			created: $user.created,
 			connect: [toNullable(userObj.connect), publicConnect],
 			about: [toNullable(userObj.about), publicAbout],
 			username: userObj.username,
-			gender: $user.gender,
+			gender: [toNullable(userObj.gender), publicGender],
 			birth: [toNullableDate(userObj.birth), publicBirth]
 				// birth needs a date to bigint transform
 		}
 
-	 console.log('newV', newUser)
+	 
 	 
 		updateProfile(newUser)
 }
@@ -106,13 +127,44 @@ const handle = () => {
 		username: {$user.username}<br />
 		created: {fromBigInt($user.created)}<br />
 		gender: {$user.gender[1]} {$user.gender[0]}<br />
-		birth: {$user.birth[1]} {$user.birth[0]}<br />
+		birth: {$user.birth[1]} {userObj.birth}<br />
 		connect: {$user.connect[1]} {$user.connect[0]}<br />
 		about: {$user.about[1]} {$user.about[0]}<br />
 	
 		<br />
 		<h3>Test out profile edit</h3>
 		<br />
+
+		<!-- <label for="genders">gender
+			<input list="genders" name="gender" id="gender">
+			<datalist id="genders" >
+				<option bind:value={userObj}>Male</option>
+				<option bind:value={{Female : null}}>Female</option>
+				</datalist>
+		</label>
+
+				{}
+			 -->
+		<label for="gender">Gender
+			<select bind:value={userObj.gender} >
+				{#each genders as gender}
+				<!-- {
+					console.log('gender.gender', gender.gender),
+					console.log('$user.gender', $user.gender[0][0]),
+					console.log('possible test', userObj.gender !== undefined &&  ? true : false)
+
+				} -->
+					<option class={gender.name} value={gender.gender} selected={userObj.gender !== undefined && userObj.gender.hasOwnProperty(gender.name) ? true : false}>
+						{gender.name}
+					</option>
+				{/each}
+			</select>
+			<input
+				type="checkbox"
+				id="togglePublic"
+				bind:checked={publicGender}
+			/>
+		</label>
 
 		<label for="birth">birth
 			<input 
@@ -179,7 +231,7 @@ const handle = () => {
 	label {
 		@apply flex justify-between m-2;
 	}
-	.inputfield {
+	.inputfield, option, select {
 		@apply bg-slate-600 p-1 rounded-md ;
 	}
 </style>
