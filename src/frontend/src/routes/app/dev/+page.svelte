@@ -3,44 +3,16 @@
 	import { user } from '$lib/stores';
 	import type { Gender, User } from 'src/declarations/backend/backend.did';
 	import { updateProfile } from '$lib/stores/tasks/updateProfile';
+	import { 
+		toNullable,
+		fromNullable,
+		toNullableDate, 
+		fromNullableDate,
+		toNullableGender,
+		fromNullableGender 
+	} from '$lib/utilities';
 
-
-//have to put these functions elsewhere
-export const toNullable = <T>(value?: T): [] | [T] => {
-  return value ? [value] : [];
-}
-
-export const fromNullable = <T>(value: [] | [T]): T | undefined => {
-  return value?.[0];
-}
-
-export function fromBigInt(utc: bigint) { 
-		utc /= BigInt(1000000)
-     return new Date(Number(utc)).toISOString(). slice(0,10) 
- }
-
-export function toBigInt(date: string) {  
-  return BigInt(Number(new Date(date)) * 1000000)
-}
-
-export const toNullableDate = (value?: string): [] | [bigint] => {
-  return value && !isNaN(parseInt(`${value?.[0]}`)) ? [toBigInt(value)] : [];
-};
-
-export const fromNullableDate = (value?: [] | [bigint]): string | undefined => {
-  const m = !isNaN(parseInt(`${value?.[0]}`)) ? value?.[0] : undefined;
-	return m !== undefined ? fromBigInt(m) : m
-}; 	
-
-export const toNullableGender = (value?: string ): [] | [Gender] => {
-	return value && value !== undefined ? [<Gender>{[value] : null}] : []
-};	
-
-export const fromNullableGender = (value?: [] | [Gender]): string | undefined => {
-  const m = value !== undefined ? value?.[0] : undefined;
-	return m !== undefined ? Object.entries(m)[0][0] : m
-}; 	
-
+	//this could be moved to some declaration/constant somewhere else
  let genders = [
 	'',
  	'Male' ,
@@ -48,14 +20,15 @@ export const fromNullableGender = (value?: [] | [Gender]): string | undefined =>
 	'Other',
 	'Queer' 
  ]
- 
+
 let publicMode: boolean = false
 let publicAbout: boolean = $user.about[1]
 let publicConnect: boolean = $user.connect[1]
 let publicBirth: boolean = $user.birth[1]
 let publicGender: boolean = $user.gender[1]
 
-let userObj = { //a temporary userObj to store and change OUR values , this has NO User interface
+//an user object to temporary store and change OUR values , this has NO User interface
+let userObj = { 
 	created: $user.created, 
 	connect: fromNullable($user.connect[0]),
 	about: fromNullable($user.about[0]),
@@ -81,7 +54,7 @@ const handle = () => {
 
 <div class="pt-10 flex mx-auto w-10/12 justify-center items-center">
 	<div class="dark:bg-slate-800 w-auto flex flex-col align-items-center justify-between bg-slate-100 rounded-md p-2">
-		<strong>User data</strong><br />
+		<!-- <strong>User data</strong><br />
 		username: {$user.username}<br />
 		created: {fromBigInt($user.created)}<br />
 		gender: {$user.gender[1]} {$user.gender[0][0]}<br />
@@ -90,7 +63,7 @@ const handle = () => {
 		about: {$user.about[1]} {$user.about[0]}<br />
 		<br />
 		<h3>Test out profile edit</h3>
-		<br />
+		<br /> -->
 
 		<label for="gender">Gender
 			<select bind:value={userObj.gender}>
