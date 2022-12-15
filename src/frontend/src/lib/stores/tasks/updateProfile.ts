@@ -19,6 +19,7 @@ export async function updateProfile(newUser: User) {
 	    // }
       console.log('newUserToSend', newUser)
       await localActor.updateProfile(newUser).then((res) => console.log('res', res))
+      await syncAuth()
 
       // let result = await localActor.getUser()
 		  //   user.set(result);
