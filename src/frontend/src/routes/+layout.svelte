@@ -2,9 +2,8 @@
 	import '../../../app.postcss';
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
-	import { AuthState, authStore, user, actor, login, syncAuth, logout } from '$lib/stores/auth';
-	import { onDestroy } from 'svelte';
-	import { RegiState, regiStore, RootState, rootStore } from '$lib/stores/stores';
+	import { rootStore, authStore, user, actor, } from '$lib/stores';
+	import { RootState, AuthState} from '$lib/stores/types';
 
 	$: {
 		//can be changed in future to make landing accessible while being logged in

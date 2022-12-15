@@ -3,16 +3,17 @@
 	import Layout from '$lib/components/common/Layout.svelte';
 	import DropdownNav from '$lib/components/header/DropdownNav.svelte';
 	import NavButton from '$lib/components/header/NavButton.svelte';
-
+	import { logout, syncAuth } from '$lib/stores/tasks';
+	import { onMount } from 'svelte';
+	
 	export let data: LayoutData;
 
-	import { logout, syncAuth } from '$lib/stores/auth';
-	import { onDestroy } from 'svelte';
 
-	// if ($authStore !== AuthState.Registered) {
-	// 	goto("/");
-	// }
-	// syncAuth();
+
+
+	// onMount( () => {
+	// 	syncAuth()
+	// })
 </script>
 
 <Layout>

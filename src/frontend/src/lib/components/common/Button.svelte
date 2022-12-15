@@ -5,7 +5,6 @@
   p-0.5 
   w-fit 
   my-10
-  mx-auto
   md:mx-0
   rounded-full 
   cursor-pointer
