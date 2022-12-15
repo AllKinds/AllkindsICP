@@ -1,7 +1,8 @@
 import type { Gender, User } from "src/declarations/backend/backend.did";
 import { actor } from '$lib/stores';
 import { get } from "svelte/store";
-import { user } from './auth';
+import { syncAuth, user } from './auth';
+import { goto } from '$app/navigation';
 
 
 export async function updateProfile(newUser: User) {
@@ -18,6 +19,9 @@ export async function updateProfile(newUser: User) {
 	    // }
       console.log('newUserToSend', newUser)
       await localActor.updateProfile(newUser).then((res) => console.log('res', res))
+      // let result = await localActor.getUser()
+		  //   user.set(result);
+      
       //await $actor.updateProfile(user).then((res) => console.log('res', res))
 
       // connect: [["email@mail.com"], true],

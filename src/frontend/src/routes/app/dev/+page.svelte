@@ -10,6 +10,7 @@
 	import { updateProfile } from '$lib/stores/tasks/updateProfile';
 	import { stringify } from 'postcss';
 	import { attr, is_empty, is_void, null_to_empty, onMount } from 'svelte/internal';
+	import type { ValueOptions } from 'postcss/lib/container';
 	//^^^this import is temporary
 
 
@@ -39,6 +40,17 @@ const fromNullableDate = (value?: [] | [bigint]): string | undefined => {
 	return m !== undefined ? fromBigInt(m) : m
 }; 	
 
+export const toNullableGender = (value?: string ): [] | [Gender] => {
+	return value && value !== undefined ? [<Gender>{[value] : null}] : []
+};	
+
+const fromNullableGender = (value?: [] | [Gender]): string | undefined => {
+  const m = value !== undefined ? value?.[0] : undefined;
+	return m !== undefined ? Object.entries(m)[0][0] : m
+}; 	
+
+//Object.entries(userObj.gender)[0][0]
+
 
 let publicMode: boolean = false
 let publicAbout: boolean = $user.about[1]
@@ -53,33 +65,36 @@ let userObj = {
 	connect: fromNullable($user.connect[0]),
 	about: fromNullable($user.about[0]),
 	username: $user.username,//ez
-	gender: fromNullable($user.gender[0]), //biiitch
+	gender: fromNullableGender($user.gender[0]), //biiitch
 	birth: fromNullableDate(($user.birth[0]))
 }
+
  let genders = [
-	{ name: 'undefined', gender : undefined},
-	{ name: 'Male', gender : {Male : null}  },
-	{ name: 'Female', gender: {Female : null} },
-	{ name: 'Other', gender: {Other : null} },
-	{ name: 'Queer', gender: {Queer : null} }
+	'',
+ 	'Male' ,
+	'Female' ,
+	'Other',
+	'Queer' 
  ]
 
 
 
 //  let keys = Object.keys(genders)
+// interface Genderr {
+// 	[key: string]: null
+// }
  
 
+//  foo['Male'] = null
 
 $: { //temptest
 	console.log('update userObj.gender:',  userObj.gender)
-	console.log('gender from user' , $user.gender[0][0])
+	console.log('gender from user' , $user.gender[0])
+	console.log('fromNullableGender :', fromNullableGender($user.gender[0]))
 
 	//console.log('fromBigIntBirth', fromBigInt(userObj.birth))
 
 }
-onMount(() => {
-	
-});
 
 
 const handle = () => {
@@ -91,7 +106,7 @@ const handle = () => {
 			connect: [toNullable(userObj.connect), publicConnect],
 			about: [toNullable(userObj.about), publicAbout],
 			username: userObj.username,
-			gender: [toNullable(userObj.gender), publicGender],
+			gender: [toNullableGender(userObj.gender), publicGender],
 			birth: [toNullableDate(userObj.birth), publicBirth]
 				// birth needs a date to bigint transform
 		}
@@ -126,7 +141,7 @@ const handle = () => {
 		<strong>User data</strong><br />
 		username: {$user.username}<br />
 		created: {fromBigInt($user.created)}<br />
-		gender: {$user.gender[1]} {$user.gender[0]}<br />
+		gender: {$user.gender[1]} {$user.gender[0][0]}<br />
 		birth: {$user.birth[1]} {userObj.birth}<br />
 		connect: {$user.connect[1]} {$user.connect[0]}<br />
 		about: {$user.about[1]} {$user.about[0]}<br />
@@ -146,16 +161,16 @@ const handle = () => {
 				{}
 			 -->
 		<label for="gender">Gender
-			<select bind:value={userObj.gender} >
+			<select bind:value={userObj.gender}>
 				{#each genders as gender}
 				<!-- {
 					console.log('gender.gender', gender.gender),
 					console.log('$user.gender', $user.gender[0][0]),
-					console.log('possible test', userObj.gender !== undefined &&  ? true : false)
-
+					console.log('possible test', userObj.gender !== undefined && userObj.gender.hasOwnProperty(gender.name) ? true : false),
+					console.log('teeeest', userObj.gender !== undefined ? Object.entries(userObj.gender)[0][0] : null)
 				} -->
-					<option class={gender.name} value={gender.gender} selected={userObj.gender !== undefined && userObj.gender.hasOwnProperty(gender.name) ? true : false}>
-						{gender.name}
+					<option value={gender} >
+						{gender}
 					</option>
 				{/each}
 			</select>
