@@ -4,20 +4,18 @@
 </script>
 
 <PageTransition>
-	<content class="mx-auto min-h-screen flex w-11/12 flex-col">
+	<content class="mx-auto min-h-screen flex flex-col w-auto ">
 		<!-- header/nav -->
-		<header
-			class="mx-auto flex self-center justify-between pt-2 h-12 w-11/12 fixed bg-transparant"
-		>
+		<div class=" mx-auto self-center flex justify-between px-3 md:px-8 lg:px-12 h-12 fixed w-[100%] bg-transparant" >
 			<AllkindsLogo />
 
 			<slot name="title" />
 
 			<slot name="nav" />
-		</header>
+		</div>
 
 		<!-- main content -->
-		<main class="mx-auto w-full pt-8">
+		<main class="mx-auto px-3 md:px-8 lg:px-12 pt-8 ">
 			<slot name="main" />
 		</main>
 	</content>

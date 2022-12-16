@@ -1,9 +1,7 @@
 <script lang="ts">
-	import { login } from '$lib/stores/tasks';
 	import Layout from '$lib/components/common/Layout.svelte';
 	import type { LayoutData } from './$types';
 	import DropdownNav from '$lib/components/header/DropdownNav.svelte';
-	import NavButton from '$lib/components/header/NavButton.svelte';
 
 	export let data: LayoutData;
 	// layout is actually not needed because landing is a single page, but still using it for possible future additions
@@ -11,9 +9,7 @@
 
 <Layout>
 	<svelte:fragment slot="nav">
-		<DropdownNav links={data} path="#">
-			<NavButton on:click={login}>login</NavButton>
-		</DropdownNav>
+		<DropdownNav links={data} path="#" />
 	</svelte:fragment>
 	<slot slot="main" />
 </Layout>

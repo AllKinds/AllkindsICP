@@ -2,22 +2,20 @@
 	import DarkMode from './DarkMode.svelte';
 	import NavBars from '$lib/assets/icons/navBars.svg?component';
 	import NavX from '$lib/assets/icons/navX.svg?component';
+	import LoginBtn from '../common/LoginBtn.svelte';
 
-	let visible = false;
+	let visible: boolean = false;
 	export let links: any;
 	export let path: any;
 
 	function toggleVissible() {
 		visible = !visible;
 	}
+
 </script>
 
-<!-- GOTTA REWORK THIS: 
-	either 1) upgrade this with option for goto route link + option siepanel
-					2) have this for landing and registration only and make seperate w sidepanel for app -->
-
 <div class="flex flex-col items-end">
-	<div class="pt-1 shrink-0 self-end " on:click={toggleVissible} on:keydown={toggleVissible}>
+	<div class="pt-2 shrink-0 self-end " on:click={toggleVissible} on:keydown={toggleVissible}>
 		{#if !visible}
 			<NavBars class="w-8 m-auto" />
 		{:else}
@@ -39,7 +37,7 @@
 					{/each}
 					<div class="h-0.5 my-1 w-full bg-gradient-to-br from-DF-purple to-DF-orange" />
 				{/if}
-				<slot />
+				<LoginBtn />
 				<DarkMode />
 			</div>
 		</div>
