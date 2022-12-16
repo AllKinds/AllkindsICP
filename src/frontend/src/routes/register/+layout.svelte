@@ -1,7 +1,6 @@
 <script lang="ts">
 	import Layout from '$lib/components/common/Layout.svelte';
 	import DropdownNav from '$lib/components/header/DropdownNav.svelte';
-	import NavButton from '$lib/components/header/NavButton.svelte';
 	import { goto } from '$app/navigation';	
 	import { logout } from '$lib/stores/tasks';
 	import { regiStore } from '$lib/stores';
@@ -21,9 +20,7 @@
 
 <Layout>
 	<svelte:fragment slot="nav">
-		<DropdownNav links={undefined} path={null}>
-			<NavButton on:click={logout}>logout</NavButton>
-		</DropdownNav>
+		<DropdownNav links={undefined} path={null} />
 	</svelte:fragment>
 
 	<svelte:fragment slot="main">

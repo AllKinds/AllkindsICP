@@ -11,6 +11,8 @@
 		toNullableGender,
 		fromNullableGender 
 	} from '$lib/utilities';
+	import PublicToggle from '$lib/components/common/PublicToggle.svelte';
+	import { is_empty, is_void, null_to_empty } from 'svelte/internal';
 
 	//this could be moved to some declaration/constant somewhere else
  let genders = [
@@ -21,7 +23,7 @@
 	'Queer' 
  ]
 
-let publicMode: boolean = false
+let publicMode: boolean = true
 let publicAbout: boolean = $user.about[1]
 let publicConnect: boolean = $user.connect[1]
 let publicBirth: boolean = $user.birth[1]
@@ -40,6 +42,7 @@ let userObj = {
 
 
 const handle = () => {
+	//sets the new user object to update
 	const newUser: User = {
 			created: $user.created,
 			connect: [toNullable(userObj.connect), publicConnect],
@@ -64,6 +67,15 @@ const handle = () => {
 		<br />
 		<h3>Test out profile edit</h3>
 		<br /> -->
+		
+		<label for="username">username
+			<input
+				type="text"
+				id="username"
+				class="inputfield"
+				bind:value={userObj.username}
+			/>
+		</label>
 
 		<label for="gender">Gender
 			<select bind:value={userObj.gender}>
@@ -73,11 +85,8 @@ const handle = () => {
 					</option>
 				{/each}
 			</select>
-			<input
-				type="checkbox"
-				id="togglePublic"
-				bind:checked={publicGender}
-			/>
+			<PublicToggle bind:checked={publicGender}/>
+			
 		</label>
 
 		<label for="birth">birth
@@ -88,26 +97,10 @@ const handle = () => {
 				bind:value={userObj.birth}
        	min="1920-01-01" max="2022-01-01"
 			/>
-			<input
-				type="checkbox"
-				id="togglePublic"
-				bind:checked={publicBirth}
-			/>
+			<PublicToggle bind:checked={publicBirth}/>
 		</label>			
 	
-		<label for="username">username
-			<input
-				type="text"
-				id="username"
-				class="inputfield"
-				bind:value={userObj.username}
-			/>
-			<input
-				type="checkbox"
-				id="togglePublic"
-				bind:checked={publicMode}
-			/>
-		</label>
+		
 
 		<label for="connect">email
 			<input
@@ -116,10 +109,7 @@ const handle = () => {
 				class="inputfield"
 				bind:value={userObj.connect}
 			/>
-			<input
-				type="checkbox"
-				bind:checked={publicConnect}
-			/>
+			<PublicToggle bind:checked={publicConnect}/>
 		</label>
 
 		<label for="about">about
@@ -129,13 +119,10 @@ const handle = () => {
 				class="inputfield"
 				bind:value={userObj.about}
 			/>
-			<input
-				type="checkbox"
-				bind:checked={publicAbout}
-			/>
+			<PublicToggle bind:checked={publicAbout}/>
 		</label>
 
-		<Button on:click={handle}>test</Button>
+		<Button on:click={handle}>Update Profile</Button>
 	
 	</div>
 </div>

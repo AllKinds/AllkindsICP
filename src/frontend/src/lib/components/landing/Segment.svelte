@@ -1,4 +1,5 @@
-<div class="flex flex-col md:flex-row items-start justify-start py-6 md:py-24">
+<div class="flex flex-col md:flex-row items-start justify-start py-6 md:py-12 md:max-h-screen ">
+
 	<!-- segment left column -->
 	<div class="flex flex-col gap-1 md:gap-3 xl:max-w-[70%]">
 		{#if $$slots.title} <slot name="title" /> {/if}
@@ -8,10 +9,10 @@
 	</div>
 
 	<!-- segment right column -->
-
 	{#if $$slots.img}
-		<div class="flex self-center justify-center md:min-w-fit">
+		<div class="flex self-center justify-center ">
 			<slot name="img" />
 		</div>
 	{/if}
+
 </div>

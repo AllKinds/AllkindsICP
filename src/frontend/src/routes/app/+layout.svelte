@@ -1,12 +1,11 @@
 <script lang="ts">
 	import type { LayoutData } from './$types';
 	import Layout from '$lib/components/common/Layout.svelte';
-	import DropdownNav from '$lib/components/header/DropdownNav.svelte';
-	import NavButton from '$lib/components/header/NavButton.svelte';
-	import { logout, syncAuth } from '$lib/stores/tasks';
-	import { onMount } from 'svelte';
+	import SidepanelNav from '$lib/components/header/SidepanelNav.svelte';
+	import { sidepanelToggle } from '$lib/stores';
+	import BorderBox from '$lib/components/common/BorderBox.svelte';
 	
-	export let data: LayoutData;
+	//export let data: LayoutData;
 
 
 
@@ -15,15 +14,21 @@
 	// 	syncAuth()
 	// })
 </script>
+<div class="flex flex-row">
+	<div class="grow">
+		<Layout>
+			<svelte:fragment slot="nav">
+				<SidepanelNav />
+			</svelte:fragment>
 
-<Layout>
-	<svelte:fragment slot="nav">
-		<DropdownNav links={data} path="/app/">
-			<NavButton on:click={logout}>logout</NavButton>
-		</DropdownNav>
-	</svelte:fragment>
+			<svelte:fragment slot="main">
+				<slot />
+			</svelte:fragment>
+		</Layout>
+	</div>
+{#if $sidepanelToggle}
+<div class="bg-slate-900 h-screen w-80 absolute right-0" on:mouseleave={() => sidepanelToggle.set(!$sidepanelToggle)} >
 
-	<svelte:fragment slot="main">
-		<slot />
-	</svelte:fragment>
-</Layout>
+</div>
+{/if}
+</div>

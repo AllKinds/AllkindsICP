@@ -16,17 +16,10 @@
 		fromNullableGender 
 	} from '$lib/utilities';
 	import { syncAuth } from '$lib/stores/tasks';
+	import Input from '$lib/components/common/Input.svelte';
+	import PublicToggle from '$lib/components/common/PublicToggle.svelte';
 
-	//this could be moved to some declaration/constant somewhere else
- let genders = [
-	'',
- 	'Male' ,
-	'Female' ,
-	'Other',
-	'Queer' 
- ]
 
-let publicMode: boolean = false
 let publicAbout: boolean = $user.about[1]
 let publicConnect: boolean = $user.connect[1]
 let publicBirth: boolean = $user.birth[1]
@@ -59,81 +52,60 @@ let userObj = {
 <div class="flex flex-col justify-center items-center">
 	
 	<h2>Setup your profile</h2>
-	<span>You can also do this later</span>
-	<br/>
-	<BorderBox fill="brand-gradient-br">
-		<div class="dark:bg-slate-800 w-auto flex flex-col align-items-center justify-between bg-slate-100 rounded-md p-2">
+	<span>(You can also do this later)</span>
 
-			
+	<div class="">
+		<Input text="Gender">
+		<select bind:value={userObj.gender} slot="input">
+			{#each [ '', 'Male' , 'Female' , 'Other', 'Queer' ] as gender}
+				<option value={gender} >
+					{gender}
+				</option>
+			{/each}
+		</select>
+		<PublicToggle slot="public" bind:checked={publicGender}/>
+	</Input>
 
-		<label for="gender">Gender
-			<select bind:value={userObj.gender}>
-				{#each genders as gender}
-					<option value={gender} >
-						{gender}
-					</option>
-				{/each}
-			</select>
-			<input
-				type="checkbox"
-				id="togglePublic"
-				bind:checked={publicGender}
-			/>
-		</label>
+	<Input text="Birthday">
+		<input
+			type="date"
+			class="inputfield"
+			slot="input"
+			bind:value={userObj.birth}
+			min="1920-01-01" max="2022-01-01"
+		/>
+		<PublicToggle slot="public" bind:checked={publicBirth}/>
+	</Input> 	
 
-		<label for="birth">birth
-			<input 
-				type="date" 
-				id="birth" 
-				class="inputfield"
-				bind:value={userObj.birth}
-       	min="1920-01-01" max="2022-01-01"
-			/>
-			<input
-				type="checkbox"
-				id="togglePublic"
-				bind:checked={publicBirth}
-			/>
-		</label>			
+	<Input text="Email">
+		<input
+			type="email"
+			class="inputfield"
+			slot="input"
+			bind:value={userObj.connect}
+		/>
+		<PublicToggle slot="public" bind:checked={publicConnect}/>
+	</Input> 
 
-		<label for="connect">email
-			<input
-				type="email"
-				id="connect"
-				class="inputfield"
-				bind:value={userObj.connect}
-			/>
-			<input
-				type="checkbox"
-				bind:checked={publicConnect}
-			/>
-		</label>
-
-		<label for="about">about
-			<input
-				type="text"
-				id="about"
-				class="inputfield"
-				bind:value={userObj.about}
-			/>
-			<input
-				type="checkbox"
-				bind:checked={publicAbout}
-			/>
-		</label>
-		</div>
-	</BorderBox>
-	<div class="w-fit h-fit mx-auto">
-		<Button on:click={submit}>Continue</Button>
+	<Input text="About you">
+		<textarea
+			type="textfield"
+			class="inputfield"
+			slot="input"
+			bind:value={userObj.about}
+		/>
+		
+		<PublicToggle slot="public" bind:checked={publicAbout}/>
+	</Input> 
 	</div>
+	
+
+	<Button on:click={submit}>Continue</Button>
 </div>
 
 
 <style style lang="postcss">
-	label {
-		@apply flex justify-between m-2;
-	}
-	.inputfield, option, select {
+	.inputfield, option, select, input {
 		@apply bg-slate-600 p-1 rounded-md ;
 	}
 </style>
