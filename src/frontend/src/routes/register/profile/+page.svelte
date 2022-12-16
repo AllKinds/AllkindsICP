@@ -54,7 +54,7 @@ let userObj = {
 	<h2>Setup your profile</h2>
 	<span>(You can also do this later)</span>
 
-	<div class=" justify-around p-5">
+	<div class="">
 		<Input text="Gender">
 		<select bind:value={userObj.gender} slot="input">
 			{#each [ '', 'Male' , 'Female' , 'Other', 'Queer' ] as gender}
