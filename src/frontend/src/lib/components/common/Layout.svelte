@@ -11,6 +11,8 @@
 		>
 			<AllkindsLogo />
 
+			<slot name="title" />
+
 			<slot name="nav" />
 		</header>
 

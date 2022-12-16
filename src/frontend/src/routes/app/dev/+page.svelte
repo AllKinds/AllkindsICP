@@ -40,6 +40,7 @@ let userObj = {
 
 
 const handle = () => {
+	//sets the new user object to update
 	const newUser: User = {
 			created: $user.created,
 			connect: [toNullable(userObj.connect), publicConnect],
