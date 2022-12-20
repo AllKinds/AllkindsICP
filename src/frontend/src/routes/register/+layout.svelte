@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Layout from '$lib/components/common/Layout.svelte';
-	import DropdownNav from '$lib/components/header/DropdownNav.svelte';
+	import DropdownNav from '$lib/components/nav/DropdownNav.svelte';
 	import { goto } from '$app/navigation';	
 	import { logout } from '$lib/stores/tasks';
 	import { regiStore } from '$lib/stores';
@@ -20,7 +20,7 @@
 
 <Layout headerBg={'bg-transparant'}>
 	<svelte:fragment slot="nav">
-		<DropdownNav links={undefined} path={null} />
+		<DropdownNav data={undefined}/>
 	</svelte:fragment>
 
 	<svelte:fragment slot="main">
