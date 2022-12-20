@@ -7,7 +7,7 @@
 	// layout is actually not needed because landing is a single page, but still using it for possible future additions
 </script>
 
-<Layout>
+<Layout headerBg={'bg-transparant'}>
 	<svelte:fragment slot="nav">
 		<DropdownNav links={data} path="#" />
 	</svelte:fragment>

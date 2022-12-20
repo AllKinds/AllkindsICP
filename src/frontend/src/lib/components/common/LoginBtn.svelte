@@ -5,11 +5,11 @@
 </script>
 
 <a 
-  class="hover:bg-gray-300 dark:hover:bg-slate-600 w-fit decoration-transparent rounded-md px-2 font-semibold cursor-pointer"
+  class=" hover:bg-slate-300 dark:hover:bg-slate-600 w-fit decoration-transparent rounded-md px-2 font-semibold cursor-pointer"
   href={null}
-  on:click={$authStore === AuthState.LoggedIn ? logout : login}
+  on:click={$authStore === AuthState.LoggedIn || $authStore === AuthState.Registered ? logout : login}
 >
-  {#if $authStore === AuthState.LoggedIn}
+  {#if $authStore === AuthState.LoggedIn || $authStore === AuthState.Registered}
     Logout
   {:else}
     Login

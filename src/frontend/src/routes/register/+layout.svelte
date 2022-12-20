@@ -18,7 +18,7 @@
 	}
 </script>
 
-<Layout>
+<Layout headerBg={'bg-transparant'}>
 	<svelte:fragment slot="nav">
 		<DropdownNav links={undefined} path={null} />
 	</svelte:fragment>

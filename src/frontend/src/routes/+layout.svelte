@@ -8,12 +8,11 @@
 	$: {
 		//can be changed in future to make landing accessible while being logged in
 		if ($rootStore === RootState.Landing || $authStore === AuthState.LoggedOut) {
-			goto('/');
+			goto('/landing');
 		} else if ($rootStore === RootState.Register || $authStore === AuthState.LoggedIn) {
 			goto('/register/username');
 		} else if ($rootStore === RootState.App || $authStore === AuthState.Registered) {
-			goto('/app/dev');
-			//temporary to dev
+			goto('/app/home');
 		}
 	}
 

@@ -31,7 +31,7 @@
 				{#if links}
 					{#each links.sections as section}
 						<a
-							class="hover:bg-slate-200 dark:hover:bg-slate-600 w-fit  decoration-transparent rounded-md px-2"
+							class="hover:bg-slate-300 dark:hover:bg-slate-600 w-fit  decoration-transparent rounded-md px-2"
 							href="{path}{section.slug}">{section.title}</a
 						>
 					{/each}
