@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Button from '$lib/components/common/Button.svelte';
 	import { rootStore } from '$lib/stores';
 	import { RootState } from '$lib/stores/types';
 
@@ -26,6 +25,19 @@
 	<h2>Well done!</h2>
 	<span>Profile finished</span>
 	<div class="w-fit h-fit mx-auto">
-		<Button on:click={submit}>Continue</Button>
+		<div class="
+      bg-gradient-to-br from-DF-blue via-DF-red to-DF-yellow
+      font-semibold 
+      p-0.5 
+      w-fit 
+      my-10
+      md:mx-0
+      rounded-full 
+      cursor-pointer
+    ">
+      <button class="fancy-btn" on:click>
+          Continue
+      </button>
+    </div>
 	</div>
 </div>

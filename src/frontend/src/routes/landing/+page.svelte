@@ -3,7 +3,6 @@
 	import Proto1 from '$lib/assets/images/proto-1.svg?url';
 	import Segment from '$lib/components/landing/Segment.svelte';
 	import Grid from '$lib/components/landing/Grid.svelte';
-	import Button from '$lib/components/common/Button.svelte';
 
 	// these arrays with text could be put in a own directory in future
 	const howWorksArr = [
@@ -63,7 +62,20 @@ should be done alot cleaner with datatype structure objects I think -->
 		to social services.
 	</p>
 	<svelte:fragment slot="extra">
-		<Button on:click={login}>Join Alpha #0</Button>
+		<div class="
+      bg-gradient-to-br from-DF-blue via-DF-red to-DF-yellow
+      font-semibold 
+      p-0.5 
+      w-fit 
+      my-10
+      md:mx-0
+      rounded-full 
+      cursor-pointer
+    ">
+      <button class="fancy-btn" on:click={login}>
+          Join Alpha #0
+      </button>
+    </div>
 	</svelte:fragment>
 	<svelte:fragment slot="img">
 		<img src={Proto1} alt="Screenshot of Allkinds Dapp" />

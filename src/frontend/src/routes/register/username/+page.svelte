@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Button from '$lib/components/common/Button.svelte';
 	import BorderBox from '$lib/components/common/BorderBox.svelte';
 
 	import { regiStore, actor } from '$lib/stores';
@@ -46,6 +45,19 @@
 		/>
 	</BorderBox>
 	<div class="w-fit h-fit mx-auto">
-		<Button on:click={register}>Register</Button>
+		<div class="
+      bg-gradient-to-br from-DF-blue via-DF-red to-DF-yellow
+      font-semibold 
+      p-0.5 
+      w-fit 
+      my-10
+      md:mx-0
+      rounded-full 
+      cursor-pointer
+    ">
+      <button class="fancy-btn" on:click={register}>
+          Register
+      </button>
+    </div>
 	</div>
 </div>
