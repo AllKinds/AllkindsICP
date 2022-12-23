@@ -1,6 +1,7 @@
+<!-- depreciated and unused -->
 <div
 	class="
-  brand-gradient-r 
+  bg-gradient-to-br from-DF-blue via-DF-red to-DF-yellow
   font-semibold 
   p-0.5 
   w-fit 
