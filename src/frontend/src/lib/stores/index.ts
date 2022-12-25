@@ -1,7 +1,6 @@
 //groups all stores
 import { rootStore, regiStore } from './tasks/routing';
 import { authStore, actor, user } from './tasks/auth';
-import { sidepanelToggle } from './tasks/sidepanel';
 
 
 export {
@@ -9,6 +8,5 @@ export {
   actor,
   user,
   rootStore,
-  regiStore,
-  sidepanelToggle
+  regiStore
 }

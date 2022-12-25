@@ -1,15 +1,15 @@
 <script lang="ts">
 	import Layout from '$lib/components/common/Layout.svelte';
 	import type { LayoutData } from './$types';
-	import DropdownNav from '$lib/components/header/DropdownNav.svelte';
+	import DropdownNav from '$lib/components/nav/DropdownNav.svelte';
 
 	export let data: LayoutData;
 	// layout is actually not needed because landing is a single page, but still using it for possible future additions
 </script>
 
-<Layout>
+<Layout headerBg={'bg-transparant'}>
 	<svelte:fragment slot="nav">
-		<DropdownNav links={data} path="#" />
+		<DropdownNav {data} />
 	</svelte:fragment>
 	<slot slot="main" />
 </Layout>

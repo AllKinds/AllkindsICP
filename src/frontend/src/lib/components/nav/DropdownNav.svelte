@@ -1,17 +1,17 @@
 <script lang="ts">
+	import DarkMode from './DarkMode.svelte';
 	import NavBars from '$lib/assets/icons/navBars.svg?component';
 	import NavX from '$lib/assets/icons/navX.svg?component';
-	import { sidepanelToggle } from '$lib/stores';
+	import Nav from './Nav.svelte';
+	import type { LayoutData } from '../../../routes/$types';
 
 	let visible: boolean = false;
+	export let data: LayoutData | undefined;
 
 	function toggleVissible() {
 		visible = !visible;
-    sidepanelToggle.set(visible)
 	}
 
-  $: { visible && !$sidepanelToggle ? toggleVissible() : null } 
-  //above line helps to update hiding sidepanel when user moves out of it
 </script>
 
 <div class="flex flex-col items-end">
@@ -22,4 +22,10 @@
 			<NavX class="w-8 m-auto" />
 		{/if}
 	</div>
+
+	{#if visible}
+		<div on:mouseleave={toggleVissible}>
+			<Nav {data} path='#'/>
+		</div>
+	{/if}
 </div>

@@ -1,22 +1,35 @@
 <script lang="ts">
-	import AllkindsLogo from '../common/AllkindsLogo.svelte';
 	import PageTransition from './PageTransition.svelte';
+	export let headerBg: string
 </script>
 
+
+
 <PageTransition>
-	<content class="mx-auto min-h-screen flex flex-col w-auto ">
+	<div class="mx-auto min-h-screen flex flex-col ">
 		<!-- header/nav -->
-		<div class=" mx-auto self-center flex justify-between px-3 md:px-8 lg:px-12 h-12 fixed w-[100%] bg-transparant" >
-			<AllkindsLogo />
-
-			<slot name="title" />
-
-			<slot name="nav" />
+		<div class="{headerBg} h-12 fixed w-[100%] " >
+			<div class="mx-auto self-center bg-transparent flex justify-between h-12 w-11/12 xl:w-10/12 ">
+				<div class="
+					self-center
+					font-semibold 
+					text-lg 
+					bg-clip-text 
+					text-transparent 
+					bg-gradient-to-r from-DF-blue via-DF-red to-DF-yellow
+				">
+					Allkinds
+				</div>
+			
+				<slot name="title" /> <!--unused -->
+			
+				<slot name="nav" />
+			</div>
 		</div>
 
 		<!-- main content -->
-		<main class="mx-auto px-3 md:px-8 lg:px-12 pt-8 ">
+		<div class="mx-auto pt-7 w-11/12 xl:w-10/12">
 			<slot name="main" />
-		</main>
-	</content>
+		</div>
+	</div>
 </PageTransition>

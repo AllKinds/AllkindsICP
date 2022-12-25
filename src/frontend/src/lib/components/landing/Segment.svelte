@@ -1,4 +1,4 @@
-<div class="flex flex-col md:flex-row items-start justify-start py-6 md:py-12 md:max-h-screen ">
+<div class="flex flex-col md:flex-row items-start justify-between py-6 md:py-12 md:max-h-screen ">
 
 	<!-- segment left column -->
 	<div class="flex flex-col gap-1 md:gap-3 xl:max-w-[70%]">

@@ -1,6 +1,4 @@
 <script lang="ts">
-	import Button from '$lib/components/common/Button.svelte';
-	import BorderBox from '$lib/components/common/BorderBox.svelte';
 	import { regiStore } from '$lib/stores';
 	import { RegiState } from '$lib/stores/types';
 
@@ -15,7 +13,6 @@
 		toNullableGender,
 		fromNullableGender 
 	} from '$lib/utilities';
-	import { syncAuth } from '$lib/stores/tasks';
 	import Input from '$lib/components/common/Input.svelte';
 	import PublicToggle from '$lib/components/common/PublicToggle.svelte';
 
@@ -99,13 +96,25 @@ let userObj = {
 	</Input> 
 	</div>
 	
-
-	<Button on:click={submit}>Continue</Button>
+	<div class="
+      bg-gradient-to-br from-DF-blue via-DF-red to-DF-yellow
+      font-semibold 
+      p-0.5 
+      w-fit 
+      my-10
+      md:mx-0
+      rounded-full 
+      cursor-pointer
+    ">
+      <button class="fancy-btn" on:click={submit}>
+          Continue
+      </button>
+    </div>
 </div>
 
 
 <style style lang="postcss">
 	.inputfield, option, select, input {
-		@apply bg-slate-600 p-1 rounded-md ;
+		@apply bg-slate-600 p-1 rounded-md outline-none;
 	}
 </style>

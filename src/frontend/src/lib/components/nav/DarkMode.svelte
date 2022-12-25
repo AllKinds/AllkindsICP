@@ -24,7 +24,7 @@
 			{#if darkMode}
 				<Sun />
 			{:else}
-				<Moon class="ml-5 h-4.5" />
+				<Moon class="ml-5 h-5 "/>
 			{/if}
 		</label>
 	</span>
@@ -35,16 +35,13 @@
 		display: none;
 	}
 	.toggle label {
-		@apply inline-block cursor-pointer relative transition-all ease-in-out duration-300 w-12 h-auto rounded-3xl border border-solid border-gray-700 bg-slate-100;
+		@apply inline-block cursor-pointer relative transition-all ease-in-out duration-300 w-12 h-6 rounded-3xl border border-solid border-gray-700 bg-slate-300;
 	}
 	.toggle label::after {
 		content: attr(data-dark);
 		@apply flex items-center justify-center rounded-full cursor-pointer absolute top-px left-px transition-all ease-in-out duration-300 w-5 h-5 bg-transparent align-middle;
 	}
 	.toggle input[type='checkbox']:checked ~ label {
-		@apply bg-gray-500;
-	}
-	.toggle input[type='checkbox']:checked ~ label::after {
-		transform: translateX(24px);
+		@apply bg-slate-700;
 	}
 </style>
