@@ -1,8 +1,8 @@
 <script lang="ts">
 	import BorderBox from '$lib/components/common/BorderBox.svelte';
 
-	import { regiStore, actor } from '$lib/stores';
-	import { syncAuth } from '$lib/stores/tasks';
+	import { regiStore, actor } from '$lib/stores/';
+	import { syncAuth } from '$lib/stores/tasks/';
 	import { RegiState } from '$lib/stores/types';
 
 	let username: string;

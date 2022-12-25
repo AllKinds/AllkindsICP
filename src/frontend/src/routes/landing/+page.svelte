@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { login } from '$lib/stores/tasks';
+	import { login } from '$lib/stores/tasks/index';
 	import Proto1 from '$lib/assets/images/proto-1.svg?url';
 	import Segment from '$lib/components/landing/Segment.svelte';
 	import Grid from '$lib/components/landing/Grid.svelte';

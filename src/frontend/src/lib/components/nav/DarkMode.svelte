@@ -35,7 +35,7 @@
 		display: none;
 	}
 	.toggle label {
-		@apply inline-block cursor-pointer relative transition-all ease-in-out duration-300 w-12 h-6 rounded-3xl border border-solid border-gray-700 bg-slate-300;
+		@apply inline-block cursor-pointer relative transition-all ease-in-out duration-300 w-12 h-6 rounded-3xl border border-solid border-gray-700 bg-slate-200;
 	}
 	.toggle label::after {
 		content: attr(data-dark);

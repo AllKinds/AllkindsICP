@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { logout, login } from '$lib/stores/tasks';
-	import { authStore } from '$lib/stores';
+  import { logout, login } from '$lib/stores/tasks/';
+	import { authStore } from '$lib/stores/';
 	import { AuthState } from '$lib/stores/types';
 </script>
 

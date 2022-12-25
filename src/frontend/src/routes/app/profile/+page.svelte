@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Button from '$lib/components/common/Button.svelte';
-	import { user } from '$lib/stores';
+	import { user } from '$lib/stores/index';
 	import type { User } from 'src/declarations/backend/backend.did';
 	import { updateProfile } from '$lib/stores/tasks/updateProfile';
 	import { 
@@ -60,7 +60,7 @@ const handle = () => {
 <div class="flex flex-col gap-4">
   <h2 class="p-0">Profile settings</h2>
   <span class="text-slate-600 flex"><Eye/> : Allow what people can initially see about you.</span>
-  <div class="bg-slate-700 w-full rounded-md flex flex-col p-2 md:p-8">
+  <div class="dark:bg-slate-700 bg-slate-100 w-full rounded-md flex flex-col p-2 md:p-8">
 		<!-- <strong>User data</strong><br />
 		username: {$user.username}<br />
 		created: {fromBigInt($user.created)}<br />
@@ -141,7 +141,7 @@ const handle = () => {
 
 <style style lang="postcss">
 	label {
-		@apply flex m-2;
+		@apply flex my-2;
     
 	}
   span {
@@ -149,7 +149,7 @@ const handle = () => {
   }
 
 	.inputfield, option, select, textarea {
-		@apply bg-slate-600 p-1 rounded-md outline-none mr-1;
+		@apply bg-slate-500 p-1 rounded-md outline-none mr-1;
 	}
 
 </style>

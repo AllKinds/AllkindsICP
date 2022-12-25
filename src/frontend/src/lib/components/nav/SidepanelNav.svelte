@@ -23,7 +23,7 @@
 	</div>
 
   {#if visible}
-		<div class="pt-12 dark:bg-slate-900 bg-slate-100 p-3 h-screen fixed right-0 " on:mouseleave={toggleVissible}>
+		<div class="pt-12 dark:bg-slate-900 bg-neutral-100 p-3 h-screen fixed right-0 " on:mouseleave={toggleVissible}>
 			<Nav {data} path=""/>
 		</div>
 	{/if}

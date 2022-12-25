@@ -21,7 +21,7 @@
     {#if checked}
       <Eye />
     {:else if !checked }
-      <EyeSlash/>
+      <EyeSlash />
     {/if}
   </label>
 </span>

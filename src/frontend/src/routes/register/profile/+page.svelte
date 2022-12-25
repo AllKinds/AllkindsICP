@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { regiStore } from '$lib/stores';
+	import { regiStore } from '$lib/stores/';
 	import { RegiState } from '$lib/stores/types';
 
-	import { user } from '$lib/stores';
+	import { user } from '$lib/stores/';
 	import type { Gender, User } from 'src/declarations/backend/backend.did';
 	import { updateProfile } from '$lib/stores/tasks/updateProfile';
 	import { 

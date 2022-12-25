@@ -1,4 +1,4 @@
-<div class="bg-slate-700 w-full rounded-md mx-auto flex flex-col justify-center items-center p-2 md:p-3 lg:p-5">
+<div class="dark:bg-slate-700 bg-slate-100 w-full rounded-md mx-auto flex flex-col justify-center items-center p-2 md:p-3 lg:p-5">
   <h2 class=" w-fit">Would you try to say 'Hello World?'</h2>
   <div class="w-full flex flex-row justify-center items-center dark:text-slate-700">
       <div class="bg-green-300 hover:bg-green-400 h-24 w-6/12 cursor-pointer rounded-l-lg flex justify-center items-center">

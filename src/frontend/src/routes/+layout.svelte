@@ -2,7 +2,7 @@
 	import '../../../app.postcss';
 	import { browser } from '$app/environment';
 	import { goto } from '$app/navigation';
-	import { rootStore, authStore, user, actor, } from '$lib/stores';
+	import { rootStore, authStore, user, actor, } from '$lib/stores/';
 	import { RootState, AuthState} from '$lib/stores/types';
 
 	$: {

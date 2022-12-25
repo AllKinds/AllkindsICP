@@ -1,6 +1,7 @@
 //groups all stores
-import { rootStore, regiStore } from './tasks/routing';
+import { rootStore, regiStore, appStore } from './tasks/routing';
 import { authStore, actor, user } from './tasks/auth';
+import { questions } from './tasks/getQuestions';
 
 
 export {
@@ -8,5 +9,7 @@ export {
   actor,
   user,
   rootStore,
-  regiStore
+  regiStore,
+  appStore,
+  questions
 }

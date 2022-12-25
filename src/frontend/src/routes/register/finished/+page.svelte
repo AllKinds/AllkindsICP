@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { rootStore } from '$lib/stores';
+	import { rootStore } from '$lib/stores/';
 	import { RootState } from '$lib/stores/types';
 
 	//import update profile call from +page.ts?
