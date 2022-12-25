@@ -115,6 +115,6 @@ let userObj = {
 
 <style style lang="postcss">
 	.inputfield, option, select, input {
-		@apply bg-slate-600 p-1 rounded-md ;
+		@apply bg-slate-600 p-1 rounded-md outline-none;
 	}
 </style>

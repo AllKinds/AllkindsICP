@@ -8,28 +8,33 @@
 
 </script>
 
-		<Layout headerBg={'dark:bg-gradient-to-r dark:from-slate-800/90 dark:to-slate-800 bg-slate-200'}>
-			<svelte:fragment slot="nav">
-				<SidepanelNav {data} />
-			</svelte:fragment>
+<Layout headerBg={'dark:bg-gradient-to-r dark:from-slate-800/90 dark:to-slate-800 bg-slate-200'}>
+	<svelte:fragment slot="nav">
+		<SidepanelNav {data} />
+	</svelte:fragment>
 
-			<svelte:fragment slot="main">
-				<div class="flex flex-row justify-center mt-10 gap-5">
+	<svelte:fragment slot="main">
+		<div class="flex flex-row justify-center mt-8 gap-5">
 
-					<!-- <div class="dark:bg-slate-800 bg-slate-100 h-screen w-56 rounded-lg max-xl:hidden">
-					</div> -->
+			<!-- <div class="dark:bg-slate-800 bg-slate-100 h-screen w-32 rounded-lg max-sm:hidden">
+				left sided column, possible for menu icons
+			</div> -->
 
-					<div class="bg-gradient-to-b from-DF-blue via-DF-red to-DF-yellow w-full rounded-lg ">
-						<div class="dark:bg-slate-800/95 h-full bg-slate-200 rounded-lg">
-							<slot />
-						</div>
-					</div>
-
-					<div class="h-screen w-44 mx-auto max-xl:hidden rounded-lg">
-						<Nav {data} path=""/>
-					</div>
-				
+			<div class="bg-gradient-to-b from-DF-blue via-DF-red to-DF-yellow h-fit w-full rounded-lg">
+				<div class="dark:bg-slate-800/95 bg-slate-200 h-screen rounded-lg p-2 md:p-5">
+					<slot />
 				</div>
-				
-			</svelte:fragment>
-		</Layout>
+			</div>
+
+			<div class="h-screen w-44 mx-auto max-xl:hidden rounded-lg">
+				<Nav {data} path=""/>
+			</div>
+		
+		</div>
+	</svelte:fragment>
+	
+</Layout>
+
+<!-- <div class="flex bg-slate-800 w-full h-14 fixed bottom-0 sm:hidden rounded-t-lg">
+		left sided col replacement for mobile view, is sticky to bottom
+</div> -->

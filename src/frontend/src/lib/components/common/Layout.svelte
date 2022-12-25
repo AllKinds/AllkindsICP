@@ -28,7 +28,7 @@
 		</div>
 
 		<!-- main content -->
-		<div class="mx-auto pt-8 w-11/12 xl:w-10/12">
+		<div class="mx-auto pt-7 w-11/12 xl:w-10/12">
 			<slot name="main" />
 		</div>
 	</div>

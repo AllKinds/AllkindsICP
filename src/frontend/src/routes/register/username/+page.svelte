@@ -40,7 +40,7 @@
 		<input
 			type="text"
 			id="username"
-			class="bg-slate-600 w-56 p-1 rounded-md"
+			class="bg-slate-600 w-56 p-1 rounded-md outline-none"
 			bind:value={username}
 		/>
 	</BorderBox>
