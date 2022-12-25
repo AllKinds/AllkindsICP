@@ -1,14 +1,14 @@
 import { actor } from '$lib/stores';
-import type { Question } from 'src/declarations/backend/backend.did';
 import { get, writable } from 'svelte/store';
 
-
-export let questions = writable<any>();
+export const questions = writable<Array<[]>>()
 
 export async function getQuestions() {
   const localActor = get(actor)
-  await localActor.getAskableQuestions().then((res) => {
+  return await localActor.getAskableQuestions().then((res) => {
     console.log(res.ok)
+    questions.set(res.ok)
+   
     //questions.set(res.ok)
   })
   

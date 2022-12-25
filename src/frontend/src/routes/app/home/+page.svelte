@@ -6,11 +6,11 @@
 	import Button from "$lib/components/common/Button.svelte";
 	import { onMount } from "svelte";
 	import { createQuestion } from "$lib/stores/tasks/createQuestion";
-	import { questions } from "$lib/stores";
-	import { getQuestions } from "$lib/stores/tasks/getQuestions";
+	import { getQuestions, questions } from "$lib/stores/tasks/getQuestions";
 
   let expandWindow: boolean = false
   let newQ: string;
+
 
 
   function submitQ() {
@@ -19,7 +19,7 @@
   } 
 
   $: {
-    console.log('$;questions', questions)
+    console.log('$;questions', $questions)
   }
 
    onMount(() => {
@@ -56,7 +56,7 @@
       {/if}
     
   </div>
-  
+
   <Qcard/>
   <!-- <Qcard/>
   <Qcard/>
