@@ -7,6 +7,10 @@
 
   let expandWindow: boolean = false
   let newQ: string;
+
+  function submitQ() {
+    console.log('rdy to submit newQ : ', newQ)
+  }
 </script>
 
 
@@ -22,9 +26,9 @@
         
         {#if !expandWindow}
           <!-- <ChevronDown class="w-9 cursor-pointerborder-none" /> -->
-          <Add class="w-9 cursor-pointerborder-none" />
+          <Add class="iconbtn" />
         {:else if expandWindow}
-          <ChevronUp class="w-9 cursor-pointerborder-none" />
+          <ChevronUp class="iconbtn" />
         {/if}
       </button>
     
@@ -34,11 +38,11 @@
             <textarea
               type="textfield"
               class="inputfield w-full min-h-fit bg-transparent outline-none text-4xl text-center"
-              placeholder="What do you want to know about people?"
+              placeholder="What would you like to ask?"
               bind:value={newQ}
             />
 
-            <Button>Submit</Button>
+            <Button on:click={submitQ}>Submit</Button>
         </div>
       {/if}
     
