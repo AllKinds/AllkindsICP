@@ -131,7 +131,7 @@ const update = () => {
     </div>
 		
 
-		<div class="fancy-btn-border">
+		<div class="fancy-btn-border mx-auto">
       <button on:click={update} class="fancy-btn">Update</button>
     </div>
 	
