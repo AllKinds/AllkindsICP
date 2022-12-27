@@ -3,25 +3,23 @@
   import Add from "$lib/assets/icons/plus-circle.svg?component"
   import ChevronUp from "$lib/assets/icons/chevronUp.svg?component"
   import ChevronDown from "$lib/assets/icons/chevronDown.svg?component"
-	import Button from "$lib/components/common/Button.svelte";
 	import { onMount } from "svelte";
-	import { createQuestion } from "$lib/stores/tasks/createQuestion";
-	import { getQuestions, questions } from "$lib/stores/tasks/getQuestions";
+	import { createQ } from "$lib/stores/tasks/createQ";
+	import { getQs, questions } from "$lib/stores/tasks/getQs";
 	import type { Question } from "src/declarations/backend/backend.did";
 	import { syncAuth } from "$lib/stores/tasks";
 
   let expandWindow: boolean = false
   let newQ: string
 
-  function submitQ() {
-    console.log('rdy to submit newQ : ', newQ)
-    createQuestion(newQ)
-    getQuestions()
-  } 
-
    onMount(async () => {
-    await getQuestions()
+    await getQs()
    })
+
+   const submit = async () => {
+    await createQ(newQ)
+    newQ = ''
+   }
 </script>
 
 <div class="flex flex-col gap-4 ">
@@ -43,16 +41,19 @@
           
             <textarea
               type="textfield"
+              id="questionInput"
               class="inputfield w-full min-h-fit bg-transparent outline-none text-4xl text-center"
               placeholder="What would you like to ask?"
               bind:value={newQ}
             />
-
-            <Button on:click={submitQ}>Submit</Button>
+            <div class="fancy-btn-border">
+              <button on:click={submit} class="fancy-btn">Submit</button>
+            </div>
         </div>
       {/if}
     
   </div>
+
 
   {#if $questions }
     {#each $questions as question}

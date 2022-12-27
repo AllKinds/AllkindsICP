@@ -3,7 +3,7 @@ import { get, writable } from 'svelte/store';
 
 export const questions = writable<Array<[]>>()
 
-export async function getQuestions() {
+export async function getQs() {
   const localActor = get(actor)
   return await localActor.getAskableQuestions().then((res) => {
     console.log('questions: ', res.ok)

@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Button from '$lib/components/common/Button.svelte';
 	import { user } from '$lib/stores/index';
 	import type { User } from 'src/declarations/backend/backend.did';
 	import { updateProfile } from '$lib/stores/tasks/updateProfile';
@@ -42,7 +41,7 @@ let userObj = {
 
 
 
-const handle = () => {
+const update = () => {
 	//sets the new user object to update
 	const newUser: User = {
 			created: $user.created,
@@ -132,7 +131,9 @@ const handle = () => {
     </div>
 		
 
-		<Button on:click={handle}>Update Profile</Button>
+		<div class="fancy-btn-border">
+      <button on:click={update} class="fancy-btn">Update</button>
+    </div>
 	
 	</div>
   
@@ -149,7 +150,7 @@ const handle = () => {
   }
 
 	.inputfield, option, select, textarea {
-		@apply bg-slate-500 p-1 rounded-md outline-none mr-1;
+		@apply bg-slate-500 p-1 rounded-md mr-1 outline-none;
 	}
 
 </style>
