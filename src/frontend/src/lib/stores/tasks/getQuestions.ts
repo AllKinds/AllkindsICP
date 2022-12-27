@@ -6,7 +6,7 @@ export const questions = writable<Array<[]>>()
 export async function getQuestions() {
   const localActor = get(actor)
   return await localActor.getAskableQuestions().then((res) => {
-    console.log(res.ok)
+    console.log('questions: ', res.ok)
     questions.set(res.ok)
    
     //questions.set(res.ok)

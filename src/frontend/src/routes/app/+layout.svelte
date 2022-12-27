@@ -12,28 +12,29 @@
 
 </script>
 
-<Layout headerBg={'dark:bg-gradient-to-r dark:from-slate-800/90 dark:to-slate-800 bg-slate-200'}>
+<Layout headerBg={'dark:bg-gradient-to-r dark:from-slate-800/95 dark:to-slate-800 bg-slate-200'}>
 	<svelte:fragment slot="nav">
 		<SidepanelNav {data} />
 	</svelte:fragment>
 
 	<svelte:fragment slot="main">
-		<div class="flex flex-row justify-center mt-8 gap-5">
+		<div class="flex flex-row justify-center mt-8 gap-3">
 
-			<!-- <div class="dark:bg-slate-800 bg-slate-100 h-screen w-16 rounded-lg max-sm:hidden flex flex-col items-center gap-4 py-5">
-				left sided column, possible for menu icons 
-				<Home class="iconbtn" />
-				<Users class="iconbtn"/>
-				<Cogwheel class="iconbtn"/>
-			</div> -->
+			<!-- left sided col, possible for menu icon shortcuts  -->
+			<div class="dark:bg-slate-800 bg-slate-100 h-fit p-2 rounded-lg max-sm:hidden flex flex-col items-center gap-4">
+				
+				<a href="/app/home"><Home class="iconbtn" /></a>
+				<a href="/app/people"><Users class="iconbtn"/></a>
+				<a href="/app/profile"><Cogwheel class="iconbtn"/></a>
+			</div>
 
 			<div class="bg-gradient-to-b from-DF-blue via-DF-red to-DF-yellow h-fit w-full rounded-lg">
-				<div class="dark:bg-slate-800/95 bg-slate-200 h-screen rounded-lg p-2 md:p-5">
+				<div class="dark:bg-slate-800/95 bg-slate-200 rounded-lg p-2 md:p-5 ">
 					<slot />
 				</div>
 			</div>
 
-			<div class="h-screen w-44 mx-auto max-xl:hidden rounded-lg">
+			<div class="w-44 mx-auto max-xl:hidden rounded-lg">
 				<Nav {data} path=""/>
 			</div>
 		
@@ -42,6 +43,9 @@
 	
 </Layout>
 
-<!--<div class="flex bg-slate-800 w-full h-14 fixed bottom-0 sm:hidden rounded-t-lg">
-		 left sided col replacement for mobile view, is sticky to bottom
-</div> -->
+<!-- left sided col replacement for mobile view, is sticky to bottom -->
+<div class="flex bg-slate-900 w-full py-2 fixed bottom-0 sm:hidden rounded-t-lg justify-evenly">
+	<a href="/app/home"><Home class="iconbtn" /></a>
+	<a href="/app/people"><Users class="iconbtn"/></a>
+	<a href="/app/profile"><Cogwheel class="iconbtn"/></a>
+</div>

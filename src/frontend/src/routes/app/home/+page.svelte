@@ -7,27 +7,24 @@
 	import { onMount } from "svelte";
 	import { createQuestion } from "$lib/stores/tasks/createQuestion";
 	import { getQuestions, questions } from "$lib/stores/tasks/getQuestions";
+	import type { Question } from "src/declarations/backend/backend.did";
+	import { syncAuth } from "$lib/stores/tasks";
 
   let expandWindow: boolean = false
-  let newQ: string;
-
-
+  let newQ: string
 
   function submitQ() {
     console.log('rdy to submit newQ : ', newQ)
     createQuestion(newQ)
+    getQuestions()
   } 
 
-  $: {
-    console.log('$;questions', $questions)
-  }
-
-   onMount(() => {
-    getQuestions()
+   onMount(async () => {
+    await getQuestions()
    })
 </script>
 
-<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-4 ">
   <div class="dark:bg-slate-700 bg-slate-100 w-full rounded-md mx-auto flex-col p-1 md:p-2 lg:p-5 justify-between">
 
       <button class="w-full flex justify-between items-center" on:click={() => expandWindow = !expandWindow}>
@@ -57,10 +54,9 @@
     
   </div>
 
-  <Qcard/>
-  <!-- <Qcard/>
-  <Qcard/>
-  <Qcard/>
-  <Qcard/>
-  <Qcard/> -->
+  {#if $questions }
+    {#each $questions as question}
+      <Qcard {question}/>
+    {/each}
+  {/if}
 </div>

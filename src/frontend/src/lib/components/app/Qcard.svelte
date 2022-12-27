@@ -1,10 +1,23 @@
-<div class="dark:bg-slate-700 bg-slate-100 w-full rounded-md mx-auto flex flex-col justify-center items-center p-2 md:p-3 lg:p-5">
-  <h2 class=" w-fit">Would you try to say 'Hello World?'</h2>
-  <div class="w-full flex flex-row justify-center items-center dark:text-slate-700">
-      <div class="bg-green-300 hover:bg-green-400 h-24 w-6/12 cursor-pointer rounded-l-lg flex justify-center items-center">
+<script lang="ts">
+	import type { Question } from "src/declarations/backend/backend.did";
+
+
+
+  export let question: any;
+</script>
+
+
+<div class="odd:dark:bg-slate-700 even:dark:bg-slate-700/50 odd:bg-slate-100 even:bg-slate-100/50 w-full rounded-md mx-auto flex flex-col justify-center items-center p-2 md:p-3 lg:p-5">
+  <h2 class=" w-fit">{question.question}</h2>
+  <span>Created: {question.created}</span>
+  <span>Hash: {question.hash}</span>
+  <span>Color: {question.color}</span>
+  <span>Creator: {question.creater}</span>
+  <div class="w-full flex flex-row justify-center items-center dark:text-slate-700 pt-3">
+      <button class="bg-green-400 hover:bg-green-500 h-20 w-4/12 cursor-pointer rounded-l-lg flex justify-center items-center">
         <h3>YES</h3>
-      </div>
-      <div class="bg-red-300 hover:bg-red-400 h-24 w-6/12 cursor-pointer rounded-r-lg flex justify-center items-center">
+      </button>
+      <div class="bg-red-400 hover:bg-red-500 h-20 w-4/12 cursor-pointer rounded-r-lg flex justify-center items-center">
         <h3>NO</h3>
       </div>
   </div>

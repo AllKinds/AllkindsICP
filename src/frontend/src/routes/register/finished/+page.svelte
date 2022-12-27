@@ -35,7 +35,7 @@
       rounded-full 
       cursor-pointer
     ">
-      <button class="fancy-btn" on:click>
+      <button class="fancy-btn" on:click={submit}>
           Continue
       </button>
     </div>

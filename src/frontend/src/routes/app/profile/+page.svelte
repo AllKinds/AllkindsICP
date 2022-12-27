@@ -30,7 +30,7 @@ let publicConnect: boolean = $user.connect[1]
 let publicBirth: boolean = $user.birth[1]
 let publicGender: boolean = $user.gender[1]
 
-//an user object to temporary store and change OUR values , this has NO User interface
+//a user object to temporary store and change OUR values , this has NO User interface
 let userObj = { 
 	created: $user.created, 
 	connect: fromNullable($user.connect[0]),
