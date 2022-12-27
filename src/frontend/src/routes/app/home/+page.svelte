@@ -6,8 +6,6 @@
 	import { onMount } from "svelte";
 	import { createQ } from "$lib/stores/tasks/createQ";
 	import { getQs, questions } from "$lib/stores/tasks/getQs";
-	import type { Question } from "src/declarations/backend/backend.did";
-	import { syncAuth } from "$lib/stores/tasks";
 
   let expandWindow: boolean = false
   let newQ: string
