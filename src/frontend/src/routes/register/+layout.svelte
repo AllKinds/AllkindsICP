@@ -2,8 +2,7 @@
 	import Layout from '$lib/components/common/Layout.svelte';
 	import DropdownNav from '$lib/components/nav/DropdownNav.svelte';
 	import { goto } from '$app/navigation';	
-	import { logout } from '$lib/stores/tasks';
-	import { regiStore } from '$lib/stores';
+	import { regiStore } from '$lib/stores/index';
 	import { RegiState  } from '$lib/stores/types';
 
 	regiStore.set(RegiState.Username);

@@ -10,17 +10,20 @@
 	.fancy-btn {
 		@apply trans-300 rounded-full p-2 px-8 text-DF-navy bg-slate-100/90 hover:bg-slate-100/20 dark:text-slate-100 dark:bg-slate-800/80 dark:hover:bg-transparent;
 	}
+	.fancy-btn-border {
+	@apply bg-gradient-to-br from-DF-blue via-DF-red to-DF-yellow font-semibold p-0.5 w-fit my-5 md:mx-0 rounded-full 
+	}
 	.iconbtn {
-		@apply w-9 cursor-pointer border-none text-slate-200 hover:text-slate-400 bg-clip-text ;
+		@apply w-6 md:w-8 cursor-pointer border-none text-slate-800 dark:text-slate-200 dark:hover:text-slate-400 bg-clip-text hover:text-slate-600;
 	}
 }
 
 @layer base {
 	h1 {
-		@apply text-7xl md:text-9xl font-semibold py-4 md:py-10 -ml-2;
+		@apply text-7xl md:text-9xl font-semibold py-2 md:py-6 -ml-2;
 	}
 	h2 {
-		@apply text-3xl md:text-5xl font-semibold py-4 md:py-10;
+		@apply text-3xl md:text-5xl font-semibold py-2 md:py-6;
 	}
 	h3 {
 		@apply text-xl md:text-3xl font-semibold py-2 md:py-6;

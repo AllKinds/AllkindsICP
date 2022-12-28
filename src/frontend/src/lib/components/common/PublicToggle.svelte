@@ -21,7 +21,7 @@
     {#if checked}
       <Eye />
     {:else if !checked }
-      <EyeSlash/>
+      <EyeSlash />
     {/if}
   </label>
 </span>
@@ -32,6 +32,6 @@
 		display: none;
 	}
 	.toggle label {
-		@apply inline-block cursor-pointer relative transition-all ease-in-out duration-300 w-8 h-auto rounded-3xl bg-transparent hover:text-slate-400;
+		@apply inline-block cursor-pointer transition-all ease-in-out duration-300 w-8 h-auto rounded-3xl bg-transparent hover:text-slate-400;
 	}
 </style>

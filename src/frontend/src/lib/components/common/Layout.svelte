@@ -6,9 +6,9 @@
 
 
 <PageTransition>
-	<div class="mx-auto min-h-screen flex flex-col ">
+	<div class="mx-auto min-h-screen flex flex-col scroll-smooth ">
 		<!-- header/nav -->
-		<div class="{headerBg} h-12 fixed w-[100%] " >
+		<div class="{headerBg} h-12 fixed w-[100%] border-b dark:border-none	" >
 			<div class="mx-auto self-center bg-transparent flex justify-between h-12 w-11/12 xl:w-10/12 ">
 				<div class="
 					self-center

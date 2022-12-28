@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { regiStore } from '$lib/stores';
+	import { regiStore } from '$lib/stores/';
 	import { RegiState } from '$lib/stores/types';
 
-	import { user } from '$lib/stores';
+	import { user } from '$lib/stores/';
 	import type { Gender, User } from 'src/declarations/backend/backend.did';
 	import { updateProfile } from '$lib/stores/tasks/updateProfile';
 	import { 
@@ -96,20 +96,9 @@ let userObj = {
 	</Input> 
 	</div>
 	
-	<div class="
-      bg-gradient-to-br from-DF-blue via-DF-red to-DF-yellow
-      font-semibold 
-      p-0.5 
-      w-fit 
-      my-10
-      md:mx-0
-      rounded-full 
-      cursor-pointer
-    ">
-      <button class="fancy-btn" on:click={submit}>
-          Continue
-      </button>
-    </div>
+	<div class="fancy-btn-border">
+		<button on:click={submit} class="fancy-btn">Continue</button>
+	</div>
 </div>
 
 

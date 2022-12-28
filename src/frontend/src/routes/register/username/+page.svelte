@@ -1,8 +1,7 @@
 <script lang="ts">
-	import BorderBox from '$lib/components/common/BorderBox.svelte';
 
-	import { regiStore, actor } from '$lib/stores';
-	import { syncAuth } from '$lib/stores/tasks';
+	import { regiStore, actor } from '$lib/stores/';
+	import { syncAuth } from '$lib/stores/tasks/';
 	import { RegiState } from '$lib/stores/types';
 
 	let username: string;
@@ -21,43 +20,23 @@
 		}
 		input.disabled = false;
 	}
-	// const updateProfile = async () => {
-	//   let gender: Gender = { Male: null }
-	//     let user: User = {
-	//       created: BigInt(0),
-	//       connect: [["email@mail.com"], true],
-	//       about: [[a], true],
-	//       username: "shiqqqqt",
-	//       gender: [[gender], false],
-	//       birth: [[BigInt(0)], true]
-	//     }
-	//   await $actor.updateProfile(user).then((res) => console.log('res', res))
 </script>
 
 <div class="flex flex-col justify-center items-center">
 	<h2>Choose a username</h2>
-	<BorderBox fill="brand-gradient-br">
+	<div class="flex p-2">
+		<div class="flex flex-col p-0.5 rounded-lg bg-gradient-to-br from-DF-blue via-DF-red to-DF-yellow">
 		<input
 			type="text"
 			id="username"
 			class="bg-slate-600 w-56 p-1 rounded-md outline-none"
 			bind:value={username}
 		/>
-	</BorderBox>
+		</div>
+	</div>
 	<div class="w-fit h-fit mx-auto">
-		<div class="
-      bg-gradient-to-br from-DF-blue via-DF-red to-DF-yellow
-      font-semibold 
-      p-0.5 
-      w-fit 
-      my-10
-      md:mx-0
-      rounded-full 
-      cursor-pointer
-    ">
-      <button class="fancy-btn" on:click={register}>
-          Register
-      </button>
+		<div class="fancy-btn-border">
+      <button on:click={register} class="fancy-btn">Register</button>
     </div>
 	</div>
 </div>

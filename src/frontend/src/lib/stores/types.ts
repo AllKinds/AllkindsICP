@@ -21,6 +21,13 @@ export enum RootState {
 	Register,
 	App
 }
+export enum AppState {
+	Home,
+	People,
+	Profile,
+	Dev
+}
+
 
 //Others
 

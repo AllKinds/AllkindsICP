@@ -1,6 +1,5 @@
 <script lang="ts">
-	import Button from '$lib/components/common/Button.svelte';
-	import { user } from '$lib/stores';
+	import { user } from '$lib/stores/index';
 	import type { User } from 'src/declarations/backend/backend.did';
 	import { updateProfile } from '$lib/stores/tasks/updateProfile';
 	import { 
@@ -30,7 +29,7 @@ let publicConnect: boolean = $user.connect[1]
 let publicBirth: boolean = $user.birth[1]
 let publicGender: boolean = $user.gender[1]
 
-//an user object to temporary store and change OUR values , this has NO User interface
+//a user object to temporary store and change OUR values , this has NO User interface
 let userObj = { 
 	created: $user.created, 
 	connect: fromNullable($user.connect[0]),
@@ -42,7 +41,7 @@ let userObj = {
 
 
 
-const handle = () => {
+const update = () => {
 	//sets the new user object to update
 	const newUser: User = {
 			created: $user.created,
@@ -60,7 +59,7 @@ const handle = () => {
 <div class="flex flex-col gap-4">
   <h2 class="p-0">Profile settings</h2>
   <span class="text-slate-600 flex"><Eye/> : Allow what people can initially see about you.</span>
-  <div class="bg-slate-700 w-full rounded-md flex flex-col p-2 md:p-8">
+  <div class="dark:bg-slate-700 bg-slate-100 w-full rounded-md flex flex-col p-2 md:p-8">
 		<!-- <strong>User data</strong><br />
 		username: {$user.username}<br />
 		created: {fromBigInt($user.created)}<br />
@@ -132,7 +131,9 @@ const handle = () => {
     </div>
 		
 
-		<Button on:click={handle}>Update Profile</Button>
+		<div class="fancy-btn-border mx-auto">
+      <button on:click={update} class="fancy-btn">Update</button>
+    </div>
 	
 	</div>
   
@@ -141,7 +142,7 @@ const handle = () => {
 
 <style style lang="postcss">
 	label {
-		@apply flex m-2;
+		@apply flex my-2;
     
 	}
   span {
@@ -149,7 +150,7 @@ const handle = () => {
   }
 
 	.inputfield, option, select, textarea {
-		@apply bg-slate-600 p-1 rounded-md outline-none mr-1;
+		@apply bg-slate-500 p-1 rounded-md mr-1 outline-none;
 	}
 
 </style>
