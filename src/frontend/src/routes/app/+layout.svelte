@@ -18,7 +18,7 @@
 	</svelte:fragment>
 
 	<svelte:fragment slot="main">
-		<div class="flex flex-row justify-center mt-8 gap-3">
+		<div class="flex flex-row justify-center mt-8 gap-4">
 
 			<!-- left sided col, possible for menu icon shortcuts  -->
 			<div class="dark:bg-slate-800 sticky top-16 bg-slate-100 border dark:border-none h-fit p-2 rounded-lg max-sm:hidden flex flex-col items-center gap-4">
