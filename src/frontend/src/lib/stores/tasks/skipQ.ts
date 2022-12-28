@@ -8,5 +8,4 @@ export async function skipQ(hash: Hash){
   const localActor = get(actor)
   console.log(hash, '= gonna be skipped')
   await localActor.submitSkip(hash).then((res) => console.log('Res after Q skipped :', res))
-  getQs()
 }

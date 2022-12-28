@@ -6,11 +6,24 @@
 	import type { AnswerKind } from "src/declarations/backend/backend.did";
 
   export let question: any;
+  let skipPending: boolean = false
+  let answerPending: boolean | undefined = undefined
   
 
   const submitAnswer = async(bool: boolean) => {
+    answerPending = bool
     let answer: AnswerKind = { Bool: bool }
-    await answerQ(question.hash, answer)
+    await answerQ(question.hash, answer).then(res => {
+      answerPending = undefined
+    })
+    getQs()
+  }
+
+  const skipQuestion = async() => {
+    skipPending = true
+    await skipQ(question.hash).then(res => {
+      skipPending = false
+    })
     getQs()
   }
  
@@ -23,13 +36,31 @@
   <!--   -->
   <div class="w-full flex flex-row justify-center items-center dark:text-slate-700 pt-3 gap-2 md:gap-4">
       <button on:click={() => submitAnswer(true)} class="bg-green-400 hover:bg-green-500 h-14 w-5/12 rounded-xl flex justify-center items-center">
-        <h3>YES</h3>
+        <h3>
+          {#if answerPending == true}
+            Loading...
+          {:else}
+            YES
+          {/if}
+        </h3>
       </button>
-      <button on:click={() => skipQ(question.hash)} class="dark:bg-slate-600 h-14 w-10 md:w-14 rounded-xl dark:hover:bg-slate-700 bg-slate-200 hover:bg-slate-300">
-        <span class=" text-slate-400">skip</span>
+      <button on:click={skipQuestion} class="dark:bg-slate-600 h-14 w-10 md:w-14 rounded-xl dark:hover:bg-slate-700 bg-slate-200 hover:bg-slate-300">
+        <span class=" text-slate-400">
+          {#if !skipPending}
+            skip
+          {:else if skipPending}
+            O
+          {/if}
+        </span>
       </button>
       <button on:click={() => submitAnswer(false)} class="bg-red-400 hover:bg-red-500 h-14 w-5/12 rounded-xl flex justify-center items-center">
-        <h3>NO</h3>
+        <h3>
+          {#if answerPending == false}
+            Loading...
+          {:else }
+            NO
+          {/if}
+        </h3>
       </button>
   </div>
 </div>
