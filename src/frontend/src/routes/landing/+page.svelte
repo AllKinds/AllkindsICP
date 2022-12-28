@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { login } from '$lib/stores/tasks/index';
-	import Proto1 from '$lib/assets/images/proto-1.svg?url';
+	import appscreen from '$lib/assets/images/appscreen.png?url';
 	import Segment from '$lib/components/landing/Segment.svelte';
 	import Grid from '$lib/components/landing/Grid.svelte';
 
@@ -62,12 +62,12 @@ should be done alot cleaner with datatype structure objects I think -->
 		to social services.
 	</p>
 	<svelte:fragment slot="extra">
-		<div class="fancy-btn-border">
+		<div class="fancy-btn-border mx-auto md:mx-0">
       <button on:click={login} class="fancy-btn">Join Alpha #0</button>
     </div>   
 	</svelte:fragment>
 	<svelte:fragment slot="img">
-		<img src={Proto1} alt="Screenshot of Allkinds Dapp" />
+		<img class=" w-72" src={appscreen} alt="Screenshot of Allkinds Dapp" />
 	</svelte:fragment>
 </Segment>
 
