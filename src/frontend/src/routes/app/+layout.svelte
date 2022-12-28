@@ -12,7 +12,7 @@
 
 </script>
 
-<Layout headerBg={'dark:bg-gradient-to-r dark:from-slate-800/95 dark:to-slate-800 bg-slate-200'}>
+<Layout headerBg={'dark:bg-gradient-to-r dark:from-slate-800/95 dark:to-slate-800 bg-slate-100'}>
 	<svelte:fragment slot="nav">
 		<SidepanelNav {data} />
 	</svelte:fragment>
@@ -21,15 +21,14 @@
 		<div class="flex flex-row justify-center mt-8 gap-3">
 
 			<!-- left sided col, possible for menu icon shortcuts  -->
-			<div class="dark:bg-slate-800 sticky top-16 bg-slate-200 h-fit p-2 rounded-lg max-sm:hidden flex flex-col items-center gap-4">
-				
+			<div class="dark:bg-slate-800 sticky top-16 bg-slate-100 border dark:border-none h-fit p-2 rounded-lg max-sm:hidden flex flex-col items-center gap-4">
 				<a href="/app/home"><Home class="iconbtn" /></a>
 				<a href="/app/people"><Users class="iconbtn"/></a>
 				<a href="/app/profile"><Cogwheel class="iconbtn"/></a>
 			</div>
 
-			<div class="bg-gradient-to-b from-DF-blue via-DF-red to-DF-yellow h-fit w-full rounded-lg">
-				<div class="dark:bg-slate-800/95 bg-slate-200 rounded-lg p-2 md:p-5 ">
+			<div class="bg-gradient-to-b from-DF-blue via-DF-red to-DF-yellow h-fit w-full rounded-lg mt-1">
+				<div class="dark:bg-slate-800/95 bg-slate-100 border dark:border-none rounded-lg p-2 md:p-5 ">
 					<slot />
 				</div>
 			</div>

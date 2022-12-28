@@ -6,7 +6,7 @@
 	export let path: any;
 </script>
 
-<div class="rounded-lg p-0.5 bg-gradient-to-br from-DF-blue via-DF-red to-DF-yellow w-40 mx-auto ">
+<div class="rounded-lg p-0.5 bg-gradient-to-br from-DF-blue via-DF-red to-DF-yellow w-40 mx-auto">
   <div class="flex flex-col dark:bg-slate-800/95 bg-slate-100 rounded-lg trans-300 p-2 text-lg items-start">
     {#if data}
       {#each data.sections as section}

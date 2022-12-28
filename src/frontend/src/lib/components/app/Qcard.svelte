@@ -15,7 +15,7 @@
   }
  
 </script>
-<div class="odd:dark:bg-slate-700 even:dark:bg-slate-700/50 odd:bg-slate-100 even:bg-slate-100/50 w-full rounded-md mx-auto flex flex-col justify-center items-center p-2 md:p-3 lg:p-5">
+<div class="odd:dark:bg-slate-700 even:dark:bg-slate-700/50 odd:bg-slate-100 even:bg-slate-200/50 dark:border-none w-full border rounded-md mx-auto flex flex-col justify-center items-center p-2 md:p-3 lg:p-5">
   <h2 class=" w-fit">{question.question}</h2>
   <span>Created: {fromBigInt(question.created)}</span>
   <!-- <span>Hash: {question.hash}</span>
