@@ -12,47 +12,56 @@
 	} from '$lib/utilities';
 	import PublicToggle from '$lib/components/common/PublicToggle.svelte';
   import Eye from '$lib/assets/icons/eye.svg?component'
+	import Spinner from '$lib/components/common/Spinner.svelte';
 
-
+  let pending: boolean | undefined = undefined
 	//this could be moved to some declaration/constant somewhere else
- let genders = [
-	'',
- 	'Male' ,
-	'Female' ,
-	'Other',
-	'Queer' 
- ]
+  let genders = [
+    '',
+    'Male' ,
+    'Female' ,
+    'Other',
+    'Queer' 
+  ]
 
-let publicMode: boolean = true
-let publicAbout: boolean = $user.about[1]
-let publicConnect: boolean = $user.connect[1]
-let publicBirth: boolean = $user.birth[1]
-let publicGender: boolean = $user.gender[1]
+  let publicMode: boolean = true
+  let publicAbout: boolean = $user.about[1]
+  let publicConnect: boolean = $user.connect[1]
+  let publicBirth: boolean = $user.birth[1]
+  let publicGender: boolean = $user.gender[1]
 
-//a user object to temporary store and change OUR values , this has NO User interface
-let userObj = { 
-	created: $user.created, 
-	connect: fromNullable($user.connect[0]),
-	about: fromNullable($user.about[0]),
-	username: $user.username,
-	gender: fromNullableGender($user.gender[0]), //biiitch
-	birth: fromNullableDate(($user.birth[0]))
-}
+  //a user object to temporary store and change OUR values , this has NO User interface
+  let userObj = { 
+    created: $user.created, 
+    connect: fromNullable($user.connect[0]),
+    about: fromNullable($user.about[0]),
+    username: $user.username,
+    gender: fromNullableGender($user.gender[0]), //biiitch
+    birth: fromNullableDate(($user.birth[0]))
+  }
 
 
 
-const update = () => {
-	//sets the new user object to update
-	const newUser: User = {
-			created: $user.created,
-			connect: [toNullable(userObj.connect), publicConnect],
-			about: [toNullable(userObj.about), publicAbout],
-			username: userObj.username,
-			gender: [toNullableGender(userObj.gender), publicGender],
-			birth: [toNullableDate(userObj.birth), publicBirth]
-		}
-		updateProfile(newUser)
-}
+  const update = async() => {
+    pending = true
+    //sets the new user object to update
+    const newUser: User = {
+        created: $user.created,
+        connect: [toNullable(userObj.connect), publicConnect],
+        about: [toNullable(userObj.about), publicAbout],
+        username: userObj.username,
+        gender: [toNullableGender(userObj.gender), publicGender],
+        birth: [toNullableDate(userObj.birth), publicBirth]
+      }
+      await updateProfile(newUser).then((res) => {
+        console.log(res)
+        pending = false
+      })
+      window.setTimeout(() => (
+        pending = undefined
+      ), 2000)
+
+  }
 </script>
 
 
@@ -130,10 +139,19 @@ const update = () => {
       </label>
     </div>
 		
+    <div class="flex flex-col justify-center items-center">
+      {#if pending == true}
+        <Spinner/> 
+        <p class="text-slate-500">Updating...</p>
+      {:else if pending == false}
+        <p class="text-slate-500">Succes c:</p>
+      {/if}
 
-		<div class="fancy-btn-border mx-auto">
-      <button on:click={update} class="fancy-btn">Update</button>
+      <div class="fancy-btn-border">
+        <button on:click={update} class="fancy-btn">Update</button>
+      </div>
     </div>
+    
 	
 	</div>
   
