@@ -26,9 +26,10 @@
       pending = false
     })
     newQ = ''
+    getQs()
     window.setTimeout(() => (
       pending = undefined,
-      getQs()
+      expandWindow = false
     ), 2000)
   }
 </script>
