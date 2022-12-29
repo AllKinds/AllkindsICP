@@ -1,9 +1,4 @@
 //groups all effects/functions
-import { login, syncAuth, logout } from "./auth";
+import { login, logout, syncAuth } from './auth';
 
-export {
-  syncAuth,
-  login,
-  logout
-}
-
+export { syncAuth, login, logout };

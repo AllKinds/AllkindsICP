@@ -1,6 +1,5 @@
 import { writable } from 'svelte/store';
-import type { RootState, RegiState, AppState } from '../types';
-
+import type { AppState, RegiState, RootState } from '../types';
 
 export const rootStore = writable<RootState>();
 export const regiStore = writable<RegiState>();

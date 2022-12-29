@@ -27,7 +27,7 @@ export interface User {
 export interface _SERVICE {
 	createQuestion: ActorMethod<[string], Result>;
 	createUser: ActorMethod<[string], Result>;
-	getAskableQuestions: ActorMethod<[], Result_2>;
+	getAskableQuestions: ActorMethod<[bigint], Result_2>;
 	getUser: ActorMethod<[], Result_1>;
 	submitAnswer: ActorMethod<[Hash, AnswerKind], Result>;
 	submitLike: ActorMethod<[Hash, LikeKind], Result>;

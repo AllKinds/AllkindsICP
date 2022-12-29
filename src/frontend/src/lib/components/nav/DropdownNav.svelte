@@ -11,7 +11,6 @@
 	function toggleVissible() {
 		visible = !visible;
 	}
-
 </script>
 
 <div class="flex flex-col items-end">
@@ -25,7 +24,7 @@
 
 	{#if visible}
 		<div on:mouseleave={toggleVissible}>
-			<Nav {data} path='#'/>
+			<Nav {data} path="#" />
 		</div>
 	{/if}
 </div>
