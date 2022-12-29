@@ -30,7 +30,7 @@ export const idlFactory = ({ IDL }) => {
 	return IDL.Service({
 		createQuestion: IDL.Func([IDL.Text], [Result], []),
 		createUser: IDL.Func([IDL.Text], [Result], []),
-		getAskableQuestions: IDL.Func([], [Result_2], ['query']),
+		getAskableQuestions: IDL.Func([IDL.Nat], [Result_2], ['query']),
 		getUser: IDL.Func([], [Result_1], ['query']),
 		submitAnswer: IDL.Func([Hash, AnswerKind], [Result], []),
 		submitLike: IDL.Func([Hash, LikeKind], [Result], []),

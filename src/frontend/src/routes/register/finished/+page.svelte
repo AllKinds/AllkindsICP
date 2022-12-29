@@ -5,7 +5,6 @@
 	async function submit() {
 		rootStore.set(RootState.App);
 	}
-
 </script>
 
 <div class="flex flex-col justify-center items-center">

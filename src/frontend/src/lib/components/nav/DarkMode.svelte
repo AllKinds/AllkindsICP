@@ -24,7 +24,7 @@
 			{#if darkMode}
 				<Sun />
 			{:else}
-				<Moon class="ml-5 h-5 "/>
+				<Moon class="ml-5 h-5 " />
 			{/if}
 		</label>
 	</span>

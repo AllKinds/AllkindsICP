@@ -1,6 +1,6 @@
 import { Actor, HttpAgent, type Identity } from '@dfinity/agent';
 import { AuthClient } from '@dfinity/auth-client';
-import type { User, _SERVICE } from 'src/declarations/backend/backend.did';
+import type { User } from 'src/declarations/backend/backend.did';
 import { get, writable } from 'svelte/store';
 import { idlFactory } from '../../../../../declarations/backend';
 import { AuthState, type BackendActor } from '../types';

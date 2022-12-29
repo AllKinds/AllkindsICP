@@ -138,9 +138,11 @@ actor {
 		skips.put(pQ, skip);
 	};
 
-	func askableQuestions(p : Principal) : [Hash.Hash] {
+	func askableQuestions(p : Principal, n : Nat) : [Hash.Hash] {
 		let buf = Buffer.Buffer<Hash.Hash>(10);
-		for (hash in questions.keys()) {
+		var count = 0;
+		label f for (hash in questions.keys()) {
+			if (n == count) break f;
 			let pQ = hashPrincipalQuestion(p, hash);
 			switch (skips.get(pQ)) {
 				case (?_) {};
@@ -152,6 +154,7 @@ actor {
 								case (?_) {};
 								case null {
 									buf.add(hash);
+									count += 1;
 								};
 							};
 						};
@@ -348,8 +351,8 @@ actor {
 		#ok();
 	};
 
-	public shared query (msg) func getAskableQuestions() : async Result.Result<[Question], Text> {
-		let askables = askableQuestions(msg.caller);
+	public shared query (msg) func getAskableQuestions(n : Nat) : async Result.Result<[Question], Text> {
+		let askables = askableQuestions(msg.caller, n);
 
 		func getQuestion(h : Hash.Hash) : ?Question {
 			questions.get(h);

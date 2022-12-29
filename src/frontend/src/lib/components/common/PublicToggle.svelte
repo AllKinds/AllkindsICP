@@ -1,31 +1,27 @@
 <script lang="ts">
-  import Eye from '$lib/assets/icons/eye.svg?component'
-  import EyeSlash from '$lib/assets/icons/eye-slash.svg?component'
+	import Eye from '$lib/assets/icons/eye.svg?component';
+	import EyeSlash from '$lib/assets/icons/eye-slash.svg?component';
 
-  export let checked: boolean
-  // const onChange = () => {
-  //   checked = !checked
-  //   console.log('onchange checked:', checked)
-  // } 
-  $: { console.log('checked:', checked)}
+	export let checked: boolean;
+	// const onChange = () => {
+	//   checked = !checked
+	//   console.log('onchange checked:', checked)
+	// }
+	$: {
+		console.log('checked:', checked);
+	}
 </script>
 
-
 <span class="toggle">
-  <label title="Public viewable" class="p-0.5">
-    <input
-      type="checkbox"
-      bind:checked={checked}
-     
-    />
-    {#if checked}
-      <Eye />
-    {:else if !checked }
-      <EyeSlash />
-    {/if}
-  </label>
+	<label title="Public viewable" class="p-0.5">
+		<input type="checkbox" bind:checked />
+		{#if checked}
+			<Eye />
+		{:else if !checked}
+			<EyeSlash />
+		{/if}
+	</label>
 </span>
-
 
 <style style lang="postcss">
 	.toggle input[type='checkbox'] {

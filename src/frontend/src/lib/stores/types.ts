@@ -28,9 +28,7 @@ export enum AppState {
 	Dev
 }
 
-
 //Others
-
 
 // export const ProfileSchema = z.object({
 //   created: z.bigint(),

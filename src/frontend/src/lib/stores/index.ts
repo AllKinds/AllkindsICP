@@ -1,12 +1,5 @@
 //groups all stores
-import { rootStore, regiStore, appStore } from './tasks/routing';
-import { authStore, actor, user } from './tasks/auth';
+import { actor, authStore, user } from './tasks/auth';
+import { appStore, regiStore, rootStore } from './tasks/routing';
 
-export {
-  authStore,
-  actor,
-  user,
-  rootStore,
-  regiStore,
-  appStore
-}
+export { authStore, actor, user, rootStore, regiStore, appStore };
