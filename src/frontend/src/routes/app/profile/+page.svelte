@@ -45,10 +45,11 @@
 			gender: [toNullableGender(userObj.gender), publicGender],
 			birth: [toNullableDate(userObj.birth), publicBirth]
 		};
-		await updateProfile(newUser).then((res) => {
-			console.log(res);
-			pending = false;
-		});
+		await updateProfile(newUser)
+			.catch((error) => {
+					console.log('errorcatch', error)
+				})
+		pending = false;
 		window.setTimeout(() => (pending = undefined), 2000);
 	};
 </script>
@@ -107,7 +108,6 @@
 			<span>About</span>
 			<label for="about">
 				<textarea
-					type="textfield "
 					id="about"
 					class="inputfield h-48 w-60"
 					bind:value={userObj.about}

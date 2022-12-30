@@ -6,9 +6,8 @@
 	import { onMount } from 'svelte';
 	import { createQ } from '$lib/stores/tasks/createQ';
 	import { getQs, questions } from '$lib/stores/tasks/getQs';
-	import { actor } from '$lib/stores';
-	import { get } from 'svelte/store';
 	import Spinner from '$lib/components/common/Spinner.svelte';
+
 
 	let expandWindow: boolean = false;
 	let newQ: string;
@@ -20,10 +19,11 @@
 
 	const submit = async () => {
 		pending = true;
-		await createQ(newQ).then((res) => {
-			console.log('Res after Q creation :', res);
-			pending = false;
-		});
+		await createQ(newQ)
+      .catch((error) => {
+        console.log('errorcatch', error)
+      })
+    pending = false;
 		newQ = '';
 		getQs();
 		window.setTimeout(() => ((pending = undefined), (expandWindow = false)), 2000);
@@ -51,9 +51,8 @@
 		</button>
 
 		{#if expandWindow}
-			<div class="mt-8 flex flex-col justify-center items-center ">
+			<div class="mt-8 flex flex-col justify-center items-center">
 				<textarea
-					type="textfield"
 					id="questionInput"
 					class="inputfield w-full min-h-fit bg-transparent outline-none text-4xl text-center placeholder-slate-300 dark:placeholder-slate-600"
 					placeholder="What would you like to ask?"
