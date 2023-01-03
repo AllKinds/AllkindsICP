@@ -6,10 +6,12 @@ export const questions = writable<Array<Question>>();
 
 export async function getQs() {
 	const localActor = get(actor);
-	let nr: bigint = BigInt(2);
+	let nr: bigint = BigInt(5);
 	return await localActor.getAskableQuestions(nr).then((res) => {
 		console.log('questions: ', res.ok);
-		questions.set(res.ok);
+		if (res.ok) {
+					questions.set(res.ok);
+		}
 
 		//questions.set(res.ok)
 	});

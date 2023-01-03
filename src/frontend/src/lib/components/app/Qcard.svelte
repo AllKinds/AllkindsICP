@@ -13,19 +13,21 @@
 	const submitAnswer = async (bool: boolean) => {
 		answerPending = bool;
 		let answer: AnswerKind = { Bool: bool };
-		await answerQ(question.hash, answer).then((res) => {
-			console.log(res);
-			answerPending = undefined;
-		});
+		await answerQ(question.hash, answer)
+			.catch((error) => {
+				console.log('errorcatch', error)
+			})
+		answerPending = undefined;
 		getQs();
 	};
 
 	const skipQuestion = async () => {
 		skipPending = true;
-		await skipQ(question.hash).then((res) => {
-			console.log(res);
-			skipPending = false;
-		});
+		await skipQ(question.hash)
+			.catch((error) => {
+				console.log('errorcatch', error)
+			})
+		skipPending = false;
 		getQs();
 	};
 </script>
@@ -45,7 +47,7 @@
 			<button
 				on:click={() => submitAnswer(true)}
 				disabled={skipPending || answerPending}
-				class="bg-green-400 hover:bg-green-500 h-16 w-4/12 rounded-xl flex justify-center items-center grow"
+				class="transition-all bg-green-400 hover:bg-green-500 h-16 w-4/12 rounded-xl flex justify-center items-center grow"
 			>
 				<h3>
 					{#if answerPending == true}
@@ -58,7 +60,7 @@
 			<button
 				on:click={skipQuestion}
 				disabled={skipPending || answerPending}
-				class="dark:bg-slate-600 h-16 w-16 md:w-36 rounded-xl dark:hover:bg-slate-800/70 bg-slate-200 hover:bg-slate-300 flex justify-center items-center"
+				class="transition-all dark:bg-slate-600 h-16 w-16 md:w-36 rounded-xl dark:hover:bg-slate-800/70 bg-slate-200 hover:bg-slate-300 flex justify-center items-center"
 			>
 				<p class=" text-slate-400">
 					{#if !skipPending}
@@ -71,7 +73,7 @@
 			<button
 				on:click={() => submitAnswer(false)}
 				disabled={skipPending || answerPending}
-				class="bg-red-400 hover:bg-red-500 h-16 w-4/12 rounded-xl flex justify-center items-center grow"
+				class="transition-all bg-red-400 hover:bg-red-500 h-16 w-4/12 rounded-xl flex justify-center items-center grow"
 			>
 				<h3>
 					{#if answerPending == false}
