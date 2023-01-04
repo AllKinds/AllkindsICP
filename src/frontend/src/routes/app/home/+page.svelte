@@ -8,7 +8,6 @@
 	import { getQs, questions } from '$lib/stores/tasks/getQs';
 	import Spinner from '$lib/components/common/Spinner.svelte';
 
-
 	let expandWindow: boolean = false;
 	let newQ: string;
 	let pending: boolean | undefined = undefined;
@@ -19,11 +18,10 @@
 
 	const submit = async () => {
 		pending = true;
-		await createQ(newQ)
-      .catch((error) => {
-        console.log('errorcatch', error)
-      })
-    pending = false;
+		await createQ(newQ).catch((error) => {
+			console.log('errorcatch', error);
+		});
+		pending = false;
 		newQ = '';
 		getQs();
 		window.setTimeout(() => ((pending = undefined), (expandWindow = false)), 2000);

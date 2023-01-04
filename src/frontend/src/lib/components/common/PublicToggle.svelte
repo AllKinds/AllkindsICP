@@ -15,7 +15,11 @@
 <span class="toggle">
 	<label title="Public viewable" class="p-0.5">
 		<input type="checkbox" bind:checked />
-		{checked ? <Eye /> : <EyeSlash />}
+		{#if checked}
+			<Eye />
+		{:else if !checked}
+			<EyeSlash />
+		{/if}
 	</label>
 </span>
 

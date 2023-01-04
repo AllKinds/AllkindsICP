@@ -13,20 +13,18 @@
 	const submitAnswer = async (bool: boolean) => {
 		answerPending = bool;
 		let answer: AnswerKind = { Bool: bool };
-		await answerQ(question.hash, answer)
-			.catch((error) => {
-				console.log('errorcatch', error)
-			})
+		await answerQ(question.hash, answer).catch((error) => {
+			console.log('errorcatch', error);
+		});
 		answerPending = undefined;
 		getQs();
 	};
 
 	const skipQuestion = async () => {
 		skipPending = true;
-		await skipQ(question.hash)
-			.catch((error) => {
-				console.log('errorcatch', error)
-			})
+		await skipQ(question.hash).catch((error) => {
+			console.log('errorcatch', error);
+		});
 		skipPending = false;
 		getQs();
 	};
