@@ -2,13 +2,16 @@
 	import { answerQ } from '$lib/stores/tasks/answerQ';
 	import { getQs } from '$lib/stores/tasks/getQs';
 	import { skipQ } from '$lib/stores/tasks/skipQ';
+	import { likeQ } from '$lib/stores/tasks/likeQ';
 	import { fromBigInt } from '$lib/utilities';
-	import type { AnswerKind, Question } from 'src/declarations/backend/backend.did';
+	import type { AnswerKind, LikeKind, Question } from 'src/declarations/backend/backend.did';
 	import Spinner from '../common/Spinner.svelte';
 
 	export let question: Question;
+	let likeWeight: number | undefined = undefined;
 	let skipPending: boolean = false;
 	let answerPending: boolean | undefined = undefined;
+	let likePending: boolean | undefined = undefined;
 
 	const submitAnswer = async (bool: boolean) => {
 		answerPending = bool;
@@ -16,7 +19,16 @@
 		await answerQ(question.hash, answer).catch((error) => {
 			console.log('errorcatch', error);
 		});
+
+		if (likeWeight !== undefined) {
+			let like: LikeKind = bool ? { Like: BigInt(likeWeight)} : { Dislike: BigInt(likeWeight)}	
+			await likeQ(question.hash, like).catch((error) => {
+				console.log('errorcatch', error);
+			});
+		}
+	
 		answerPending = undefined;
+		likePending = undefined;
 		getQs();
 	};
 
@@ -36,20 +48,23 @@
 	<div class="2xl:w-9/12 mx-auto rounded-md flex flex-col justify-center items-center">
 		<h2 class=" w-fit">{question.question}</h2>
 		<p class="text-slate-500 text-sm p-0">Created: {fromBigInt(question.created)}</p>
-		<!-- <span>Hash: {question.hash}</span>
+		 <span>Hash: {question.hash}</span><!--
   <span>Color: {question.color[0]}</span> -->
 		<!--   -->
 		<div
 			class="w-full flex flex-row justify-center items-center dark:text-slate-700 pt-3 gap-2 md:gap-4"
 		>
+	<!-- make these into own components -->
 			<button
-				on:click={() => submitAnswer(true)}
+				on:click={() => likePending == true ? submitAnswer(true) : likePending = true}
 				disabled={skipPending || answerPending}
 				class="transition-all bg-green-400 hover:bg-green-500 h-16 w-4/12 rounded-xl flex justify-center items-center grow"
 			>
 				<h3>
 					{#if answerPending == true}
 						<Spinner />
+					{:else if likePending == true}
+						Submit
 					{:else}
 						YES
 					{/if}
@@ -69,18 +84,32 @@
 				</p>
 			</button>
 			<button
-				on:click={() => submitAnswer(false)}
+				on:click={() => likePending == false ? submitAnswer(false) : likePending = false}
 				disabled={skipPending || answerPending}
 				class="transition-all bg-red-400 hover:bg-red-500 h-16 w-4/12 rounded-xl flex justify-center items-center grow"
 			>
 				<h3>
 					{#if answerPending == false}
 						<Spinner />
+					{:else if likePending == false}
+						Submit
 					{:else}
 						NO
 					{/if}
 				</h3>
 			</button>
 		</div>
+
+		{#if likePending !== undefined} 
+		<p class="text-slate-500 text-sm p-0">Optionally: Rate how important this is for you.</p>
+			<div class="gap-2 flex ">
+				{#each Array(10) as _, index}
+					<input type=radio bind:group={likeWeight} value={index}>
+					{index}
+					|
+				{/each}
+			</div>
+		{/if}
+
 	</div>
 </div>
