@@ -24,6 +24,7 @@ export enum RootState {
 export enum AppState {
 	Home,
 	People,
+	User,
 	Profile,
 	Dev
 }

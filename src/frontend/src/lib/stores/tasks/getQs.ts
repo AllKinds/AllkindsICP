@@ -10,7 +10,7 @@ export async function getQs() {
 	return await localActor.getAskableQuestions(nr).then((res) => {
 		console.log('questions: ', res.ok);
 		if (res.ok) {
-					questions.set(res.ok);
+			questions.set(res.ok);
 		}
 
 		//questions.set(res.ok)
