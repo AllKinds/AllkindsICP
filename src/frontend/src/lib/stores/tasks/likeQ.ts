@@ -1,5 +1,5 @@
 import { actor } from '$lib/stores';
-import type { LikeKind, Hash } from 'src/declarations/backend/backend.did';
+import type { Hash, LikeKind } from 'src/declarations/backend/backend.did';
 import { get } from 'svelte/store';
 
 export async function likeQ(hash: Hash, like: LikeKind) {

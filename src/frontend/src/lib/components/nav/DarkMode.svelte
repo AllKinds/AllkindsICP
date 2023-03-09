@@ -13,7 +13,7 @@
 </script>
 
 {#if darkModeReady}
-	<span class="toggle mr-1 px-2 pt-2">
+	<span class="toggle mr-1 px-1 pt-2">
 		<input
 			type="checkbox"
 			id="toggle"

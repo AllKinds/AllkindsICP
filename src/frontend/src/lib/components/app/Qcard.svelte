@@ -9,13 +9,11 @@
 	import PlusCircle from '$lib/assets/icons/plus-circle.svg?component';
 	import MinusCircle from '$lib/assets/icons/minus-circle.svg?component';
 
-
 	export let question: Question;
 	let likeWeight: number = 0;
 	let skipPending: boolean = false;
 	let answerPending: boolean | undefined = undefined;
 	let likePending: boolean | undefined = undefined;
-
 
 	const submitAnswer = async (bool: boolean) => {
 		answerPending = bool;
@@ -25,12 +23,12 @@
 		});
 
 		if (likeWeight !== 0) {
-			let like: LikeKind = bool ? { Like: BigInt(likeWeight)} : { Dislike: BigInt(likeWeight)}	
+			let like: LikeKind = bool ? { Like: BigInt(likeWeight) } : { Dislike: BigInt(likeWeight) };
 			await likeQ(question.hash, like).catch((error) => {
 				console.log('errorcatch', error);
 			});
 		}
-	
+
 		answerPending = undefined;
 		likePending = undefined;
 		likeWeight = 0;
@@ -69,9 +67,9 @@
 
 		<div
 			class="w-full flex flex-row justify-center items-center dark:text-slate-700 pt-3 gap-2 md:gap-4"
-		>			
-		<!-- button sets likePending status after first click, second click submits the answer value and optionally the like value -->
-		<!-- OLD onclick event: on:click={() => likePending == false ? submitAnswer(false) : likePending = false} -->
+		>
+			<!-- button sets likePending status after first click, second click submits the answer value and optionally the like value -->
+			<!-- OLD onclick event: on:click={() => likePending == false ? submitAnswer(false) : likePending = false} -->
 			<button
 				on:click={() => submitAnswer(false)}
 				disabled={skipPending || answerPending}
@@ -87,7 +85,7 @@
 					{/if}
 				</h3>
 			</button>
-			
+
 			<button
 				on:click={skipQuestion}
 				disabled={skipPending || answerPending}
@@ -117,11 +115,9 @@
 					{/if}
 				</h3>
 			</button>
-
 		</div>
 
-
-<!-- OLD wrong way of likeweight, leaving it in just in case
+		<!-- OLD wrong way of likeweight, leaving it in just in case
 		{#if likePending !== undefined} 
 		 
 		<p class="text-slate-500 text-sm p-0 my-1">Optionally: Rate how important this is for you.</p>
@@ -137,7 +133,5 @@
 			</div>
 		{/if}
 -->
-
-
 	</div>
 </div>

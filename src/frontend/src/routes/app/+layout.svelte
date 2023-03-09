@@ -6,6 +6,7 @@
 	import Home from '$lib/assets/icons/home.svg?component';
 	import Cogwheel from '$lib/assets/icons/cogwheel.svg?component';
 	import Users from '$lib/assets/icons/users.svg?component';
+	import User from '$lib/assets/icons/user.svg?component';
 	import { goto } from '$app/navigation';
 
 	export let data: LayoutData;
@@ -24,6 +25,7 @@
 			>
 				<a href="/app/home"><Home class="iconbtn" /></a>
 				<a href="/app/people"><Users class="iconbtn" /></a>
+				<a href="/app/user"><User class="iconbtn" /></a>
 				<a href="/app/profile"><Cogwheel class="iconbtn" /></a>
 			</div>
 
@@ -50,5 +52,6 @@
 >
 	<a href="/app/home"><Home class="iconbtn" /></a>
 	<a href="/app/people"><Users class="iconbtn" /></a>
+	<a href="/app/user"><User class="iconbtn" /></a>
 	<a href="/app/profile"><Cogwheel class="iconbtn" /></a>
 </div>
