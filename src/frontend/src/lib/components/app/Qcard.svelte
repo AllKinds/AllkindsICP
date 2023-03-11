@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { user } from '$lib/stores/index';
 	import { answerQ } from '$lib/stores/tasks/answerQ';
 	import { getQs } from '$lib/stores/tasks/getQs';
 	import { skipQ } from '$lib/stores/tasks/skipQ';
@@ -15,19 +16,40 @@
 	let answerPending: boolean | undefined = undefined;
 	let likePending: boolean | undefined = undefined;
 
-	const submitAnswer = async (bool: boolean) => {
-		answerPending = bool;
+	const submitAnswer = async (bool: boolean) => {		
 		let answer: AnswerKind = { Bool: bool };
-		await answerQ(question.hash, answer).catch((error) => {
+		const putAnswer = async () => await answerQ(question.hash, answer).catch((error) => {
 			console.log('errorcatch', error);
 		});
 
-		if (likeWeight !== 0) {
-			let like: LikeKind = bool ? { Like: BigInt(likeWeight) } : { Dislike: BigInt(likeWeight) };
-			await likeQ(question.hash, like).catch((error) => {
-				console.log('errorcatch', error);
-			});
+		answerPending = bool;
+		let like: LikeKind = bool ? { Like: BigInt(likeWeight) } : { Dislike: BigInt(likeWeight) };
+		if (likeWeight == 0) {
+			putAnswer();
+		} else {//lil bit ugly of an ugly fix here
+			if (($user.points - BigInt(likeWeight)) >= 0 ) {
+				await likeQ(question.hash, like).catch((error) => {
+					console.log('errorcatch', error);
+					console.log('points - like', $user.points - BigInt(likeWeight));
+				}).then(() => putAnswer())
+			}
+			//TODO : show errors on questions correctly
 		}
+
+
+
+		
+
+
+		// if (likeWeight !== 0) {
+		// 	let like: LikeKind = bool ? { Like: BigInt(likeWeight) } : { Dislike: BigInt(likeWeight) };
+		// 	await likeQ(question.hash, like).catch((error) => {
+		// 		console.log('errorcatch', error);
+
+		// 	}).then(() => putAnswer())
+		// } else {
+		// 	putAnswer();
+		// }
 
 		answerPending = undefined;
 		likePending = undefined;
