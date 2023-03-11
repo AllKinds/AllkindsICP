@@ -7,7 +7,8 @@ export const idlFactory = ({ IDL }) => {
 		creater: IDL.Principal,
 		question: IDL.Text,
 		hash: Hash,
-		color: IDL.Opt(Color)
+		color: IDL.Opt(Color),
+		points: IDL.Int
 	});
 	const Result_2 = IDL.Variant({ ok: IDL.Vec(Question), err: IDL.Text });
 	const Gender = IDL.Variant({
@@ -22,7 +23,8 @@ export const idlFactory = ({ IDL }) => {
 		about: IDL.Tuple(IDL.Opt(IDL.Text), IDL.Bool),
 		username: IDL.Text,
 		gender: IDL.Tuple(IDL.Opt(Gender), IDL.Bool),
-		birth: IDL.Tuple(IDL.Opt(IDL.Int), IDL.Bool)
+		birth: IDL.Tuple(IDL.Opt(IDL.Int), IDL.Bool),
+		points: IDL.Nat
 	});
 	const Result_1 = IDL.Variant({ ok: User, err: IDL.Text });
 	const AnswerKind = IDL.Variant({ Bool: IDL.Bool });

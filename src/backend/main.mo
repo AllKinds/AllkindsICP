@@ -286,7 +286,7 @@ actor {
 					gender = user.gender;
 					birth = user.birth;
 					connect = user.connect;
-					points = user.points + value; //nat
+					points = value; //nat
 				};
 			};
 		};

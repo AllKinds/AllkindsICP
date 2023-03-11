@@ -43,7 +43,8 @@
 			about: [toNullable(userObj.about), publicAbout],
 			username: userObj.username,
 			gender: [toNullableGender(userObj.gender), publicGender],
-			birth: [toNullableDate(userObj.birth), publicBirth]
+			birth: [toNullableDate(userObj.birth), publicBirth],
+			points: $user.points
 		};
 		await updateProfile(newUser).catch((error) => {
 			console.log('errorcatch', error);

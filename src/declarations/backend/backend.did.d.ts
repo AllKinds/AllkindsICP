@@ -12,6 +12,7 @@ export interface Question {
 	question: string;
 	hash: Hash;
 	color: [] | [Color];
+	points: bigint;
 }
 export type Result = { ok: null } | { err: string };
 export type Result_1 = { ok: User } | { err: string };
@@ -23,6 +24,7 @@ export interface User {
 	username: string;
 	gender: [[] | [Gender], boolean];
 	birth: [[] | [bigint], boolean];
+	points: bigint;
 }
 export interface _SERVICE {
 	createQuestion: ActorMethod<[string], Result>;
