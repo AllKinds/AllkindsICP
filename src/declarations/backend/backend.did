@@ -16,6 +16,7 @@ type User = record {
 		opt Gender;
 		bool;
 	};
+	points : nat;
 	username : text;
 };
 type Result_2 = variant {
@@ -35,6 +36,7 @@ type Question = record {
 	created : int;
 	creater : principal;
 	hash : Hash;
+	points : int;
 	question : text;
 };
 type LikeKind = variant {

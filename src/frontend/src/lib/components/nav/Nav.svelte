@@ -8,7 +8,6 @@
 
 	export let data: any;
 	export let path: any;
-	
 </script>
 
 <div class="rounded-lg p-0.5 bg-gradient-to-br from-DF-blue via-DF-red to-DF-yellow w-40 mx-auto">
@@ -19,7 +18,7 @@
 			{$user.username}
 			<div class="flex">
 				<span class="mt-1 mr-1"><Heart /> </span>
-				43
+				{$user.points}
 			</div>
 			<div class="h-0.5 my-2 px-3 w-full bg-gradient-to-br from-DF-purple to-DF-orange" />
 		{/if}
