@@ -10,6 +10,9 @@ import Iter "mo:base/Iter";
 import Option "mo:base/Option";
 import Buffer "mo:base/Buffer";
 import Nat32 "mo:base/Nat32";
+import Nat8 "mo:base/Nat8";
+import Int8 "mo:base/Int8";
+import Int32 "mo:base/Int32";
 import Debug "mo:base/Debug";
 import Array "mo:base/Array";
 
@@ -17,6 +20,8 @@ actor {
 
 	// CONSTANTS
 	let N = 10;
+	let initialPoints = 100;
+	let answerPoints = 5;
 
 	// DATA TYPES
 
@@ -28,6 +33,7 @@ actor {
 		gender : (?Gender, Bool);
 		birth : (?Int, Bool);
 		connect : (?Text, Bool);
+		points : Nat; //Nat bcs user points should not go negative
 	};
 
 	type Gender = {
@@ -44,6 +50,7 @@ actor {
 		question : Text;
 		hash : Hash.Hash;
 		color : ?Color;
+		points : Int; //int bcs question points should be able to go negative
 	};
 
 	// Only one color for now
@@ -111,6 +118,7 @@ actor {
 		let creater = p;
 		let hash = hashQuestion(created, creater, question);
 		let color = ?#Default;
+		let points : Int = 0;
 
 		let q : Question = {
 			created;
@@ -118,6 +126,7 @@ actor {
 			question;
 			hash;
 			color;
+			points;
 		};
 
 		questions.put(hash, q);
@@ -263,6 +272,39 @@ actor {
 		score;
 	};
 
+	//TODO : make function changeUserPoints and changeQuestionPoints
+
+	func changeUserPoints(p : Principal, value : Nat) : () {
+		//change into easier way of ?null checking
+		let user = switch (users.get(p)) {
+			case null return ();
+			case (?user) {
+				{
+					username = user.username;
+					created = user.created;
+					about = user.about;
+					gender = user.gender;
+					birth = user.birth;
+					connect = user.connect;
+					points = user.points + value; //nat
+				};
+			};
+		};
+		users.put(p, user);
+	};
+
+	func changeQuestionPoints(q : Question, value : Int) : () {
+		let newQ : Question = {
+			created = q.created;
+			creater = q.creater;
+			question = q.question;
+			hash = q.hash;
+			color = q.color;
+			points = q.points + value;
+		};
+		questions.put(q.hash, newQ);
+	};
+
 	// DATA STORAGE
 
 	stable var stableUsers : [(Principal, User)] = [];
@@ -314,6 +356,7 @@ actor {
 					gender = (null, false);
 					birth = (null, false);
 					connect = (null, false);
+					points = initialPoints; //nat
 				};
 
 				// Mutate storage for users data
@@ -372,6 +415,7 @@ actor {
 			answer;
 		};
 		answers.put(principalQuestion, newAnswer);
+		changeUserPoints(msg.caller, answerPoints);
 		#ok();
 	};
 
@@ -383,7 +427,72 @@ actor {
 			question;
 			like;
 		};
-		likes.put(principalQuestion, newLike);
+		//TEMP : likes.put line is moved to after points check
+
+		let likeValue : Nat = switch (like) {
+			case (#Like(value)) { value };
+			case (#Dislike(value)) { value }; //I removed '-' because here it has to be subtracted anyway, maybe like value could be extracted without switch
+		};
+
+		//get user data
+		let user = switch (users.get(msg.caller)) {
+			case null return #err("User does not exist");
+			case (?user) {
+				user;
+			};
+		};
+
+		//get question data
+		let q : Question = switch (questions.get(question)) {
+			case null return #err("Question does not exist");
+			case (?q) {
+				q;
+			};
+		};
+
+		//check if user has enough points
+		//convertion to prevent under/over -flow
+
+		//TODO : checkout traps and wraps as all these conversions and point check could be done easier
+		let userPoints_ : Int32 = Int32.fromNat32(Nat32.fromNat(user.points));
+		let likeValue_ : Int32 = Int32.fromNat32(Nat32.fromNat(likeValue));
+		let newPoints = userPoints_ - likeValue_;
+
+		//TODO : might be best to put everything in switch statements, func for points check?
+
+		if (newPoints >= 0) {
+			likes.put(principalQuestion, newLike);
+			//TODO : create a function changeUserPoints
+
+			changeUserPoints(msg.caller, Nat32.toNat(Int32.toNat32(newPoints)));
+
+			//check if user !== creater
+			if (msg.caller != q.creater) {
+				switch (users.get(q.creater)) {
+					case null {}; //do nothing, creater has deleted his/her account
+					case (?creater) {
+						changeUserPoints(q.creater, (creater.points + likeValue));
+					};
+				};
+			};
+
+			let newQuestionPoints : Int = q.points + Int32.toInt(likeValue_);
+			changeQuestionPoints(q, newQuestionPoints);
+
+		} else {
+			return #err("You don't have enough points");
+		};
+
+		// switch (user.points - likeValue) { // FIX : should be transformed to Int here and correctly caseD
+		// 	case (>= 0) { //FIX : wrong statement here
+		// 		likes.put(principalQuestion, newLike);
+		// 		//if likes.put succeeds -> subtract likeValue from user points + add points to Q creater
+		// 		//(dont add points if Q.creater == user, dont break if Q creater doesn't exist anymore)
+		// 		// Then add points to Q.points
+		// 	}
+		// 	case (_) return #err("You don't have enough points");
+		// };
+
 		#ok();
 	};
 
