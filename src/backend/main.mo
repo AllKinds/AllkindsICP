@@ -20,8 +20,9 @@ actor {
 
 	// CONSTANTS
 	let N = 10;
-	let initialPoints = 100;
-	let answerPoints = 5;
+	let initialPoints : Nat = 100;
+	let answerPoints : Nat = 5;
+	let createrPoints : Nat = 30;
 
 	// DATA TYPES
 
@@ -389,6 +390,8 @@ actor {
 			case null return #err("User does not exist");
 			case (?user) {
 				putQuestion(msg.caller, question);
+				//might need to check here for put to be success before awarding points, same for other occurrences
+				changeUserPoints(msg.caller, (user.points + createrPoints));
 			};
 		};
 		#ok();
@@ -415,7 +418,14 @@ actor {
 			answer;
 		};
 		answers.put(principalQuestion, newAnswer);
-		changeUserPoints(msg.caller, answerPoints);
+		//let user = users.get(msg.caller);
+		let user = switch (users.get(msg.caller)) {
+			case null return #err("User does not exist");
+			case (?user) {
+				user;
+			};
+		};
+		changeUserPoints(msg.caller, (user.points + answerPoints));
 		#ok();
 	};
 
@@ -451,47 +461,29 @@ actor {
 		};
 
 		//check if user has enough points
-		//convertion to prevent under/over -flow
-
-		//TODO : checkout traps and wraps as all these conversions and point check could be done easier
+		//conversion to prevent under/over -flow
+		//TODO : checkout traps and wraps as all these conversions and point check should be done easier
 		let userPoints_ : Int32 = Int32.fromNat32(Nat32.fromNat(user.points));
 		let likeValue_ : Int32 = Int32.fromNat32(Nat32.fromNat(likeValue));
 		let newPoints = userPoints_ - likeValue_;
 
-		//TODO : might be best to put everything in switch statements, func for points check?
-
 		if (newPoints >= 0) {
 			likes.put(principalQuestion, newLike);
-			//TODO : create a function changeUserPoints
-
-			changeUserPoints(msg.caller, Nat32.toNat(Int32.toNat32(newPoints)));
-
+			changeUserPoints(msg.caller, (user.points - likeValue));
 			//check if user !== creater
 			if (msg.caller != q.creater) {
 				switch (users.get(q.creater)) {
-					case null {}; //do nothing, creater has deleted his/her account
+					case null {}; //do nothing, creater account might have been removed
 					case (?creater) {
 						changeUserPoints(q.creater, (creater.points + likeValue));
 					};
 				};
 			};
-
 			let newQuestionPoints : Int = q.points + Int32.toInt(likeValue_);
 			changeQuestionPoints(q, newQuestionPoints);
-
 		} else {
 			return #err("You don't have enough points");
 		};
-
-		// switch (user.points - likeValue) { // FIX : should be transformed to Int here and correctly caseD
-		// 	case (>= 0) { //FIX : wrong statement here
-		// 		likes.put(principalQuestion, newLike);
-		// 		//if likes.put succeeds -> subtract likeValue from user points + add points to Q creater
-		// 		//(dont add points if Q.creater == user, dont break if Q creater doesn't exist anymore)
-		// 		// Then add points to Q.points
-		// 	}
-		// 	case (_) return #err("You don't have enough points");
-		// };
 
 		#ok();
 	};
