@@ -156,6 +156,13 @@ actor {
 									buf.add(hash);
 									count += 1;
 								};
+								//changing this around could be used to get questions that User has answered
+								//or modify function so an extra function parameter could sort on skipped, liked, answered, etc?
+								//case null {};
+								// case (?_) {
+								// 	buf.add(hash);
+								// 	count += 1;
+								// };
 							};
 						};
 					};
@@ -397,4 +404,5 @@ actor {
 		skips.put(principalQuestion, skip);
 		#ok();
 	};
+	
 };
