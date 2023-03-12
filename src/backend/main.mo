@@ -101,7 +101,11 @@ actor {
 	};
 
 	type FilterParameters = {
-
+		minAge : ?Nat;
+		maxAge : ?Nat;
+		gender : ?Gender;
+		cohesion : ?Nat; 
+		//could be nat8, would be cool to make unique type with a fixed range 0-100
 	}
 
 	// UTILITY FUNCTIONS
