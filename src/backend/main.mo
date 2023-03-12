@@ -626,12 +626,11 @@ actor {
 			changeUserPoints(msg.caller, Nat.sub(user.points, queryCost));
 
 				//5. return 2 best
-			return filteredUsers;
 		} else {
 			return #err("You don't have enough points");
 		};
 
-		#ok();//should return array of users
+		#ok(filteredUsers);//should return array of users
 	};
 	
 };
