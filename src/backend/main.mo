@@ -182,6 +182,33 @@ actor {
 		buf.toArray();
 	};
 
+	func answeredQuestions(p : Principal, n : Nat) : [Hash.Hash] {
+		let buf = Buffer.Buffer<Hash.Hash>(10);
+		var count = 0;
+		label f for (hash in questions.keys()) {
+			if (n == count) break f;
+			let pQ = hashPrincipalQuestion(p, hash);
+			switch (skips.get(pQ)) {
+				case (?_) {};
+				case null {
+					switch (likes.get(pQ)) {
+						case (?_) {};
+						case null {
+							switch (answers.get(pQ)) {
+								case (?_) {
+									buf.add(hash);
+									count += 1;
+								};
+								case null {};
+							};
+						};
+					};
+				};
+			};
+		};
+		buf.toArray();
+	};
+
 	// calc score for 2 answers and optional 2 likes
 	func calcQuestionScore(sourceAnswer : Answer, testAnswer : Answer, sourceLike : ?Like, testLike : ?Like) : Int {
 		assert (sourceAnswer.question == testAnswer.question);
