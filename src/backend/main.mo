@@ -439,7 +439,17 @@ actor {
 		};
 
 		let q = Array.mapFilter(askables, getQuestion);
+		#ok(q);
+	};
 
+	public shared query (msg) func getAnsweredQuestions(n : Nat) : async Result.Result<[Question], Text> {
+		let answered = answeredQuestions(msg.caller, n);
+
+		func getQuestion(h : Hash.Hash) : ?Question {
+			questions.get(h);
+		};
+
+		let q = Array.mapFilter(answered, getQuestion);
 		#ok(q);
 	};
 
