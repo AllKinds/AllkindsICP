@@ -100,13 +100,7 @@ actor {
 		testLike : ?Like;
 	};
 
-	type FilterParameters = {
-		minAge : ?Nat;
-		maxAge : ?Nat;
-		gender : ?Gender;
-		cohesion : ?Nat; 
-		//could be nat8, would be cool to make unique type with a fixed range 0-100
-	}
+
 
 	// UTILITY FUNCTIONS
 
@@ -219,13 +213,29 @@ actor {
 		};
 		buf.toArray();
 	};
+	//TEMP : ref
+	// type MatchingFilter = {
+	// 	minAge : ?Nat;
+	// 	maxAge : ?Nat;
+	// 	gender : ?Gender;
+	// 	cohesion : ?Nat; 
+	// };
 
 	// filter users according to parameters
-	func filterUsers() : [Hash.Hash] {
-		let buf = Buffer.Buffer<Hash.Hash>(users.size());
+	func filterUsers(para : MatchingFilter) : [User] {
+		let buf = Buffer.Buffer<Hash.Hash>(users.size()); //maybe fixed buf not needed or workaround, test stuff
 		var count = 0;
-		label f for (hash in users.keys()) {
+		label f for (user in users()) {
 			if (users.size() == count) break f;
+				switch(user.gender == para.gender) {
+					case false {};
+					case true {
+						buf.add(user);
+						//testing out with just gender 
+					};
+				};
+
+			count += 1;
 			// let pQ = hashPrincipalQuestion(p, hash);
 			// switch (skips.get(pQ)) {
 			// 	case (?_) {};
@@ -590,7 +600,7 @@ actor {
 	};
 
 	//find users based on parameters
-	public shared query (msg) func findMatches(ageMin : ?Int, ageMax : ?Int, gender : ?Gender, cohesion : Nat) : async Result.Result<[User], Text> {
+	public shared query (msg) func findMatches(para : MatchingFilter) : async Result.Result<[User], Text> {
 		//1. check if user has funds, if not send error
 		let user = switch (users.get(msg.caller)) {
 			case null return #err("User does not exist");
@@ -605,13 +615,18 @@ actor {
 
 		//TODO : maybe Nat.sub could be used in this check statement, test
 		if (newPoints >= 0) {
+
+			let filteredUsers : [User] = filterUsers(para);
+			//TEMP : testing out with just gender filter and returning full array
 		
-		//2. prepare data (age should be converted in frontend)
-		//3. get all users with filters applied
-		//4. calculate msg.caller score w users for something in return
-		//5. return 2 best
+			//2. prepare data (age should be converted in frontend)
+			//3. get all users with filters applied
+			//4. calculate msg.caller score w users for something in return
+	
 			changeUserPoints(msg.caller, Nat.sub(user.points, queryCost));
-			//nat.sub might seem better for these calls to prevent any underflowing or infer-errors, just in case
+
+				//5. return 2 best
+			return filteredUsers;
 		} else {
 			return #err("You don't have enough points");
 		};
