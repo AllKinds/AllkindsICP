@@ -11,6 +11,7 @@ import Option "mo:base/Option";
 import Buffer "mo:base/Buffer";
 import Nat32 "mo:base/Nat32";
 import Nat8 "mo:base/Nat8";
+import Nat "mo:base/Nat";
 import Int8 "mo:base/Int8";
 import Int32 "mo:base/Int32";
 import Debug "mo:base/Debug";
@@ -20,9 +21,11 @@ actor {
 
 	// CONSTANTS
 	let N = 10;
+	//TODO : change 'points' to 'reward'
 	let initialPoints : Nat = 100;
-	let answerPoints : Nat = 5;
-	let createrPoints : Nat = 30;
+	let answerPoints : Nat = 2;
+	let createrPoints : Nat = 10;
+	let queryCost : Nat = 30;
 
 	// DATA TYPES
 
@@ -96,6 +99,10 @@ actor {
 		sourceLike : ?Like;
 		testLike : ?Like;
 	};
+
+	type FilterParameters = {
+
+	}
 
 	// UTILITY FUNCTIONS
 
@@ -209,6 +216,34 @@ actor {
 		buf.toArray();
 	};
 
+	// filter users according to parameters
+	func filterUsers() : [Hash.Hash] {
+		let buf = Buffer.Buffer<Hash.Hash>(users.size());
+		var count = 0;
+		label f for (hash in users.keys()) {
+			if (users.size() == count) break f;
+			// let pQ = hashPrincipalQuestion(p, hash);
+			// switch (skips.get(pQ)) {
+			// 	case (?_) {};
+			// 	case null {
+			// 		switch (likes.get(pQ)) {
+			// 			case (?_) {};
+			// 			case null {
+			// 				switch (answers.get(pQ)) {
+			// 					case (?_) {
+			// 						buf.add(hash);
+			// 						count += 1;
+			// 					};
+			// 					case null {};
+			// 				};
+			// 			};
+			// 		};
+			// 	};
+			};
+		};
+		buf.toArray();
+	};
+
 	// calc score for 2 answers and optional 2 likes
 	func calcQuestionScore(sourceAnswer : Answer, testAnswer : Answer, sourceLike : ?Like, testLike : ?Like) : Int {
 		assert (sourceAnswer.question == testAnswer.question);
@@ -307,6 +342,8 @@ actor {
 		score;
 	};
 
+
+
 	//TODO : make function changeUserPoints and changeQuestionPoints
 
 	func changeUserPoints(p : Principal, value : Nat) : () {
@@ -339,6 +376,7 @@ actor {
 		};
 		questions.put(q.hash, newQ);
 	};
+
 
 	// DATA STORAGE
 
@@ -506,7 +544,11 @@ actor {
 
 		//check if user has enough points
 		//conversion to prevent under/over -flow
-		//TODO : checkout traps and wraps as all these conversions and point check should be done easier
+		//TODO : checkout traps as all these conversions and point check should be done easier
+		// let newPoints = Nat32.sub(
+		// 	Nat32.fromNat(user.points), 
+		// 	Nat32.fromNat(queryCost)
+		// );
 		let userPoints_ : Int32 = Int32.fromNat32(Nat32.fromNat(user.points));
 		let likeValue_ : Int32 = Int32.fromNat32(Nat32.fromNat(likeValue));
 		let newPoints = userPoints_ - likeValue_;
@@ -544,16 +586,33 @@ actor {
 	};
 
 	//find users based on parameters
-	public shared query (msg) func queryUsers(aMin : ?Nat, aMax : ?Nat, g : ?Gender, c : Nat) : async Result.Result<[User], Text> {
-		//para: Age min/max , Gender, cohesion (0-100)
-		//each parameter shoudl add extra token cost?
-		//1. calculate cost and check if user has funds, if not send error
-		//2. prepare data (calc age paras to user birth Int, check if cohesion is not outside bounds)
+	public shared query (msg) func findMatches(ageMin : ?Int, ageMax : ?Int, gender : ?Gender, cohesion : Nat) : async Result.Result<[User], Text> {
+		//1. check if user has funds, if not send error
+		let user = switch (users.get(msg.caller)) {
+			case null return #err("User does not exist");
+			case (?user) {
+				user;
+			};
+		};
+	
+		let userPoints_ : Int32 = Int32.fromNat32(Nat32.fromNat(user.points));
+		let queryCost_ : Int32 = Int32.fromNat32(Nat32.fromNat(queryCost));
+		let newPoints = userPoints_ - queryCost_;
+
+		//TODO : maybe Nat.sub could be used in this check statement, test
+		if (newPoints >= 0) {
+		
+		//2. prepare data (age should be converted in frontend)
 		//3. get all users with filters applied
 		//4. calculate msg.caller score w users for something in return
-		//5. post 2 best
+		//5. return 2 best
+			changeUserPoints(msg.caller, Nat.sub(user.points, queryCost));
+			//nat.sub might seem better for these calls to prevent any underflowing or infer-errors, just in case
+		} else {
+			return #err("You don't have enough points");
+		};
 
-		//currently give 2 users as result
+		#ok();//should return array of users
 	};
 	
 };
