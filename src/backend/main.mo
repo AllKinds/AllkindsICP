@@ -542,5 +542,18 @@ actor {
 		skips.put(principalQuestion, skip);
 		#ok();
 	};
+
+	//find users based on parameters
+	public shared query (msg) func queryUsers(aMin : ?Nat, aMax : ?Nat, g : ?Gender, c : Nat) : async Result.Result<[User], Text> {
+		//para: Age min/max , Gender, cohesion (0-100)
+		//each parameter shoudl add extra token cost?
+		//1. calculate cost and check if user has funds, if not send error
+		//2. prepare data (calc age paras to user birth Int, check if cohesion is not outside bounds)
+		//3. get all users with filters applied
+		//4. calculate msg.caller score w users for something in return
+		//5. post 2 best
+
+		//currently give 2 users as result
+	};
 	
 };
