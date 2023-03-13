@@ -104,10 +104,8 @@ actor {
 		minAge : ?Nat;
 		maxAge : ?Nat;
 		gender : ?Gender;
-		cohesion : ?Nat; 
+		cohesion : ?Nat;
 	};
-
-
 
 	// UTILITY FUNCTIONS
 
@@ -225,7 +223,7 @@ actor {
 	// 	minAge : ?Nat;
 	// 	maxAge : ?Nat;
 	// 	gender : ?Gender;
-	// 	cohesion : ?Nat; 
+	// 	cohesion : ?Nat;
 	// };
 
 	// filter users according to parameters
@@ -234,14 +232,13 @@ actor {
 		var count = 0;
 		label f for (p in users.keys()) {
 			if (users.size() == count) break f;
-				let user = switch (users.get(p)) {
-					case null ();
-					case (?user) {
-						buf.add(user);
-						//test out without pqrqmeters first
-					};
+			let user = switch (users.get(p)) {
+				case null ();
+				case (?user) {
+					buf.add(user);
+					//test out without pqrqmeters first
 				};
-				
+			};
 
 			count += 1;
 			// let pQ = hashPrincipalQuestion(p, hash);
@@ -261,7 +258,7 @@ actor {
 			// 			};
 			// 		};
 			// 	};
-			
+
 		};
 		buf.toArray();
 	};
@@ -364,8 +361,6 @@ actor {
 		score;
 	};
 
-
-
 	//TODO : make function changeUserPoints and changeQuestionPoints
 
 	func changeUserPoints(p : Principal, value : Nat) : () {
@@ -398,7 +393,6 @@ actor {
 		};
 		questions.put(q.hash, newQ);
 	};
-
 
 	// DATA STORAGE
 
@@ -568,7 +562,7 @@ actor {
 		//conversion to prevent under/over -flow
 		//TODO : checkout traps as all these conversions and point check should be done easier
 		// let newPoints = Nat32.sub(
-		// 	Nat32.fromNat(user.points), 
+		// 	Nat32.fromNat(user.points),
 		// 	Nat32.fromNat(queryCost)
 		// );
 		let userPoints_ : Int32 = Int32.fromNat32(Nat32.fromNat(user.points));
@@ -616,7 +610,7 @@ actor {
 				user;
 			};
 		};
-	
+
 		let userPoints_ : Int32 = Int32.fromNat32(Nat32.fromNat(user.points));
 		let queryCost_ : Int32 = Int32.fromNat32(Nat32.fromNat(queryCost));
 		let newPoints = userPoints_ - queryCost_;
@@ -626,22 +620,22 @@ actor {
 
 			//let filteredUsers : [User] = filterUsers(para);
 			//TEMP : testing out with just gender filter and returning full array
-		
+
 			//2. prepare data
 			//3. get all users with filters applied
 			//4. calculate msg.caller score w users for something in return
-	
+
 			changeUserPoints(msg.caller, Nat.sub(user.points, queryCost));
 
-				//5. return 2 best
+			//5. return 2 best
 		} else {
 			return #err("You don't have enough points");
 		};
 
 		//TEMP fix
-		let filteredUsers : [User]= filterUsers(para);
+		let filteredUsers : [User] = filterUsers(para);
 
-		#ok(filteredUsers);//should return array of users
+		#ok(filteredUsers); //should return array of users
 	};
-	
+
 };
