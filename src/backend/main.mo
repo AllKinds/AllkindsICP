@@ -624,7 +624,7 @@ actor {
 		//TODO : maybe Nat.sub could be used in this check statement, test
 		if (newPoints >= 0) {
 
-			let filteredUsers : [User] = filterUsers(para);
+			//let filteredUsers : [User] = filterUsers(para);
 			//TEMP : testing out with just gender filter and returning full array
 		
 			//2. prepare data
@@ -637,6 +637,9 @@ actor {
 		} else {
 			return #err("You don't have enough points");
 		};
+
+		//TEMP fix
+		let filteredUsers : [User]= filterUsers(para);
 
 		#ok(filteredUsers);//should return array of users
 	};
