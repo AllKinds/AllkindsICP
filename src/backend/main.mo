@@ -619,7 +619,7 @@ actor {
 			let filteredUsers : [User] = filterUsers(para);
 			//TEMP : testing out with just gender filter and returning full array
 		
-			//2. prepare data (age should be converted in frontend)
+			//2. prepare data
 			//3. get all users with filters applied
 			//4. calculate msg.caller score w users for something in return
 	
