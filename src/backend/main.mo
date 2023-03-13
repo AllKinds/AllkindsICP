@@ -534,7 +534,7 @@ actor {
 			like;
 		};
 		//TEMP : likes.put line is moved to after points check
-
+		//TODO : cleanup and extract possible funcs
 		let likeValue : Nat = switch (like) {
 			case (#Like(value)) { value };
 			case (#Dislike(value)) { value }; //I removed '-' because here it has to be subtracted anyway, maybe like value could be extracted without switch
