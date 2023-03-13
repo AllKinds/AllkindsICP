@@ -32,6 +32,8 @@
 	</span>
 	<span class="mx-auto">{$user.about[0] ? $user.about[0] : ''}</span>
 
+
+	<!--TODO :  2 buttons to call AnsweredQ and MyCreatedQ -->
 	<div class="dark:bg-slate-700 bg-slate-100 w-100% rounded-md flex flex-col p-2 md:p-8 gap-2">
 		{#if $questionsAnswered}
 			{#each $questionsAnswered as q}
