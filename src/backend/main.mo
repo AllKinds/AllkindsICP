@@ -100,6 +100,13 @@ actor {
 		testLike : ?Like;
 	};
 
+	type MatchingFilter = {
+		minAge : ?Nat;
+		maxAge : ?Nat;
+		gender : ?Gender;
+		cohesion : ?Nat; 
+	};
+
 
 
 	// UTILITY FUNCTIONS
