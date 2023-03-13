@@ -230,17 +230,18 @@ actor {
 
 	// filter users according to parameters
 	func filterUsers(para : MatchingFilter) : [User] {
-		let buf = Buffer.Buffer<Hash.Hash>(users.size()); //maybe fixed buf not needed or workaround, test stuff
+		let buf = Buffer.Buffer<User>(users.size()); //maybe fixed buf not needed or workaround, test stuff
 		var count = 0;
-		label f for (user in users()) {
+		label f for (p in users.keys()) {
 			if (users.size() == count) break f;
-				switch(user.gender == para.gender) {
-					case false {};
-					case true {
+				let user = switch (users.get(p)) {
+					case null ();
+					case (?user) {
 						buf.add(user);
-						//testing out with just gender 
+						//test out without pqrqmeters first
 					};
 				};
+				
 
 			count += 1;
 			// let pQ = hashPrincipalQuestion(p, hash);
@@ -260,7 +261,7 @@ actor {
 			// 			};
 			// 		};
 			// 	};
-			};
+			
 		};
 		buf.toArray();
 	};
