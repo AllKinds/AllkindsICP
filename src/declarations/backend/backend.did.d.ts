@@ -7,10 +7,10 @@ export type Gender = { Male: null } | { Female: null } | { Other: null } | { Que
 export type Hash = number;
 export type LikeKind = { Like: bigint } | { Dislike: bigint };
 export interface MatchingFilter {
-	cohesion: [] | [bigint];
-	minAge: [] | [bigint];
+	cohesion: bigint;
+	minAge: bigint;
 	gender: [] | [Gender];
-	maxAge: [] | [bigint];
+	maxAge: bigint;
 }
 export interface Question {
 	created: bigint;

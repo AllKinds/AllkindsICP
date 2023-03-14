@@ -15,28 +15,27 @@
 	let skipPending: boolean = false;
 	let answerPending: boolean | undefined = undefined;
 
-
 	const submitAnswer = async (bool: boolean) => {
-		answerPending = bool;	
+		answerPending = bool;
 		let answer: AnswerKind = { Bool: bool };
 		let like: LikeKind = bool ? { Like: BigInt(likeWeight) } : { Dislike: BigInt(likeWeight) };
 
-		const putAnswer = async () => await answerQ(question.hash, answer).catch((error) => {
-			console.log('errorcatch', error);	
-			
-		});
+		const putAnswer = async () =>
+			await answerQ(question.hash, answer).catch((error) => {
+				console.log('errorcatch', error);
+			});
 
-			//TODO : clean up and write more efficient
+		//TODO : clean up and write more efficient
 		if (likeWeight == 0) {
 			await putAnswer();
 		} else {
-			if (($user.points - BigInt(likeWeight)) >= 0 ) {
-				await likeQ(question.hash, like).catch((error) => {
-					console.log('errorcatch', error);
-					console.log('points - like', $user.points - BigInt(likeWeight));
-				}).then(async () => await putAnswer(
-
-				))
+			if ($user.points - BigInt(likeWeight) >= 0) {
+				await likeQ(question.hash, like)
+					.catch((error) => {
+						console.log('errorcatch', error);
+						console.log('points - like', $user.points - BigInt(likeWeight));
+					})
+					.then(async () => await putAnswer());
 			}
 			//TODO : show errors on questions correctly
 		}

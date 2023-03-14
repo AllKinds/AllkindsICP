@@ -28,4 +28,4 @@ declare module '*.svg?dataurl' {
 	export default content;
 }
 
-declare module '@bulatdashiev/svelte-slider'
+declare module '@bulatdashiev/svelte-slider';

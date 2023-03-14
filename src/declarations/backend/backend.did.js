@@ -7,10 +7,10 @@ export const idlFactory = ({ IDL }) => {
 		Queer: IDL.Null
 	});
 	const MatchingFilter = IDL.Record({
-		cohesion: IDL.Opt(IDL.Nat),
-		minAge: IDL.Opt(IDL.Nat),
+		cohesion: IDL.Nat,
+		minAge: IDL.Nat,
 		gender: IDL.Opt(Gender),
-		maxAge: IDL.Opt(IDL.Nat)
+		maxAge: IDL.Nat
 	});
 	const User = IDL.Record({
 		created: IDL.Int,
