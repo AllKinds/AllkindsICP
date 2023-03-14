@@ -48,7 +48,6 @@
       {:else}
         Find a new connection
       {/if}
-      
     </button>
 	</div>
 	<button

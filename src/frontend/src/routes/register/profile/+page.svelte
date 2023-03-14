@@ -15,11 +15,19 @@
 	} from '$lib/utilities';
 	import Input from '$lib/components/common/Input.svelte';
 	import PublicToggle from '$lib/components/common/PublicToggle.svelte';
+	import Spinner from '$lib/components/common/Spinner.svelte';
+
+	//TODO : RECYCLE CODE (see other profile file) 
+	//TODO : DECOMPONENTIALISE parts that could be used in future
+
+	let pending: boolean = false;
+	let genders = ['', 'Male', 'Female', 'Other', 'Queer'];
 
 	let publicAbout: boolean = $user.about[1];
 	let publicConnect: boolean = $user.connect[1];
 	let publicBirth: boolean = $user.birth[1];
 	let publicGender: boolean = $user.gender[1];
+	
 
 	//an user object to temporary store and change OUR values , this has NO User interface
 	let userObj = {
@@ -32,6 +40,7 @@
 	};
 
 	async function submit() {
+		pending = true;
 		const newUser: User = {
 			created: $user.created,
 			connect: [toNullable(userObj.connect), publicConnect],
@@ -44,6 +53,7 @@
 		};
 		await updateProfile(newUser);
 		regiStore.set(RegiState.Finished);
+		pending = false;
 	}
 </script>
 
@@ -53,8 +63,8 @@
 
 	<div class="">
 		<Input text="Gender">
-			<select bind:value={userObj.gender} slot="input">
-				{#each ['', 'Male', 'Female', 'Other', 'Queer'] as gender}
+			<select bind:value={userObj.gender} slot="input" disabled={pending}>
+				{#each genders as gender}
 					<option value={gender}>
 						{gender}
 					</option>
@@ -71,24 +81,30 @@
 				bind:value={userObj.birth}
 				min="1920-01-01"
 				max="2022-01-01"
+				disabled={pending}
 			/>
 			<PublicToggle slot="public" bind:checked={publicBirth} />
 		</Input>
 
 		<Input text="Email">
-			<input type="email" class="inputfield" slot="input" bind:value={userObj.connect} />
-			<PublicToggle slot="public" bind:checked={publicConnect} />
+			<input type="email" class="inputfield" slot="input" bind:value={userObj.connect} disabled={pending}/>
+			<PublicToggle slot="public" bind:checked={publicConnect}/>
 		</Input>
 
 		<Input text="About you">
-			<textarea type="textfield" class="inputfield" slot="input" bind:value={userObj.about} />
-
-			<PublicToggle slot="public" bind:checked={publicAbout} />
+			<textarea type="textfield" class="inputfield" slot="input" bind:value={userObj.about} disabled={pending}/>
+			<PublicToggle slot="public" bind:checked={publicAbout}/>
 		</Input>
 	</div>
 
 	<div class="fancy-btn-border">
-		<button on:click={submit} class="fancy-btn">Continue</button>
+		<button on:click={submit} class="fancy-btn">
+			{#if pending}
+				<Spinner />
+			{:else}
+				Continue
+			{/if}
+		</button>
 	</div>
 </div>
 
