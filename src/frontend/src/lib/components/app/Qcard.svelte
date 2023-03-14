@@ -14,45 +14,34 @@
 	let likeWeight: number = 0;
 	let skipPending: boolean = false;
 	let answerPending: boolean | undefined = undefined;
-	let likePending: boolean | undefined = undefined;
 
-	const submitAnswer = async (bool: boolean) => {		
+
+	const submitAnswer = async (bool: boolean) => {
+		answerPending = bool;	
 		let answer: AnswerKind = { Bool: bool };
+		let like: LikeKind = bool ? { Like: BigInt(likeWeight) } : { Dislike: BigInt(likeWeight) };
+
 		const putAnswer = async () => await answerQ(question.hash, answer).catch((error) => {
-			console.log('errorcatch', error);
+			console.log('errorcatch', error);	
+			
 		});
 
-		answerPending = bool;
-		let like: LikeKind = bool ? { Like: BigInt(likeWeight) } : { Dislike: BigInt(likeWeight) };
+			//TODO : clean up and write more efficient
 		if (likeWeight == 0) {
-			putAnswer();
-		} else {//lil bit ugly of an ugly fix here
+			await putAnswer();
+		} else {
 			if (($user.points - BigInt(likeWeight)) >= 0 ) {
 				await likeQ(question.hash, like).catch((error) => {
 					console.log('errorcatch', error);
 					console.log('points - like', $user.points - BigInt(likeWeight));
-				}).then(() => putAnswer())
+				}).then(async () => await putAnswer(
+
+				))
 			}
 			//TODO : show errors on questions correctly
 		}
 
-
-
-		
-
-
-		// if (likeWeight !== 0) {
-		// 	let like: LikeKind = bool ? { Like: BigInt(likeWeight) } : { Dislike: BigInt(likeWeight) };
-		// 	await likeQ(question.hash, like).catch((error) => {
-		// 		console.log('errorcatch', error);
-
-		// 	}).then(() => putAnswer())
-		// } else {
-		// 	putAnswer();
-		// }
-
 		answerPending = undefined;
-		likePending = undefined;
 		likeWeight = 0;
 		getQs();
 	};
@@ -98,12 +87,10 @@
 				class="transition-all bg-red-400 hover:bg-red-500 h-16 w-4/12 rounded-xl flex justify-center items-center grow"
 			>
 				<h3>
-					{#if answerPending == false}
-						<Spinner />
-					{:else if likePending == false}
-						Submit
-					{:else}
+					{#if answerPending == undefined}
 						NO
+					{:else if answerPending == false}
+						<Spinner />
 					{/if}
 				</h3>
 			</button>
@@ -128,12 +115,10 @@
 				class="transition-all bg-green-400 hover:bg-green-500 h-16 w-4/12 rounded-xl flex justify-center items-center grow"
 			>
 				<h3>
-					{#if answerPending == true}
-						<Spinner />
-					{:else if likePending == true}
-						Submit
-					{:else}
+					{#if answerPending == undefined}
 						YES
+					{:else if answerPending == true}
+						<Spinner />
 					{/if}
 				</h3>
 			</button>

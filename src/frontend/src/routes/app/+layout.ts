@@ -10,8 +10,8 @@ export const load: LayoutLoad = () => {
 		sections: [
 			{ slug: 'home', title: 'Home', icon: Home },
 			{ slug: 'people', title: 'People', icon: Users },
-			{ slug: 'user', title: 'Me', icon: User },
-			{ slug: 'profile', title: 'Settings', icon: Cogwheel },
+			{ slug: 'profile', title: 'Me', icon: User },
+			{ slug: 'settings', title: 'Settings', icon: Cogwheel },
 			{ slug: 'dev', title: 'Dev', icon: Dev }
 		]
 	};

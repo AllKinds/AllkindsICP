@@ -25,8 +25,8 @@
 			>
 				<a href="/app/home"><Home class="iconbtn" /></a>
 				<a href="/app/people"><Users class="iconbtn" /></a>
-				<a href="/app/user"><User class="iconbtn" /></a>
-				<a href="/app/profile"><Cogwheel class="iconbtn" /></a>
+				<a href="/app/profile"><User class="iconbtn" /></a>
+				<a href="/app/settings"><Cogwheel class="iconbtn" /></a>
 			</div>
 
 			<div
@@ -52,6 +52,6 @@
 >
 	<a href="/app/home"><Home class="iconbtn" /></a>
 	<a href="/app/people"><Users class="iconbtn" /></a>
-	<a href="/app/user"><User class="iconbtn" /></a>
-	<a href="/app/profile"><Cogwheel class="iconbtn" /></a>
+	<a href="/app/profile"><User class="iconbtn" /></a>
+	<a href="/app/settings"><Cogwheel class="iconbtn" /></a>
 </div>

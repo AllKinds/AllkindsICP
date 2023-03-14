@@ -11,6 +11,7 @@ import Option "mo:base/Option";
 import Buffer "mo:base/Buffer";
 import Nat32 "mo:base/Nat32";
 import Nat8 "mo:base/Nat8";
+import Nat "mo:base/Nat";
 import Int8 "mo:base/Int8";
 import Int32 "mo:base/Int32";
 import Debug "mo:base/Debug";
@@ -20,9 +21,11 @@ actor {
 
 	// CONSTANTS
 	let N = 10;
+	//TODO : change 'points' to 'reward'
 	let initialPoints : Nat = 100;
-	let answerPoints : Nat = 5;
-	let createrPoints : Nat = 30;
+	let answerPoints : Nat = 2;
+	let createrPoints : Nat = 10;
+	let queryCost : Nat = 30;
 
 	// DATA TYPES
 
@@ -97,6 +100,13 @@ actor {
 		testLike : ?Like;
 	};
 
+	type MatchingFilter = {
+		minAge : ?Nat;
+		maxAge : ?Nat;
+		gender : ?Gender;
+		cohesion : ?Nat;
+	};
+
 	// UTILITY FUNCTIONS
 
 	func hashQuestion(created : Int, creater : Principal, question : Text) : Hash.Hash {
@@ -166,11 +176,89 @@ actor {
 									buf.add(hash);
 									count += 1;
 								};
+								//changing this around could be used to get questions that User has answered
+								//or modify function so an extra function parameter could sort on skipped, liked, answered, etc?
+								//case null {};
+								// case (?_) {
+								// 	buf.add(hash);
+								// 	count += 1;
+								// };
 							};
 						};
 					};
 				};
 			};
+		};
+		buf.toArray();
+	};
+
+	func answeredQuestions(p : Principal, n : Nat) : [Hash.Hash] {
+		let buf = Buffer.Buffer<Hash.Hash>(10);
+		var count = 0;
+		label f for (hash in questions.keys()) {
+			if (n == count) break f;
+			let pQ = hashPrincipalQuestion(p, hash);
+			switch (skips.get(pQ)) {
+				case (?_) {};
+				case null {
+					switch (likes.get(pQ)) {
+						case (?_) {};
+						case null {
+							switch (answers.get(pQ)) {
+								case (?_) {
+									buf.add(hash);
+									count += 1;
+								};
+								case null {};
+							};
+						};
+					};
+				};
+			};
+		};
+		buf.toArray();
+	};
+	//TEMP : ref
+	// type MatchingFilter = {
+	// 	minAge : ?Nat;
+	// 	maxAge : ?Nat;
+	// 	gender : ?Gender;
+	// 	cohesion : ?Nat;
+	// };
+
+	// filter users according to parameters
+	func filterUsers(para : MatchingFilter) : [User] {
+		let buf = Buffer.Buffer<User>(users.size()); //maybe fixed buf not needed or workaround, test stuff
+		var count = 0;
+		label f for (p in users.keys()) {
+			if (users.size() == count) break f;
+			let user = switch (users.get(p)) {
+				case null ();
+				case (?user) {
+					buf.add(user);
+					//test out without pqrqmeters first
+				};
+			};
+
+			count += 1;
+			// let pQ = hashPrincipalQuestion(p, hash);
+			// switch (skips.get(pQ)) {
+			// 	case (?_) {};
+			// 	case null {
+			// 		switch (likes.get(pQ)) {
+			// 			case (?_) {};
+			// 			case null {
+			// 				switch (answers.get(pQ)) {
+			// 					case (?_) {
+			// 						buf.add(hash);
+			// 						count += 1;
+			// 					};
+			// 					case null {};
+			// 				};
+			// 			};
+			// 		};
+			// 	};
+
 		};
 		buf.toArray();
 	};
@@ -405,7 +493,17 @@ actor {
 		};
 
 		let q = Array.mapFilter(askables, getQuestion);
+		#ok(q);
+	};
 
+	public shared query (msg) func getAnsweredQuestions(n : Nat) : async Result.Result<[Question], Text> {
+		let answered = answeredQuestions(msg.caller, n);
+
+		func getQuestion(h : Hash.Hash) : ?Question {
+			questions.get(h);
+		};
+
+		let q = Array.mapFilter(answered, getQuestion);
 		#ok(q);
 	};
 
@@ -438,7 +536,7 @@ actor {
 			like;
 		};
 		//TEMP : likes.put line is moved to after points check
-
+		//TODO : cleanup and extract possible funcs
 		let likeValue : Nat = switch (like) {
 			case (#Like(value)) { value };
 			case (#Dislike(value)) { value }; //I removed '-' because here it has to be subtracted anyway, maybe like value could be extracted without switch
@@ -462,7 +560,11 @@ actor {
 
 		//check if user has enough points
 		//conversion to prevent under/over -flow
-		//TODO : checkout traps and wraps as all these conversions and point check should be done easier
+		//TODO : checkout traps as all these conversions and point check should be done easier
+		// let newPoints = Nat32.sub(
+		// 	Nat32.fromNat(user.points),
+		// 	Nat32.fromNat(queryCost)
+		// );
 		let userPoints_ : Int32 = Int32.fromNat32(Nat32.fromNat(user.points));
 		let likeValue_ : Int32 = Int32.fromNat32(Nat32.fromNat(likeValue));
 		let newPoints = userPoints_ - likeValue_;
@@ -498,4 +600,42 @@ actor {
 		skips.put(principalQuestion, skip);
 		#ok();
 	};
+
+	//find users based on parameters
+	public shared query (msg) func findMatches(para : MatchingFilter) : async Result.Result<[User], Text> {
+		//1. check if user has funds, if not send error
+		let user = switch (users.get(msg.caller)) {
+			case null return #err("User does not exist");
+			case (?user) {
+				user;
+			};
+		};
+
+		let userPoints_ : Int32 = Int32.fromNat32(Nat32.fromNat(user.points));
+		let queryCost_ : Int32 = Int32.fromNat32(Nat32.fromNat(queryCost));
+		let newPoints = userPoints_ - queryCost_;
+
+		//TODO : maybe Nat.sub could be used in this check statement, test
+		if (newPoints >= 0) {
+
+			//let filteredUsers : [User] = filterUsers(para);
+			//TEMP : testing out with just gender filter and returning full array
+
+			//2. prepare data
+			//3. get all users with filters applied
+			//4. calculate msg.caller score w users for something in return
+
+			changeUserPoints(msg.caller, Nat.sub(user.points, queryCost));
+
+			//5. return 2 best
+		} else {
+			return #err("You don't have enough points");
+		};
+
+		//TEMP fix
+		let filteredUsers : [User] = filterUsers(para);
+
+		#ok(filteredUsers); //should return array of users
+	};
+
 };

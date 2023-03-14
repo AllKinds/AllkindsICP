@@ -19,6 +19,10 @@ type User = record {
 	points : nat;
 	username : text;
 };
+type Result_3 = variant {
+	err : text;
+	ok : vec User;
+};
 type Result_2 = variant {
 	err : text;
 	ok : vec Question;
@@ -39,6 +43,12 @@ type Question = record {
 	points : int;
 	question : text;
 };
+type MatchingFilter = record {
+	cohesion : opt nat;
+	gender : opt Gender;
+	maxAge : opt nat;
+	minAge : opt nat;
+};
 type LikeKind = variant {
 	Dislike : nat;
 	Like : nat;
@@ -55,6 +65,8 @@ type AnswerKind = variant { Bool : bool };
 service : {
 	createQuestion : (text) -> (Result);
 	createUser : (text) -> (Result);
+	findMatches : (MatchingFilter) -> (Result_3) query;
+	getAnsweredQuestions : (nat) -> (Result_2) query;
 	getAskableQuestions : (nat) -> (Result_2) query;
 	getUser : () -> (Result_1) query;
 	submitAnswer : (Hash, AnswerKind) -> (Result);
