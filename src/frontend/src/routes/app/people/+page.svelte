@@ -14,9 +14,10 @@
 
 	const handleFindMatches = async () => {
 		let filter: MatchingFilter = {
-			cohesion: cohesionValue[0],
-			ageMin: ageValue[0],
-			ageMax: ageValue[1]
+			cohesion: BigInt(cohesionValue[0]),
+			minAge:  BigInt(ageValue[0]),
+			maxAge:  BigInt(ageValue[1]),
+      gender : 
 		};
 	};
 </script>
