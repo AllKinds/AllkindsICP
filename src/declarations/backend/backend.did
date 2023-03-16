@@ -44,10 +44,10 @@ type Question = record {
 	question : text;
 };
 type MatchingFilter = record {
-	cohesion : opt nat;
+	cohesion : nat;
 	gender : opt Gender;
-	maxAge : opt nat;
-	minAge : opt nat;
+	maxAge : nat;
+	minAge : nat;
 };
 type LikeKind = variant {
 	Dislike : nat;

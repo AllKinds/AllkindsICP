@@ -10,7 +10,7 @@
 
 	let expandWindow: boolean = false;
 	let newQ: string;
-	let pending: boolean | undefined = undefined;
+	let pending: boolean = false;
 
 	onMount(async () => {
 		await getQs();
@@ -24,7 +24,9 @@
 		pending = false;
 		newQ = '';
 		getQs();
-		window.setTimeout(() => ((pending = undefined), (expandWindow = false)), 2000);
+		window.setTimeout(() => (expandWindow = false), 1500);
+		// 1500ms seems a balanced time for window to retract,
+		//this might unconsciously help for the user to lessen Q spamming
 	};
 </script>
 
@@ -58,15 +60,14 @@
 					bind:value={newQ}
 				/>
 
-				{#if pending == true}
-					<Spinner />
-					<p class="text-slate-500">Submitting...</p>
-				{:else if pending == false}
-					<p class="text-slate-500">Succes c:</p>
-				{/if}
-
 				<div class="fancy-btn-border">
-					<button on:click={submit} class="fancy-btn">Submit</button>
+					<button on:click={submit} class="fancy-btn">
+						{#if pending}
+							<Spinner />
+						{:else}
+							Submit
+						{/if}
+					</button>
 				</div>
 			</div>
 		{/if}

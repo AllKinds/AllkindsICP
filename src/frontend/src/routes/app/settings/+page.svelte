@@ -14,7 +14,10 @@
 	import Eye from '$lib/assets/icons/eye.svg?component';
 	import Spinner from '$lib/components/common/Spinner.svelte';
 
-	let pending: boolean | undefined = undefined;
+	//TODO : RECYCLE CODE (see other profile file)
+	//TODO : DECOMPONENTIALISE parts that could be used in future
+
+	let pending: boolean = false;
 	//this could be moved to some declaration/constant somewhere else
 	let genders = ['', 'Male', 'Female', 'Other', 'Queer'];
 
@@ -50,7 +53,6 @@
 			console.log('errorcatch', error);
 		});
 		pending = false;
-		window.setTimeout(() => (pending = undefined), 2000);
 	};
 </script>
 
@@ -58,16 +60,6 @@
 	<h2 class="p-0">Profile settings</h2>
 	<span class="text-slate-600 flex"><Eye /> : Allow what people can initially see about you.</span>
 	<div class="dark:bg-slate-700 bg-slate-100 w-full rounded-md flex flex-col p-2 md:p-8">
-		<!-- <strong>User data</strong><br />
-		username: {$user.username}<br />
-		created: {fromBigInt($user.created)}<br />
-		gender: {$user.gender[1]} {$user.gender[0][0]}<br />
-		birth: {$user.birth[1]} {userObj.birth}<br />
-		connect: {$user.connect[1]} {$user.connect[0]}<br />
-		about: {$user.about[1]} {$user.about[0]}<br />
-		<br />
-		<h3>Test out profile edit</h3>
-		<br /> -->
 		<div class="flex flex-col w-10/12">
 			<span>Username</span>
 			<label for="username" class="pr-8">
@@ -113,15 +105,14 @@
 		</div>
 
 		<div class="flex flex-col justify-center items-center">
-			{#if pending == true}
-				<Spinner />
-				<p class="text-slate-500">Updating...</p>
-			{:else if pending == false}
-				<p class="text-slate-500">Succes c:</p>
-			{/if}
-
 			<div class="fancy-btn-border">
-				<button on:click={update} class="fancy-btn">Update</button>
+				<button on:click={update} class="fancy-btn">
+					{#if pending}
+						<Spinner />
+					{:else}
+						Update
+					{/if}
+				</button>
 			</div>
 		</div>
 	</div>

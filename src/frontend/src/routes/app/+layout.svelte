@@ -13,6 +13,7 @@
 </script>
 
 <Layout headerBg={'dark:bg-gradient-to-r dark:from-slate-800/95 dark:to-slate-800 bg-slate-100'}>
+	<!-- right sided main app nav -->
 	<svelte:fragment slot="nav">
 		<SidepanelNav {data} />
 	</svelte:fragment>
@@ -29,11 +30,10 @@
 				<a href="/app/settings"><Cogwheel class="iconbtn" /></a>
 			</div>
 
-			<div
-				class="bg-gradient-to-b from-DF-blue via-DF-red to-DF-yellow h-fit w-full rounded-lg mt-1"
-			>
+			<!-- main content -->
+			<div class="bg-gradient-to-br from-DF-blue to-DF-red  h-fit w-full rounded-lg mt-1">
 				<div
-					class="dark:bg-slate-800/95 bg-slate-100 border dark:border-none rounded-lg p-2 md:p-5 "
+					class="dark:bg-slate-800/95 bg-slate-100 border dark:border-none rounded-lg p-2 md:p-5  min-h-screen"
 				>
 					<slot />
 				</div>
@@ -46,7 +46,7 @@
 	</svelte:fragment>
 </Layout>
 
-<!-- left sided col replacement for mobile view, is sticky to bottom -->
+<!-- menu shortcuts sticky to bottom , left sided col replacement for mobile view -->
 <div
 	class="flex bg-slate-100 dark:bg-slate-900 w-full py-2 fixed bottom-0 sm:hidden rounded-t-lg justify-evenly"
 >

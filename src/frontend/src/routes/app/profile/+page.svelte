@@ -1,12 +1,8 @@
 <script lang="ts">
 	import { user } from '$lib/stores/index';
-	import {
-		fromNullableDate,
-		fromNullableGender,
-	} from '$lib/utilities';
+	import { fromNullableDate, fromNullableGender } from '$lib/utilities';
 	import { onMount } from 'svelte';
 	import { getQsAnswered, questionsAnswered } from '$lib/stores/tasks/getQsAnswered';
-	
 
 	let userBirth = fromNullableDate($user.birth[0]);
 	//ISSUE date ms is counted from 1970, anyone born before might have issues (prob wrong date-time used in createProfile)
@@ -19,9 +15,8 @@
 	onMount(async () => {
 		//FIX change into button that then calls answered Q
 		await getQsAnswered();
-		console.log($questionsAnswered)
+		console.log($questionsAnswered);
 	});
-
 </script>
 
 <div class="flex flex-col gap-4">
@@ -31,7 +26,6 @@
 		{userBirth ? ageY : 'undefined'} , {fromNullableGender($user.gender[0])}
 	</span>
 	<span class="mx-auto">{$user.about[0] ? $user.about[0] : ''}</span>
-
 
 	<!--TODO :  2 buttons to call AnsweredQ and MyCreatedQ -->
 	<div class="dark:bg-slate-700 bg-slate-100 w-100% rounded-md flex flex-col p-2 md:p-8 gap-2">

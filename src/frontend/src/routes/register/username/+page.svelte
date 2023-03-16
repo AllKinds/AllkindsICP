@@ -1,13 +1,14 @@
 <script lang="ts">
+	import Spinner from '$lib/components/common/Spinner.svelte';
 	import { regiStore, actor } from '$lib/stores/';
 	import { syncAuth } from '$lib/stores/tasks/';
 	import { RegiState } from '$lib/stores/types';
 
 	let username: string;
+	let pending: boolean = false;
 
 	async function register() {
-		const input = document.getElementById('username') as HTMLInputElement;
-		input.disabled = true;
+		pending = true;
 		console.log('username input : ', username);
 		const result = await $actor.createUser(username);
 		if (result.hasOwnProperty('ok')) {
@@ -17,7 +18,7 @@
 		} else {
 			console.error(result);
 		}
-		input.disabled = false;
+		pending = false;
 	}
 </script>
 
@@ -29,6 +30,7 @@
 		>
 			<input
 				type="text"
+				disabled={pending}
 				id="username"
 				class="bg-slate-600 w-56 p-1 rounded-md outline-none"
 				bind:value={username}
@@ -37,7 +39,13 @@
 	</div>
 	<div class="w-fit h-fit mx-auto">
 		<div class="fancy-btn-border">
-			<button on:click={register} class="fancy-btn">Register</button>
+			<button on:click={register} class="fancy-btn">
+				{#if pending}
+					<Spinner />
+				{:else}
+					Register
+				{/if}
+			</button>
 		</div>
 	</div>
 </div>

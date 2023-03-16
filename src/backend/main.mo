@@ -101,10 +101,10 @@ actor {
 	};
 
 	type MatchingFilter = {
-		minAge : ?Nat;
-		maxAge : ?Nat;
+		minAge : Nat;
+		maxAge : Nat;
 		gender : ?Gender;
-		cohesion : ?Nat;
+		cohesion : Nat;
 	};
 
 	// UTILITY FUNCTIONS

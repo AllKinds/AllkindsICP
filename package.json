@@ -11,6 +11,7 @@
 		"generate": "dfx generate && node ./update.types.mjs && npm run format"
 	},
 	"devDependencies": {
+		"@bulatdashiev/svelte-slider": "^1.0.3",
 		"@esbuild-plugins/node-globals-polyfill": "^0.1.1",
 		"@esbuild-plugins/node-modules-polyfill": "^0.1.4",
 		"@poppanator/sveltekit-svg": "^1.1.1",
