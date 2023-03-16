@@ -14,8 +14,7 @@
 	import Eye from '$lib/assets/icons/eye.svg?component';
 	import Spinner from '$lib/components/common/Spinner.svelte';
 
-
-	//TODO : RECYCLE CODE (see other profile file) 
+	//TODO : RECYCLE CODE (see other profile file)
 	//TODO : DECOMPONENTIALISE parts that could be used in future
 
 	let pending: boolean = false;
@@ -61,7 +60,6 @@
 	<h2 class="p-0">Profile settings</h2>
 	<span class="text-slate-600 flex"><Eye /> : Allow what people can initially see about you.</span>
 	<div class="dark:bg-slate-700 bg-slate-100 w-full rounded-md flex flex-col p-2 md:p-8">
-
 		<div class="flex flex-col w-10/12">
 			<span>Username</span>
 			<label for="username" class="pr-8">
@@ -117,7 +115,6 @@
 				</button>
 			</div>
 		</div>
-
 	</div>
 </div>
 

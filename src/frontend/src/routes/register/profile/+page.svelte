@@ -17,7 +17,7 @@
 	import PublicToggle from '$lib/components/common/PublicToggle.svelte';
 	import Spinner from '$lib/components/common/Spinner.svelte';
 
-	//TODO : RECYCLE CODE (see other profile file) 
+	//TODO : RECYCLE CODE (see other profile file)
 	//TODO : DECOMPONENTIALISE parts that could be used in future
 
 	let pending: boolean = false;
@@ -27,7 +27,6 @@
 	let publicConnect: boolean = $user.connect[1];
 	let publicBirth: boolean = $user.birth[1];
 	let publicGender: boolean = $user.gender[1];
-	
 
 	//an user object to temporary store and change OUR values , this has NO User interface
 	let userObj = {
@@ -87,13 +86,25 @@
 		</Input>
 
 		<Input text="Email">
-			<input type="email" class="inputfield" slot="input" bind:value={userObj.connect} disabled={pending}/>
-			<PublicToggle slot="public" bind:checked={publicConnect}/>
+			<input
+				type="email"
+				class="inputfield"
+				slot="input"
+				bind:value={userObj.connect}
+				disabled={pending}
+			/>
+			<PublicToggle slot="public" bind:checked={publicConnect} />
 		</Input>
 
 		<Input text="About you">
-			<textarea type="textfield" class="inputfield" slot="input" bind:value={userObj.about} disabled={pending}/>
-			<PublicToggle slot="public" bind:checked={publicAbout}/>
+			<textarea
+				type="textfield"
+				class="inputfield"
+				slot="input"
+				bind:value={userObj.about}
+				disabled={pending}
+			/>
+			<PublicToggle slot="public" bind:checked={publicAbout} />
 		</Input>
 	</div>
 

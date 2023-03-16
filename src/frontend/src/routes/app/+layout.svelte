@@ -13,7 +13,6 @@
 </script>
 
 <Layout headerBg={'dark:bg-gradient-to-r dark:from-slate-800/95 dark:to-slate-800 bg-slate-100'}>
-
 	<!-- right sided main app nav -->
 	<svelte:fragment slot="nav">
 		<SidepanelNav {data} />
@@ -32,13 +31,10 @@
 			</div>
 
 			<!-- main content -->
-			<div
-				class="bg-gradient-to-br from-DF-blue to-DF-red  h-fit w-full rounded-lg mt-1"
-			>
+			<div class="bg-gradient-to-br from-DF-blue to-DF-red  h-fit w-full rounded-lg mt-1">
 				<div
 					class="dark:bg-slate-800/95 bg-slate-100 border dark:border-none rounded-lg p-2 md:p-5  min-h-screen"
 				>
-					
 					<slot />
 				</div>
 			</div>
