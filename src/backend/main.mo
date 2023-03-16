@@ -220,8 +220,8 @@ actor {
 	};
 
 	// filter users according to parameters
-	func filterUsers(p : Principal, f : MatchingFilter) : [User] {
-		let buf = Buffer.Buffer<User>(users.size()); //TODO : test out possible buffer size props
+	func filterUsers(p : Principal, f : MatchingFilter) : [(User, Int)] {
+		let buf = Buffer.Buffer<(User, Int)>(users.size()); //TODO : test out possible buffer size props
 		var count = 0;
 		let caller = users.get(p);
 		//User Loop
@@ -252,23 +252,29 @@ actor {
 									//TODO : find way to have em both in if statement , || doesnt work
 									if (f.minAge >= userAge) {
 										break fl;
-									} else if (userAge >= f.maxAge) {
+									} else if (f.maxAge <= userAge) {
 										break fl;
 									};
 								};
 								case (_)();
 							};
 
-							buf.add(user);
+							//TODO : fix bug, calScore traps after a while, 
+							// bug in some function from calcScore
+							// overflow? type inferr?
+							buf.add(user, calcScore(p, p2));
 						}; //end  fl
 					};
 				};
 			};
-
 			count += 1;
-
 		}; // end ul
+		//NEXT : MAP buffer order by score
+		//NEXT : get X users closest to cohesion score
+		//return result
 		buf.toArray();
+
+
 	};
 
 	// calc score for 2 answers and optional 2 likes
@@ -610,7 +616,7 @@ actor {
 	};
 
 	//find users based on parameters
-	public shared query (msg) func findMatches(para : MatchingFilter) : async Result.Result<[User], Text> {
+	public shared query (msg) func findMatches(para : MatchingFilter) : async Result.Result<[(User, Int)], Text> {
 		//1. check if user has funds, if not send error
 		let user = switch (users.get(msg.caller)) {
 			case null return #err("User does not exist");
@@ -641,7 +647,7 @@ actor {
 		};
 
 		//TEMP fix
-		let filteredUsers : [User] = filterUsers(msg.caller, para);
+		let filteredUsers : [(User, Int)] = filterUsers(msg.caller, para);
 
 		#ok(filteredUsers); //should return array of users
 	};

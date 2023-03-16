@@ -23,7 +23,7 @@ export interface Question {
 export type Result = { ok: null } | { err: string };
 export type Result_1 = { ok: User } | { err: string };
 export type Result_2 = { ok: Array<Question> } | { err: string };
-export type Result_3 = { ok: Array<User> } | { err: string };
+export type Result_3 = { ok: Array<[User, bigint]> } | { err: string };
 export interface User {
 	created: bigint;
 	connect: [[] | [string], boolean];

@@ -21,7 +21,10 @@ export const idlFactory = ({ IDL }) => {
 		birth: IDL.Tuple(IDL.Opt(IDL.Int), IDL.Bool),
 		points: IDL.Nat
 	});
-	const Result_3 = IDL.Variant({ ok: IDL.Vec(User), err: IDL.Text });
+	const Result_3 = IDL.Variant({
+		ok: IDL.Vec(IDL.Tuple(User, IDL.Int)),
+		err: IDL.Text
+	});
 	const Hash = IDL.Nat32;
 	const Color = IDL.Variant({ Default: IDL.Null });
 	const Question = IDL.Record({

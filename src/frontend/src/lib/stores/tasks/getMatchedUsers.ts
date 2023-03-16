@@ -2,7 +2,7 @@ import { actor } from '$lib/stores';
 import type { MatchingFilter, User } from 'src/declarations/backend/backend.did';
 import { get, writable } from 'svelte/store';
 
-export const matchedUsers = writable<Array<User>>();
+export const matchedUsers = writable<Array<[User, BigInt]>>();
 
 export async function getMatchedUsers(filter: MatchingFilter) {
 	const localActor = get(actor);

@@ -11,7 +11,7 @@
 	let ageValue = [0, 150];
 	let cohesionValue = [100, 100];
 	let genderValue = 'Everyone';
-	let matches: Array<User>;
+	let matches: Array<[User, BigInt]>;
 
 	//this could be moved to some declaration/constant somewhere else
 	let genders = ['Everyone', 'Male', 'Female', 'Other', 'Queer'];
@@ -95,7 +95,8 @@
 			{#each matches as match}
 				<!-- TODO make userCard component -->
 				<div>
-					{match.username}
+					{match[0].username}
+					{match[1]}
 				</div>
 			{/each}
 		{/if}

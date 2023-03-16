@@ -21,7 +21,10 @@ type User = record {
 };
 type Result_3 = variant {
 	err : text;
-	ok : vec User;
+	ok : vec record {
+		User;
+		int;
+	};
 };
 type Result_2 = variant {
 	err : text;
