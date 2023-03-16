@@ -5,7 +5,6 @@
 	import { getQsAnswered, questionsAnswered } from '$lib/stores/tasks/getQsAnswered';
 
 	let userBirth = fromNullableDate($user.birth[0]);
-	//ISSUE date ms is counted from 1970, anyone born before might have issues (prob wrong date-time used in createProfile)
 	let ageMs = Number(new Date()) - Number($user.birth[0]) / 1000000;
 	let ageY = Math.floor(ageMs / (1000 * 3600 * 24) / 365);
 
@@ -13,7 +12,7 @@
 	console.log($user.about[0]);
 
 	onMount(async () => {
-		//FIX change into button that then calls answered Q
+		//TODO change into button that then calls answered Q
 		await getQsAnswered();
 		console.log($questionsAnswered);
 	});

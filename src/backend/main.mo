@@ -101,7 +101,8 @@ actor {
 	};
 
 	type MatchingFilter = {
-		ageRange : (Nat, Nat);
+		minAge : Nat;
+		maxAge : Nat;
 		gender : ?Gender;
 		cohesion : Nat;
 	};
@@ -219,41 +220,54 @@ actor {
 	};
 
 	// filter users according to parameters
-	func filterUsers(p : Principal, filter : MatchingFilter) : [User] {
-		let buf = Buffer.Buffer<User>(users.size());
+	func filterUsers(p : Principal, f : MatchingFilter) : [User] {
+		let buf = Buffer.Buffer<User>(users.size()); //TODO : test out possible buffer size props
 		var count = 0;
-		label f for (p2 in users.keys()) {
-			if (users.size() == count) break f;
+		let caller = users.get(p);
+		//User Loop
+		label ul for (p2 in users.keys()) {
+			if (users.size() == count) break ul;
+			//user = possible match
 			let user = switch (users.get(p2)) {
 				case null ();
 				case (?user) {
 					//filter msg.caller
 					if (p2 != p) {
-						//main filters 
-						label fp {	
-
+						//Filter Loop
+						label fl {
 							//gender
-							switch (filter.gender) {
+							switch (f.gender) {
 								case null ();
 								case (Gender) {
-									if ((filter.gender, true) != user.gender) {
-										break fp;
+									if ((f.gender, true) != user.gender) {
+										break fl;
 									};
 								};
 							};
-
 							//age
-							
+							switch (user.birth) {
+								case (?birth, _) {
+									//TODO : make birth-age conversion utility func
+									let userAge = birth / (1_000_000_000 * 3600 * 24) / 365;
+									//TODO : find way to have em both in if statement , || doesnt work
+									if (f.minAge >= userAge) {
+										break fl;
+									} else if (userAge >= f.maxAge) {
+										break fl;
+									};
+								};
+								case (_)();
+							};
 
 							buf.add(user);
-						}; //end label fp
+						}; //end  fl
 					};
 				};
 			};
 
 			count += 1;
 
-		};
+		}; // end ul
 		buf.toArray();
 	};
 

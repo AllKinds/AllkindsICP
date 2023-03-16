@@ -8,8 +8,9 @@ export const idlFactory = ({ IDL }) => {
 	});
 	const MatchingFilter = IDL.Record({
 		cohesion: IDL.Nat,
-		ageRange: IDL.Tuple(IDL.Nat, IDL.Nat),
-		gender: IDL.Opt(Gender)
+		minAge: IDL.Nat,
+		gender: IDL.Opt(Gender),
+		maxAge: IDL.Nat
 	});
 	const User = IDL.Record({
 		created: IDL.Int,

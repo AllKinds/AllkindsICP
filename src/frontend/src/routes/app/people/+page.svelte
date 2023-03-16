@@ -23,7 +23,8 @@
 		pending = true;
 		let filter: MatchingFilter = {
 			cohesion: BigInt(cohesionValue[0]),
-			ageRange: [BigInt(ageValue[0]), BigInt(ageValue[1])],
+			minAge: BigInt(ageValue[0]),
+			maxAge: BigInt(ageValue[1]),
 			gender: toNullableGender(genderValue == 'Everyone' ? '' : genderValue)
 		};
 		console.log('filter obj ready: ', filter);
