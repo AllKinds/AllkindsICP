@@ -8,9 +8,8 @@ export type Hash = number;
 export type LikeKind = { Like: bigint } | { Dislike: bigint };
 export interface MatchingFilter {
 	cohesion: bigint;
-	minAge: bigint;
+	ageRange: [bigint, bigint];
 	gender: [] | [Gender];
-	maxAge: bigint;
 }
 export interface Question {
 	created: bigint;

@@ -101,8 +101,7 @@ actor {
 	};
 
 	type MatchingFilter = {
-		minAge : Nat;
-		maxAge : Nat;
+		ageRange : (Nat, Nat);
 		gender : ?Gender;
 		cohesion : Nat;
 	};
@@ -218,46 +217,41 @@ actor {
 		};
 		buf.toArray();
 	};
-	//TEMP : ref
-	// type MatchingFilter = {
-	// 	minAge : ?Nat;
-	// 	maxAge : ?Nat;
-	// 	gender : ?Gender;
-	// 	cohesion : ?Nat;
-	// };
 
 	// filter users according to parameters
-	func filterUsers(para : MatchingFilter) : [User] {
-		let buf = Buffer.Buffer<User>(users.size()); //maybe fixed buf not needed or workaround, test stuff
+	func filterUsers(p : Principal, filter : MatchingFilter) : [User] {
+		let buf = Buffer.Buffer<User>(users.size());
 		var count = 0;
-		label f for (p in users.keys()) {
+		label f for (p2 in users.keys()) {
 			if (users.size() == count) break f;
-			let user = switch (users.get(p)) {
+			let user = switch (users.get(p2)) {
 				case null ();
 				case (?user) {
-					buf.add(user);
-					//test out without pqrqmeters first
+					//filter msg.caller
+					if (p2 != p) {
+						//main filters 
+						label fp {	
+
+							//gender
+							switch (filter.gender) {
+								case null ();
+								case (Gender) {
+									if ((filter.gender, true) != user.gender) {
+										break fp;
+									};
+								};
+							};
+
+							//age
+							
+
+							buf.add(user);
+						}; //end label fp
+					};
 				};
 			};
 
 			count += 1;
-			// let pQ = hashPrincipalQuestion(p, hash);
-			// switch (skips.get(pQ)) {
-			// 	case (?_) {};
-			// 	case null {
-			// 		switch (likes.get(pQ)) {
-			// 			case (?_) {};
-			// 			case null {
-			// 				switch (answers.get(pQ)) {
-			// 					case (?_) {
-			// 						buf.add(hash);
-			// 						count += 1;
-			// 					};
-			// 					case null {};
-			// 				};
-			// 			};
-			// 		};
-			// 	};
 
 		};
 		buf.toArray();
@@ -633,7 +627,7 @@ actor {
 		};
 
 		//TEMP fix
-		let filteredUsers : [User] = filterUsers(para);
+		let filteredUsers : [User] = filterUsers(msg.caller, para);
 
 		#ok(filteredUsers); //should return array of users
 	};
