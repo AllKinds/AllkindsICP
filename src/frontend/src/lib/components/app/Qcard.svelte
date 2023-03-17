@@ -18,7 +18,10 @@
 	const submitAnswer = async (bool: boolean) => {
 		answerPending = bool;
 		let answer: AnswerKind = { Bool: bool };
-		let like: LikeKind = bool ? { Like: BigInt(likeWeight) } : { Dislike: BigInt(likeWeight) };
+		let like: LikeKind =
+			likeWeight > 0
+				? { Like: BigInt(Math.abs(likeWeight)) }
+				: { Dislike: BigInt(Math.abs(likeWeight)) };
 
 		const putAnswer = async () =>
 			await answerQ(question.hash, answer).catch((error) => {
@@ -29,14 +32,12 @@
 		if (likeWeight == 0) {
 			await putAnswer();
 		} else {
-			if ($user.points - BigInt(likeWeight) >= 0) {
-				await likeQ(question.hash, like)
-					.catch((error) => {
-						console.log('errorcatch', error);
-						console.log('points - like', $user.points - BigInt(likeWeight));
-					})
-					.then(async () => await putAnswer());
-			}
+			await likeQ(question.hash, like)
+				.catch((error) => {
+					console.log('errorcatch', error);
+				})
+				.then(async () => await putAnswer());
+
 			//TODO : show errors on questions correctly
 		}
 

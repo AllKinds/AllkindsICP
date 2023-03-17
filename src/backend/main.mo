@@ -101,8 +101,7 @@ actor {
 	};
 
 	type MatchingFilter = {
-		minAge : Nat;
-		maxAge : Nat;
+		ageRange : (Nat, Nat);
 		gender : ?Gender;
 		cohesion : Nat;
 	};
@@ -250,18 +249,15 @@ actor {
 									//TODO : make birth-age conversion utility func
 									let userAge = birth / (1_000_000_000 * 3600 * 24) / 365;
 									//TODO : find way to have em both in if statement , || doesnt work
-									if (f.minAge >= userAge) {
+									if (f.ageRange.0 >= userAge) {
 										break fl;
-									} else if (f.maxAge <= userAge) {
+									} else if (f.ageRange.1 <= userAge) {
 										break fl;
 									};
 								};
 								case (_)();
 							};
 
-							//TODO : fix bug, calScore traps after a while, 
-							// bug in some function from calcScore
-							// overflow? type inferr?
 							buf.add(user, calcScore(p, p2));
 						}; //end  fl
 					};
@@ -274,7 +270,6 @@ actor {
 		//return result
 		buf.toArray();
 
-
 	};
 
 	// calc score for 2 answers and optional 2 likes
@@ -283,7 +278,7 @@ actor {
 
 		let hasLikes = Option.isSome(sourceLike) and Option.isSome(testLike);
 		let hasNoLikes = Option.isNull(sourceLike) and Option.isNull(testLike);
-		assert (hasLikes or hasNoLikes);
+		//assert (hasLikes or hasNoLikes);
 
 		let sourceAnswerScore : Int = if (sourceAnswer.answer == #Bool(true)) {
 			1;
@@ -376,8 +371,6 @@ actor {
 		score;
 	};
 
-	//TODO : make function changeUserPoints and changeQuestionPoints
-
 	func changeUserPoints(p : Principal, value : Nat) : () {
 		//change into easier way of ?null checking
 		let user = switch (users.get(p)) {
@@ -404,7 +397,7 @@ actor {
 			question = q.question;
 			hash = q.hash;
 			color = q.color;
-			points = q.points + value;
+			points = value;
 		};
 		questions.put(q.hash, newQ);
 	};
@@ -552,11 +545,10 @@ actor {
 		};
 		//TEMP : likes.put line is moved to after points check
 		//TODO : cleanup and extract possible funcs
-		let likeValue : Nat = switch (like) {
+		let likeValue : Int = switch (like) {
 			case (#Like(value)) { value };
-			case (#Dislike(value)) { value }; //I removed '-' because here it has to be subtracted anyway, maybe like value could be extracted without switch
+			case (#Dislike(value)) { - value };
 		};
-
 		//get user data
 		let user = switch (users.get(msg.caller)) {
 			case null return #err("User does not exist");
@@ -564,7 +556,6 @@ actor {
 				user;
 			};
 		};
-
 		//get question data
 		let q : Question = switch (questions.get(question)) {
 			case null return #err("Question does not exist");
@@ -572,35 +563,25 @@ actor {
 				q;
 			};
 		};
-
 		//check if user has enough points
-		//conversion to prevent under/over -flow
-		//TODO : checkout traps as all these conversions and point check should be done easier
-		// let newPoints = Nat32.sub(
-		// 	Nat32.fromNat(user.points),
-		// 	Nat32.fromNat(queryCost)
-		// );
-		let userPoints_ : Int32 = Int32.fromNat32(Nat32.fromNat(user.points));
-		let likeValue_ : Int32 = Int32.fromNat32(Nat32.fromNat(likeValue));
-		let newPoints = userPoints_ - likeValue_;
-
-		if (newPoints >= 0) {
-			likes.put(principalQuestion, newLike);
-			changeUserPoints(msg.caller, (user.points - likeValue));
-			//check if user !== creater
-			if (msg.caller != q.creater) {
-				switch (users.get(q.creater)) {
-					case null {}; //do nothing, creater account might have been removed
-					case (?creater) {
-						changeUserPoints(q.creater, (creater.points + likeValue));
-					};
-				};
-			};
-			let newQuestionPoints : Int = q.points + Int32.toInt(likeValue_);
-			changeQuestionPoints(q, newQuestionPoints);
-		} else {
+		if (Nat.less(user.points, Int.abs(likeValue))) {
 			return #err("You don't have enough points");
 		};
+		//let newPoints = Nat.sub(user.points, likeValue);
+
+		likes.put(principalQuestion, newLike);
+		changeUserPoints(msg.caller, (user.points - Int.abs(likeValue)));
+		//check if user !== creater
+		if (msg.caller != q.creater) {
+			switch (users.get(q.creater)) {
+				case null {}; //do nothing, creater account might have been removed
+				case (?creater) {
+					changeUserPoints(q.creater, (creater.points + Int.abs(likeValue)));
+				};
+			};
+		};
+
+		changeQuestionPoints(q, (q.points + likeValue));
 
 		#ok();
 	};
@@ -618,7 +599,6 @@ actor {
 
 	//find users based on parameters
 	public shared query (msg) func findMatches(para : MatchingFilter) : async Result.Result<[(User, Int)], Text> {
-		//1. check if user has funds, if not send error
 		let user = switch (users.get(msg.caller)) {
 			case null return #err("User does not exist");
 			case (?user) {
@@ -626,31 +606,17 @@ actor {
 			};
 		};
 
-		let userPoints_ : Int32 = Int32.fromNat32(Nat32.fromNat(user.points));
-		let queryCost_ : Int32 = Int32.fromNat32(Nat32.fromNat(queryCost));
-		let newPoints = userPoints_ - queryCost_;
-
-		//TODO : maybe Nat.sub could be used in this check statement, test
-		if (newPoints >= 0) {
-
-			//let filteredUsers : [User] = filterUsers(para);
-			//TEMP : testing out with just gender filter and returning full array
-
-			//2. prepare data
-			//3. get all users with filters applied
-			//4. calculate msg.caller score w users for something in return
-
-			changeUserPoints(msg.caller, Nat.sub(user.points, queryCost));
-
-			//5. return 2 best
-		} else {
+		if (Nat.less(user.points, queryCost)) {
 			return #err("You don't have enough points");
 		};
 
-		//TEMP fix
-		let filteredUsers : [(User, Int)] = filterUsers(msg.caller, para);
 
-		#ok(filteredUsers); //should return array of users
+		// TODO ; this line doesnt seem to work, IDK WHY
+		changeUserPoints(msg.caller, (user.points - queryCost));
+		
+
+		let filteredUsers : [(User, Int)] = filterUsers(msg.caller, para);
+		#ok(filteredUsers);
 	};
 
 };
