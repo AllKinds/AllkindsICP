@@ -32,7 +32,7 @@
 
 <div class="flex flex-col gap-4">
 	<div
-		class="dark:bg-slate-700 bg-slate-100 w-full rounded-md mx-auto flex-col p-1 md:p-2 lg:p-5 justify-between"
+		class="bg-transparant w-full rounded-md mx-auto flex-col p-1 md:p-2 lg:p-5 justify-between"
 	>
 		<button
 			class="w-full flex justify-between items-center"
@@ -54,7 +54,7 @@
 			<div class="mt-8 flex flex-col justify-center items-center">
 				<textarea
 					id="questionInput"
-					class="inputfield w-full min-h-fit bg-transparent outline-none text-4xl text-center placeholder-slate-300 dark:placeholder-slate-600"
+					class="inputfield w-full min-h-fit py-20 bg-transparent outline-none text-4xl text-center placeholder-slate-300 dark:placeholder-slate-600"
 					placeholder="What would you like to ask?"
 					disabled={pending}
 					bind:value={newQ}

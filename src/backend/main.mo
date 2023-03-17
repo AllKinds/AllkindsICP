@@ -300,7 +300,6 @@ actor {
 
 		let testLikeScore : Int = switch (testLike) {
 			case (?testLike) {
-				//TODO CHECK IF TRAP IS NOT BCS HERE  SCORE : Nat
 				switch (testLike.like) {
 					case (#Like(score)) { score };
 					case (#Dislike(score)) { -score };

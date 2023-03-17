@@ -27,7 +27,7 @@
 	</div>
 
 	<!-- main content -->
-	<div class="mx-auto pt-7 pb-10 w-11/12">
+	<div class="mx-auto pt-7 pb-24 w-11/12">
 		<slot name="main" />
 	</div>
 </div>
