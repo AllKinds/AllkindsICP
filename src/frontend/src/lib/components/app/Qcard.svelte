@@ -14,7 +14,7 @@
 </script>
 
 <div
-	class="odd:dark:bg-slate-700 even:dark:bg-slate-700/50 odd:bg-slate-100 even:bg-slate-200/50 dark:border-none h-fit w-full border rounded-lg p-2 md:p-3 lg:p-5"
+	class="odd:dark:bg-slate-900/30 even:dark:bg-slate-900/40 odd:bg-slate-100 even:bg-slate-200/50 dark:border-none h-fit w-full border rounded-lg p-2 md:p-3 lg:p-5"
 >
   <button 
     class="flex h-full w-full text-slate-500 hover:text-slate-200"
