@@ -22,11 +22,27 @@
 	.active {
 		@apply bg-slate-500;
 	}
-	.fancy-border {
+	.bg-fancy {
 		@apply bg-gradient-to-br from-DF-blue via-DF-red to-DF-yellow;
 	}
-
-
+	.bg-main {
+		@apply bg-zinc-100 dark:bg-zinc-900;
+	}
+	.bg-main90 {
+		@apply bg-zinc-100/90 dark:bg-zinc-900/90;
+	}
+	.bg-sub {
+		@apply bg-zinc-200 dark:bg-zinc-800;
+	}
+	.bg-sub30 {
+		@apply bg-zinc-200 dark:bg-zinc-800/30;
+	}
+	.bg-sub90 {
+		@apply bg-zinc-200 dark:bg-zinc-800/90;
+	}
+	.sub-btn {
+		@apply cursor-pointer border-none text-slate-800 dark:text-slate-500 dark:hover:text-slate-200 bg-clip-text hover:text-slate-500;
+	}
 }
 
 @layer base {

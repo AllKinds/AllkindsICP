@@ -31,9 +31,7 @@
 </script>
 
 <div class="flex flex-col gap-4">
-	<div
-		class="bg-transparant w-full rounded-md mx-auto flex-col p-1 md:p-2 lg:p-5 justify-between"
-	>
+	<div class="bg-transparant border border-zinc-600 bg-sub30 w-full rounded-md mx-auto flex-col p-1 md:p-2 lg:p-5 justify-between">
 		<button
 			class="w-full flex justify-between items-center"
 			on:click={() => (expandWindow = !expandWindow)}
