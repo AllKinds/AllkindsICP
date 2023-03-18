@@ -37,7 +37,7 @@
 	};
 </script>
 
-<div class="flex flex-col gap-2">
+<div class="flex flex-col gap-2 border-main bg-sub30">
 	<div class="fancy-btn-border mx-auto mb-0">
 		<button on:click={handleFindMatches} class="fancy-btn">
 			{#if pending}

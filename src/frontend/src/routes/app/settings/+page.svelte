@@ -56,10 +56,10 @@
 	};
 </script>
 
-<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-4 border-main bg-sub30 py-8">
 	<h2 class="p-0 text-center">Profile settings</h2>
 	<span class="text-zinc-600 flex justify-center"><Eye /> : Allow what people can initially see about you.</span>
-	<div class="border-main bg-sub30 w-full rounded-md flex flex-col p-2 md:p-8">
+	<div class=" w-full rounded-md flex flex-col p-2 md:p-8">
 		<div class="flex flex-col w-10/12">
 			<span>Username</span>
 			<label for="username" class="pr-8">

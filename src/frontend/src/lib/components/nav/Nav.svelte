@@ -10,13 +10,16 @@
 	export let path: any;
 </script>
 
-<div class="bg-main rounded-lg border-main w-40 mx-auto">
+<!-- border-main if not using fancy bg -->
+<div class="bg-fancy rounded-lg w-40 mx-auto p-0.5">
+
 	<div
-		class="flex flex-col bg-sub30 rounded-lg trans-300 p-2 text-lg items-start "
+		class="flex flex-col bg-main95 rounded-lg trans-300 p-2 text-lg items-start "
 	>
 		{#if $authStore === AuthState.Registered}
-			{$user.username}
-			<div class="flex">
+		<!-- bg-clip-text text-transparent bg-fancy  -->
+			<span class="font-semibold">{$user.username}</span>
+			<div class="flex ">
 				<span class="mt-1 mr-1"><Heart /> </span>
 				{$user.points}
 			</div>

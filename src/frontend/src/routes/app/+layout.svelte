@@ -22,7 +22,7 @@
 		<div class="flex flex-row justify-center mt-8 gap-4">
 			<!-- left sided col, possible for menu icon shortcuts  -->
 			<div
-				class="sticky top-16 h-fit p-2 rounded-lg max-sm:hidden flex flex-col items-center gap-4"
+				class="sticky top-16 h-fit rounded-lg max-sm:hidden flex flex-col items-center gap-4"
 			>
 				<a href="/app/home"><Home class="iconbtn" /></a>
 				<a href="/app/people"><Users class="iconbtn" /></a>
@@ -50,7 +50,7 @@
 
 <!-- menu shortcuts sticky to bottom , left sided col replacement for mobile view -->
 <div
-	class="flex bg-main w-full py-2 fixed bottom-0 sm:hidden rounded-t-lg justify-evenly"
+	class="flex bg-main w-full py-2 fixed bottom-0 sm:hidden  rounded-t-lg justify-evenly"
 >
 	<a href="/app/home"><Home class="iconbtn" /></a>
 	<a href="/app/people"><Users class="iconbtn" /></a>

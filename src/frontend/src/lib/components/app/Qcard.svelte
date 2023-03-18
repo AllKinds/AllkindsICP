@@ -10,7 +10,7 @@
 </script>
 
 <div
-	class="odd:bg-slate-300/50 even:bg-slate-300/20 dark:odd:bg-slate-700/10 dark:even:bg-slate-700/30 h-fit w-full border-main rounded-lg p-2 md:p-3 lg:p-5"
+	class="odd:bg-slate-300/40 even:bg-slate-300/20 dark:odd:bg-slate-700/10 dark:even:bg-slate-700/30 h-fit w-full border-main rounded-lg p-2 md:p-3 lg:p-5"
 >
 	<button
 		class="flex h-full w-full hover-color "
