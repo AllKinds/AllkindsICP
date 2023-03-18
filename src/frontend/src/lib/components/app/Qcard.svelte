@@ -2,7 +2,7 @@
 	import type { AnswerKind, LikeKind, Question } from 'src/declarations/backend/backend.did';
 
 	import EllipsisVertical from '$lib/assets/icons/ellipsis-vertical.svg?component';
-	import NavX from '$lib/assets/icons/navX.svg?component';
+	import ChevronUp from '$lib/assets/icons/chevronUp.svg?component';
 	import Qcontent from './Qcontent.svelte';
 
 	export let question: Question;
@@ -27,7 +27,7 @@
 			{#if !expandWindow}
 				<EllipsisVertical />
 			{:else}
-				<NavX />
+				<ChevronUp />
 			{/if}
 		</div>
 	</button>
