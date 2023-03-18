@@ -83,10 +83,10 @@
 				class=" fancy-btn w-full flex justify-center items-center"
 			>
 				<span>
-					{#if answerPending == undefined}
-						YES
-					{:else if answerPending == true}
+					{#if answerPending == true}
 						<Spinner />
+					{:else }
+						YES
 					{/if}
 				</span>
 			</button>
@@ -99,10 +99,10 @@
 				class="fancy-btn w-full flex justify-center items-center "
 			>
 				<span>
-					{#if answerPending == undefined}
-						NO
-					{:else if answerPending == false}
+					{#if answerPending == false}
 						<Spinner />
+					{:else}
+						NO
 					{/if}
 				</span>
 			</button>
