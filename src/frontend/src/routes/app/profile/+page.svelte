@@ -27,11 +27,11 @@
 	<span class="mx-auto">{$user.about[0] ? $user.about[0] : ''}</span>
 
 	<!--TODO :  2 buttons to call AnsweredQ and MyCreatedQ -->
-	<div class="dark:bg-slate-700 bg-slate-100 w-100% rounded-md flex flex-col p-2 md:p-8 gap-2">
+	<div class="bg-sub30 border-main w-100% rounded-md flex flex-col p-2 md:p-8 gap-2">
 		{#if $questionsAnswered}
 			{#each $questionsAnswered as q}
 				<!--TODO : a more default small question card -->
-				<div class="flex bg-slate-800 p-4">
+				<div class="flex bg-sub90 border-main p-4">
 					{q.question},
 					{q.points},
 					{q.creater}

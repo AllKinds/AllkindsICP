@@ -32,10 +32,10 @@
 
 			<!-- main content -->
 			<div
-				class="border border-zinc-600 h-fit w-full rounded-lg mt-1"
+				class=" h-fit w-full rounded-lg mt-1 min-h-screen"
 			>
 				<div
-					class=" border dark:border-none rounded-lg p-2 md:p-5  min-h-screen"
+					class="rounded-lg "
 				>
 					<slot />
 				</div>
@@ -50,7 +50,7 @@
 
 <!-- menu shortcuts sticky to bottom , left sided col replacement for mobile view -->
 <div
-	class="flex bg-transparant w-full py-2 fixed bottom-0 sm:hidden rounded-t-lg justify-evenly"
+	class="flex bg-main w-full py-2 fixed bottom-0 sm:hidden rounded-t-lg justify-evenly"
 >
 	<a href="/app/home"><Home class="iconbtn" /></a>
 	<a href="/app/people"><Users class="iconbtn" /></a>

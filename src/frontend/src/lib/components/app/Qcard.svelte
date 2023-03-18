@@ -10,13 +10,13 @@
 </script>
 
 <div
-	class="odd:dark:bg-zinc-700/30 even:dark:bg-zinc-700/50 odd:bg-slate-100 even:bg-slate-200/50 dark:border-none h-fit w-full border rounded-lg p-2 md:p-3 lg:p-5"
+	class="odd:bg-slate-300/50 even:bg-slate-300/20 dark:odd:bg-slate-700/10 dark:even:bg-slate-700/30 h-fit w-full border-main rounded-lg p-2 md:p-3 lg:p-5"
 >
 	<button
-		class="flex h-full w-full text-slate-500 hover:text-slate-200"
+		class="flex h-full w-full hover-color "
 		on:click={() => (expandWindow = !expandWindow)}
 	>
-		<span class="break-all text-2xl text-left grow text-slate-200">
+		<span class="break-all text-2xl text-left grow">
 			{#if !expandWindow}
 				{question.question}
 				<div class="mt-14" />

@@ -4,7 +4,7 @@
 
 <div class="mx-auto min-h-screen flex flex-col scroll-smooth ">
 	<!-- header/nav -->
-	<div class=" h-12 fixed w-[100%] border-b dark:border-none	">
+	<div class="bg-main h-12 fixed w-[100%]">
 		<div class="mx-auto self-center bg-transparent flex justify-between h-12 w-11/12">
 			<div
 				class="

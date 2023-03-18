@@ -63,7 +63,7 @@
 		<p class="text-slate-500 text-sm p-0">By: {question.creater}</p>
 		<span>Color: {question.color[0]}</span>
 		 -->
-	<div class="flex gap-2 my-8">
+	<div class="flex gap-2 my-5">
 		<button class="sub-btn" on:click={() => likeWeight--}>
 			<MinusCircle />
 		</button>
@@ -74,56 +74,52 @@
 	</div>
 
 	<div
-		class="w-full flex flex-col md:flex-row justify-center items-center dark:text-slate-500 pt-3 gap-5"
+		class="w-full flex flex-col md:flex-row justify-center items-center dark:text-slate-500 gap-3"
 	>
-		<div
-			class="hover:bg-fancy rounded-full flex h-14 w-3/4 md:w-4/12 grow hover:border-0 border-slate-400 p-0.5 border-2 md:order-last"
-		>
+		<div class="m-0 fancy-btn-border flex h-10 w-36 md:order-last">
 			<button
 				on:click={() => submitAnswer(true)}
 				disabled={skipPending || answerPending}
-				class="bg-sub30 hover:bg-sub90 rounded-full w-full flex justify-center items-center"
+				class=" fancy-btn w-full flex justify-center items-center"
 			>
-				<h3>
+				<span>
 					{#if answerPending == undefined}
 						YES
 					{:else if answerPending == true}
 						<Spinner />
 					{/if}
-				</h3>
+				</span>
 			</button>
 		</div>
 
-		<div
-			class="hover:bg-fancy rounded-full flex h-14 w-3/4 md:w-4/12 grow hover:border-0 border-slate-400 p-0.5 border-2 "
-		>
+		<div class="m-0 fancy-btn-border flex h-10 w-36">
 			<button
 				on:click={() => submitAnswer(false)}
 				disabled={skipPending || answerPending}
-				class="bg-sub90 hover:bg-sub90 rounded-full w-full flex justify-center items-center "
+				class="fancy-btn w-full flex justify-center items-center "
 			>
-				<h3>
+				<span>
 					{#if answerPending == undefined}
 						NO
 					{:else if answerPending == false}
 						<Spinner />
 					{/if}
-				</h3>
+				</span>
 			</button>
 		</div>
 
 		<button
 			on:click={skipQuestion}
 			disabled={skipPending || answerPending}
-			class=" md:w-36 flex justify-center hover:text-slate-400 "
+			class=" md:w-36 flex justify-center sub-btn "
 		>
-			<p class="">
+			<span>
 				{#if !skipPending}
 					skip
 				{:else if skipPending}
 					<Spinner />
 				{/if}
-			</p>
+			</span>
 		</button>
 	</div>
 

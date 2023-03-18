@@ -30,13 +30,13 @@
 	};
 </script>
 
-<div class="flex flex-col gap-4">
-	<div class="bg-transparant border border-zinc-600 bg-sub30 w-full rounded-md mx-auto flex-col p-1 md:p-2 lg:p-5 justify-between">
+<div class=" bg-main flex flex-col gap-4">
+	<div class="border-main bg-sub30 w-full mx-auto flex-col p-1 md:p-2 lg:p-5 justify-between">
 		<button
 			class="w-full flex justify-between items-center"
 			on:click={() => (expandWindow = !expandWindow)}
 		>
-			<span class="dark:text-slate-400 hover:text-slate-500">
+			<span class="hover-color">
 				Create a new Yes/No question...
 			</span>
 
