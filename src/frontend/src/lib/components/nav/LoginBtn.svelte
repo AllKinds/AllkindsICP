@@ -6,7 +6,7 @@
 </script>
 
 <a
-	class=" hover:bg-slate-300 dark:hover:bg-slate-600 w-fit decoration-transparent rounded-md px-1 font-semibold cursor-pointer flex"
+	class="hover:bg-zinc-300/50 dark:hover:bg-zinc-700/50 w-fit decoration-transparent rounded-md px-1 font-semibold cursor-pointer flex"
 	href={null}
 	on:click={$authStore === AuthState.LoggedIn || $authStore === AuthState.Registered
 		? logout

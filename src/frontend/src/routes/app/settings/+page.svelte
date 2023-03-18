@@ -56,14 +56,14 @@
 	};
 </script>
 
-<div class="flex flex-col gap-4">
-	<h2 class="p-0">Profile settings</h2>
-	<span class="text-slate-600 flex"><Eye /> : Allow what people can initially see about you.</span>
-	<div class="dark:bg-slate-700 bg-slate-100 w-full rounded-md flex flex-col p-2 md:p-8">
+<div class="flex flex-col gap-4 border-main bg-sub30 py-8">
+	<h2 class="p-0 text-center">Profile settings</h2>
+	<span class="text-zinc-600 flex justify-center"><Eye /> : Allow what people can initially see about you.</span>
+	<div class=" w-full rounded-md flex flex-col p-2 md:p-8">
 		<div class="flex flex-col w-10/12">
 			<span>Username</span>
 			<label for="username" class="pr-8">
-				<input type="text" id="username" class="inputfield" bind:value={userObj.username} />
+				<input type="text" id="username" class="inputfield border-main" bind:value={userObj.username} />
 			</label>
 
 			<span>Gender</span>
@@ -83,7 +83,7 @@
 				<input
 					type="date"
 					id="birth"
-					class="inputfield"
+					class="inputfield border-main"
 					bind:value={userObj.birth}
 					min="1920-01-01"
 					max="2022-01-01"
@@ -93,13 +93,13 @@
 
 			<span>Email</span>
 			<label for="connect">
-				<input type="email" id="connect" class="inputfield" bind:value={userObj.connect} />
+				<input type="email" id="connect" class="inputfield border-main" bind:value={userObj.connect} />
 				<PublicToggle bind:checked={publicConnect} />
 			</label>
 
 			<span>About</span>
 			<label for="about">
-				<textarea id="about" class="inputfield h-48 w-60" bind:value={userObj.about} />
+				<textarea id="about" class="inputfield h-48 w-60 border-main" bind:value={userObj.about} />
 				<PublicToggle bind:checked={publicAbout} />
 			</label>
 		</div>
@@ -119,6 +119,7 @@
 </div>
 
 <style style lang="postcss">
+
 	label {
 		@apply flex my-2;
 	}
@@ -130,6 +131,6 @@
 	option,
 	select,
 	textarea {
-		@apply bg-slate-500 p-1 rounded-md mr-1 outline-none;
+		@apply bg-zinc-500/20 p-1 rounded-md mr-1 outline-none;
 	}
 </style>

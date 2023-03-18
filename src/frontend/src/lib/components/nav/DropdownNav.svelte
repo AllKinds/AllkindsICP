@@ -14,13 +14,13 @@
 </script>
 
 <div class="flex flex-col items-end">
-	<div class="pt-2 shrink-0 self-end " on:click={toggleVissible} on:keydown={toggleVissible}>
+	<button class="pt-2 shrink-0 self-end hover:cursor-pointer" on:click={toggleVissible} on:keydown={toggleVissible}>
 		{#if !visible}
 			<NavBars class="w-8 m-auto" />
 		{:else}
 			<NavX class="w-8 m-auto" />
 		{/if}
-	</div>
+	</button>
 
 	{#if visible}
 		<div on:mouseleave={toggleVissible}>

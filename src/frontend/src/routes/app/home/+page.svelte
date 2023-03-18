@@ -30,15 +30,13 @@
 	};
 </script>
 
-<div class="flex flex-col gap-4">
-	<div
-		class="dark:bg-slate-700 bg-slate-100 w-full rounded-md mx-auto flex-col p-1 md:p-2 lg:p-5 justify-between"
-	>
+<div class=" bg-main flex flex-col gap-4">
+	<div class="border-main bg-sub30 w-full mx-auto flex-col p-1 md:p-2 lg:p-5 justify-between">
 		<button
 			class="w-full flex justify-between items-center"
 			on:click={() => (expandWindow = !expandWindow)}
 		>
-			<span class="dark:text-slate-400 hover:text-slate-500">
+			<span class="hover-color">
 				Create a new Yes/No question...
 			</span>
 
@@ -54,7 +52,7 @@
 			<div class="mt-8 flex flex-col justify-center items-center">
 				<textarea
 					id="questionInput"
-					class="inputfield w-full min-h-fit bg-transparent outline-none text-4xl text-center placeholder-slate-300 dark:placeholder-slate-600"
+					class="inputfield w-full min-h-fit py-20 bg-transparent outline-none text-4xl text-center placeholder-slate-300 dark:placeholder-slate-600"
 					placeholder="What would you like to ask?"
 					disabled={pending}
 					bind:value={newQ}

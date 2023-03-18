@@ -42,6 +42,6 @@
 		@apply flex items-center justify-center rounded-full cursor-pointer  top-px left-px transition-all ease-in-out duration-300 w-5 h-5 bg-transparent align-middle;
 	}
 	.toggle input[type='checkbox']:checked ~ label {
-		@apply bg-slate-700;
+		@apply bg-slate-700/30;
 	}
 </style>

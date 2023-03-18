@@ -12,7 +12,7 @@
 	export let data: LayoutData;
 </script>
 
-<Layout headerBg={'dark:bg-gradient-to-r dark:from-slate-800/95 dark:to-slate-800 bg-slate-100'}>
+<Layout >
 	<!-- right sided main app nav -->
 	<svelte:fragment slot="nav">
 		<SidepanelNav {data} />
@@ -22,7 +22,7 @@
 		<div class="flex flex-row justify-center mt-8 gap-4">
 			<!-- left sided col, possible for menu icon shortcuts  -->
 			<div
-				class="dark:bg-slate-800 sticky top-16 bg-slate-100 border dark:border-none h-fit p-2 rounded-lg max-sm:hidden flex flex-col items-center gap-4"
+				class="sticky top-16 h-fit rounded-lg max-sm:hidden flex flex-col items-center gap-4"
 			>
 				<a href="/app/home"><Home class="iconbtn" /></a>
 				<a href="/app/people"><Users class="iconbtn" /></a>
@@ -31,15 +31,17 @@
 			</div>
 
 			<!-- main content -->
-			<div class="bg-gradient-to-br from-DF-blue to-DF-red  h-fit w-full rounded-lg mt-1">
+			<div
+				class=" h-fit w-full rounded-lg mt-1 min-h-screen"
+			>
 				<div
-					class="dark:bg-slate-800/95 bg-slate-100 border dark:border-none rounded-lg p-2 md:p-5  min-h-screen"
+					class="rounded-lg "
 				>
 					<slot />
 				</div>
 			</div>
 
-			<div class="sticky top-16 h-fit w-44 mx-auto max-xl:hidden rounded-lg">
+			<div class="bg-main sticky top-16 h-fit w-44 mx-auto max-xl:hidden rounded-lg">
 				<Nav {data} path="" />
 			</div>
 		</div>
@@ -48,7 +50,7 @@
 
 <!-- menu shortcuts sticky to bottom , left sided col replacement for mobile view -->
 <div
-	class="flex bg-slate-100 dark:bg-slate-900 w-full py-2 fixed bottom-0 sm:hidden rounded-t-lg justify-evenly"
+	class="flex bg-main w-full py-2 fixed bottom-0 sm:hidden  rounded-t-lg justify-evenly"
 >
 	<a href="/app/home"><Home class="iconbtn" /></a>
 	<a href="/app/people"><Users class="iconbtn" /></a>

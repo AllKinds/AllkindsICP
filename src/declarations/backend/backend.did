@@ -21,7 +21,10 @@ type User = record {
 };
 type Result_3 = variant {
 	err : text;
-	ok : vec User;
+	ok : vec record {
+		User;
+		int;
+	};
 };
 type Result_2 = variant {
 	err : text;
@@ -44,10 +47,12 @@ type Question = record {
 	question : text;
 };
 type MatchingFilter = record {
+	ageRange : record {
+		nat;
+		nat;
+	};
 	cohesion : nat;
 	gender : opt Gender;
-	maxAge : nat;
-	minAge : nat;
 };
 type LikeKind = variant {
 	Dislike : nat;

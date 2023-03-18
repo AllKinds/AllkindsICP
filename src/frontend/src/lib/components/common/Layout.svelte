@@ -1,10 +1,10 @@
 <script lang="ts">
-	export let headerBg: string;
+	//export let headerBg: string;
 </script>
 
 <div class="mx-auto min-h-screen flex flex-col scroll-smooth ">
 	<!-- header/nav -->
-	<div class="{headerBg} h-12 fixed w-[100%] border-b dark:border-none	">
+	<div class="bg-main h-12 fixed w-[100%]">
 		<div class="mx-auto self-center bg-transparent flex justify-between h-12 w-11/12">
 			<div
 				class="
@@ -27,7 +27,7 @@
 	</div>
 
 	<!-- main content -->
-	<div class="mx-auto pt-7 pb-10 w-11/12">
+	<div class="mx-auto pt-7 pb-24 w-11/12">
 		<slot name="main" />
 	</div>
 </div>

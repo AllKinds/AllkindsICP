@@ -8,18 +8,16 @@
 	{#each data as d, i}
 		<div
 			class="flex flex-col p-0.5 rounded-lg bg-gradient-to-br from-DF-blue via-DF-red to-DF-yellow"
-		>
-			<div class="h-full rounded-lg" style:background-color={d.color}>
-				<div class="h-full bg-slate-100/90 dark:bg-slate-800/90 p-2 lg:p-4 rounded-lg">
-					<div class="text-2xl pb-1 md:pb-2 lg:text-3xl w-fit font-medium">
-						{#if ids} {i + 1} {/if}
-						{#if d.title} {d.title} {/if}
-					</div>
-					<div class="font-montserrat">
-						{d.text}
-					</div>
+		>	
+			<div class="h-full bg-sub90 p-2 lg:p-4 rounded-lg">
+				<div class="text-2xl pb-1 md:pb-2 lg:text-3xl w-fit font-medium">
+					{#if ids} {i + 1} {/if}
+					{#if d.title} {d.title} {/if}
 				</div>
-			</div>
+				<div class="font-montserrat">
+					{d.text}
+				</div>
+			</div>	
 		</div>
 	{/each}
 </div>

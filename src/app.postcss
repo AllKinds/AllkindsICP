@@ -8,19 +8,46 @@
 		@apply transition-all ease-in-out duration-300;
 	}
 	.fancy-btn {
-		@apply trans-300 rounded-full p-2 px-8 text-DF-navy bg-slate-100/90 hover:bg-slate-100/20 dark:text-slate-100 dark:bg-slate-800/80 dark:hover:bg-transparent;
+		@apply trans-300 rounded-full p-2 px-8 text-zinc-900 bg-zinc-100/90 hover:bg-zinc-100/20 dark:text-zinc-200 dark:bg-zinc-800/80 dark:hover:bg-transparent;
 	}
 	.fancy-btn-border {
 		@apply bg-gradient-to-br from-DF-blue via-DF-red to-DF-yellow font-semibold w-fit p-0.5 my-5 md:mx-0 rounded-full;
 	}
 	.iconbtn {
-		@apply w-6 md:w-8 cursor-pointer border-none text-slate-800 dark:text-slate-200 dark:hover:text-slate-400 bg-clip-text hover:text-slate-600;
-	}
-	.subtleBtn {
-		@apply bg-slate-700 rounded-md hover:bg-slate-600 h-8;
+		@apply w-6 md:w-8 cursor-pointer border-none hover-color bg-clip-text ;
 	}
 	.active {
-		@apply bg-slate-500;
+		@apply bg-zinc-300 dark:bg-zinc-700;
+	}
+	.bg-fancy {
+		@apply bg-gradient-to-br from-DF-blue via-DF-red to-DF-yellow;
+	}
+	.bg-main {
+		@apply bg-zinc-100 dark:bg-zinc-900;
+	}
+	.bg-main90 {
+		@apply bg-zinc-100/90 dark:bg-zinc-900/90;
+	}
+	.bg-main95 {
+		@apply bg-zinc-100 dark:bg-zinc-900/90;
+	}
+	.bg-sub {
+		@apply bg-zinc-200 dark:bg-zinc-800;
+	}
+	.bg-sub30 {
+		@apply bg-zinc-200/30 dark:bg-zinc-800/30;
+	}
+	.bg-sub90 {
+		@apply bg-zinc-200/90 dark:bg-zinc-800/90;
+	}
+	.sub-btn {
+		@apply cursor-pointer border-none bg-clip-text hover-color;
+	}
+	.hover-color {
+		@apply text-slate-700 hover:text-zinc-800 dark:text-zinc-300 dark:hover:text-zinc-200;
+	}
+	.border-main {
+		@apply  rounded-lg border border-zinc-300 dark:border-zinc-700;
 	}
 }
 
