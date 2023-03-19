@@ -5,6 +5,7 @@
 	import Spinner from '$lib/components/common/Spinner.svelte';
 	import Slider from '@bulatdashiev/svelte-slider';
 	import type { MatchingFilter, User } from 'src/declarations/backend/backend.did';
+	import UserCard from '$lib/components/app/UserCard.svelte';
 
 	let pending: boolean = false;
 	let expandWindow: Boolean = false;
@@ -36,7 +37,7 @@
 	};
 </script>
 
-<div class="flex flex-col gap-2 border-main bg-sub30">
+<div class="flex flex-col gap-2 border-main bg-sub30 py-8">
 	<div class="fancy-btn-border mx-auto mb-0">
 		<button on:click={handleFindMatches} class="fancy-btn">
 			{#if pending}
@@ -85,17 +86,16 @@
 					{/each}
 				</div>
 			</div>
+
 		</div>
 	{/if}
 
-	<div class="w-100% rounded-md flex flex-col p-2 md:p-8 gap-2 mt-8">
+	<div class="w-100% rounded-md flex flex-col p-2 md:p-8 gap-2">
 		{#if matches}
 			{#each matches as match}
 				<!-- TODO make userCard component -->
-				<div>
-					{match[0].username}
-					score: {match[1]}
-				</div>
+				<UserCard {match}/>
+				
 			{/each}
 		{/if}
 	</div>

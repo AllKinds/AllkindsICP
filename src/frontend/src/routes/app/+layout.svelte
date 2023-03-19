@@ -38,7 +38,7 @@
 				</div>
 			</div>
 
-			<div class="bg-main sticky top-16 h-fit w-44 mx-auto max-xl:hidden rounded-lg">
+			<div class="bg-main sticky top-16 h-fit w-44 mx-auto max-lg:hidden rounded-lg">
 				<Nav {data} path="" />
 			</div>
 		</div>

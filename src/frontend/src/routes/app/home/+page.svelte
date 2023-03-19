@@ -31,12 +31,12 @@
 </script>
 
 <div class=" bg-main flex flex-col gap-4">
-	<div class="border-main bg-sub30 w-full mx-auto flex-col padding justify-between">
+	<div class="border-main bg-sub30 w-full mx-auto flex-col padding py-1 justify-between">
 		<button
 			class="w-full flex justify-between items-center"
 			on:click={() => (expandWindow = !expandWindow)}
 		>
-			<span class="hover-color"> Create a new Yes/No question... </span>
+			<span class=""> Create a new Yes/No question... </span>
 
 			{#if !expandWindow}
 				<!-- <ChevronDown class="w-9 cursor-pointerborder-none" /> -->
@@ -69,9 +69,11 @@
 		{/if}
 	</div>
 
-	{#if $questions}
+	{#if $questions && $questions.length > 0}
 		{#each $questions as question}
 			<Qcard {question} />
 		{/each}
+	{:else}
+		<span class="text-slate-700 mx-auto mt-10">Oops! There are no questions for you to answer at this moment.</span>
 	{/if}
 </div>

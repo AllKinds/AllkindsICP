@@ -14,7 +14,7 @@
 
 <div class="flex flex-col items-end">
 	<button
-		class="mt-2 shrink-0 self-end xl:hidden hover-circle cursor-pointer"
+		class="mt-2 shrink-0 self-end lg:hidden hover-circle cursor-pointer"
 		on:click={toggleVissible}
 		on:keydown={toggleVissible}
 	>
