@@ -55,9 +55,11 @@
 		getQs();
 	};
 </script>
-
-<div class="2xl:w-9/12 mx-auto rounded-md flex flex-col justify-center items-center">
-	<span class=" text-3xl w-fit text-center">{question.question}</span>
+<!-- TODO : fix a minimum height here -->
+<div class="2xl:w-9/12 mx-auto h-fit rounded-md flex flex-col justify-center items-center">
+	<p class="text-4xl w-fit text-center">
+		{question.question}
+	</p>
 	<!--
 		<p class="text-slate-500 text-sm p-0">Created: {fromBigInt(question.created)}</p>
 		<p class="text-slate-500 text-sm p-0">By: {question.creater}</p>

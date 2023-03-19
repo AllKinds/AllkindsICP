@@ -21,14 +21,14 @@
 	<svelte:fragment slot="main">
 		<div class="flex flex-row justify-center mt-8 gap-4">
 			<!-- left sided col, possible for menu icon shortcuts  -->
-			<div
+			<!-- <div
 				class="sticky top-16 h-fit rounded-lg max-sm:hidden flex flex-col items-center gap-4"
 			>
 				<a href="/app/home"><Home class="iconbtn" /></a>
 				<a href="/app/people"><Users class="iconbtn" /></a>
 				<a href="/app/profile"><User class="iconbtn" /></a>
 				<a href="/app/settings"><Cogwheel class="iconbtn" /></a>
-			</div>
+			</div> -->
 
 			<!-- main content -->
 			<div

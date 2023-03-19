@@ -611,6 +611,7 @@ actor {
 
 
 		// TODO ; this line doesnt seem to work, IDK WHY
+		// try with assert next time
 		changeUserPoints(msg.caller, (user.points - queryCost));
 		
 

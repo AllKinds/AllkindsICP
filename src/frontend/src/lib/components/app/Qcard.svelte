@@ -16,7 +16,7 @@
 		class="flex h-full w-full hover-color "
 		on:click={() => (expandWindow = !expandWindow)}
 	>
-		<span class="break-all text-2xl text-left grow">
+		<span class="text-2xl text-left grow">
 			{#if !expandWindow}
 				{question.question}
 				<div class="mt-14" />
