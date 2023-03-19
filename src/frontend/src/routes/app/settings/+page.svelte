@@ -58,12 +58,19 @@
 
 <div class="flex flex-col gap-4 border-main bg-sub30 py-8">
 	<h2 class="p-0 text-center">Profile settings</h2>
-	<span class="text-zinc-600 flex justify-center"><Eye /> : Allow what people can initially see about you.</span>
+	<span class="text-zinc-600 flex justify-center"
+		><Eye /> : Allow what people can initially see about you.</span
+	>
 	<div class=" w-full rounded-md flex flex-col p-2 md:p-8">
 		<div class="flex flex-col w-10/12">
 			<span>Username</span>
 			<label for="username" class="pr-8">
-				<input type="text" id="username" class="inputfield border-main" bind:value={userObj.username} />
+				<input
+					type="text"
+					id="username"
+					class="inputfield border-main"
+					bind:value={userObj.username}
+				/>
 			</label>
 
 			<span>Gender</span>
@@ -93,7 +100,12 @@
 
 			<span>Email</span>
 			<label for="connect">
-				<input type="email" id="connect" class="inputfield border-main" bind:value={userObj.connect} />
+				<input
+					type="email"
+					id="connect"
+					class="inputfield border-main"
+					bind:value={userObj.connect}
+				/>
 				<PublicToggle bind:checked={publicConnect} />
 			</label>
 
@@ -119,7 +131,6 @@
 </div>
 
 <style style lang="postcss">
-
 	label {
 		@apply flex my-2;
 	}

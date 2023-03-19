@@ -609,11 +609,9 @@ actor {
 			return #err("You don't have enough points");
 		};
 
-
 		// TODO ; this line doesnt seem to work, IDK WHY
 		// try with assert next time
 		changeUserPoints(msg.caller, (user.points - queryCost));
-		
 
 		let filteredUsers : [(User, Int)] = filterUsers(msg.caller, para);
 		#ok(filteredUsers);

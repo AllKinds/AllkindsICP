@@ -31,20 +31,18 @@
 </script>
 
 <div class=" bg-main flex flex-col gap-4">
-	<div class="border-main bg-sub30 w-full mx-auto flex-col p-1 md:p-2 lg:p-5 justify-between">
+	<div class="border-main bg-sub30 w-full mx-auto flex-col padding justify-between">
 		<button
 			class="w-full flex justify-between items-center"
 			on:click={() => (expandWindow = !expandWindow)}
 		>
-			<span class="hover-color">
-				Create a new Yes/No question...
-			</span>
+			<span class="hover-color"> Create a new Yes/No question... </span>
 
 			{#if !expandWindow}
 				<!-- <ChevronDown class="w-9 cursor-pointerborder-none" /> -->
-				<Add class="iconbtn" />
+				<Add class="w-12 hover-circle" />
 			{:else if expandWindow}
-				<ChevronUp class="iconbtn" />
+				<ChevronUp class="w-12 hover-circle" />
 			{/if}
 		</button>
 
