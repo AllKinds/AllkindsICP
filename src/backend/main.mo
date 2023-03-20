@@ -603,7 +603,7 @@ actor {
 			case (?user) {
 				user;
 			};
-		};
+		}; 
 
 		if (Nat.less(user.points, queryCost)) {
 			return #err("You don't have enough points");
