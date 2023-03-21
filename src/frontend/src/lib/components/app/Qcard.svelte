@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { AnswerKind, LikeKind, Question } from 'src/declarations/backend/backend.did';
+	import type { AnswerKind, WeightKind, Question } from 'src/declarations/backend/backend.did';
 
 	import ChevronDown from '$lib/assets/icons/chevronDown.svg?component';
 	import ChevronUp from '$lib/assets/icons/chevronUp.svg?component';

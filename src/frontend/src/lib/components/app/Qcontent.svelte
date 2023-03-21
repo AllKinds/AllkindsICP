@@ -5,7 +5,7 @@
 	import { skipQ } from '$lib/stores/tasks/skipQ';
 	import { likeQ } from '$lib/stores/tasks/likeQ';
 	import { fromBigInt } from '$lib/utilities';
-	import type { AnswerKind, LikeKind, Question } from 'src/declarations/backend/backend.did';
+	import type { AnswerKind, WeightKind, Question } from 'src/declarations/backend/backend.did';
 	import Spinner from '../common/Spinner.svelte';
 	import PlusCircle from '$lib/assets/icons/plus-circle.svg?component';
 	import MinusCircle from '$lib/assets/icons/minus-circle.svg?component';
@@ -18,7 +18,7 @@
 	const submitAnswer = async (bool: boolean) => {
 		answerPending = bool;
 		let answer: AnswerKind = { Bool: bool };
-		let like: LikeKind =
+		let like: WeightKind =
 			likeWeight > 0
 				? { Like: BigInt(Math.abs(likeWeight)) }
 				: { Dislike: BigInt(Math.abs(likeWeight)) };

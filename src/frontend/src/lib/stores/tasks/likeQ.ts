@@ -1,11 +1,11 @@
 import { actor } from '$lib/stores';
-import type { Hash, LikeKind } from 'src/declarations/backend/backend.did';
+import type { Hash, WeightKind } from 'src/declarations/backend/backend.did';
 import { get } from 'svelte/store';
 
-export async function likeQ(hash: Hash, like: LikeKind) {
+export async function likeQ(hash: Hash, like: WeightKind) {
 	const localActor = get(actor);
 	console.log(hash, ' = gonna be answerLiked with: ', like);
 	await localActor
-		.submitLike(hash, like)
+		.submitWeight(hash, like)
 		.then((res) => console.log('Res after like submitted :', res));
 }

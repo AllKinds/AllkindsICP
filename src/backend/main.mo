@@ -22,7 +22,7 @@ actor {
 	// CONSTANTS
 	let N = 10;
 	//TODO : change 'points' to 'reward'
-	let initReward : Nat = 100;
+	let initReward : Nat = 10000;
 	let answerReward : Nat = 2;
 	let createrReward : Nat = 10;
 	let queryCost : Nat = 30;
@@ -71,10 +71,10 @@ actor {
 		answer : AnswerKind;
 	};
 
-	type Like = {
+	type Weight = {
 		user : Principal;
 		question : Hash.Hash;
-		like : LikeKind;
+		weight : WeightKind;
 	};
 
 	type Skip = {
@@ -88,7 +88,7 @@ actor {
 	};
 
 	// Nat indicates a possible amount of tokens / points appointed by the user to to the question
-	type LikeKind = {
+	type WeightKind = {
 		#Like : Nat;
 		#Dislike : Nat;
 	};
@@ -99,8 +99,8 @@ actor {
 		question : Hash.Hash;
 		sourceAnswer : Answer;
 		testAnswer : Answer;
-		sourceLike : ?Like;
-		testLike : ?Like;
+		sourceWeight : ?Weight;
+		testWeight : ?Weight;
 	};
 
 	type MatchingFilter = {
@@ -150,9 +150,9 @@ actor {
 		answers.put(pQ, answer);
 	};
 
-	func putLike(p : Principal, like : Like) : () {
-		let pQ = hashPrincipalQuestion(p, like.question);
-		likes.put(pQ, like);
+	func putWeight(p : Principal, weight : Weight) : () {
+		let pQ = hashPrincipalQuestion(p, weight.question);
+		weights.put(pQ, weight);
 	};
 
 	func putSkip(p : Principal, skip : Skip) : () {
@@ -169,7 +169,7 @@ actor {
 			switch (skips.get(pQ)) {
 				case (?_) {};
 				case null {
-					switch (likes.get(pQ)) {
+					switch (weights.get(pQ)) {
 						case (?_) {};
 						case null {
 							switch (answers.get(pQ)) {
@@ -179,7 +179,7 @@ actor {
 									count += 1;
 								};
 								//changing this around could be used to get questions that User has answered
-								//or modify function so an extra function parameter could sort on skipped, liked, answered, etc?
+								//or modify function so an extra function parameter could sort on skipped, weightd, answered, etc?
 								//case null {};
 								// case (?_) {
 								// 	buf.add(hash);
@@ -203,7 +203,7 @@ actor {
 			switch (skips.get(pQ)) {
 				case (?_) {};
 				case null {
-					switch (likes.get(pQ)) {
+					switch (weights.get(pQ)) {
 						case (?_) {};
 						case null {
 							switch (answers.get(pQ)) {
@@ -275,16 +275,16 @@ actor {
 
 	};
 
-	// calc score for 2 answers and optional 2 likes
-	func calcQuestionScore(sourceAnswer : Answer, testAnswer : Answer, sourceLike : ?Like, testLike : ?Like) : Int {
+	// calc score for 2 answers and optional 2 weights
+	func calcQuestionScore(sourceAnswer : Answer, testAnswer : Answer, sourceWeight : ?Weight, testWeight : ?Weight) : Int {
 		assert (sourceAnswer.question == testAnswer.question);
 
-		let hasLikes = Option.isSome(sourceLike) and Option.isSome(testLike);
-		let hasNoLikes = Option.isNull(sourceLike) and Option.isNull(testLike);
+		let hasWeights = Option.isSome(sourceWeight) and Option.isSome(testWeight);
+		let hasNoWeights = Option.isNull(sourceWeight) and Option.isNull(testWeight);
 
-		//assert(hasLikes or hasNoLikes);
+		//assert(hasWeights or hasNoWeights);
 		//TEMP : testing out why above assert breaks everything, this seems a temp fix
-		if (hasLikes or hasNoLikes) {
+		if (hasWeights or hasNoWeights) {
 			//do nothing
 		} else {
 			return 0;
@@ -298,9 +298,9 @@ actor {
 			-1;
 		};
 
-		let sourceLikeScore : Int = switch (sourceLike) {
-			case (?sourceLike) {
-				switch (sourceLike.like) {
+		let sourceWeightScore : Int = switch (sourceWeight) {
+			case (?sourceWeight) {
+				switch (sourceWeight.weight) {
 					case (#Like(score)) { score };
 					case (#Dislike(score)) { -score };
 				};
@@ -308,9 +308,9 @@ actor {
 			case null { 1 };
 		};
 
-		let testLikeScore : Int = switch (testLike) {
-			case (?testLike) {
-				switch (testLike.like) {
+		let testWeightScore : Int = switch (testWeight) {
+			case (?testWeight) {
+				switch (testWeight.weight) {
 					case (#Like(score)) { score };
 					case (#Dislike(score)) { -score };
 				};
@@ -318,7 +318,7 @@ actor {
 			case null { 1 };
 		};
 
-		sourceAnswerScore * testAnswerScore * sourceLikeScore * testLikeScore;
+		sourceAnswerScore * testAnswerScore * sourceWeightScore * testWeightScore;
 	};
 
 	func hasAnswered(p : Principal, question : Hash.Hash) : ?Answer {
@@ -329,11 +329,11 @@ actor {
 		};
 	};
 
-	func hasliked(p : Principal, question : Hash.Hash) : ?Like {
+	func hasweightd(p : Principal, question : Hash.Hash) : ?Weight {
 		let pQ = hashPrincipalQuestion(p, question);
-		switch (likes.get(pQ)) {
+		switch (weights.get(pQ)) {
 			case null return null;
-			case (?like) { return ?like };
+			case (?weight) { return ?weight };
 		};
 	};
 
@@ -348,14 +348,14 @@ actor {
 					switch (answers.get(testPQ)) {
 						case null {};
 						case (?testAnswer) {
-							let sourceLike = likes.get(sourcePQ);
-							let testLike = likes.get(testPQ);
+							let sourceWeight = weights.get(sourcePQ);
+							let testWeight = weights.get(testPQ);
 							let commonQuestion : CommonQuestion = {
 								question = hash;
 								sourceAnswer;
 								testAnswer;
-								sourceLike;
-								testLike;
+								sourceWeight;
+								testWeight;
 							};
 							buf.add(commonQuestion);
 						};
@@ -373,8 +373,8 @@ actor {
 			score += calcQuestionScore(
 				q.sourceAnswer,
 				q.testAnswer,
-				q.sourceLike,
-				q.testLike
+				q.sourceWeight,
+				q.testWeight
 			);
 		};
 		score;
@@ -423,8 +423,8 @@ actor {
 	stable var stableAnswers : [(PrincipalQuestionHash, Answer)] = [];
 	let answers = HashMap.fromIter<PrincipalQuestionHash, Answer>(Iter.fromArray(stableAnswers), 100, Hash.equal, hashhash);
 
-	stable var stableLikes : [(PrincipalQuestionHash, Like)] = [];
-	let likes = HashMap.fromIter<PrincipalQuestionHash, Like>(Iter.fromArray(stableLikes), 100, Hash.equal, hashhash);
+	stable var stableWeights : [(PrincipalQuestionHash, Weight)] = [];
+	let weights = HashMap.fromIter<PrincipalQuestionHash, Weight>(Iter.fromArray(stableWeights), 100, Hash.equal, hashhash);
 
 	stable var stableSkips : [(PrincipalQuestionHash, Skip)] = [];
 	let skips = HashMap.fromIter<PrincipalQuestionHash, Skip>(Iter.fromArray(stableSkips), 100, Hash.equal, hashhash);
@@ -434,7 +434,7 @@ actor {
 		stableUsers := Iter.toArray(users.entries());
 		stableQuestions := Iter.toArray(questions.entries());
 		stableAnswers := Iter.toArray(answers.entries());
-		stableLikes := Iter.toArray(likes.entries());
+		stableWeights := Iter.toArray(weights.entries());
 		stableSkips := Iter.toArray(skips.entries());
 	};
 
@@ -442,7 +442,7 @@ actor {
 		stableUsers := [];
 		stableQuestions := [];
 		stableAnswers := [];
-		stableLikes := [];
+		stableWeights := [];
 		stableSkips := [];
 	};
 
@@ -545,17 +545,17 @@ actor {
 		#ok();
 	};
 
-	// // Add a like
-	public shared (msg) func submitLike(question : Hash.Hash, like : LikeKind) : async Result.Result<(), Text> {
+	// // Add a weight
+	public shared (msg) func submitWeight(question : Hash.Hash, weight : WeightKind) : async Result.Result<(), Text> {
 		let principalQuestion = hashPrincipalQuestion(msg.caller, question);
-		let newLike = {
+		let newWeight = {
 			user = msg.caller;
 			question;
-			like;
+			weight;
 		};
-		//TEMP : likes.put line is moved to after points check
+		//TEMP : weights.put line is moved to after points check
 		//TODO : cleanup and extract possible funcs
-		let likeValue : Int = switch (like) {
+		let weightValue : Int = switch (weight) {
 			case (#Like(value)) { value };
 			case (#Dislike(value)) { - value };
 		};
@@ -574,24 +574,24 @@ actor {
 			};
 		};
 		//check if user has enough points
-		if (Nat.less(user.points, Int.abs(likeValue))) {
+		if (Nat.less(user.points, Int.abs(weightValue))) {
 			return #err("You don't have enough points");
 		};
-		//let newPoints = Nat.sub(user.points, likeValue);
+		//let newPoints = Nat.sub(user.points, weightValue);
 
-		likes.put(principalQuestion, newLike);
-		changeUserPoints(msg.caller, (user.points - Int.abs(likeValue)));
+		weights.put(principalQuestion, newWeight);
+		changeUserPoints(msg.caller, (user.points - Int.abs(weightValue)));
 		//check if user !== creater
 		if (msg.caller != q.creater) {
 			switch (users.get(q.creater)) {
 				case null {}; //do nothing, creater account might have been removed
 				case (?creater) {
-					changeUserPoints(q.creater, (creater.points + Int.abs(likeValue)));
+					changeUserPoints(q.creater, (creater.points + Int.abs(weightValue)));
 				};
 			};
 		};
 
-		changeQuestionPoints(q, (q.points + likeValue));
+		changeQuestionPoints(q, (q.points + weightValue));
 
 		#ok();
 	};
