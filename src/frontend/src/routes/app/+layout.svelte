@@ -47,7 +47,7 @@
 
 <!-- menu shortcuts sticky to bottom , left sided col replacement for mobile view -->
 <!-- TEMP FIX ,, TODO : generate from LayoutData-->
-<div class="flex w-full py-1 fixed bottom-0 sm:hidden rounded-t-lg justify-evenly">
+<div class="flex w-full bg-main90 py-1 fixed bottom-0 sm:hidden rounded-t-lg justify-evenly">
 	<a href="/app/home"><Home class="w-10 sub-btn" /></a>
 	<a href="/app/connect"><GlobeAlt class="w-10 sub-btn" /></a>
 	<a href="/app/friends"><Users class="w-10 sub-btn" /></a>

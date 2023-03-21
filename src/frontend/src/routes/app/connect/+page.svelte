@@ -92,7 +92,7 @@
 		</div>
 	{/if}
 
-	<div class="w-100% rounded-md flex flex-col p-2 md:p-8 gap-2">
+	<div class="rounded-md flex flex-col mx-auto">
 		{#if matches}
 			{#each matches as match}
 				<UserCard {match} />
