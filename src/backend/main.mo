@@ -39,6 +39,7 @@ actor {
 		connect : (?Text, Bool);
 		points : Nat; //Nat bcs user points should not go negative
 	};
+
 	type UserMatch = {
 
 	};
@@ -221,60 +222,6 @@ actor {
 		buf.toArray();
 	};
 
-	// filter users according to parameters
-	func filterUsers(p : Principal, f : MatchingFilter) : [(User, Int)] {
-		let buf = Buffer.Buffer<(User, Int)>(users.size()); //TODO : test out possible buffer size props
-		var count = 0;
-		let caller = users.get(p);
-		//User Loop
-		label ul for (p2 in users.keys()) {
-			if (users.size() == count) break ul;
-			//user = possible match
-			let user = switch (users.get(p2)) {
-				case null ();
-				case (?user) {
-					//filter msg.caller, TEMP diabled for testing
-					//if (p2 != p) {
-					//Filter Loop
-					label fl {
-						//gender
-						switch (f.gender) {
-							case null ();
-							case (Gender) {
-								if ((f.gender, true) != user.gender) {
-									break fl;
-								};
-							};
-						};
-						//age
-						switch (user.birth) {
-							case (?birth, _) {
-								//TODO : make birth-age conversion utility func
-								let userAge = birth / (1_000_000_000 * 3600 * 24) / 365;
-								//TODO : find way to have em both in if statement , || doesnt work
-								if (f.ageRange.0 >= userAge) {
-									break fl;
-								} else if (f.ageRange.1 <= userAge) {
-									break fl;
-								};
-							};
-							case (_)();
-						};
-
-						buf.add(user, calcScore(p, p2));
-					}; //end  fl
-					//};
-				};
-			};
-			count += 1;
-		}; // end ul
-		//NEXT : MAP buffer order by score
-		//NEXT : get X users closest to cohesion score
-		//return result
-		buf.toArray();
-
-	};
-
 	// calc score for 2 answers and optional 2 weights
 	func calcQuestionScore(sourceAnswer : Answer, testAnswer : Answer, sourceWeight : ?Weight, testWeight : ?Weight) : Int {
 		assert (sourceAnswer.question == testAnswer.question);
@@ -410,6 +357,61 @@ actor {
 			points = value;
 		};
 		questions.put(q.hash, newQ);
+	};
+
+
+	// filter users according to parameters
+	func filterUsers(p : Principal, f : MatchingFilter) : [(User, Int)] {
+		let buf = Buffer.Buffer<(User, Int)>(users.size()); //TODO : test out possible buffer size props
+		var count = 0;
+		let caller = users.get(p);
+		//User Loop
+		label ul for (p2 in users.keys()) {
+			if (users.size() == count) break ul;
+			//user = possible match
+			let user = switch (users.get(p2)) {
+				case null ();
+				case (?user) {
+					//filter msg.caller, TEMP diabled for testing
+					//if (p2 != p) {
+					//Filter Loop
+					label fl {
+						//gender
+						switch (f.gender) {
+							case null ();
+							case (Gender) {
+								if ((f.gender, true) != user.gender) {
+									break fl;
+								};
+							};
+						};
+						//age
+						switch (user.birth) {
+							case (?birth, _) {
+								//TODO : make birth-age conversion utility func
+								let userAge = birth / (1_000_000_000 * 3600 * 24) / 365;
+								//TODO : find way to have em both in if statement , || doesnt work
+								if (f.ageRange.0 >= userAge) {
+									break fl;
+								} else if (f.ageRange.1 <= userAge) {
+									break fl;
+								};
+							};
+							case (_)();
+						};
+
+						buf.add(user, calcScore(p, p2));
+					}; //end  fl
+					//};
+				};
+			};
+			count += 1;
+		}; // end ul
+		//NEXT : MAP buffer order by score
+		//NEXT : get X users closest to cohesion score
+		//return result
+		buf.toArray();
+
 	};
 
 	// DATA STORAGE
