@@ -12,6 +12,7 @@
 		visible = !visible;
 	}
 </script>
+
 <!-- TODO : rethink the nav components as this is almost equal to sidepanelnav.svelte -->
 <div class="flex flex-col items-end">
 	<button

@@ -70,7 +70,7 @@ type AnswerKind = variant { Bool : bool };
 service : {
 	createQuestion : (text) -> (Result);
 	createUser : (text) -> (Result);
-	findMatches : (MatchingFilter) -> (Result_3) query;
+	findMatches : (MatchingFilter) -> (Result_3);
 	getAnsweredQuestions : (nat) -> (Result_2) query;
 	getAskableQuestions : (nat) -> (Result_2) query;
 	getUser : () -> (Result_1) query;

@@ -39,6 +39,9 @@ actor {
 		connect : (?Text, Bool);
 		points : Nat; //Nat bcs user points should not go negative
 	};
+	type UserMatch = {
+
+	};
 
 	type Gender = {
 		#Male;
@@ -597,24 +600,26 @@ actor {
 	};
 
 	//find users based on parameters
-	public shared query (msg) func findMatches(para : MatchingFilter) : async Result.Result<[(User, Int)], Text> {
+	public shared (msg) func findMatches(para : MatchingFilter) : async Result.Result<[(User, Int)], Text> {
 		let user = switch (users.get(msg.caller)) {
 			case null return #err("User does not exist");
 			case (?user) {
 				user;
 			};
-		}; 
+		};
 
 		if (Nat.less(user.points, queryCost)) {
 			return #err("You don't have enough points");
 		};
 
-		// TODO ; this line doesnt seem to work, IDK WHY
-		// try with assert next time
-		changeUserPoints(msg.caller, (user.points - queryCost));
+		try {
+			changeUserPoints(msg.caller, (user.points - Int.abs(queryCost)));
+			let filteredUsers : [(User, Int)] = filterUsers(msg.caller, para);
+			return #ok(filteredUsers);
+		} catch err {
+			return #err("Couldn't filter users and/or deduct points");
+		};
 
-		let filteredUsers : [(User, Int)] = filterUsers(msg.caller, para);
-		#ok(filteredUsers);
 	};
 
 };

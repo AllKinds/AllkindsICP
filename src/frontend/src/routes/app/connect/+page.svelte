@@ -66,7 +66,7 @@
 			<div class="filter-box">
 				<span class="filter-name">Cohesion</span>
 				<span class="mx-auto">{cohesionValue[0]}%</span>
-				<Slider bind:value={cohesionValue}/>
+				<Slider bind:value={cohesionValue} />
 			</div>
 
 			<!-- TODO : gender options, make like profile settings
@@ -86,7 +86,6 @@
 					{/each}
 				</div>
 			</div>
-
 		</div>
 	{/if}
 
@@ -94,8 +93,7 @@
 		{#if matches}
 			{#each matches as match}
 				<!-- TODO make userCard component -->
-				<UserCard {match}/>
-				
+				<UserCard {match} />
 			{/each}
 		{/if}
 	</div>

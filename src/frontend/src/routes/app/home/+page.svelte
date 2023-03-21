@@ -74,6 +74,8 @@
 			<Qcard {question} />
 		{/each}
 	{:else}
-		<span class="text-slate-700 mx-auto mt-10">Oops! There are no questions for you to answer at this moment.</span>
+		<span class="text-slate-700 mx-auto mt-10"
+			>Oops! There are no questions for you to answer at this moment.</span
+		>
 	{/if}
 </div>

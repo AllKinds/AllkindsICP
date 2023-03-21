@@ -20,7 +20,6 @@
 
 <div class="flex flex-col gap-4 border-main bg-sub30 py-8">
 	<div class="w-24 h-24 rounded-full border-main bg-sub mx-auto">
-		
 		<!-- placeholder profile picture -->
 	</div>
 	<span class=" text-4xl font-semibold mx-auto bg-clip-text text-transparent bg-fancy">
