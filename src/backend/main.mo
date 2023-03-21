@@ -22,9 +22,9 @@ actor {
 	// CONSTANTS
 	let N = 10;
 	//TODO : change 'points' to 'reward'
-	let initialPoints : Nat = 100;
-	let answerPoints : Nat = 2;
-	let createrPoints : Nat = 10;
+	let initReward : Nat = 100;
+	let answerReward : Nat = 2;
+	let createrReward : Nat = 10;
 	let queryCost : Nat = 30;
 
 	// DATA TYPES
@@ -455,7 +455,7 @@ actor {
 					gender = (null, false);
 					birth = (null, false);
 					connect = (null, false);
-					points = initialPoints; //nat
+					points = initReward; //nat
 				};
 
 				// Mutate storage for users data
@@ -489,7 +489,7 @@ actor {
 			case (?user) {
 				putQuestion(msg.caller, question);
 				//might need to check here for put to be success before awarding points, same for other occurrences
-				changeUserPoints(msg.caller, (user.points + createrPoints));
+				changeUserPoints(msg.caller, (user.points + createrReward));
 			};
 		};
 		#ok();
@@ -533,7 +533,7 @@ actor {
 				user;
 			};
 		};
-		changeUserPoints(msg.caller, (user.points + answerPoints));
+		changeUserPoints(msg.caller, (user.points + answerReward));
 		#ok();
 	};
 
