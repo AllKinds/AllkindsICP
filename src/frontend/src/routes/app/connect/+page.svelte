@@ -4,7 +4,7 @@
 	import { toNullableGender } from '$lib/utilities';
 	import Spinner from '$lib/components/common/Spinner.svelte';
 	import Slider from '@bulatdashiev/svelte-slider';
-	import type { MatchingFilter, User } from 'src/declarations/backend/backend.did';
+	import type { MatchingFilter, User, UserMatch } from 'src/declarations/backend/backend.did';
 	import UserCard from '$lib/components/app/UserCard.svelte';
 
 	let pending: boolean = false;
@@ -12,7 +12,8 @@
 	let ageValue = [0, 150];
 	let cohesionValue = [100, 100];
 	let genderValue = 'Everyone';
-	let matches: Array<[User, BigInt]>;
+	//let matches: Array<[User, BigInt]>;
+	let matches: Array<UserMatch>;
 
 	//this could be moved to some declaration/constant somewhere else
 	let genders = ['Everyone', 'Male', 'Female', 'Other', 'Queer'];
@@ -31,6 +32,8 @@
 		await getMatchedUsers(filter).catch((error) => {
 			console.log('error while getting matchedUsers', error);
 		});
+		//matches = $matchedUsers;
+		//console.log($matchedUsers, matches);
 		matches = $matchedUsers;
 		console.log($matchedUsers, matches);
 		pending = false;
@@ -92,7 +95,6 @@
 	<div class="w-100% rounded-md flex flex-col p-2 md:p-8 gap-2">
 		{#if matches}
 			{#each matches as match}
-				<!-- TODO make userCard component -->
 				<UserCard {match} />
 			{/each}
 		{/if}

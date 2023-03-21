@@ -41,7 +41,13 @@ actor {
 	};
 
 	type UserMatch = {
-
+		username : Text;
+		about : ?Text;
+		gender : ?Gender;
+		birth : ?Int;
+		connect : ?Text;
+		//TEMP changed into score for testing : cohesion : Nat; //should always between 0-100, maybe nat8
+		score : Int;
 	};
 
 	type Gender = {
@@ -359,10 +365,9 @@ actor {
 		questions.put(q.hash, newQ);
 	};
 
-
 	// filter users according to parameters
-	func filterUsers(p : Principal, f : MatchingFilter) : [(User, Int)] {
-		let buf = Buffer.Buffer<(User, Int)>(users.size()); //TODO : test out possible buffer size props
+	func filterUsers(p : Principal, f : MatchingFilter) : [UserMatch] {
+		let buf = Buffer.Buffer<UserMatch>(users.size()); //TODO : test out possible buffer size props
 		var count = 0;
 		let caller = users.get(p);
 		//User Loop
@@ -399,8 +404,18 @@ actor {
 							};
 							case (_)();
 						};
+						//TODO : streamline the function, maybe use new checkPublic func
+						let score = calcScore(p, p2);
 
-						buf.add(user, calcScore(p, p2));
+						let newUserMatch : UserMatch = {
+							username = user.username;
+							about = checkPublic(user.about);
+							gender = checkPublic(user.gender);
+							birth = checkPublic(user.birth);
+							connect = checkPublic(user.connect);
+							score = score; //TEMP score instead of cohesion
+						};
+						buf.add(newUserMatch);
 					}; //end  fl
 					//};
 				};
@@ -410,8 +425,19 @@ actor {
 		//NEXT : MAP buffer order by score
 		//NEXT : get X users closest to cohesion score
 		//return result
-		buf.toArray();
 
+		buf.toArray();
+	};
+
+	//returns user info opt property if not undefined and public viewable
+	func checkPublic<T>(prop : (?T, Bool)) : (?T) {
+		switch (prop) {
+			case (null, _) { null };
+			case (?T, false) { null };
+			case (?T, true) {
+				?T;
+			};
+		};
 	};
 
 	// DATA STORAGE
@@ -610,7 +636,7 @@ actor {
 	};
 
 	//find users based on parameters
-	public shared (msg) func findMatches(para : MatchingFilter) : async Result.Result<[(User, Int)], Text> {
+	public shared (msg) func findMatches(para : MatchingFilter) : async Result.Result<[UserMatch], Text> {
 		let user = switch (users.get(msg.caller)) {
 			case null return #err("User does not exist");
 			case (?user) {
@@ -624,7 +650,7 @@ actor {
 
 		try {
 			changeUserPoints(msg.caller, (user.points - Int.abs(queryCost)));
-			let filteredUsers : [(User, Int)] = filterUsers(msg.caller, para);
+			let filteredUsers : [UserMatch] = filterUsers(msg.caller, para);
 			return #ok(filteredUsers);
 		} catch err {
 			return #err("Couldn't filter users and/or deduct points");
