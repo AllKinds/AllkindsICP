@@ -17,6 +17,7 @@ TODO : backend create friendlist and connection request implementation -->
 	<div class="grow flex flex-col">
 		<span class="text-sub text-2xl">{match[0].username}</span>
 		<span>{match[0].about}</span>
+		<span>{match[1]}</span>
 	</div>
 
 	<!-- create and implement a Connection Request btn only when used from /home -->

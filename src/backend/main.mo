@@ -233,37 +233,37 @@ actor {
 			let user = switch (users.get(p2)) {
 				case null ();
 				case (?user) {
-					//filter msg.caller
-					if (p2 != p) {
-						//Filter Loop
-						label fl {
-							//gender
-							switch (f.gender) {
-								case null ();
-								case (Gender) {
-									if ((f.gender, true) != user.gender) {
-										break fl;
-									};
+					//filter msg.caller, TEMP diabled for testing
+					//if (p2 != p) {
+					//Filter Loop
+					label fl {
+						//gender
+						switch (f.gender) {
+							case null ();
+							case (Gender) {
+								if ((f.gender, true) != user.gender) {
+									break fl;
 								};
 							};
-							//age
-							switch (user.birth) {
-								case (?birth, _) {
-									//TODO : make birth-age conversion utility func
-									let userAge = birth / (1_000_000_000 * 3600 * 24) / 365;
-									//TODO : find way to have em both in if statement , || doesnt work
-									if (f.ageRange.0 >= userAge) {
-										break fl;
-									} else if (f.ageRange.1 <= userAge) {
-										break fl;
-									};
+						};
+						//age
+						switch (user.birth) {
+							case (?birth, _) {
+								//TODO : make birth-age conversion utility func
+								let userAge = birth / (1_000_000_000 * 3600 * 24) / 365;
+								//TODO : find way to have em both in if statement , || doesnt work
+								if (f.ageRange.0 >= userAge) {
+									break fl;
+								} else if (f.ageRange.1 <= userAge) {
+									break fl;
 								};
-								case (_)();
 							};
+							case (_)();
+						};
 
-							buf.add(user, calcScore(p, p2));
-						}; //end  fl
-					};
+						buf.add(user, calcScore(p, p2));
+					}; //end  fl
+					//};
 				};
 			};
 			count += 1;
@@ -281,7 +281,14 @@ actor {
 
 		let hasLikes = Option.isSome(sourceLike) and Option.isSome(testLike);
 		let hasNoLikes = Option.isNull(sourceLike) and Option.isNull(testLike);
-		//assert (hasLikes or hasNoLikes);
+
+		//assert(hasLikes or hasNoLikes);
+		//TEMP : testing out why above assert breaks everything, this seems a temp fix
+		if (hasLikes or hasNoLikes) {
+			//do nothing
+		} else {
+			return 0;
+		};
 
 		let sourceAnswerScore : Int = if (sourceAnswer.answer == #Bool(true)) {
 			1;
@@ -371,6 +378,7 @@ actor {
 			);
 		};
 		score;
+		//TODO : FIX whole calcscore system as results are weird and incorrect
 	};
 
 	func changeUserPoints(p : Principal, value : Nat) : () {
