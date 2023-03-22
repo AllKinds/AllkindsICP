@@ -1,96 +1,86 @@
-type WeightKind = 
- variant {
-   Dislike: nat;
-   Like: nat;
- };
-type UserMatch = 
- record {
-   about: opt text;
-   birth: opt int;
-   connect: opt text;
-   gender: opt Gender;
-   score: float64;
-   username: text;
- };
-type User = 
- record {
-   about: record {
-            opt text;
-            bool;
-          };
-   birth: record {
-            opt int;
-            bool;
-          };
-   connect: record {
-              opt text;
-              bool;
-            };
-   created: int;
-   gender: record {
-             opt Gender;
-             bool;
-           };
-   points: nat;
-   username: text;
- };
-type Result_3 = 
- variant {
-   err: text;
-   ok: vec UserMatch;
- };
-type Result_2 = 
- variant {
-   err: text;
-   ok: vec Question;
- };
-type Result_1 = 
- variant {
-   err: text;
-   ok: User;
- };
-type Result = 
- variant {
-   err: text;
-   ok;
- };
-type Question = 
- record {
-   color: opt Color;
-   created: int;
-   creater: principal;
-   hash: Hash;
-   points: int;
-   question: text;
- };
-type MatchingFilter = 
- record {
-   ageRange: record {
-               nat;
-               nat;
-             };
-   cohesion: int;
-   gender: opt Gender;
- };
+type WeightKind = variant {
+	Dislike : nat;
+	Like : nat;
+};
+type UserMatch = record {
+	about : opt text;
+	birth : opt int;
+	connect : opt text;
+	gender : opt Gender;
+	score : float64;
+	username : text;
+};
+type User = record {
+	about : record {
+		opt text;
+		bool;
+	};
+	birth : record {
+		opt int;
+		bool;
+	};
+	connect : record {
+		opt text;
+		bool;
+	};
+	created : int;
+	gender : record {
+		opt Gender;
+		bool;
+	};
+	points : nat;
+	username : text;
+};
+type Result_3 = variant {
+	err : text;
+	ok : vec UserMatch;
+};
+type Result_2 = variant {
+	err : text;
+	ok : vec Question;
+};
+type Result_1 = variant {
+	err : text;
+	ok : User;
+};
+type Result = variant {
+	err : text;
+	ok;
+};
+type Question = record {
+	color : opt Color;
+	created : int;
+	creater : principal;
+	hash : Hash;
+	points : int;
+	question : text;
+};
+type MatchingFilter = record {
+	ageRange : record {
+		nat;
+		nat;
+	};
+	cohesion : int;
+	gender : opt Gender;
+};
 type Hash = nat32;
-type Gender = 
- variant {
-   Female;
-   Male;
-   Other;
-   Queer;
- };
-type Color = variant {Default;};
-type AnswerKind = variant {Bool: bool;};
+type Gender = variant {
+	Female;
+	Male;
+	Other;
+	Queer;
+};
+type Color = variant { Default };
+type AnswerKind = variant { Bool : bool };
 service : {
-  createQuestion: (text) -> (Result);
-  createUser: (text) -> (Result);
-  findMatches: (MatchingFilter) -> (Result_3);
-  getAnsweredQuestions: (nat) -> (Result_2) query;
-  getAskableQuestions: (nat) -> (Result_2) query;
-  getUser: () -> (Result_1) query;
-  submitAnswer: (Hash, AnswerKind) -> (Result);
-  submitSkip: (Hash) -> (Result);
-  submitWeight: (Hash, WeightKind) -> (Result);
-  updateProfile: (User) -> (Result);
-}
+	createQuestion : (text) -> (Result);
+	createUser : (text) -> (Result);
+	findMatches : (MatchingFilter) -> (Result_3);
+	getAnsweredQuestions : (nat) -> (Result_2) query;
+	getAskableQuestions : (nat) -> (Result_2) query;
+	getUser : () -> (Result_1) query;
+	submitAnswer : (Hash, AnswerKind) -> (Result);
+	submitSkip : (Hash) -> (Result);
+	submitWeight : (Hash, WeightKind) -> (Result);
+	updateProfile : (User) -> (Result);
+};

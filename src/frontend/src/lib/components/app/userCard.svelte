@@ -25,7 +25,7 @@ TODO : finish this card, and fix cohesion score in backend for a proper result
 TODO : at same time implement this into a friendlist and using same component 
 TODO : backend create friendlist and connection request implementation -->
 
-<div class="sm:w-96 border-main flex flex-col justify-between">
+<div class="sm:w-96 border-main flex flex-col lg:flex-row justify-between">
 	<div class="w-full h-64 sm:h-96 mx-auto rounded-md bg-sub">
 		<!-- placeholder profile picture -->
 	</div>
@@ -48,8 +48,6 @@ TODO : backend create friendlist and connection request implementation -->
 				{/if}
 			</button>
 		</div>
-
-		<div class="h-10" />
 	</div>
 
 	<!-- create and implement a Connection Request btn only when used from /home -->
