@@ -17,6 +17,7 @@ import Int32 "mo:base/Int32";
 import Debug "mo:base/Debug";
 import Array "mo:base/Array";
 import Float "mo:base/Float";
+import Order "mo:base/Order";
 
 actor {
 
@@ -48,7 +49,7 @@ actor {
 		birth : ?Int;
 		connect : ?Text;
 		//TEMP changed into score for testing : cohesion : Nat; //should always between 0-100, maybe nat8
-		score : Float;
+		cohesion : Int;
 		//answeredQuestions : [Question];
 	};
 
@@ -412,7 +413,7 @@ actor {
 
 	// filter users according to parameters
 	func filterUsers(p : Principal, f : MatchingFilter) : [UserMatch] {
-		let buf = Buffer.Buffer<(UserMatch)>(4);
+		let buf = Buffer.Buffer<(Principal, Int)>(2);
 		var count = 0;
 		let callerScore : Float = calcScore(p, p);
 		//User Loop
@@ -448,7 +449,7 @@ actor {
 						};
 
 						let score : Float = calcScore(p, p2);
-
+						let cohesion = Float.toInt(Float.trunc((score / callerScore) * 100));
 						//TEMP for testing
 						let newUserMatch : UserMatch = {
 							username = user.username;
@@ -456,15 +457,16 @@ actor {
 							gender = checkPublic(user.gender);
 							birth = checkPublic(user.birth);
 							connect = checkPublic(user.connect);
-							score = Float.trunc((score / callerScore) * 100);
+							cohesion = cohesion;
 							//answeredQuestions = getXAnsweredQuestions(p2, null);
 							//TODO : re-enable answeredQuestions
 							//also filter first on commonQuestions to add a bool to this array for front-end indicating if both answered
-			
 						};
 
 						//TODO : 1) put (p2, score) (!! score calc to % !!) in temp new buff
-						buf.add(newUserMatch);
+						buf.add((p2, cohesion));
+						
+						
 
 						//sets callerScore
 
@@ -474,7 +476,17 @@ actor {
 			count += 1;
 		}; // end ul
 		//TODO : 2) sort on score with cohesion after 'ul' and MATCH
+		//HELP : need to sort on tuple.1 = (_ , Int)
+		//buf.sort(Nat.compare);
+		func compare(t : (Principal , Int), u : (Principal, Int) ) : Order.Order {
+			if (t.1 < u.1) {return #less} 
+				else if (t.1 > u.1) {return #greater}
+				else {return #equal};
+		};
+		buf.sort(compare);
+						//Array.filter<Nat>(a, func (x: Nat) : Bool {x == n});
 		//select X most closest to cohesion score
+		
 
 		//TODO : 3) prepare UserMatch
 
