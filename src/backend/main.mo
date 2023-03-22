@@ -82,7 +82,7 @@ actor {
 	type Weight = {
 		user : Principal;
 		question : Hash.Hash;
-		weight : WeightKind;
+		weight : WeightKind; //this would need to become an Int
 	};
 
 	type Skip = {
@@ -97,9 +97,11 @@ actor {
 
 	// Nat indicates a possible amount of tokens / points appointed by the user to to the question
 	type WeightKind = {
+		//this would need to be removed
 		#Like : Nat;
 		#Dislike : Nat;
 	};
+	//
 
 	type PrincipalQuestionHash = Hash.Hash;
 
@@ -186,13 +188,6 @@ actor {
 									buf.add(hash);
 									count += 1;
 								};
-								//changing this around could be used to get questions that User has answered
-								//or modify function so an extra function parameter could sort on skipped, weightd, answered, etc?
-								//case null {};
-								// case (?_) {
-								// 	buf.add(hash);
-								// 	count += 1;
-								// };
 							};
 						};
 					};
@@ -201,6 +196,16 @@ actor {
 		};
 		buf.toArray();
 	};
+
+	// Consider new syntax
+	// let ?_ = skips.get(pQ) else {
+	// 	let ?_ = weights.get(pQ) ese {
+	// 		let ?_ = answers.get(pQ) else {
+	// 			buf.add(hash);
+	// 			count += 1;
+	// 		}
+	// 	}
+	// }
 
 	func answeredQuestions(p : Principal, n : Nat) : [Hash.Hash] {
 		let buf = Buffer.Buffer<Hash.Hash>(10);
@@ -233,54 +238,61 @@ actor {
 	func calcQuestionScore(sourceAnswer : Answer, testAnswer : Answer, sourceWeight : ?Weight, testWeight : ?Weight) : Int {
 		assert (sourceAnswer.question == testAnswer.question);
 
-		let hasWeights = Option.isSome(sourceWeight) and Option.isSome(testWeight);
-		let hasNoWeights = Option.isNull(sourceWeight) and Option.isNull(testWeight);
+		// let hasWeights = Option.isSome(sourceWeight) and Option.isSome(testWeight);
+		// let hasNoWeights = Option.isNull(sourceWeight) and Option.isNull(testWeight);
 
-		//assert(hasWeights or hasNoWeights);
-		//TEMP : testing out why above assert breaks everything, this seems a temp fix
-		if (hasWeights or hasNoWeights) {
-			//do nothing
-		} else {
+		let compareAnswers : Bool = sourceAnswer.answer == testAnswer.answer;
+		//let compareWeights : Bool = ...
+
+		//Weights should be: both positive, or both negative. -> and result both in +value
+
+		if (compareAnswers == false) {
+			//also check for weights here
 			return 0;
-		};
+		} else {
+			// let sourceAnswerScore : Int = if (sourceAnswer.answer == #Bool(true)) { 1 } else { -1 };
+			// let testAnswerScore : Int = if (testAnswer.answer == #Bool(true)) { 1 } else { -1 };
 
-		let sourceAnswerScore : Int = if (sourceAnswer.answer == #Bool(true)) {
-			1;
-		} else { -1 };
-
-		let testAnswerScore : Int = if (testAnswer.answer == #Bool(true)) { 1 } else {
-			-1;
-		};
-
-		let sourceWeightScore : Int = switch (sourceWeight) {
-			case (?sourceWeight) {
-				switch (sourceWeight.weight) {
-					case (#Like(score)) { score };
-					case (#Dislike(score)) { -score };
+			//functions remade with possible changed weight type
+			let sourceWeightScore : Int = switch (sourceWeight) {
+				case (?sourceWeight) {
+					switch (sourceWeight.weight) {
+						case (#Like(score)) { score };
+						case (#Dislike(score)) { -score };
+					};
 				};
+				case null { 1 };
 			};
-			case null { 1 };
-		};
 
-		let testWeightScore : Int = switch (testWeight) {
-			case (?testWeight) {
-				switch (testWeight.weight) {
-					case (#Like(score)) { score };
-					case (#Dislike(score)) { -score };
+			let testWeightScore : Int = switch (testWeight) {
+				case (?testWeight) {
+					switch (testWeight.weight) {
+						case (#Like(score)) { score };
+						case (#Dislike(score)) { -score };
+					};
 				};
+				case null { 1 };
 			};
-			case null { 1 };
-		};
 
-		//sourceAnswerScore * testAnswerScore * sourceWeightScore * testWeightScore;
-		//need addition not multiplication?
-		sourceWeightScore + testWeightScore;
+			var wScore : Int = 1; //temp ugly fix
+			//init score with 1 so people can match even if they didnt weigh but still answered the same
+			if (sourceWeightScore >= 0 and testWeightScore >= 0) {
+				wScore += sourceWeightScore + testWeightScore;
+			};
+			if (sourceWeightScore <= 0 and testWeightScore >= 0) {
+				wScore += sourceWeightScore + testWeightScore;
+			};
+			return wScore;
+		};
 	};
 
 	func hasAnswered(p : Principal, question : Hash.Hash) : ?Answer {
 		let pQ = hashPrincipalQuestion(p, question);
+		// let ?answer = answers.get(pQ) else { return null };
+		// ?answer;
+		// TEMP : ERRUR LET ELSE aint working cannot be found, not in base lib or what import?
 		switch (answers.get(pQ)) {
-			case null { return null };
+			case null return null;
 			case (?answer) { return ?answer };
 		};
 	};
@@ -294,7 +306,7 @@ actor {
 	};
 
 	func commonQuestions(sourceUser : Principal, testUser : Principal) : [CommonQuestion] {
-		let buf = Buffer.Buffer<CommonQuestion>(200);
+		let buf = Buffer.Buffer<CommonQuestion>(2);
 		for (hash in questions.keys()) {
 			let sourcePQ = hashPrincipalQuestion(sourceUser, hash);
 			let testPQ = hashPrincipalQuestion(testUser, hash);
@@ -324,20 +336,20 @@ actor {
 
 	func calcScore(sourceUser : Principal, testUser : Principal) : Float {
 		let common = commonQuestions(sourceUser, testUser);
-		var score : Float = 0;
+		var score : Int = 0;
+		var qScore : Float = 0;
 		for (q in Iter.fromArray(common)) {
-			score += Float.fromInt(
-				calcQuestionScore(
-					q.sourceAnswer,
-					q.testAnswer,
-					q.sourceWeight,
-					q.testWeight
-				) * 10 / (2 * Array.size(common))
-				//added * 10 to make it more usable
+			score := calcQuestionScore(
+				q.sourceAnswer,
+				q.testAnswer,
+				q.sourceWeight,
+				q.testWeight
 			);
+			//score *= 10; //temp
+			//score /= (2 * common.size()); //what is theory or reasoning behind this? check algorithm
+			qScore += Float.fromInt(score);
 		};
-		score;
-		//TODO : FIX whole calcscore system as results are weird and incorrect
+		qScore;
 	};
 
 	func changeUserPoints(p : Principal, value : Nat) : () {
@@ -373,9 +385,10 @@ actor {
 
 	// filter users according to parameters
 	func filterUsers(p : Principal, f : MatchingFilter) : [UserMatch] {
-		let buf = Buffer.Buffer<UserMatch>(users.size()); //TODO : test out possible buffer size props
+		let buf = Buffer.Buffer<(UserMatch)>(4);
 		var count = 0;
 		let caller = users.get(p);
+		var callerScore : Float = 0;
 		//User Loop
 		label ul for (p2 in users.keys()) {
 			if (users.size() == count) break ul;
@@ -413,15 +426,24 @@ actor {
 						//TODO : streamline the function, maybe use new checkPublic func
 						let score : Float = calcScore(p, p2);
 
+						//catches and uses callerScore BUT need to implement this differenty or map the whole buffer
+						//because userCaller might not always be the first user in the label 'ul' loop
+						if (p2 == p) {
+							callerScore := score;
+						};
+
 						let newUserMatch : UserMatch = {
 							username = user.username;
 							about = checkPublic(user.about);
 							gender = checkPublic(user.gender);
 							birth = checkPublic(user.birth);
 							connect = checkPublic(user.connect);
-							score = score; //TEMP score instead of cohesion
+							score = (score / callerScore) * 100; //TEMP score instead of cohesion
 						};
+
 						buf.add(newUserMatch);
+
+						//sets callerScore
 
 					}; //end  fl
 					//};
@@ -429,11 +451,11 @@ actor {
 			};
 			count += 1;
 		}; // end ul
-		//NEXT : MAP buffer order by score
-		//NEXT : get X users closest to cohesion score
-		//return result
+		//TODO : MAP buffer by score, add value ,
+		//and attach % value according to first user = caller = 100%
 
 		buf.toArray();
+
 	};
 
 	//returns user info opt property if not undefined and public viewable
