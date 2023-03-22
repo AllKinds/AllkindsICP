@@ -49,7 +49,7 @@ actor {
 		connect : ?Text;
 		//TEMP changed into score for testing : cohesion : Nat; //should always between 0-100, maybe nat8
 		score : Float;
-		answeredQuestions : [Question];
+		//answeredQuestions : [Question];
 	};
 
 	type Gender = {
@@ -389,7 +389,7 @@ actor {
 		questions.put(q.hash, newQ);
 	};
 
-		//returns user info opt property if not undefined and public viewable
+	//returns user info opt property if not undefined and public viewable
 	func checkPublic<T>(prop : (?T, Bool)) : (?T) {
 		switch (prop) {
 			case (null, _) { null };
@@ -400,7 +400,7 @@ actor {
 		};
 	};
 
-	func getXAnsweredQuestions(p : Principal, n : ?Nat) : async [Question] {
+	func getXAnsweredQuestions(p : Principal, n : ?Nat) : [Question] {
 		let answered = answeredQuestions(p, n);
 
 		func getQuestion(h : Hash.Hash) : ?Question {
@@ -410,10 +410,8 @@ actor {
 		let q = Array.mapFilter(answered, getQuestion);
 	};
 
-
-
 	// filter users according to parameters
-	func filterUsers(p : Principal, f : MatchingFilter) : async [UserMatch] {
+	func filterUsers(p : Principal, f : MatchingFilter) : [UserMatch] {
 		let buf = Buffer.Buffer<(UserMatch)>(4);
 		var count = 0;
 		let callerScore : Float = calcScore(p, p);
@@ -458,8 +456,11 @@ actor {
 							gender = checkPublic(user.gender);
 							birth = checkPublic(user.birth);
 							connect = checkPublic(user.connect);
-							score = (score / callerScore) * 100;
-							answeredQuestions = await getXAnsweredQuestions(p2, null);
+							score = Float.trunc((score / callerScore) * 100);
+							//answeredQuestions = getXAnsweredQuestions(p2, null);
+							//TODO : re-enable answeredQuestions
+							//also filter first on commonQuestions to add a bool to this array for front-end indicating if both answered
+			
 						};
 
 						//TODO : 1) put (p2, score) (!! score calc to % !!) in temp new buff
@@ -473,7 +474,7 @@ actor {
 			count += 1;
 		}; // end ul
 		//TODO : 2) sort on score with cohesion after 'ul' and MATCH
-		//select X most closest to cohesion score 
+		//select X most closest to cohesion score
 
 		//TODO : 3) prepare UserMatch
 
@@ -481,8 +482,6 @@ actor {
 		buf.toArray();
 
 	};
-
-
 
 	// DATA STORAGE
 
@@ -586,7 +585,7 @@ actor {
 		#ok(q);
 	};
 
-	public shared query (msg) func getAnsweredQuestions(n : Nat) : async Result.Result<[Question], Text> {
+	public shared query (msg) func getAnsweredQuestions(n : ?Nat) : async Result.Result<[Question], Text> {
 		let answered = answeredQuestions(msg.caller, n);
 
 		func getQuestion(h : Hash.Hash) : ?Question {

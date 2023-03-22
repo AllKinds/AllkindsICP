@@ -47,7 +47,7 @@ export const idlFactory = ({ IDL }) => {
 		createQuestion: IDL.Func([IDL.Text], [Result], []),
 		createUser: IDL.Func([IDL.Text], [Result], []),
 		findMatches: IDL.Func([MatchingFilter], [Result_3], []),
-		getAnsweredQuestions: IDL.Func([IDL.Nat], [Result_2], ['query']),
+		getAnsweredQuestions: IDL.Func([IDL.Opt(IDL.Nat)], [Result_2], ['query']),
 		getAskableQuestions: IDL.Func([IDL.Nat], [Result_2], ['query']),
 		getUser: IDL.Func([], [Result_1], ['query']),
 		submitAnswer: IDL.Func([Hash, AnswerKind], [Result], []),

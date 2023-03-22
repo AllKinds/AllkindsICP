@@ -44,7 +44,7 @@ export interface _SERVICE {
 	createQuestion: ActorMethod<[string], Result>;
 	createUser: ActorMethod<[string], Result>;
 	findMatches: ActorMethod<[MatchingFilter], Result_3>;
-	getAnsweredQuestions: ActorMethod<[bigint], Result_2>;
+	getAnsweredQuestions: ActorMethod<[[] | [bigint]], Result_2>;
 	getAskableQuestions: ActorMethod<[bigint], Result_2>;
 	getUser: ActorMethod<[], Result_1>;
 	submitAnswer: ActorMethod<[Hash, AnswerKind], Result>;

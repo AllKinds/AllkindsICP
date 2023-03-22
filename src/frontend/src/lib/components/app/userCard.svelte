@@ -13,7 +13,7 @@
 	let userBirth = fromNullable(match.birth);
 	let ageMs = Number(new Date()) - Number(match.birth) / 1000000;
 	let ageY = Math.floor(ageMs / (1000 * 3600 * 24) / 365);
-  let answeredQuestions = match.answeredQuestions;
+	//let answeredQuestions = match.answeredQuestions;
 
 	//TODO : change backend so it doesn't return a User obj,
 	//let it return the values that according user has made init public viewable
@@ -26,14 +26,14 @@ TODO : finish this card, and fix cohesion score in backend for a proper result
 TODO : at same time implement this into a friendlist and using same component 
 TODO : backend create friendlist and connection request implementation -->
 
-<div class="sm:w-96 border-main flex flex-col lg:flex-row justify-between">
+<div class="sm:w-96 border-main flex flex-col justify-between">
 	<div class="w-full h-64 sm:h-96 mx-auto rounded-md bg-sub">
 		<!-- placeholder profile picture -->
 	</div>
 	<div class="p-1 sm:p-2 flex flex-col">
 		<div class="flex p-1 text-2xl font-bold justify-between">
 			<span>{userName}</span>
-			<span>{userScore}{'%(' + answeredQuestions.length + ')'}</span>
+			<span>{userScore}{'%(' + userScore + ')'}</span>
 		</div>
 		<span class="p-1 text-slate-600"
 			>{userBirth ? ageY + ', ' : ''}{userGender ? userGender : ''}</span
