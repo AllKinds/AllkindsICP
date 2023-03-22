@@ -11,10 +11,6 @@
 			},
 			"source": ["build/"],
 			"type": "assets"
-		},
-		"test": {
-			"main": "src/backend/test.mo",
-			"type": "motoko"
 		}
 	},
 	"dfx": "0.13.1",

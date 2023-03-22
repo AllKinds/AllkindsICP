@@ -16,6 +16,7 @@ import Int8 "mo:base/Int8";
 import Int32 "mo:base/Int32";
 import Debug "mo:base/Debug";
 import Array "mo:base/Array";
+import Float "mo:base/Float";
 
 actor {
 
@@ -47,7 +48,7 @@ actor {
 		birth : ?Int;
 		connect : ?Text;
 		//TEMP changed into score for testing : cohesion : Nat; //should always between 0-100, maybe nat8
-		score : Int;
+		score : Float;
 	};
 
 	type Gender = {
@@ -113,7 +114,7 @@ actor {
 	type MatchingFilter = {
 		ageRange : (Nat, Nat);
 		gender : ?Gender;
-		cohesion : Nat;
+		cohesion : Int;
 	};
 
 	// UTILITY FUNCTIONS
@@ -271,7 +272,9 @@ actor {
 			case null { 1 };
 		};
 
-		sourceAnswerScore * testAnswerScore * sourceWeightScore * testWeightScore;
+		//sourceAnswerScore * testAnswerScore * sourceWeightScore * testWeightScore;
+		//need addition not multiplication?
+		sourceWeightScore + testWeightScore;
 	};
 
 	func hasAnswered(p : Principal, question : Hash.Hash) : ?Answer {
@@ -291,7 +294,7 @@ actor {
 	};
 
 	func commonQuestions(sourceUser : Principal, testUser : Principal) : [CommonQuestion] {
-		let buf = Buffer.Buffer<CommonQuestion>(2);
+		let buf = Buffer.Buffer<CommonQuestion>(200);
 		for (hash in questions.keys()) {
 			let sourcePQ = hashPrincipalQuestion(sourceUser, hash);
 			let testPQ = hashPrincipalQuestion(testUser, hash);
@@ -319,15 +322,18 @@ actor {
 		buf.toArray();
 	};
 
-	func calcScore(sourceUser : Principal, testUser : Principal) : Int {
+	func calcScore(sourceUser : Principal, testUser : Principal) : Float {
 		let common = commonQuestions(sourceUser, testUser);
-		var score : Int = 0;
+		var score : Float = 0;
 		for (q in Iter.fromArray(common)) {
-			score += calcQuestionScore(
-				q.sourceAnswer,
-				q.testAnswer,
-				q.sourceWeight,
-				q.testWeight
+			score += Float.fromInt(
+				calcQuestionScore(
+					q.sourceAnswer,
+					q.testAnswer,
+					q.sourceWeight,
+					q.testWeight
+				) * 10 / (2 * Array.size(common))
+				//added * 10 to make it more usable
 			);
 		};
 		score;
@@ -405,7 +411,7 @@ actor {
 							case (_)();
 						};
 						//TODO : streamline the function, maybe use new checkPublic func
-						let score = calcScore(p, p2);
+						let score : Float = calcScore(p, p2);
 
 						let newUserMatch : UserMatch = {
 							username = user.username;
@@ -416,6 +422,7 @@ actor {
 							score = score; //TEMP score instead of cohesion
 						};
 						buf.add(newUserMatch);
+
 					}; //end  fl
 					//};
 				};
