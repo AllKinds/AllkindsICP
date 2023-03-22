@@ -186,13 +186,6 @@ actor {
 									buf.add(hash);
 									count += 1;
 								};
-								//changing this around could be used to get questions that User has answered
-								//or modify function so an extra function parameter could sort on skipped, weightd, answered, etc?
-								//case null {};
-								// case (?_) {
-								// 	buf.add(hash);
-								// 	count += 1;
-								// };
 							};
 						};
 					};
@@ -201,6 +194,16 @@ actor {
 		};
 		buf.toArray();
 	};
+
+	// Consider new syntax
+	// let ?_ = skips.get(pQ) else {
+	// 	let ?_ = weights.get(pQ) ese {
+	// 		let ?_ = answers.get(pQ) else {
+	// 			buf.add(hash);
+	// 			count += 1;
+	// 		}
+	// 	}
+	// }
 
 	func answeredQuestions(p : Principal, n : Nat) : [Hash.Hash] {
 		let buf = Buffer.Buffer<Hash.Hash>(10);
@@ -244,13 +247,9 @@ actor {
 			return 0;
 		};
 
-		let sourceAnswerScore : Int = if (sourceAnswer.answer == #Bool(true)) {
-			1;
-		} else { -1 };
+		let sourceAnswerScore : Int = if (sourceAnswer.answer == #Bool(true)) { 1 } else { -1 };
 
-		let testAnswerScore : Int = if (testAnswer.answer == #Bool(true)) { 1 } else {
-			-1;
-		};
+		let testAnswerScore : Int = if (testAnswer.answer == #Bool(true)) { 1 } else { -1 };
 
 		let sourceWeightScore : Int = switch (sourceWeight) {
 			case (?sourceWeight) {
@@ -279,10 +278,8 @@ actor {
 
 	func hasAnswered(p : Principal, question : Hash.Hash) : ?Answer {
 		let pQ = hashPrincipalQuestion(p, question);
-		switch (answers.get(pQ)) {
-			case null { return null };
-			case (?answer) { return ?answer };
-		};
+		let ?answer = answers.get(pQ) else { return null };
+		?answer
 	};
 
 	func hasweightd(p : Principal, question : Hash.Hash) : ?Weight {
@@ -324,20 +321,21 @@ actor {
 
 	func calcScore(sourceUser : Principal, testUser : Principal) : Float {
 		let common = commonQuestions(sourceUser, testUser);
-		var score : Float = 0;
+		var score : Int = 0;
+		var qScore : Float = 0;
 		for (q in Iter.fromArray(common)) {
-			score += Float.fromInt(
-				calcQuestionScore(
-					q.sourceAnswer,
-					q.testAnswer,
-					q.sourceWeight,
-					q.testWeight
-				) * 10 / (2 * Array.size(common))
-				//added * 10 to make it more usable
+			score := calcQuestionScore(
+				q.sourceAnswer,
+				q.testAnswer,
+				q.sourceWeight,
+				q.testWeight
 			);
+			score *= 10; 
+			score /= 2 * common.size(); 
+
+			qScore := Float.fromInt( score );
 		};
-		score;
-		//TODO : FIX whole calcscore system as results are weird and incorrect
+		qScore
 	};
 
 	func changeUserPoints(p : Principal, value : Nat) : () {
