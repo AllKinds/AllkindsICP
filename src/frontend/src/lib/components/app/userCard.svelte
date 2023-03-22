@@ -13,6 +13,7 @@
 	let userBirth = fromNullable(match.birth);
 	let ageMs = Number(new Date()) - Number(match.birth) / 1000000;
 	let ageY = Math.floor(ageMs / (1000 * 3600 * 24) / 365);
+  let answeredQuestions = match.answeredQuestions;
 
 	//TODO : change backend so it doesn't return a User obj,
 	//let it return the values that according user has made init public viewable
@@ -32,7 +33,7 @@ TODO : backend create friendlist and connection request implementation -->
 	<div class="p-1 sm:p-2 flex flex-col">
 		<div class="flex p-1 text-2xl font-bold justify-between">
 			<span>{userName}</span>
-			<span>{userScore}{'%(' + userScore + ')'}</span>
+			<span>{userScore}{'%(' + answeredQuestions.length + ')'}</span>
 		</div>
 		<span class="p-1 text-slate-600"
 			>{userBirth ? ageY + ', ' : ''}{userGender ? userGender : ''}</span

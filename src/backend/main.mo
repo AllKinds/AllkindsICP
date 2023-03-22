@@ -49,6 +49,7 @@ actor {
 		connect : ?Text;
 		//TEMP changed into score for testing : cohesion : Nat; //should always between 0-100, maybe nat8
 		score : Float;
+		answeredQuestions : [Question];
 	};
 
 	type Gender = {
@@ -207,11 +208,16 @@ actor {
 	// 	}
 	// }
 
-	func answeredQuestions(p : Principal, n : Nat) : [Hash.Hash] {
+	func answeredQuestions(p : Principal, n : ?Nat) : [Hash.Hash] {
 		let buf = Buffer.Buffer<Hash.Hash>(10);
 		var count = 0;
 		label f for (hash in questions.keys()) {
-			if (n == count) break f;
+			switch (n) {
+				case null {};
+				case (?n) {
+					if (n == count) break f;
+				};
+			};
 			let pQ = hashPrincipalQuestion(p, hash);
 			switch (skips.get(pQ)) {
 				case (?_) {};
@@ -383,21 +389,40 @@ actor {
 		questions.put(q.hash, newQ);
 	};
 
+		//returns user info opt property if not undefined and public viewable
+	func checkPublic<T>(prop : (?T, Bool)) : (?T) {
+		switch (prop) {
+			case (null, _) { null };
+			case (?T, false) { null };
+			case (?T, true) {
+				?T;
+			};
+		};
+	};
+
+	func getXAnsweredQuestions(p : Principal, n : ?Nat) : async [Question] {
+		let answered = answeredQuestions(p, n);
+
+		func getQuestion(h : Hash.Hash) : ?Question {
+			questions.get(h);
+		};
+
+		let q = Array.mapFilter(answered, getQuestion);
+	};
+
+
+
 	// filter users according to parameters
-	func filterUsers(p : Principal, f : MatchingFilter) : [UserMatch] {
+	func filterUsers(p : Principal, f : MatchingFilter) : async [UserMatch] {
 		let buf = Buffer.Buffer<(UserMatch)>(4);
 		var count = 0;
-		let caller = users.get(p);
-		var callerScore : Float = 0;
+		let callerScore : Float = calcScore(p, p);
 		//User Loop
 		label ul for (p2 in users.keys()) {
 			if (users.size() == count) break ul;
-			//user = possible match
 			let user = switch (users.get(p2)) {
 				case null ();
 				case (?user) {
-					//filter msg.caller, TEMP diabled for testing
-					//if (p2 != p) {
 					//Filter Loop
 					label fl {
 						//gender
@@ -423,51 +448,41 @@ actor {
 							};
 							case (_)();
 						};
-						//TODO : streamline the function, maybe use new checkPublic func
+
 						let score : Float = calcScore(p, p2);
 
-						//catches and uses callerScore BUT need to implement this differenty or map the whole buffer
-						//because userCaller might not always be the first user in the label 'ul' loop
-						if (p2 == p) {
-							callerScore := score;
-						};
-
+						//TEMP for testing
 						let newUserMatch : UserMatch = {
 							username = user.username;
 							about = checkPublic(user.about);
 							gender = checkPublic(user.gender);
 							birth = checkPublic(user.birth);
 							connect = checkPublic(user.connect);
-							score = (score / callerScore) * 100; //TEMP score instead of cohesion
+							score = (score / callerScore) * 100;
+							answeredQuestions = await getXAnsweredQuestions(p2, null);
 						};
 
+						//TODO : 1) put (p2, score) (!! score calc to % !!) in temp new buff
 						buf.add(newUserMatch);
 
 						//sets callerScore
 
 					}; //end  fl
-					//};
 				};
 			};
 			count += 1;
 		}; // end ul
-		//TODO : MAP buffer by score, add value ,
-		//and attach % value according to first user = caller = 100%
+		//TODO : 2) sort on score with cohesion after 'ul' and MATCH
+		//select X most closest to cohesion score 
 
+		//TODO : 3) prepare UserMatch
+
+		//TODO :  return UserMatch (currently use X value for testing, should be 1 in future)
 		buf.toArray();
 
 	};
 
-	//returns user info opt property if not undefined and public viewable
-	func checkPublic<T>(prop : (?T, Bool)) : (?T) {
-		switch (prop) {
-			case (null, _) { null };
-			case (?T, false) { null };
-			case (?T, true) {
-				?T;
-			};
-		};
-	};
+
 
 	// DATA STORAGE
 
