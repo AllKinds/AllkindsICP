@@ -103,7 +103,6 @@ actor {
 		#Like : Nat;
 		#Dislike : Nat;
 	};
-	//
 
 	type PrincipalQuestionHash = Hash.Hash;
 
@@ -411,15 +410,20 @@ actor {
 		let q = Array.mapFilter(answered, getQuestion);
 	};
 
+	
+
+
+
+
 	// filter users according to parameters
-	func filterUsers(p : Principal, f : MatchingFilter) : [UserMatch] {
+	func filterUsers(p : Principal, f : MatchingFilter) : UserMatch {
 		let buf = Buffer.Buffer<(Principal, Int)>(2);
 		var count = 0;
 		let callerScore : Float = calcScore(p, p);
 		//User Loop
-		label ul for (p2 in users.keys()) {
+		label ul for (pm in users.keys()) {
 			if (users.size() == count) break ul;
-			let user = switch (users.get(p2)) {
+			let user = switch (users.get(pm)) {
 				case null ();
 				case (?user) {
 					//Filter Loop
@@ -448,51 +452,54 @@ actor {
 							case (_)();
 						};
 
-						let score : Float = calcScore(p, p2);
+						let score : Float = calcScore(p, pm);
 						let cohesion = Float.toInt(Float.trunc((score / callerScore) * 100));
-						//TEMP for testing
-						let newUserMatch : UserMatch = {
-							username = user.username;
-							about = checkPublic(user.about);
-							gender = checkPublic(user.gender);
-							birth = checkPublic(user.birth);
-							connect = checkPublic(user.connect);
-							cohesion = cohesion;
-							//answeredQuestions = getXAnsweredQuestions(p2, null);
-							//TODO : re-enable answeredQuestions
-							//also filter first on commonQuestions to add a bool to this array for front-end indicating if both answered
-						};
 
-						//TODO : 1) put (p2, score) (!! score calc to % !!) in temp new buff
-						buf.add((p2, cohesion));
-						
-						
-
-						//sets callerScore
+						buf.add((pm, cohesion));
 
 					}; //end  fl
 				};
 			};
 			count += 1;
 		}; // end ul
-		//TODO : 2) sort on score with cohesion after 'ul' and MATCH
-		//HELP : need to sort on tuple.1 = (_ , Int)
-		//buf.sort(Nat.compare);
-		func compare(t : (Principal , Int), u : (Principal, Int) ) : Order.Order {
+		//brute insert the filter target
+		buf.add((p, f.cohesion));
+
+		func sortByScore(t : (Principal , Int), u : (Principal, Int) ) : Order.Order {
 			if (t.1 < u.1) {return #less} 
-				else if (t.1 > u.1) {return #greater}
-				else {return #equal};
+			else if (t.1 > u.1) {return #greater}
+			else {return #equal};
 		};
-		buf.sort(compare);
-						//Array.filter<Nat>(a, func (x: Nat) : Bool {x == n});
-		//select X most closest to cohesion score
+		func isEq(t : (Principal , Int), u : (Principal, Int) ) : Bool {
+			t.1 == u.1
+		};
+		buf.sort(sortByScore);
+		//let index : Nat = Buffer.indexOf(f.cohesion , buf, isEq);
+		//might have to write own indexOf , or better nearestIndex func
+		let match : (Principal, Int) = buf.get(indexC + 1);
 		
 
-		//TODO : 3) prepare UserMatch
+		let user = switch (users.get(match.0)) {
+			case null {};
+			case (?user) {
+				user;
+			};
+		};
+		let newUserMatch : UserMatch = {
+			username = user.username;
+			about = checkPublic(user.about);
+			gender = checkPublic(user.gender);
+			birth = checkPublic(user.birth);
+			connect = checkPublic(user.connect);
+			cohesion = match.1;
+			//answeredQuestions = getXAnsweredQuestions(pm, null);
+			//TODO : re-enable answeredQuestions
+			//also filter first on commonQuestions to add a bool to this array for front-end indicating if both answered
+		};
 
 		//TODO :  return UserMatch (currently use X value for testing, should be 1 in future)
-		buf.toArray();
-
+		//buf.toArray();
+		return newUserMatch;	
 	};
 
 	// DATA STORAGE
@@ -691,7 +698,7 @@ actor {
 	};
 
 	//find users based on parameters
-	public shared (msg) func findMatches(para : MatchingFilter) : async Result.Result<[UserMatch], Text> {
+	public shared (msg) func findMatches(para : MatchingFilter) : async Result.Result<UserMatch, Text> {
 		let user = switch (users.get(msg.caller)) {
 			case null return #err("User does not exist");
 			case (?user) {
@@ -705,7 +712,7 @@ actor {
 
 		try {
 			changeUserPoints(msg.caller, (user.points - Int.abs(queryCost)));
-			let filteredUsers : [UserMatch] = filterUsers(msg.caller, para);
+			let filteredUser : UserMatch = filterUsers(msg.caller, para);
 			return #ok(filteredUsers);
 		} catch err {
 			return #err("Couldn't filter users and/or deduct points");
