@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { user } from '$lib/stores/index';
-	import { getMatchedUsers, matchedUsers } from '$lib/stores/tasks/getMatchedUsers';
+	import { getMatchedUser, matchedUser } from '$lib/stores/tasks/getMatchedUser';
 	import { toNullableGender } from '$lib/utilities';
 	import Spinner from '$lib/components/common/Spinner.svelte';
 	import Slider from '@bulatdashiev/svelte-slider';
@@ -13,7 +13,7 @@
 	let cohesionValue = [100, 100];
 	let genderValue = 'Everyone';
 	//let matches: Array<[User, BigInt]>;
-	let matches: Array<UserMatch>;
+	let match: UserMatch;
 
 	//this could be moved to some declaration/constant somewhere else
 	let genders = ['Everyone', 'Male', 'Female', 'Other', 'Queer'];
@@ -29,13 +29,13 @@
 		};
 		console.log('filter obj ready: ', filter);
 
-		await getMatchedUsers(filter).catch((error) => {
+		await getMatchedUser(filter).catch((error) => {
 			console.log('error while getting matchedUsers', error);
 		});
 		//matches = $matchedUsers;
 		//console.log($matchedUsers, matches);
-		matches = $matchedUsers;
-		console.log($matchedUsers, matches);
+		match = $matchedUser;
+		console.log($matchedUser, match);
 		pending = false;
 	};
 </script>
@@ -93,10 +93,10 @@
 	{/if}
 
 	<div class="rounded-md flex flex-col mx-auto">
-		{#if matches}
-			{#each matches as match}
-				<UserCard {match} />
-			{/each}
+		{#if match}
+			<!-- {#each matches as match} -->
+			<UserCard {match} />
+			<!-- {/each} -->
 		{/if}
 	</div>
 </div>

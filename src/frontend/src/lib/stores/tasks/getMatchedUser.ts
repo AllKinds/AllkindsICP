@@ -3,16 +3,16 @@ import type { MatchingFilter, UserMatch } from 'src/declarations/backend/backend
 import { get, writable } from 'svelte/store';
 
 //export const matchedUsers = writable<Array<[User, BigInt]>>();
-export const matchedUsers = writable<Array<UserMatch>>();
+export const matchedUser = writable<UserMatch>();
 
-export async function getMatchedUsers(filter: MatchingFilter) {
+export async function getMatchedUser(filter: MatchingFilter) {
 	const localActor = get(actor);
 
-	return await localActor.findMatches(filter).then((res) => {
-		console.log('matched users: ', res.ok);
+	return await localActor.findMatch(filter).then((res) => {
+		console.log('matched user: ', res.ok);
 		console.log(res);
 		if (res.ok) {
-			matchedUsers.set(res.ok);
+			matchedUser.set(res.ok);
 		}
 	});
 }
