@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 	import { getQsAnswered, questionsAnswered } from '$lib/stores/tasks/getQsAnswered';
 
+	//TODO make this into ultility function
 	let userBirth = fromNullableDate($user.birth[0]);
 	let ageMs = Number(new Date()) - Number($user.birth[0]) / 1000000;
 	let ageY = Math.floor(ageMs / (1000 * 3600 * 24) / 365);

@@ -16,15 +16,17 @@ import Int8 "mo:base/Int8";
 import Int32 "mo:base/Int32";
 import Debug "mo:base/Debug";
 import Array "mo:base/Array";
+import Float "mo:base/Float";
+import Order "mo:base/Order";
 
 actor {
 
 	// CONSTANTS
 	let N = 10;
 	//TODO : change 'points' to 'reward'
-	let initialPoints : Nat = 100;
-	let answerPoints : Nat = 2;
-	let createrPoints : Nat = 10;
+	let initReward : Nat = 10000;
+	let answerReward : Nat = 2;
+	let createrReward : Nat = 10;
 	let queryCost : Nat = 30;
 
 	// DATA TYPES
@@ -38,6 +40,17 @@ actor {
 		birth : (?Int, Bool);
 		connect : (?Text, Bool);
 		points : Nat; //Nat bcs user points should not go negative
+	};
+
+	type UserMatch = {
+		username : Text;
+		about : ?Text;
+		gender : ?Gender;
+		birth : ?Int;
+		connect : ?Text;
+		//TEMP changed into score for testing : cohesion : Nat; //should always between 0-100, maybe nat8
+		cohesion : Int;
+		answeredQuestions : [Question];
 	};
 
 	type Gender = {
@@ -68,10 +81,10 @@ actor {
 		answer : AnswerKind;
 	};
 
-	type Like = {
+	type Weight = {
 		user : Principal;
 		question : Hash.Hash;
-		like : LikeKind;
+		weight : WeightKind; //this would need to become an Int
 	};
 
 	type Skip = {
@@ -85,7 +98,8 @@ actor {
 	};
 
 	// Nat indicates a possible amount of tokens / points appointed by the user to to the question
-	type LikeKind = {
+	type WeightKind = {
+		//this would need to be removed
 		#Like : Nat;
 		#Dislike : Nat;
 	};
@@ -96,15 +110,17 @@ actor {
 		question : Hash.Hash;
 		sourceAnswer : Answer;
 		testAnswer : Answer;
-		sourceLike : ?Like;
-		testLike : ?Like;
+		sourceWeight : ?Weight;
+		testWeight : ?Weight;
 	};
 
 	type MatchingFilter = {
 		ageRange : (Nat, Nat);
 		gender : ?Gender;
-		cohesion : Nat;
+		cohesion : Int;
 	};
+
+	type UserWScore = (Principal, Int);
 
 	// UTILITY FUNCTIONS
 
@@ -147,9 +163,9 @@ actor {
 		answers.put(pQ, answer);
 	};
 
-	func putLike(p : Principal, like : Like) : () {
-		let pQ = hashPrincipalQuestion(p, like.question);
-		likes.put(pQ, like);
+	func putWeight(p : Principal, weight : Weight) : () {
+		let pQ = hashPrincipalQuestion(p, weight.question);
+		weights.put(pQ, weight);
 	};
 
 	func putSkip(p : Principal, skip : Skip) : () {
@@ -166,7 +182,7 @@ actor {
 			switch (skips.get(pQ)) {
 				case (?_) {};
 				case null {
-					switch (likes.get(pQ)) {
+					switch (weights.get(pQ)) {
 						case (?_) {};
 						case null {
 							switch (answers.get(pQ)) {
@@ -175,13 +191,6 @@ actor {
 									buf.add(hash);
 									count += 1;
 								};
-								//changing this around could be used to get questions that User has answered
-								//or modify function so an extra function parameter could sort on skipped, liked, answered, etc?
-								//case null {};
-								// case (?_) {
-								// 	buf.add(hash);
-								// 	count += 1;
-								// };
 							};
 						};
 					};
@@ -191,16 +200,31 @@ actor {
 		buf.toArray();
 	};
 
-	func answeredQuestions(p : Principal, n : Nat) : [Hash.Hash] {
+	// Consider new syntax
+	// let ?_ = skips.get(pQ) else {
+	// 	let ?_ = weights.get(pQ) ese {
+	// 		let ?_ = answers.get(pQ) else {
+	// 			buf.add(hash);
+	// 			count += 1;
+	// 		}
+	// 	}
+	// }
+
+	func answeredQuestions(p : Principal, n : ?Nat) : [Hash.Hash] {
 		let buf = Buffer.Buffer<Hash.Hash>(10);
 		var count = 0;
 		label f for (hash in questions.keys()) {
-			if (n == count) break f;
+			switch (n) {
+				case null {};
+				case (?n) {
+					if (n == count) break f;
+				};
+			};
 			let pQ = hashPrincipalQuestion(p, hash);
 			switch (skips.get(pQ)) {
 				case (?_) {};
 				case null {
-					switch (likes.get(pQ)) {
+					switch (weights.get(pQ)) {
 						case (?_) {};
 						case null {
 							switch (answers.get(pQ)) {
@@ -218,112 +242,74 @@ actor {
 		buf.toArray();
 	};
 
-	// filter users according to parameters
-	func filterUsers(p : Principal, f : MatchingFilter) : [(User, Int)] {
-		let buf = Buffer.Buffer<(User, Int)>(users.size()); //TODO : test out possible buffer size props
-		var count = 0;
-		let caller = users.get(p);
-		//User Loop
-		label ul for (p2 in users.keys()) {
-			if (users.size() == count) break ul;
-			//user = possible match
-			let user = switch (users.get(p2)) {
-				case null ();
-				case (?user) {
-					//filter msg.caller
-					if (p2 != p) {
-						//Filter Loop
-						label fl {
-							//gender
-							switch (f.gender) {
-								case null ();
-								case (Gender) {
-									if ((f.gender, true) != user.gender) {
-										break fl;
-									};
-								};
-							};
-							//age
-							switch (user.birth) {
-								case (?birth, _) {
-									//TODO : make birth-age conversion utility func
-									let userAge = birth / (1_000_000_000 * 3600 * 24) / 365;
-									//TODO : find way to have em both in if statement , || doesnt work
-									if (f.ageRange.0 >= userAge) {
-										break fl;
-									} else if (f.ageRange.1 <= userAge) {
-										break fl;
-									};
-								};
-								case (_)();
-							};
-
-							buf.add(user, calcScore(p, p2));
-						}; //end  fl
-					};
-				};
-			};
-			count += 1;
-		}; // end ul
-		//NEXT : MAP buffer order by score
-		//NEXT : get X users closest to cohesion score
-		//return result
-		buf.toArray();
-
-	};
-
-	// calc score for 2 answers and optional 2 likes
-	func calcQuestionScore(sourceAnswer : Answer, testAnswer : Answer, sourceLike : ?Like, testLike : ?Like) : Int {
+	// calc score for 2 answers and optional 2 weights
+	func calcQuestionScore(sourceAnswer : Answer, testAnswer : Answer, sourceWeight : ?Weight, testWeight : ?Weight) : Int {
 		assert (sourceAnswer.question == testAnswer.question);
 
-		let hasLikes = Option.isSome(sourceLike) and Option.isSome(testLike);
-		let hasNoLikes = Option.isNull(sourceLike) and Option.isNull(testLike);
-		//assert (hasLikes or hasNoLikes);
+		// let hasWeights = Option.isSome(sourceWeight) and Option.isSome(testWeight);
+		// let hasNoWeights = Option.isNull(sourceWeight) and Option.isNull(testWeight);
 
-		let sourceAnswerScore : Int = if (sourceAnswer.answer == #Bool(true)) {
-			1;
-		} else { -1 };
+		let compareAnswers : Bool = sourceAnswer.answer == testAnswer.answer;
+		//let compareWeights : Bool = ...
 
-		let testAnswerScore : Int = if (testAnswer.answer == #Bool(true)) { 1 } else {
-			-1;
-		};
+		//Weights should be: both positive, or both negative. -> and result both in +value
 
-		let sourceLikeScore : Int = switch (sourceLike) {
-			case (?sourceLike) {
-				switch (sourceLike.like) {
-					case (#Like(score)) { score };
-					case (#Dislike(score)) { -score };
+		if (compareAnswers == false) {
+			//also check for weights here
+			return 0;
+		} else {
+			// let sourceAnswerScore : Int = if (sourceAnswer.answer == #Bool(true)) { 1 } else { -1 };
+			// let testAnswerScore : Int = if (testAnswer.answer == #Bool(true)) { 1 } else { -1 };
+
+			//functions remade with possible changed weight type
+			let sourceWeightScore : Int = switch (sourceWeight) {
+				case (?sourceWeight) {
+					switch (sourceWeight.weight) {
+						case (#Like(score)) { score };
+						case (#Dislike(score)) { -score };
+					};
 				};
+				case null { 1 };
 			};
-			case null { 1 };
-		};
 
-		let testLikeScore : Int = switch (testLike) {
-			case (?testLike) {
-				switch (testLike.like) {
-					case (#Like(score)) { score };
-					case (#Dislike(score)) { -score };
+			let testWeightScore : Int = switch (testWeight) {
+				case (?testWeight) {
+					switch (testWeight.weight) {
+						case (#Like(score)) { score };
+						case (#Dislike(score)) { -score };
+					};
 				};
+				case null { 1 };
 			};
-			case null { 1 };
-		};
 
-		sourceAnswerScore * testAnswerScore * sourceLikeScore * testLikeScore;
+			var wScore : Int = 1; //temp ugly fix
+			//init score with 1 so people can match even if they didnt weigh but still answered the same
+			if (sourceWeightScore >= 0 and testWeightScore >= 0) {
+				wScore += sourceWeightScore + testWeightScore;
+			};
+			if (sourceWeightScore <= 0 and testWeightScore >= 0) {
+				wScore += sourceWeightScore + testWeightScore;
+			};
+			return wScore;
+		};
 	};
 
 	func hasAnswered(p : Principal, question : Hash.Hash) : ?Answer {
 		let pQ = hashPrincipalQuestion(p, question);
+		// let ?answer = answers.get(pQ) else { return null };
+		// ?answer;
+		// TEMP : ERRUR LET ELSE aint working cannot be found, not in base lib or what import?
 		switch (answers.get(pQ)) {
-			case null { return null };
+			case null return null;
 			case (?answer) { return ?answer };
 		};
 	};
 
-	func hasliked(p : Principal, question : Hash.Hash) : ?Like {
+	func hasweightd(p : Principal, question : Hash.Hash) : ?Weight {
 		let pQ = hashPrincipalQuestion(p, question);
-		switch (likes.get(pQ)) {
+		switch (weights.get(pQ)) {
 			case null return null;
-			case (?like) { return ?like };
+			case (?weight) { return ?weight };
 		};
 	};
 
@@ -338,14 +324,14 @@ actor {
 					switch (answers.get(testPQ)) {
 						case null {};
 						case (?testAnswer) {
-							let sourceLike = likes.get(sourcePQ);
-							let testLike = likes.get(testPQ);
+							let sourceWeight = weights.get(sourcePQ);
+							let testWeight = weights.get(testPQ);
 							let commonQuestion : CommonQuestion = {
 								question = hash;
 								sourceAnswer;
 								testAnswer;
-								sourceLike;
-								testLike;
+								sourceWeight;
+								testWeight;
 							};
 							buf.add(commonQuestion);
 						};
@@ -356,18 +342,22 @@ actor {
 		buf.toArray();
 	};
 
-	func calcScore(sourceUser : Principal, testUser : Principal) : Int {
+	func calcScore(sourceUser : Principal, testUser : Principal) : Float {
 		let common = commonQuestions(sourceUser, testUser);
 		var score : Int = 0;
+		var qScore : Float = 0;
 		for (q in Iter.fromArray(common)) {
-			score += calcQuestionScore(
+			score := calcQuestionScore(
 				q.sourceAnswer,
 				q.testAnswer,
-				q.sourceLike,
-				q.testLike
+				q.sourceWeight,
+				q.testWeight
 			);
+			//score *= 10; //temp
+			//score /= (2 * common.size()); //what is theory or reasoning behind this? check algorithm
+			qScore += Float.fromInt(score);
 		};
-		score;
+		qScore;
 	};
 
 	func changeUserPoints(p : Principal, value : Nat) : () {
@@ -401,6 +391,102 @@ actor {
 		questions.put(q.hash, newQ);
 	};
 
+	//returns user info opt property if not undefined and public viewable
+	func checkPublic<T>(prop : (?T, Bool)) : (?T) {
+		switch (prop) {
+			case (null, _) { null };
+			case (?T, false) { null };
+			case (?T, true) {
+				?T;
+			};
+		};
+	};
+
+	func getXAnsweredQuestions(p : Principal, n : ?Nat) : [Question] {
+		let answered = answeredQuestions(p, n);
+
+		func getQuestion(h : Hash.Hash) : ?Question {
+			questions.get(h);
+		};
+
+		let q = Array.mapFilter(answered, getQuestion);
+	};
+
+	//utility functions mostly for filterUsers, could be made more generalized
+	func sortByScore(t : (UserWScore), u : (UserWScore)) : Order.Order {
+		if (t.1 > u.1) { return #less } else if (t.1 < u.1) { return #greater } else { return #equal };
+	};
+
+	func isEq(t : (UserWScore), u : (UserWScore)) : Bool {
+		t.1 == u.1;
+	};
+
+	// filter users according to parameters
+	func filterUsers(p : Principal, f : MatchingFilter) : (UserWScore) {
+		let buf = Buffer.Buffer<(UserWScore)>(2);
+		var count = 0;
+		let callerScore : Float = calcScore(p, p);
+		//User Loop
+		label ul for (pm in users.keys()) {
+			if (users.size() == count) break ul;
+			let user = switch (users.get(pm)) {
+				case null ();
+				case (?user) {
+					//Filter Loop
+					label fl {
+						if (p == pm) { break fl } else {
+							//gender
+							switch (f.gender) {
+								case null ();
+								case (Gender) {
+									if ((f.gender, true) != user.gender) {
+										break fl;
+									};
+								};
+							};
+							//age
+							switch (user.birth) {
+								case (?birth, _) {
+									//TODO : make birth-age conversion utility func
+									let userAge = birth / (1_000_000_000 * 3600 * 24) / 365;
+									//TODO : find way to have em both in if statement , || doesnt work
+									if (f.ageRange.0 >= userAge) {
+										break fl;
+									} else if (f.ageRange.1 <= userAge) {
+										break fl;
+									};
+								};
+								case (_)();
+							};
+
+							let score : Float = calcScore(p, pm);
+							let cohesion = Float.toInt(Float.trunc((score / callerScore) * 100));
+							buf.add((pm, cohesion));
+						};
+					}; //end  fl
+				};
+			};
+			count += 1;
+		}; // end ul
+		//brute insert the filter target (p can also be anything)
+		let cohesionFilter : UserWScore = (p, f.cohesion);
+		buf.add(cohesionFilter);
+		buf.sort(sortByScore);
+		//find index of filter target
+
+		let indexF : ?Nat = Buffer.indexOf(cohesionFilter, buf, isEq);
+		let indexM : Nat = switch (indexF) {
+			case null { 0 }; //hmm
+			case (?i) {
+				if (buf.size() == i + 1) { i - 1 } //if last index
+				else { i + 1 };
+			};
+		};
+
+		let match : (UserWScore) = buf.get(indexM); //THIS IS WRONG
+		return match;
+	};
+
 	// DATA STORAGE
 
 	stable var stableUsers : [(Principal, User)] = [];
@@ -412,8 +498,8 @@ actor {
 	stable var stableAnswers : [(PrincipalQuestionHash, Answer)] = [];
 	let answers = HashMap.fromIter<PrincipalQuestionHash, Answer>(Iter.fromArray(stableAnswers), 100, Hash.equal, hashhash);
 
-	stable var stableLikes : [(PrincipalQuestionHash, Like)] = [];
-	let likes = HashMap.fromIter<PrincipalQuestionHash, Like>(Iter.fromArray(stableLikes), 100, Hash.equal, hashhash);
+	stable var stableWeights : [(PrincipalQuestionHash, Weight)] = [];
+	let weights = HashMap.fromIter<PrincipalQuestionHash, Weight>(Iter.fromArray(stableWeights), 100, Hash.equal, hashhash);
 
 	stable var stableSkips : [(PrincipalQuestionHash, Skip)] = [];
 	let skips = HashMap.fromIter<PrincipalQuestionHash, Skip>(Iter.fromArray(stableSkips), 100, Hash.equal, hashhash);
@@ -423,7 +509,7 @@ actor {
 		stableUsers := Iter.toArray(users.entries());
 		stableQuestions := Iter.toArray(questions.entries());
 		stableAnswers := Iter.toArray(answers.entries());
-		stableLikes := Iter.toArray(likes.entries());
+		stableWeights := Iter.toArray(weights.entries());
 		stableSkips := Iter.toArray(skips.entries());
 	};
 
@@ -431,7 +517,7 @@ actor {
 		stableUsers := [];
 		stableQuestions := [];
 		stableAnswers := [];
-		stableLikes := [];
+		stableWeights := [];
 		stableSkips := [];
 	};
 
@@ -452,7 +538,7 @@ actor {
 					gender = (null, false);
 					birth = (null, false);
 					connect = (null, false);
-					points = initialPoints; //nat
+					points = initReward; //nat
 				};
 
 				// Mutate storage for users data
@@ -486,7 +572,7 @@ actor {
 			case (?user) {
 				putQuestion(msg.caller, question);
 				//might need to check here for put to be success before awarding points, same for other occurrences
-				changeUserPoints(msg.caller, (user.points + createrPoints));
+				changeUserPoints(msg.caller, (user.points + createrReward));
 			};
 		};
 		#ok();
@@ -503,7 +589,7 @@ actor {
 		#ok(q);
 	};
 
-	public shared query (msg) func getAnsweredQuestions(n : Nat) : async Result.Result<[Question], Text> {
+	public shared query (msg) func getAnsweredQuestions(n : ?Nat) : async Result.Result<[Question], Text> {
 		let answered = answeredQuestions(msg.caller, n);
 
 		func getQuestion(h : Hash.Hash) : ?Question {
@@ -530,21 +616,21 @@ actor {
 				user;
 			};
 		};
-		changeUserPoints(msg.caller, (user.points + answerPoints));
+		changeUserPoints(msg.caller, (user.points + answerReward));
 		#ok();
 	};
 
-	// // Add a like
-	public shared (msg) func submitLike(question : Hash.Hash, like : LikeKind) : async Result.Result<(), Text> {
+	// // Add a weight
+	public shared (msg) func submitWeight(question : Hash.Hash, weight : WeightKind) : async Result.Result<(), Text> {
 		let principalQuestion = hashPrincipalQuestion(msg.caller, question);
-		let newLike = {
+		let newWeight = {
 			user = msg.caller;
 			question;
-			like;
+			weight;
 		};
-		//TEMP : likes.put line is moved to after points check
+		//TEMP : weights.put line is moved to after points check
 		//TODO : cleanup and extract possible funcs
-		let likeValue : Int = switch (like) {
+		let weightValue : Int = switch (weight) {
 			case (#Like(value)) { value };
 			case (#Dislike(value)) { - value };
 		};
@@ -563,24 +649,24 @@ actor {
 			};
 		};
 		//check if user has enough points
-		if (Nat.less(user.points, Int.abs(likeValue))) {
+		if (Nat.less(user.points, Int.abs(weightValue))) {
 			return #err("You don't have enough points");
 		};
-		//let newPoints = Nat.sub(user.points, likeValue);
+		//let newPoints = Nat.sub(user.points, weightValue);
 
-		likes.put(principalQuestion, newLike);
-		changeUserPoints(msg.caller, (user.points - Int.abs(likeValue)));
+		weights.put(principalQuestion, newWeight);
+		changeUserPoints(msg.caller, (user.points - Int.abs(weightValue)));
 		//check if user !== creater
 		if (msg.caller != q.creater) {
 			switch (users.get(q.creater)) {
 				case null {}; //do nothing, creater account might have been removed
 				case (?creater) {
-					changeUserPoints(q.creater, (creater.points + Int.abs(likeValue)));
+					changeUserPoints(q.creater, (creater.points + Int.abs(weightValue)));
 				};
 			};
 		};
 
-		changeQuestionPoints(q, (q.points + likeValue));
+		changeQuestionPoints(q, (q.points + weightValue));
 
 		#ok();
 	};
@@ -597,7 +683,7 @@ actor {
 	};
 
 	//find users based on parameters
-	public shared query (msg) func findMatches(para : MatchingFilter) : async Result.Result<[(User, Int)], Text> {
+	public shared (msg) func findMatch(para : MatchingFilter) : async Result.Result<UserMatch, Text> {
 		let user = switch (users.get(msg.caller)) {
 			case null return #err("User does not exist");
 			case (?user) {
@@ -609,13 +695,29 @@ actor {
 			return #err("You don't have enough points");
 		};
 
-
-		// TODO ; this line doesnt seem to work, IDK WHY
-		changeUserPoints(msg.caller, (user.points - queryCost));
-		
-
-		let filteredUsers : [(User, Int)] = filterUsers(msg.caller, para);
-		#ok(filteredUsers);
+		try {
+			changeUserPoints(msg.caller, (user.points - Int.abs(queryCost))); //might other position
+			let match : UserWScore = filterUsers(msg.caller, para);
+			switch (users.get(match.0)) {
+				case null { return #err("Matched user not found!") };
+				case (?user) {
+					let matchObj : UserMatch = {
+						username = user.username;
+						about = checkPublic(user.about);
+						gender = checkPublic(user.gender);
+						birth = checkPublic(user.birth);
+						connect = checkPublic(user.connect);
+						cohesion = match.1;
+						answeredQuestions = getXAnsweredQuestions(match.0, null);
+						//TODO : re-enable answeredQuestions
+						//also filter first on commonQuestions to add a bool to this array for front-end indicating if both answered
+					};
+					return #ok(matchObj);
+				};
+			};
+		} catch err {
+			return #err("Couldn't filter users and/or deduct points");
+		};
 	};
 
 };

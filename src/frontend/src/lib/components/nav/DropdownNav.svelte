@@ -13,12 +13,17 @@
 	}
 </script>
 
+<!-- TODO : rethink the nav components as this is almost equal to sidepanelnav.svelte -->
 <div class="flex flex-col items-end">
-	<button class="pt-2 shrink-0 self-end hover:cursor-pointer" on:click={toggleVissible} on:keydown={toggleVissible}>
+	<button
+		class="mt-2 shrink-0 self-end cursor-pointer hover-circle"
+		on:click={toggleVissible}
+		on:keydown={toggleVissible}
+	>
 		{#if !visible}
-			<NavBars class="w-8 m-auto" />
+			<NavBars class="w-8" />
 		{:else}
-			<NavX class="w-8 m-auto" />
+			<NavX class="w-8" />
 		{/if}
 	</button>
 

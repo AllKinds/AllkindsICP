@@ -1,3 +1,16 @@
+type WeightKind = variant {
+	Dislike : nat;
+	Like : nat;
+};
+type UserMatch = record {
+	about : opt text;
+	answeredQuestions : vec Question;
+	birth : opt int;
+	cohesion : int;
+	connect : opt text;
+	gender : opt Gender;
+	username : text;
+};
 type User = record {
 	about : record {
 		opt text;
@@ -21,10 +34,7 @@ type User = record {
 };
 type Result_3 = variant {
 	err : text;
-	ok : vec record {
-		User;
-		int;
-	};
+	ok : UserMatch;
 };
 type Result_2 = variant {
 	err : text;
@@ -51,12 +61,8 @@ type MatchingFilter = record {
 		nat;
 		nat;
 	};
-	cohesion : nat;
+	cohesion : int;
 	gender : opt Gender;
-};
-type LikeKind = variant {
-	Dislike : nat;
-	Like : nat;
 };
 type Hash = nat32;
 type Gender = variant {
@@ -70,12 +76,12 @@ type AnswerKind = variant { Bool : bool };
 service : {
 	createQuestion : (text) -> (Result);
 	createUser : (text) -> (Result);
-	findMatches : (MatchingFilter) -> (Result_3) query;
-	getAnsweredQuestions : (nat) -> (Result_2) query;
+	findMatch : (MatchingFilter) -> (Result_3);
+	getAnsweredQuestions : (opt nat) -> (Result_2) query;
 	getAskableQuestions : (nat) -> (Result_2) query;
 	getUser : () -> (Result_1) query;
 	submitAnswer : (Hash, AnswerKind) -> (Result);
-	submitLike : (Hash, LikeKind) -> (Result);
 	submitSkip : (Hash) -> (Result);
+	submitWeight : (Hash, WeightKind) -> (Result);
 	updateProfile : (User) -> (Result);
 };

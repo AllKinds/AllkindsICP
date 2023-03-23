@@ -5,7 +5,7 @@
 	import { skipQ } from '$lib/stores/tasks/skipQ';
 	import { likeQ } from '$lib/stores/tasks/likeQ';
 	import { fromBigInt } from '$lib/utilities';
-	import type { AnswerKind, LikeKind, Question } from 'src/declarations/backend/backend.did';
+	import type { AnswerKind, WeightKind, Question } from 'src/declarations/backend/backend.did';
 	import Spinner from '../common/Spinner.svelte';
 	import PlusCircle from '$lib/assets/icons/plus-circle.svg?component';
 	import MinusCircle from '$lib/assets/icons/minus-circle.svg?component';
@@ -18,7 +18,7 @@
 	const submitAnswer = async (bool: boolean) => {
 		answerPending = bool;
 		let answer: AnswerKind = { Bool: bool };
-		let like: LikeKind =
+		let like: WeightKind =
 			likeWeight > 0
 				? { Like: BigInt(Math.abs(likeWeight)) }
 				: { Dislike: BigInt(Math.abs(likeWeight)) };
@@ -56,8 +56,11 @@
 	};
 </script>
 
-<div class="2xl:w-9/12 mx-auto rounded-md flex flex-col justify-center items-center">
-	<span class=" text-3xl w-fit text-center">{question.question}</span>
+<!-- TODO : fix a minimum height here -->
+<div class="2xl:w-9/12 mx-auto h-fit rounded-md flex flex-col justify-center items-center">
+	<p class="text-4xl w-fit text-center">
+		{question.question}
+	</p>
 	<!--
 		<p class="text-slate-500 text-sm p-0">Created: {fromBigInt(question.created)}</p>
 		<p class="text-slate-500 text-sm p-0">By: {question.creater}</p>
@@ -67,7 +70,7 @@
 		<button class="sub-btn" on:click={() => likeWeight--}>
 			<MinusCircle />
 		</button>
-		<span class="sub-btn">{likeWeight}</span>
+		<span class="mt-2">{likeWeight}</span>
 		<button class="sub-btn" on:click={() => likeWeight++}>
 			<PlusCircle />
 		</button>
@@ -85,7 +88,7 @@
 				<span>
 					{#if answerPending == true}
 						<Spinner />
-					{:else }
+					{:else}
 						YES
 					{/if}
 				</span>

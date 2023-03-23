@@ -8,7 +8,7 @@
 	{#each data as d, i}
 		<div
 			class="flex flex-col p-0.5 rounded-lg bg-gradient-to-br from-DF-blue via-DF-red to-DF-yellow"
-		>	
+		>
 			<div class="h-full bg-sub90 p-2 lg:p-4 rounded-lg">
 				<div class="text-2xl pb-1 md:pb-2 lg:text-3xl w-fit font-medium">
 					{#if ids} {i + 1} {/if}
@@ -17,7 +17,7 @@
 				<div class="font-montserrat">
 					{d.text}
 				</div>
-			</div>	
+			</div>
 		</div>
 	{/each}
 </div>

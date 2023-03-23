@@ -1,7 +1,5 @@
 ## Allkinds
 
-
-
 ## Test out
 
 Decided to use nns for II in testing authentication. No wallet support build in yet.
