@@ -4,10 +4,11 @@ type WeightKind = variant {
 };
 type UserMatch = record {
 	about : opt text;
+	answeredQuestions : vec Question;
 	birth : opt int;
+	cohesion : int;
 	connect : opt text;
 	gender : opt Gender;
-	score : float64;
 	username : text;
 };
 type User = record {
@@ -33,7 +34,7 @@ type User = record {
 };
 type Result_3 = variant {
 	err : text;
-	ok : vec UserMatch;
+	ok : UserMatch;
 };
 type Result_2 = variant {
 	err : text;
@@ -75,7 +76,7 @@ type AnswerKind = variant { Bool : bool };
 service : {
 	createQuestion : (text) -> (Result);
 	createUser : (text) -> (Result);
-	findMatches : (MatchingFilter) -> (Result_3);
+	findMatch : (MatchingFilter) -> (Result_3);
 	getAnsweredQuestions : (opt nat) -> (Result_2) query;
 	getAskableQuestions : (nat) -> (Result_2) query;
 	getUser : () -> (Result_1) query;

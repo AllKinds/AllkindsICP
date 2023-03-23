@@ -11,15 +11,6 @@ export const idlFactory = ({ IDL }) => {
 		ageRange: IDL.Tuple(IDL.Nat, IDL.Nat),
 		gender: IDL.Opt(Gender)
 	});
-	const UserMatch = IDL.Record({
-		connect: IDL.Opt(IDL.Text),
-		about: IDL.Opt(IDL.Text),
-		username: IDL.Text,
-		score: IDL.Float64,
-		gender: IDL.Opt(Gender),
-		birth: IDL.Opt(IDL.Int)
-	});
-	const Result_3 = IDL.Variant({ ok: IDL.Vec(UserMatch), err: IDL.Text });
 	const Hash = IDL.Nat32;
 	const Color = IDL.Variant({ Default: IDL.Null });
 	const Question = IDL.Record({
@@ -30,6 +21,16 @@ export const idlFactory = ({ IDL }) => {
 		color: IDL.Opt(Color),
 		points: IDL.Int
 	});
+	const UserMatch = IDL.Record({
+		connect: IDL.Opt(IDL.Text),
+		about: IDL.Opt(IDL.Text),
+		username: IDL.Text,
+		cohesion: IDL.Int,
+		gender: IDL.Opt(Gender),
+		birth: IDL.Opt(IDL.Int),
+		answeredQuestions: IDL.Vec(Question)
+	});
+	const Result_3 = IDL.Variant({ ok: UserMatch, err: IDL.Text });
 	const Result_2 = IDL.Variant({ ok: IDL.Vec(Question), err: IDL.Text });
 	const User = IDL.Record({
 		created: IDL.Int,
@@ -46,7 +47,7 @@ export const idlFactory = ({ IDL }) => {
 	return IDL.Service({
 		createQuestion: IDL.Func([IDL.Text], [Result], []),
 		createUser: IDL.Func([IDL.Text], [Result], []),
-		findMatches: IDL.Func([MatchingFilter], [Result_3], []),
+		findMatch: IDL.Func([MatchingFilter], [Result_3], []),
 		getAnsweredQuestions: IDL.Func([IDL.Opt(IDL.Nat)], [Result_2], ['query']),
 		getAskableQuestions: IDL.Func([IDL.Nat], [Result_2], ['query']),
 		getUser: IDL.Func([], [Result_1], ['query']),

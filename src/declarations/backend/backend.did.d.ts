@@ -21,7 +21,7 @@ export interface Question {
 export type Result = { ok: null } | { err: string };
 export type Result_1 = { ok: User } | { err: string };
 export type Result_2 = { ok: Array<Question> } | { err: string };
-export type Result_3 = { ok: Array<UserMatch> } | { err: string };
+export type Result_3 = { ok: UserMatch } | { err: string };
 export interface User {
 	created: bigint;
 	connect: [[] | [string], boolean];
@@ -35,15 +35,16 @@ export interface UserMatch {
 	connect: [] | [string];
 	about: [] | [string];
 	username: string;
-	score: number;
+	cohesion: bigint;
 	gender: [] | [Gender];
 	birth: [] | [bigint];
+	answeredQuestions: Array<Question>;
 }
 export type WeightKind = { Like: bigint } | { Dislike: bigint };
 export interface _SERVICE {
 	createQuestion: ActorMethod<[string], Result>;
 	createUser: ActorMethod<[string], Result>;
-	findMatches: ActorMethod<[MatchingFilter], Result_3>;
+	findMatch: ActorMethod<[MatchingFilter], Result_3>;
 	getAnsweredQuestions: ActorMethod<[[] | [bigint]], Result_2>;
 	getAskableQuestions: ActorMethod<[bigint], Result_2>;
 	getUser: ActorMethod<[], Result_1>;

@@ -50,7 +50,7 @@ actor {
 		connect : ?Text;
 		//TEMP changed into score for testing : cohesion : Nat; //should always between 0-100, maybe nat8
 		cohesion : Int;
-		//answeredQuestions : [Question];
+		answeredQuestions : [Question];
 	};
 
 	type Gender = {
@@ -119,6 +119,8 @@ actor {
 		gender : ?Gender;
 		cohesion : Int;
 	};
+
+	type UserWScore = (Principal, Int);
 
 	// UTILITY FUNCTIONS
 
@@ -410,14 +412,18 @@ actor {
 		let q = Array.mapFilter(answered, getQuestion);
 	};
 
-	
+	//utility functions mostly for filterUsers, could be made more generalized
+	func sortByScore(t : (UserWScore), u : (UserWScore)) : Order.Order {
+		if (t.1 > u.1) { return #less } else if (t.1 < u.1) { return #greater } else { return #equal };
+	};
 
-
-
+	func isEq(t : (UserWScore), u : (UserWScore)) : Bool {
+		t.1 == u.1;
+	};
 
 	// filter users according to parameters
-	func filterUsers(p : Principal, f : MatchingFilter) : UserMatch {
-		let buf = Buffer.Buffer<(Principal, Int)>(2);
+	func filterUsers(p : Principal, f : MatchingFilter) : (UserWScore) {
+		let buf = Buffer.Buffer<(UserWScore)>(2);
 		var count = 0;
 		let callerScore : Float = calcScore(p, p);
 		//User Loop
@@ -428,84 +434,57 @@ actor {
 				case (?user) {
 					//Filter Loop
 					label fl {
-						//gender
-						switch (f.gender) {
-							case null ();
-							case (Gender) {
-								if ((f.gender, true) != user.gender) {
-									break fl;
+						if (p == pm) { break fl } else {
+							//gender
+							switch (f.gender) {
+								case null ();
+								case (Gender) {
+									if ((f.gender, true) != user.gender) {
+										break fl;
+									};
 								};
 							};
-						};
-						//age
-						switch (user.birth) {
-							case (?birth, _) {
-								//TODO : make birth-age conversion utility func
-								let userAge = birth / (1_000_000_000 * 3600 * 24) / 365;
-								//TODO : find way to have em both in if statement , || doesnt work
-								if (f.ageRange.0 >= userAge) {
-									break fl;
-								} else if (f.ageRange.1 <= userAge) {
-									break fl;
+							//age
+							switch (user.birth) {
+								case (?birth, _) {
+									//TODO : make birth-age conversion utility func
+									let userAge = birth / (1_000_000_000 * 3600 * 24) / 365;
+									//TODO : find way to have em both in if statement , || doesnt work
+									if (f.ageRange.0 >= userAge) {
+										break fl;
+									} else if (f.ageRange.1 <= userAge) {
+										break fl;
+									};
 								};
+								case (_)();
 							};
-							case (_)();
+
+							let score : Float = calcScore(p, pm);
+							let cohesion = Float.toInt(Float.trunc((score / callerScore) * 100));
+							buf.add((pm, cohesion));
 						};
-
-						let score : Float = calcScore(p, pm);
-						let cohesion = Float.toInt(Float.trunc((score / callerScore) * 100));
-
-						buf.add((pm, cohesion));
-
 					}; //end  fl
 				};
 			};
 			count += 1;
 		}; // end ul
 		//brute insert the filter target (p can also be anything)
-		buf.add((p, f.cohesion)); 
-
-		func sortByScore(t : (Principal , Int), u : (Principal, Int) ) : Order.Order {
-			if (t.1 < u.1) {return #less} 
-			else if (t.1 > u.1) {return #greater}
-			else {return #equal};
-		};
-		func isEq(t : (Principal , Int), u : (Principal, Int))  : Bool {
-			t.1 == f.cohesion;
-		};
+		let cohesionFilter : UserWScore = (p, f.cohesion);
+		buf.add(cohesionFilter);
 		buf.sort(sortByScore);
-		let index : ?Nat = Buffer.indexOf((p, f.cohesion), buf, isEq);
-		//might have to write own indexOf , or better nearestIndex func
-		let indexM : Nat = switch (index) {
-			case null {0}; //hmm
+		//find index of filter target
+
+		let indexF : ?Nat = Buffer.indexOf(cohesionFilter, buf, isEq);
+		let indexM : Nat = switch (indexF) {
+			case null { 0 }; //hmm
 			case (?i) {
-				i+1 //gets user closest above cohesionFilter
+				if (buf.size() == i + 1) { i - 1 } //if last index
+				else { i + 1 };
 			};
 		};
-		let match : (Principal, Int) = buf.get(indexM);
-		//Q : r some buffer funcs not supp yet?
 
-		let user = switch (users.get(match.0)) {
-			case null {};
-			case (?user) {
-				user;
-			};
-		};
-		let newUserMatch : UserMatch = {
-			username = user.username;
-			about = checkPublic(user.about);
-			gender = checkPublic(user.gender);
-			birth = checkPublic(user.birth);
-			connect = checkPublic(user.connect);
-			cohesion = match.1;
-			//answeredQuestions = getXAnsweredQuestions(pm, null);
-			//TODO : re-enable answeredQuestions
-			//also filter first on commonQuestions to add a bool to this array for front-end indicating if both answered
-		};
-
-		//TODO :  return UserMatch (currently use X value for testing, should be 1 in future)
-		//buf.toArray();
-		return newUserMatch;	
+		let match : (UserWScore) = buf.get(indexM); //THIS IS WRONG
+		return match;
 	};
 
 	// DATA STORAGE
@@ -704,7 +683,7 @@ actor {
 	};
 
 	//find users based on parameters
-	public shared (msg) func findMatches(para : MatchingFilter) : async Result.Result<UserMatch, Text> {
+	public shared (msg) func findMatch(para : MatchingFilter) : async Result.Result<UserMatch, Text> {
 		let user = switch (users.get(msg.caller)) {
 			case null return #err("User does not exist");
 			case (?user) {
@@ -717,13 +696,28 @@ actor {
 		};
 
 		try {
-			changeUserPoints(msg.caller, (user.points - Int.abs(queryCost)));
-			let filteredUser : UserMatch = filterUsers(msg.caller, para);
-			return #ok(filteredUsers);
+			changeUserPoints(msg.caller, (user.points - Int.abs(queryCost))); //might other position
+			let match : UserWScore = filterUsers(msg.caller, para);
+			switch (users.get(match.0)) {
+				case null { return #err("Matched user not found!") };
+				case (?user) {
+					let matchObj : UserMatch = {
+						username = user.username;
+						about = checkPublic(user.about);
+						gender = checkPublic(user.gender);
+						birth = checkPublic(user.birth);
+						connect = checkPublic(user.connect);
+						cohesion = match.1;
+						answeredQuestions = getXAnsweredQuestions(match.0, null);
+						//TODO : re-enable answeredQuestions
+						//also filter first on commonQuestions to add a bool to this array for front-end indicating if both answered
+					};
+					return #ok(matchObj);
+				};
+			};
 		} catch err {
 			return #err("Couldn't filter users and/or deduct points");
 		};
-
 	};
 
 };
