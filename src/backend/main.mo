@@ -462,22 +462,28 @@ actor {
 			};
 			count += 1;
 		}; // end ul
-		//brute insert the filter target
-		buf.add((p, f.cohesion));
+		//brute insert the filter target (p can also be anything)
+		buf.add((p, f.cohesion)); 
 
 		func sortByScore(t : (Principal , Int), u : (Principal, Int) ) : Order.Order {
 			if (t.1 < u.1) {return #less} 
 			else if (t.1 > u.1) {return #greater}
 			else {return #equal};
 		};
-		func isEq(t : (Principal , Int), u : (Principal, Int) ) : Bool {
-			t.1 == u.1
+		func isEq(t : (Principal , Int), u : (Principal, Int))  : Bool {
+			t.1 == f.cohesion;
 		};
 		buf.sort(sortByScore);
-		//let index : Nat = Buffer.indexOf(f.cohesion , buf, isEq);
+		let index : ?Nat = Buffer.indexOf((p, f.cohesion), buf, isEq);
 		//might have to write own indexOf , or better nearestIndex func
-		let match : (Principal, Int) = buf.get(indexC + 1);
-		
+		let indexM : Nat = switch (index) {
+			case null {0}; //hmm
+			case (?i) {
+				i+1 //gets user closest above cohesionFilter
+			};
+		};
+		let match : (Principal, Int) = buf.get(indexM);
+		//Q : r some buffer funcs not supp yet?
 
 		let user = switch (users.get(match.0)) {
 			case null {};
