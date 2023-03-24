@@ -179,7 +179,7 @@ actor {
 	};
 
 	func askableQuestions(p : Principal, n : Nat) : [Hash.Hash] {
-		let buf = Buffer.Buffer<Hash.Hash>(10);
+		let buf = Buffer.Buffer<Hash.Hash>(16);
 		var count = 0;
 		label f for (hash in questions.keys()) {
 			if (n == count) break f;
@@ -193,32 +193,14 @@ actor {
 	};
 
 	func answeredQuestions(p : Principal, n : ?Nat) : [Hash.Hash] {
-		let buf = Buffer.Buffer<Hash.Hash>(10);
+		let buf = Buffer.Buffer<Hash.Hash>(16);
 		var count = 0;
 		label f for (hash in questions.keys()) {
-			switch (n) {
-				case null {};
-				case (?n) {
-					if (n == count) break f;
-				};
-			};
+			if (n == ?count) break f;
 			let pQ = hashPrincipalQuestion(p, hash);
-			switch (skips.get(pQ)) {
-				case (?_) {};
-				case null {
-					switch (weights.get(pQ)) {
-						case (?_) {};
-						case null {
-							switch (answers.get(pQ)) {
-								case (?_) {
-									buf.add(hash);
-									count += 1;
-								};
-								case null {};
-							};
-						};
-					};
-				};
+			if (null == skips.get(pQ)) if (null == weights.get(pQ)) if (null != answers.get(pQ)) {
+				buf.add(hash);
+				count += 1;
 			};
 		};
 		buf.toArray();
@@ -227,14 +209,10 @@ actor {
 	// calc score for 2 answers and optional 2 weights
 	func calcQuestionScore(sourceAnswer : Answer, testAnswer : Answer, sourceWeight : ?Weight, testWeight : ?Weight) : Int {
 		assert (sourceAnswer.question == testAnswer.question);
-
 		// let hasWeights = Option.isSome(sourceWeight) and Option.isSome(testWeight);
 		// let hasNoWeights = Option.isNull(sourceWeight) and Option.isNull(testWeight);
-
 		let compareAnswers : Bool = sourceAnswer.answer == testAnswer.answer;
 		//let compareWeights : Bool = ...
-
-		//Weights should be: both positive, or both negative. -> and result both in +value
 
 		if (compareAnswers == false) {
 			//also check for weights here
@@ -242,8 +220,7 @@ actor {
 		} else {
 			// let sourceAnswerScore : Int = if (sourceAnswer.answer == #Bool(true)) { 1 } else { -1 };
 			// let testAnswerScore : Int = if (testAnswer.answer == #Bool(true)) { 1 } else { -1 };
-
-			//functions remade with possible changed weight type
+			//maybe remake  with possible new weight type
 			let sourceWeightScore : Int = switch (sourceWeight) {
 				case (?sourceWeight) {
 					switch (sourceWeight.weight) {
@@ -251,7 +228,7 @@ actor {
 						case (#Dislike(score)) { -score };
 					};
 				};
-				case null { 1 };
+				case null { 0 };
 			};
 
 			let testWeightScore : Int = switch (testWeight) {
@@ -261,7 +238,7 @@ actor {
 						case (#Dislike(score)) { -score };
 					};
 				};
-				case null { 1 };
+				case null { 0 };
 			};
 
 			var wScore : Int = 1; //temp ugly fix
@@ -278,18 +255,16 @@ actor {
 
 	func hasAnswered(p : Principal, question : Hash.Hash) : ?Answer {
 		let pQ = hashPrincipalQuestion(p, question);
-		let answer = do { answers.get(pQ) };
-		return answer;
+		return answers.get(pQ);
 	};
 
 	func hasweightd(p : Principal, question : Hash.Hash) : ?Weight {
 		let pQ = hashPrincipalQuestion(p, question);
-		let weight = do { weights.get(pQ) };
-		return weight;
+		return weights.get(pQ);
 	};
 
 	func commonQuestions(sourceUser : Principal, testUser : Principal) : [CommonQuestion] {
-		let buf = Buffer.Buffer<CommonQuestion>(2);
+		let buf = Buffer.Buffer<CommonQuestion>(16);
 		for (hash in questions.keys()) {
 			let sourcePQ = hashPrincipalQuestion(sourceUser, hash);
 			let testPQ = hashPrincipalQuestion(testUser, hash);
@@ -313,6 +288,25 @@ actor {
 					};
 				};
 			};
+			// label l {
+			//	// TEMP : code ready for moc 0.8.3
+			// 	//MO-playground ex : https://m7sm4-2iaaa-aaaab-qabra-cai.ic0.app/?tag=1670004281
+			// 	let ?sourceAnswer = answers.get(sourcePQ) else { break l };
+			// 	let ?testAnswer = answers.get(testPQ) else  { break l };
+
+			// 	//exceptions bcs of type : ?Weight
+			// 	let sourceWeight = weights.get(sourcePQ);
+			// 	let testWeight = weights.get(testPQ);
+
+			// 	let commonQuestion : CommonQuestion = {
+			// 		question = hash;
+			// 		sourceAnswer;
+			// 		testAnswer;
+			// 		sourceWeight;
+			// 		testWeight;
+			// 	};
+			// 	buf.add(commonQuestion);
+			// }
 		};
 		buf.toArray();
 	};
@@ -398,7 +392,7 @@ actor {
 
 	// filter users according to parameters
 	func filterUsers(p : Principal, f : MatchingFilter) : (UserWScore) {
-		let buf = Buffer.Buffer<(UserWScore)>(2);
+		let buf = Buffer.Buffer<(UserWScore)>(16);
 		var count = 0;
 		let callerScore : Float = calcScore(p, p);
 		//User Loop
