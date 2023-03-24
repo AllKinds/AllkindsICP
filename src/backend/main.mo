@@ -22,9 +22,9 @@ import None "mo:base/None";
 
 actor {
 
-	//TODO : change hashmaps and buffer inital sizes, every double does take some cost to double
-	//better a fair amount value instead of small values like 2 for buffs that eventually grow way bigger
-	//TODO : use more hashmaps for bigger calculations
+	//TODO : use more hashmap functionality for longer calculations
+	//TODO : maybe make and extract some code to types.mo and utils.mo
+	//TODO : integrate more variants (point usages, common errors, etc..)
 
 	// CONSTANTS
 	let N = 10;
@@ -53,7 +53,7 @@ actor {
 		gender : ?Gender;
 		birth : ?Int;
 		connect : ?Text;
-		//TEMP changed into score for testing : cohesion : Nat; //should always between 0-100, maybe nat8
+		//TODO: (cohesion : Nat;) changed into int for testing,  should always be between 0-100 so nat8 better
 		cohesion : Int;
 		answeredQuestions : [Question];
 	};
@@ -207,6 +207,7 @@ actor {
 	};
 
 	// calc score for 2 answers and optional 2 weights
+	//TODO : optimise with let-alse after 0.8.3 and change accordingly after Weight type is revamped
 	func calcQuestionScore(sourceAnswer : Answer, testAnswer : Answer, sourceWeight : ?Weight, testWeight : ?Weight) : Int {
 		assert (sourceAnswer.question == testAnswer.question);
 		// let hasWeights = Option.isSome(sourceWeight) and Option.isSome(testWeight);
@@ -220,7 +221,6 @@ actor {
 		} else {
 			// let sourceAnswerScore : Int = if (sourceAnswer.answer == #Bool(true)) { 1 } else { -1 };
 			// let testAnswerScore : Int = if (testAnswer.answer == #Bool(true)) { 1 } else { -1 };
-			//maybe remake  with possible new weight type
 			let sourceWeightScore : Int = switch (sourceWeight) {
 				case (?sourceWeight) {
 					switch (sourceWeight.weight) {
@@ -268,6 +268,7 @@ actor {
 		for (hash in questions.keys()) {
 			let sourcePQ = hashPrincipalQuestion(sourceUser, hash);
 			let testPQ = hashPrincipalQuestion(testUser, hash);
+			//could be optimized with ifs, but better wait for let-else
 			switch (answers.get(sourcePQ)) {
 				case null {};
 				case (?sourceAnswer) {
@@ -288,13 +289,12 @@ actor {
 					};
 				};
 			};
-			// label l {
-			//	// TEMP : code ready for moc 0.8.3
-			// 	//MO-playground ex : https://m7sm4-2iaaa-aaaab-qabra-cai.ic0.app/?tag=1670004281
+			// label l { //TEMP : code ready for moc 0.8.3
+			// 	// TODO if possible put label in front of loop and use continue
+			// 	//MO-playground pow ex : https://m7sm4-2iaaa-aaaab-qabra-cai.ic0.app/?tag=1670004281
 			// 	let ?sourceAnswer = answers.get(sourcePQ) else { break l };
 			// 	let ?testAnswer = answers.get(testPQ) else  { break l };
 
-			// 	//exceptions bcs of type : ?Weight
 			// 	let sourceWeight = weights.get(sourcePQ);
 			// 	let testWeight = weights.get(testPQ);
 
@@ -306,7 +306,7 @@ actor {
 			// 		testWeight;
 			// 	};
 			// 	buf.add(commonQuestion);
-			// }
+			// };
 		};
 		buf.toArray();
 	};
@@ -322,8 +322,8 @@ actor {
 				q.sourceWeight,
 				q.testWeight
 			);
-			//score *= 10; //temp
-			//score /= (2 * common.size()); //what is theory or reasoning behind this? check algorithm
+			//score /= (2 * common.size());
+			//Algorithm calc needs heavy revamp, but atleast its now giving a more normal value
 			qScore += Float.fromInt(score);
 		};
 		qScore;
@@ -381,17 +381,18 @@ actor {
 		let q = Array.mapFilter(answered, getQuestion);
 	};
 
-	//utility functions mostly for filterUsers, could be made more generalized
+	//utility functions mostly for filterUsers
+	//could be made more generalized and optimised with switch prob for faster process
 	func sortByScore(t : (UserWScore), u : (UserWScore)) : Order.Order {
 		if (t.1 > u.1) { return #less } else if (t.1 < u.1) { return #greater } else { return #equal };
 	};
 
-	func isEq(t : (UserWScore), u : (UserWScore)) : Bool {
-		t.1 == u.1;
-	};
+
+	
 
 	// filter users according to parameters
 	func filterUsers(p : Principal, f : MatchingFilter) : (UserWScore) {
+		//TODO : optimize with let-else after 0.8.3
 		let buf = Buffer.Buffer<(UserWScore)>(16);
 		var count = 0;
 		let callerScore : Float = calcScore(p, p);
@@ -418,10 +419,7 @@ actor {
 								case (?birth, _) {
 									//TODO : make birth-age conversion utility func
 									let userAge = birth / (1_000_000_000 * 3600 * 24) / 365;
-									//TODO : find way to have em both in if statement , || doesnt work
-									if (f.ageRange.0 >= userAge) {
-										break fl;
-									} else if (f.ageRange.1 <= userAge) {
+									if ((f.ageRange.0 >= userAge) or (f.ageRange.1 <= userAge)) {
 										break fl;
 									};
 								};
@@ -437,23 +435,32 @@ actor {
 			};
 			count += 1;
 		}; // end ul
-		//brute insert the filter target (p can also be anything)
+		//TODO : split this part into its own function for readability
+		//TODO : check if cohesion is 100% or 0% , then most of these operations can be skipped and shortened
+		//TEMP brute insert the filter target (p can also be anything), TODO fix as this isnt clean
 		let cohesionFilter : UserWScore = (p, f.cohesion);
 		buf.add(cohesionFilter);
 		buf.sort(sortByScore);
-		//find index of filter target
 
+		//find index of filter target
+		//TODO : isEq prob has a cleaner solution
+		func isEq(t : (UserWScore), u : (UserWScore)) : Bool {
+			t.1 == u.1;
+		};
 		let indexF : ?Nat = Buffer.indexOf(cohesionFilter, buf, isEq);
 		let indexM : Nat = switch (indexF) {
-			case null { 0 }; //hmm
+			case null { 0 }; //TODO fix as this isnt clean
 			case (?i) {
-				if (buf.size() == i + 1) { i - 1 } //if last index
-				else { i + 1 };
+				//takes next Index in score after f.cohesion unless end or start of buf
+				//TODO : optimize by getting both edging values of f.cohesion to return the closest one.
+				if (i != 0) {
+					if (buf.size() == i + 1) { i - 1 } 
+						else { i + 1 };
+				} else {i};
 			};
 		};
 
-		let match : (UserWScore) = buf.get(indexM); //THIS IS WRONG
-		return match;
+		buf.get(indexM);
 	};
 
 	// DATA STORAGE
@@ -496,7 +503,7 @@ actor {
 	public shared (msg) func createUser(username : Text) : async Result.Result<(), Text> {
 		let caller = msg.caller;
 		let created = Time.now();
-
+		//TODO : optimise with let-else after 0.8.3
 		switch (users.get(caller)) {
 			case (?_) return #err("User is already registered!");
 			case null {
@@ -522,6 +529,7 @@ actor {
 			case (?user) return #ok(user);
 			case null return #err("User does not exist!");
 		};
+		//TODO : optimise with let-else after 0.8.3
 	};
 
 	public shared (msg) func updateProfile(user : User) : async Result.Result<(), Text> {
@@ -532,7 +540,9 @@ actor {
 			};
 		};
 		#ok();
+		//TODO : optimise with let-else after 0.8.3
 	};
+
 
 	// Create a new question with default color
 	public shared (msg) func createQuestion(question : Text) : async Result.Result<(), Text> {
@@ -545,6 +555,7 @@ actor {
 			};
 		};
 		#ok();
+		//TODO : optimise with let-else after 0.8.3
 	};
 
 	public shared query (msg) func getAskableQuestions(n : Nat) : async Result.Result<[Question], Text> {
@@ -578,7 +589,8 @@ actor {
 			answer;
 		};
 		answers.put(principalQuestion, newAnswer);
-		//let user = users.get(msg.caller);
+	
+		//TODO : optimise with let-else after 0.8.3
 		let user = switch (users.get(msg.caller)) {
 			case null return #err("User does not exist");
 			case (?user) {
@@ -638,6 +650,7 @@ actor {
 		changeQuestionPoints(q, (q.points + weightValue));
 
 		#ok();
+		//TODO : optimise with let-else after 0.8.3
 	};
 
 	// Add a skip
@@ -667,6 +680,7 @@ actor {
 		try {
 			changeUserPoints(msg.caller, (user.points - Int.abs(queryCost))); //might other position
 			let match : UserWScore = filterUsers(msg.caller, para);
+			//TODO : optimise with let-else after 0.8.3
 			switch (users.get(match.0)) {
 				case null { return #err("Matched user not found!") };
 				case (?user) {
