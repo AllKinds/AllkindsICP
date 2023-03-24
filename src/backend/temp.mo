@@ -24,12 +24,12 @@ import None "mo:base/None";
 
 actor {
 
-  func commonQuestions(sourceUser : Principal, testUser : Principal) : [CommonQuestion] {
+	func commonQuestions(sourceUser : Principal, testUser : Principal) : [CommonQuestion] {
 		let buf = Buffer.Buffer<CommonQuestion>(16);
 		for (hash in questions.keys()) {
 			let sourcePQ = hashPrincipalQuestion(sourceUser, hash);
 			let testPQ = hashPrincipalQuestion(testUser, hash);
-      //check
+			//check
 			switch (answers.get(sourcePQ)) {
 				case null {};
 				case (?sourceAnswer) {
@@ -38,7 +38,7 @@ actor {
 						case (?testAnswer) {
 							let sourceWeight = weights.get(sourcePQ);
 							let testWeight = weights.get(testPQ);
-              //build
+							//build
 							let commonQuestion : CommonQuestion = {
 								question = hash;
 								sourceAnswer;
@@ -55,29 +55,28 @@ actor {
 		buf.toArray();
 	};
 
-  //Code ready for moc 0.8.3
-  func commonQuestionsX(sourceUser : Principal, testUser : Principal) : [CommonQuestion] {
+	//Code ready for moc 0.8.3
+	func commonQuestionsX(sourceUser : Principal, testUser : Principal) : [CommonQuestion] {
 		let buf = Buffer.Buffer<CommonQuestion>(16);
 		label l for (hash in questions.keys()) {
 			let sourcePQ = hashPrincipalQuestion(sourceUser, hash);
 			let testPQ = hashPrincipalQuestion(testUser, hash);
-      //check
-      let ?sourceAnswer = answers.get(sourcePQ) else continue l ;
-      let ?testAnswer = answers.get(testPQ) else continue l ;
-      let sourceWeight = weights.get(sourcePQ);
-      let testWeight = weights.get(testPQ);
-      //build
-      let commonQuestion : CommonQuestion = {
-        question = hash;
-        sourceAnswer;
-        testAnswer;
-        sourceWeight;
-        testWeight;
-      };
-      buf.add(commonQuestion);
+			//check
+			let ?sourceAnswer = answers.get(sourcePQ) else continue l;
+			let ?testAnswer = answers.get(testPQ) else continue l;
+			let sourceWeight = weights.get(sourcePQ);
+			let testWeight = weights.get(testPQ);
+			//build
+			let commonQuestion : CommonQuestion = {
+				question = hash;
+				sourceAnswer;
+				testAnswer;
+				sourceWeight;
+				testWeight;
+			};
+			buf.add(commonQuestion);
 		};
 		buf.toArray();
 	};
-
 
 };

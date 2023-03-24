@@ -22,7 +22,7 @@ import None "mo:base/None";
 
 actor {
 
-	//TODO : use more hashmap functionality for longer calculations
+	//TODO : use more hashmap functionality instead of buffers for faster calculations
 	//TODO : maybe make and extract some code to types.mo and utils.mo
 	//TODO : integrate more variants (point usages, common errors, etc..)
 
@@ -43,7 +43,7 @@ actor {
 		about : (?Text, Bool);
 		gender : (?Gender, Bool);
 		birth : (?Int, Bool);
-		connect : (?Text, Bool);
+		connect : (?Text, Bool); //= email or social media link
 		points : Nat; //Nat bcs user points should not go negative
 	};
 
@@ -387,9 +387,6 @@ actor {
 		if (t.1 > u.1) { return #less } else if (t.1 < u.1) { return #greater } else { return #equal };
 	};
 
-
-	
-
 	// filter users according to parameters
 	func filterUsers(p : Principal, f : MatchingFilter) : (UserWScore) {
 		//TODO : optimize with let-else after 0.8.3
@@ -428,6 +425,7 @@ actor {
 
 							let score : Float = calcScore(p, pm);
 							let cohesion = Float.toInt(Float.trunc((score / callerScore) * 100));
+							//maybe fix: check here if user is itself, and if so add cohesion filter to username to solve 2 bugs
 							buf.add((pm, cohesion));
 						};
 					}; //end  fl
@@ -454,9 +452,8 @@ actor {
 				//takes next Index in score after f.cohesion unless end or start of buf
 				//TODO : optimize by getting both edging values of f.cohesion to return the closest one.
 				if (i != 0) {
-					if (buf.size() == i + 1) { i - 1 } 
-						else { i + 1 };
-				} else {i};
+					if (buf.size() == i + 1) { i - 1 } else { i + 1 };
+				} else { i };
 			};
 		};
 
@@ -543,7 +540,6 @@ actor {
 		//TODO : optimise with let-else after 0.8.3
 	};
 
-
 	// Create a new question with default color
 	public shared (msg) func createQuestion(question : Text) : async Result.Result<(), Text> {
 		switch (users.get(msg.caller)) {
@@ -589,7 +585,7 @@ actor {
 			answer;
 		};
 		answers.put(principalQuestion, newAnswer);
-	
+
 		//TODO : optimise with let-else after 0.8.3
 		let user = switch (users.get(msg.caller)) {
 			case null return #err("User does not exist");
