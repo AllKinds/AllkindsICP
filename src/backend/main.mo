@@ -18,8 +18,13 @@ import Debug "mo:base/Debug";
 import Array "mo:base/Array";
 import Float "mo:base/Float";
 import Order "mo:base/Order";
+import None "mo:base/None";
 
 actor {
+
+	//TODO : change hashmaps and buffer inital sizes, every double does take some cost to double
+	//better a fair amount value instead of small values like 2 for buffs that eventually grow way bigger
+	//TODO : use more hashmaps for bigger calculations
 
 	// CONSTANTS
 	let N = 10;
@@ -179,36 +184,13 @@ actor {
 		label f for (hash in questions.keys()) {
 			if (n == count) break f;
 			let pQ = hashPrincipalQuestion(p, hash);
-			switch (skips.get(pQ)) {
-				case (?_) {};
-				case null {
-					switch (weights.get(pQ)) {
-						case (?_) {};
-						case null {
-							switch (answers.get(pQ)) {
-								case (?_) {};
-								case null {
-									buf.add(hash);
-									count += 1;
-								};
-							};
-						};
-					};
-				};
+			if (null == skips.get(pQ)) if (null == weights.get(pQ)) if (null == answers.get(pQ)) {
+				buf.add(hash);
+				count += 1;
 			};
 		};
 		buf.toArray();
 	};
-
-	// Consider new syntax
-	// let ?_ = skips.get(pQ) else {
-	// 	let ?_ = weights.get(pQ) ese {
-	// 		let ?_ = answers.get(pQ) else {
-	// 			buf.add(hash);
-	// 			count += 1;
-	// 		}
-	// 	}
-	// }
 
 	func answeredQuestions(p : Principal, n : ?Nat) : [Hash.Hash] {
 		let buf = Buffer.Buffer<Hash.Hash>(10);
@@ -287,7 +269,7 @@ actor {
 			if (sourceWeightScore >= 0 and testWeightScore >= 0) {
 				wScore += sourceWeightScore + testWeightScore;
 			};
-			if (sourceWeightScore <= 0 and testWeightScore >= 0) {
+			if (sourceWeightScore <= 0 and testWeightScore <= 0) {
 				wScore += sourceWeightScore + testWeightScore;
 			};
 			return wScore;
@@ -296,21 +278,14 @@ actor {
 
 	func hasAnswered(p : Principal, question : Hash.Hash) : ?Answer {
 		let pQ = hashPrincipalQuestion(p, question);
-		// let ?answer = answers.get(pQ) else { return null };
-		// ?answer;
-		// TEMP : ERRUR LET ELSE aint working cannot be found, not in base lib or what import?
-		switch (answers.get(pQ)) {
-			case null return null;
-			case (?answer) { return ?answer };
-		};
+		let answer = do { answers.get(pQ) };
+		return answer;
 	};
 
 	func hasweightd(p : Principal, question : Hash.Hash) : ?Weight {
 		let pQ = hashPrincipalQuestion(p, question);
-		switch (weights.get(pQ)) {
-			case null return null;
-			case (?weight) { return ?weight };
-		};
+		let weight = do { weights.get(pQ) };
+		return weight;
 	};
 
 	func commonQuestions(sourceUser : Principal, testUser : Principal) : [CommonQuestion] {
