@@ -127,6 +127,8 @@ actor {
 
 	type UserWScore = (Principal, Int);
 
+	type Friends = [Principal];
+
 	// UTILITY FUNCTIONS
 
 	func hashQuestion(created : Int, creater : Principal, question : Text) : Hash.Hash {
@@ -477,6 +479,10 @@ actor {
 	stable var stableSkips : [(PrincipalQuestionHash, Skip)] = [];
 	let skips = HashMap.fromIter<PrincipalQuestionHash, Skip>(Iter.fromArray(stableSkips), 100, Hash.equal, hashhash);
 
+	stable var stableFriends : [(Principal, Friends)] = [];
+	let friends = HashMap.fromIter<Principal, Friends>(Iter.fromArray(stableFriends), 100, Principal.equal, Principal.hash);
+
+
 	// Upgrade canister
 	system func preupgrade() {
 		stableUsers := Iter.toArray(users.entries());
@@ -484,6 +490,7 @@ actor {
 		stableAnswers := Iter.toArray(answers.entries());
 		stableWeights := Iter.toArray(weights.entries());
 		stableSkips := Iter.toArray(skips.entries());
+		stableFriends := Iter.toArray(friends.entries());
 	};
 
 	system func postupgrade() {
@@ -492,6 +499,7 @@ actor {
 		stableAnswers := [];
 		stableWeights := [];
 		stableSkips := [];
+		stableFriends := [];
 	};
 
 	// PUBLIC API
