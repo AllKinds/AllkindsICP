@@ -52,6 +52,7 @@ export const idlFactory = ({ IDL }) => {
 		getAnsweredQuestions: IDL.Func([IDL.Opt(IDL.Nat)], [Result_2], ['query']),
 		getAskableQuestions: IDL.Func([IDL.Nat], [Result_2], ['query']),
 		getUser: IDL.Func([], [Result_1], ['query']),
+		sendFriendRequest: IDL.Func([IDL.Principal], [Result], []),
 		submitAnswer: IDL.Func([Hash, AnswerKind], [Result], []),
 		submitSkip: IDL.Func([Hash], [Result], []),
 		submitWeight: IDL.Func([Hash, WeightKind], [Result], []),

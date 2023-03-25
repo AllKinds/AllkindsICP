@@ -24,6 +24,7 @@ import None "mo:base/None";
 
 actor {
 	//Code ready for moc 0.8.3
+	//TODO , put optimized parts or ideas
 
 	func commonQuestionsX(sourceUser : Principal, testUser : Principal) : [CommonQuestion] {
 		let buf = Buffer.Buffer<CommonQuestion>(16);
@@ -50,7 +51,7 @@ actor {
 
 	func changeUserPoints(p : Principal, value : Nat) : () {
 		let ?user = users.get(p) else return;
-		user.points := value;
+		user.points := value; //needs to be var for this in user type
 		return users.put(p, user);
 	};
 

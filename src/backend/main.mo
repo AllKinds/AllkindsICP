@@ -347,22 +347,18 @@ actor {
 
 	func changeUserPoints(p : Principal, value : Nat) : () {
 		//change into easier way of ?null checking
-		let user = switch (users.get(p)) {
-			case null return ();
-			case (?user) {
-				{
-					username = user.username;
-					created = user.created;
-					about = user.about;
-					gender = user.gender;
-					birth = user.birth;
-					connect = user.connect;
-					points = value; //nat
-					friendRequests = user.friendRequests;
-				};
-			};
+		let ?user = users.get(p) else return;
+		let changedUser = {
+			username = user.username;
+			created = user.created;
+			about = user.about;
+			gender = user.gender;
+			birth = user.birth;
+			connect = user.connect;
+			points = value; //nat
+			friendRequests = user.friendRequests;
 		};
-		users.put(p, user);
+		users.put(p, changedUser);
 	};
 
 	func changeQuestionPoints(q : Question, value : Int) : () {

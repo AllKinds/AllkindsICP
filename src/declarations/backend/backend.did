@@ -81,6 +81,7 @@ service : {
 	getAnsweredQuestions : (opt nat) -> (Result_2) query;
 	getAskableQuestions : (nat) -> (Result_2) query;
 	getUser : () -> (Result_1) query;
+	sendFriendRequest : (principal) -> (Result);
 	submitAnswer : (Hash, AnswerKind) -> (Result);
 	submitSkip : (Hash) -> (Result);
 	submitWeight : (Hash, WeightKind) -> (Result);

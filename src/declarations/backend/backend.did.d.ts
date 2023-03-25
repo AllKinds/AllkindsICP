@@ -49,6 +49,7 @@ export interface _SERVICE {
 	getAnsweredQuestions: ActorMethod<[[] | [bigint]], Result_2>;
 	getAskableQuestions: ActorMethod<[bigint], Result_2>;
 	getUser: ActorMethod<[], Result_1>;
+	sendFriendRequest: ActorMethod<[Principal], Result>;
 	submitAnswer: ActorMethod<[Hash, AnswerKind], Result>;
 	submitSkip: ActorMethod<[Hash], Result>;
 	submitWeight: ActorMethod<[Hash, WeightKind], Result>;
