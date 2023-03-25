@@ -23,39 +23,8 @@ import None "mo:base/None";
 // TEMPORARY MOTOKO FILE FOR WHTVR
 
 actor {
-
-	func commonQuestions(sourceUser : Principal, testUser : Principal) : [CommonQuestion] {
-		let buf = Buffer.Buffer<CommonQuestion>(16);
-		for (hash in questions.keys()) {
-			let sourcePQ = hashPrincipalQuestion(sourceUser, hash);
-			let testPQ = hashPrincipalQuestion(testUser, hash);
-			//check
-			switch (answers.get(sourcePQ)) {
-				case null {};
-				case (?sourceAnswer) {
-					switch (answers.get(testPQ)) {
-						case null {};
-						case (?testAnswer) {
-							let sourceWeight = weights.get(sourcePQ);
-							let testWeight = weights.get(testPQ);
-							//build
-							let commonQuestion : CommonQuestion = {
-								question = hash;
-								sourceAnswer;
-								testAnswer;
-								sourceWeight;
-								testWeight;
-							};
-							buf.add(commonQuestion);
-						};
-					};
-				};
-			};
-		};
-		buf.toArray();
-	};
-
 	//Code ready for moc 0.8.3
+
 	func commonQuestionsX(sourceUser : Principal, testUser : Principal) : [CommonQuestion] {
 		let buf = Buffer.Buffer<CommonQuestion>(16);
 		label l for (hash in questions.keys()) {
@@ -77,6 +46,12 @@ actor {
 			buf.add(commonQuestion);
 		};
 		buf.toArray();
+	};
+
+	func changeUserPoints(p : Principal, value : Nat) : () {
+		let ?user = users.get(p) else return;
+		user.points := value;
+		return users.put(p, user);
 	};
 
 };

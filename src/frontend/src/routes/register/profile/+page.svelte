@@ -22,7 +22,6 @@
 
 	let pending: boolean = false;
 	let genders = ['', 'Male', 'Female', 'Other', 'Queer'];
-
 	let publicAbout: boolean = $user.about[1];
 	let publicConnect: boolean = $user.connect[1];
 	let publicBirth: boolean = $user.birth[1];
@@ -40,17 +39,18 @@
 
 	async function submit() {
 		pending = true;
-		const newUser: User = {
+		const newUserObj: User = {
 			created: $user.created,
 			connect: [toNullable(userObj.connect), publicConnect],
 			about: [toNullable(userObj.about), publicAbout],
 			username: userObj.username,
 			gender: [toNullableGender(userObj.gender), publicGender],
 			birth: [toNullableDate(userObj.birth), publicBirth],
-			points: $user.points
+			points: $user.points,
+			friendRequests: $user.friendRequests
 			//HUGE vulnerability, points shouldn't be part user obj, not a high priority for demo, but NEED to be fixed before any public deployment
 		};
-		await updateProfile(newUser);
+		await updateProfile(newUserObj);
 		regiStore.set(RegiState.Finished);
 		pending = false;
 	}
@@ -97,13 +97,7 @@
 		</Input>
 
 		<Input text="About you">
-			<textarea
-				type="textfield"
-				class="inputfield"
-				slot="input"
-				bind:value={userObj.about}
-				disabled={pending}
-			/>
+			<textarea class="inputfield" slot="input" bind:value={userObj.about} disabled={pending} />
 			<PublicToggle slot="public" bind:checked={publicAbout} />
 		</Input>
 	</div>

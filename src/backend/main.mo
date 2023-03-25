@@ -21,10 +21,11 @@ import Order "mo:base/Order";
 import None "mo:base/None";
 
 actor {
-
+	//TODO : copy and remake functions with moc 8.3 additions and test w forced moc version
 	//TODO : use more hashmap functionality instead of buffers for faster calculations
 	//TODO : maybe make and extract some code to types.mo and utils.mo
 	//TODO : integrate more variants (point usages, common errors, etc..)
+	//TODO : should overall be retyped for more cohersiveness, See type operational expressions
 
 	// CONSTANTS
 	let N = 10;
@@ -45,6 +46,7 @@ actor {
 		birth : (?Int, Bool);
 		connect : (?Text, Bool); //= email or social media link
 		points : Nat; //Nat bcs user points should not go negative
+		friendRequests : [Principal]; //could be of type Friends, but might give issues in future
 	};
 
 	type UserMatch = {
@@ -128,6 +130,11 @@ actor {
 	type UserWScore = (Principal, Int);
 
 	type Friends = [Principal];
+
+	//for viewable data of caller's friends
+	type FriendlyUserMatch = UserMatch and {
+		friends : Friends;
+	};
 
 	// UTILITY FUNCTIONS
 
@@ -327,6 +334,7 @@ actor {
 			//score /= (2 * common.size());
 			//Algorithm calc needs heavy revamp, but atleast its now giving a more normal value
 			qScore += Float.fromInt(score);
+			Debug.print(debug_show (qScore));
 		};
 		qScore;
 	};
@@ -344,6 +352,7 @@ actor {
 					birth = user.birth;
 					connect = user.connect;
 					points = value; //nat
+					friendRequests = user.friendRequests;
 				};
 			};
 		};
@@ -391,7 +400,7 @@ actor {
 
 	// filter users according to parameters
 	func filterUsers(p : Principal, f : MatchingFilter) : (UserWScore) {
-		//TODO : optimize with let-else after 0.8.3
+		//TODO : optimize with let-else after 0.8.3 because this is messy
 		let buf = Buffer.Buffer<(UserWScore)>(16);
 		var count = 0;
 		let callerScore : Float = calcScore(p, p);
@@ -403,33 +412,31 @@ actor {
 				case (?user) {
 					//Filter Loop
 					label fl {
-						if (p == pm) { break fl } else {
-							//gender
-							switch (f.gender) {
-								case null ();
-								case (Gender) {
-									if ((f.gender, true) != user.gender) {
-										break fl;
-									};
+						if (p == pm) break fl; //gender
+						switch (f.gender) {
+							case null ();
+							case (Gender) {
+								if ((f.gender, true) != user.gender) {
+									break fl;
 								};
 							};
-							//age
-							switch (user.birth) {
-								case (?birth, _) {
-									//TODO : make birth-age conversion utility func
-									let userAge = birth / (1_000_000_000 * 3600 * 24) / 365;
-									if ((f.ageRange.0 >= userAge) or (f.ageRange.1 <= userAge)) {
-										break fl;
-									};
-								};
-								case (_)();
-							};
-
-							let score : Float = calcScore(p, pm);
-							let cohesion = Float.toInt(Float.trunc((score / callerScore) * 100));
-							//maybe fix: check here if user is itself, and if so add cohesion filter to username to solve 2 bugs
-							buf.add((pm, cohesion));
 						};
+						//age
+						switch (user.birth) {
+							case (?birth, _) {
+								//TODO : make birth-age conversion utility func
+								let userAge = birth / (1_000_000_000 * 3600 * 24) / 365;
+								if ((f.ageRange.0 >= userAge) or (f.ageRange.1 <= userAge)) {
+									break fl;
+								};
+							};
+							case (_)();
+						};
+
+						let score : Float = calcScore(p, pm);
+						let cohesion = Float.toInt(Float.trunc((score / callerScore) * 100));
+						//maybe fix: check here if user is itself, and if so add cohesion filter to username to solve 2 bugs
+						buf.add((pm, cohesion));
 					}; //end  fl
 				};
 			};
@@ -453,12 +460,13 @@ actor {
 			case (?i) {
 				//takes next Index in score after f.cohesion unless end or start of buf
 				//TODO : optimize by getting both edging values of f.cohesion to return the closest one.
-				if (i != 0) {
-					if (buf.size() == i + 1) { i - 1 } else { i + 1 };
-				} else { i };
+				if (i == 0) { i + 1 } else {
+					if (buf.size() == i + 1) { i - 1 } else {
+						i - 1;
+					};
+				};
 			};
 		};
-
 		buf.get(indexM);
 	};
 
@@ -481,7 +489,6 @@ actor {
 
 	stable var stableFriends : [(Principal, Friends)] = [];
 	let friends = HashMap.fromIter<Principal, Friends>(Iter.fromArray(stableFriends), 100, Principal.equal, Principal.hash);
-
 
 	// Upgrade canister
 	system func preupgrade() {
@@ -520,6 +527,7 @@ actor {
 					birth = (null, false);
 					connect = (null, false);
 					points = initReward; //nat
+					friendRequests = [];
 				};
 
 				// Mutate storage for users data
@@ -696,7 +704,7 @@ actor {
 						connect = checkPublic(user.connect);
 						cohesion = match.1;
 						answeredQuestions = getXAnsweredQuestions(match.0, null);
-						//TODO : re-enable answeredQuestions
+						//TODO : fix above func getXAnsQues, gives literally only answeredQ bcs ongoing bad weight-like-answer implementation
 						//also filter first on commonQuestions to add a bool to this array for front-end indicating if both answered
 					};
 					return #ok(matchObj);
