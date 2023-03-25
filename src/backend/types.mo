@@ -93,6 +93,7 @@ module T {
 		cohesion : Int;
 	};
 
+  //gotta rewrite this arrays prob will be very bad and broken
 	public type UserWScore = (Principal, Int);
 
 	public type Friends = [Principal];
@@ -101,4 +102,5 @@ module T {
 	public type FriendlyUserMatch = UserMatch and {
 		friends : Friends;
 	};
+
 }

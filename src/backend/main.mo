@@ -20,8 +20,27 @@ import Float "mo:base/Float";
 import Order "mo:base/Order";
 import None "mo:base/None";
 
+import T "types";
+
+type User = T.User;
+type UserMatch = T.UserMatch;
+type Gender = T.Gender;
+type Question = T.Question;
+type Color = T.Color; 
+type Answer = T.Answer; 
+type Weight = T.Weight; 
+type Skip = T.Skip;
+type AnswerKind = T.AnswerKind; 
+type WeightKind = T.WeightKind; 
+type PrincipalQuestionHash = T.PrincipalQuestionHash;
+type CommonQuestion = T.CommonQuestion; 
+type MatchingFilter = T.MatchingFilter; 
+type UserWScore = T.UserWScore; 
+type Friends = T.Friends; 
+type FriendlyUserMatch = T.FriendlyUserMatch; 
+
 actor {
-	//TODO : copy and remake functions with moc 8.3 additions and test w forced moc version
+	//TODO : copy and remake functions with moc 8.3 (check also .4 and .5) additions 
 	//TODO : use more hashmap functionality instead of buffers for faster calculations
 	//TODO : maybe make and extract some code to types.mo and utils.mo
 	//TODO : integrate more variants (point usages, common errors, etc..)
@@ -35,106 +54,7 @@ actor {
 	let createrReward : Nat = 10;
 	let queryCost : Nat = 30;
 
-	// DATA TYPES
 
-	// User type, tuple values contain a bool indicating field public visibility and optional value
-	type User = {
-		username : Text;
-		created : Int;
-		about : (?Text, Bool);
-		gender : (?Gender, Bool);
-		birth : (?Int, Bool);
-		connect : (?Text, Bool); //= email or social media link
-		points : Nat; //Nat bcs user points should not go negative
-		friendRequests : [Principal]; //could be of type Friends, but might give issues in future
-	};
-
-	type UserMatch = {
-		username : Text;
-		about : ?Text;
-		gender : ?Gender;
-		birth : ?Int;
-		connect : ?Text;
-		//TODO: (cohesion : Nat;) changed into int for testing,  should always be between 0-100 so nat8 better
-		cohesion : Int;
-		answeredQuestions : [Question];
-	};
-
-	type Gender = {
-		#Male;
-		#Female;
-		#Queer;
-		#Other;
-	};
-
-	// Color indicates optional background color for the question
-	type Question = {
-		created : Int;
-		creater : Principal;
-		question : Text;
-		hash : Hash.Hash;
-		color : ?Color;
-		points : Int; //int bcs question points should be able to go negative
-	};
-
-	// Only one color for now
-	type Color = {
-		#Default;
-	};
-
-	type Answer = {
-		user : Principal;
-		question : Hash.Hash;
-		answer : AnswerKind;
-	};
-
-	type Weight = {
-		user : Principal;
-		question : Hash.Hash;
-		weight : WeightKind; //this would need to become an Int
-	};
-
-	type Skip = {
-		user : Principal;
-		question : Hash.Hash;
-	};
-
-	// Only one answer type for now
-	type AnswerKind = {
-		#Bool : Bool;
-	};
-
-	// Nat indicates a possible amount of tokens / points appointed by the user to to the question
-	type WeightKind = {
-		//this would need to be removed
-		#Like : Nat;
-		#Dislike : Nat;
-	};
-
-	type PrincipalQuestionHash = Hash.Hash;
-
-	type CommonQuestion = {
-		question : Hash.Hash;
-		sourceAnswer : Answer;
-		testAnswer : Answer;
-		sourceWeight : ?Weight;
-		testWeight : ?Weight;
-	};
-
-	type MatchingFilter = {
-		ageRange : (Nat, Nat);
-		gender : ?Gender;
-		cohesion : Int;
-	};
-
-	type UserWScore = (Principal, Int);
-
-	type Friends = [Principal];
-
-	//for viewable data of caller's friends
-	type FriendlyUserMatch = UserMatch and {
-		friends : Friends;
-	};
 
 	// UTILITY FUNCTIONS
 
@@ -251,17 +171,21 @@ actor {
 			};
 
 			var wScore : Int = 1; //temp ugly fix
+			//rework this: 1) both negative weight should then become positive and added
+			// 2) negative and positive weight could make only count negative (seems logical)
+
 			//init score with 1 so people can match even if they didnt weigh but still answered the same
 
-			if (sourceWeightScore >= 0 and testWeightScore >= 0) {
-				wScore += sourceWeightScore + testWeightScore;
-			};
-			if (sourceWeightScore <= 0 and testWeightScore <= 0) {
-				wScore += sourceWeightScore + testWeightScore;
-			};
-			if (sourceWeightScore == 0 and testWeightScore == 0) {
-				wScore += sourceWeightScore + testWeightScore;
-			};
+			// if (sourceWeightScore >= 0 and testWeightScore >= 0) {
+			// 	wScore += sourceWeightScore + testWeightScore;
+			// };
+			// if (sourceWeightScore <= 0 and testWeightScore <= 0) {
+			// 	wScore += sourceWeightScore + testWeightScore;
+			// };
+			// if (sourceWeightScore == 0 and testWeightScore == 0) {
+			// 	wScore += sourceWeightScore + testWeightScore;
+			// };
+			wScore += sourceWeightScore + testWeightScore;
 
 			Debug.print(debug_show ("wScore :", wScore));
 			return wScore;
@@ -280,48 +204,23 @@ actor {
 
 	func commonQuestions(sourceUser : Principal, testUser : Principal) : [CommonQuestion] {
 		let buf = Buffer.Buffer<CommonQuestion>(16);
-		for (hash in questions.keys()) {
+		label l for (hash in questions.keys()) {
 			let sourcePQ = hashPrincipalQuestion(sourceUser, hash);
 			let testPQ = hashPrincipalQuestion(testUser, hash);
-			//could be optimized with ifs, but better wait for let-else
-			switch (answers.get(sourcePQ)) {
-				case null {};
-				case (?sourceAnswer) {
-					switch (answers.get(testPQ)) {
-						case null {};
-						case (?testAnswer) {
-							let sourceWeight = weights.get(sourcePQ);
-							let testWeight = weights.get(testPQ);
-							let commonQuestion : CommonQuestion = {
-								question = hash;
-								sourceAnswer;
-								testAnswer;
-								sourceWeight;
-								testWeight;
-							};
-							buf.add(commonQuestion);
-						};
-					};
-				};
+			//check
+			let ?sourceAnswer = answers.get(sourcePQ) else continue l;
+			let ?testAnswer = answers.get(testPQ) else continue l;
+			let sourceWeight = weights.get(sourcePQ);
+			let testWeight = weights.get(testPQ);
+			//build
+			let commonQuestion : CommonQuestion = {
+				question = hash;
+				sourceAnswer;
+				testAnswer;
+				sourceWeight;
+				testWeight;
 			};
-			// label l { //TEMP : code ready for moc 0.8.3
-			// 	// TODO if possible put label in front of loop and use continue
-			// 	//MO-playground pow ex : https://m7sm4-2iaaa-aaaab-qabra-cai.ic0.app/?tag=1670004281
-			// 	let ?sourceAnswer = answers.get(sourcePQ) else { break l };
-			// 	let ?testAnswer = answers.get(testPQ) else  { break l };
-
-			// 	let sourceWeight = weights.get(sourcePQ);
-			// 	let testWeight = weights.get(testPQ);
-
-			// 	let commonQuestion : CommonQuestion = {
-			// 		question = hash;
-			// 		sourceAnswer;
-			// 		testAnswer;
-			// 		sourceWeight;
-			// 		testWeight;
-			// 	};
-			// 	buf.add(commonQuestion);
-			// };
+			buf.add(commonQuestion);
 		};
 		buf.toArray();
 	};
@@ -436,6 +335,7 @@ actor {
 						};
 
 						let score : Float = calcScore(p, pm);
+						Debug.print(debug_show ("score : ", score, " : ", pm));
 						let cohesion = Float.toInt(Float.trunc((score / callerScore) * 100));
 						//maybe fix: check here if user is itself, and if so add cohesion filter to username to solve 2 bugs
 						buf.add((pm, cohesion));
@@ -452,11 +352,12 @@ actor {
 		buf.sort(sortByScore);
 
 		//find index of filter target
-		//TODO : isEq prob has a cleaner solution
+		//TODO : isEq prob has a cleaner solution or make into util function
 		func isEq(t : (UserWScore), u : (UserWScore)) : Bool {
 			t.1 == u.1;
 		};
 		let indexF : ?Nat = Buffer.indexOf(cohesionFilter, buf, isEq);
+		//TODO : can be done better with subBuffer
 		let indexM : Nat = switch (indexF) {
 			case null { 0 }; //TODO fix as this isnt clean
 			case (?i) {
@@ -468,7 +369,7 @@ actor {
 		buf.get(indexM);
 	};
 
-	// DATA STORAGE
+		// DATA STORAGE
 
 	stable var stableUsers : [(Principal, User)] = [];
 	let users = HashMap.fromIter<Principal, User>(Iter.fromArray(stableUsers), 100, Principal.equal, Principal.hash);
@@ -714,6 +615,7 @@ actor {
 	};
 
 	public shared (msg) func sendFriendRequest(p : Principal) : async Result.Result<(), Text> {
+		//
 		#ok();
 	};
 
