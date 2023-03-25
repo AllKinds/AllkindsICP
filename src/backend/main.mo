@@ -234,7 +234,7 @@ actor {
 				case (?sourceWeight) {
 					switch (sourceWeight.weight) {
 						case (#Like(score)) { score };
-						case (#Dislike(score)) { -score };
+						case (#Dislike(score)) { score };
 					};
 				};
 				case null { 0 };
@@ -244,7 +244,7 @@ actor {
 				case (?testWeight) {
 					switch (testWeight.weight) {
 						case (#Like(score)) { score };
-						case (#Dislike(score)) { -score };
+						case (#Dislike(score)) { score };
 					};
 				};
 				case null { 0 };
@@ -252,12 +252,18 @@ actor {
 
 			var wScore : Int = 1; //temp ugly fix
 			//init score with 1 so people can match even if they didnt weigh but still answered the same
+
 			if (sourceWeightScore >= 0 and testWeightScore >= 0) {
 				wScore += sourceWeightScore + testWeightScore;
 			};
 			if (sourceWeightScore <= 0 and testWeightScore <= 0) {
 				wScore += sourceWeightScore + testWeightScore;
 			};
+			if (sourceWeightScore == 0 and testWeightScore == 0) {
+				wScore += sourceWeightScore + testWeightScore;
+			};
+
+			Debug.print(debug_show ("wScore :", wScore));
 			return wScore;
 		};
 	};
@@ -334,7 +340,7 @@ actor {
 			//score /= (2 * common.size());
 			//Algorithm calc needs heavy revamp, but atleast its now giving a more normal value
 			qScore += Float.fromInt(score);
-			Debug.print(debug_show (qScore));
+			Debug.print(debug_show ("qScore :", qScore, "from", sourceUser));
 		};
 		qScore;
 	};
@@ -460,11 +466,7 @@ actor {
 			case (?i) {
 				//takes next Index in score after f.cohesion unless end or start of buf
 				//TODO : optimize by getting both edging values of f.cohesion to return the closest one.
-				if (i == 0) { i + 1 } else {
-					if (buf.size() == i + 1) { i - 1 } else {
-						i - 1;
-					};
-				};
+				if (i == 0) { i + 1 } else { i - 1 };
 			};
 		};
 		buf.get(indexM);
@@ -713,6 +715,10 @@ actor {
 		} catch err {
 			return #err("Couldn't filter users and/or deduct points");
 		};
+	};
+
+	public shared (msg) func sendFriendRequest(p : Principal) : async Result.Result<(), Text> {
+		#ok();
 	};
 
 };
