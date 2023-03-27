@@ -3,6 +3,11 @@ import type { Principal } from '@dfinity/principal';
 
 export type AnswerKind = { Bool: boolean };
 export type Color = { Default: null };
+export interface Friend {
+	status: [] | [FriendStatus];
+	account: Principal;
+}
+export type FriendStatus = { Approved: null } | { Waiting: null } | { Requested: null };
 export type Gender = { Male: null } | { Female: null } | { Other: null } | { Queer: null };
 export type Hash = number;
 export interface MatchingFilter {
@@ -19,9 +24,11 @@ export interface Question {
 	points: bigint;
 }
 export type Result = { ok: null } | { err: string };
-export type Result_1 = { ok: User } | { err: string };
-export type Result_2 = { ok: Array<Question> } | { err: string };
-export type Result_3 = { ok: UserMatch } | { err: string };
+export type Result_1 = { ok: string } | { err: string };
+export type Result_2 = { ok: User } | { err: string };
+export type Result_3 = { ok: Array<Friend> } | { err: string };
+export type Result_4 = { ok: Array<Question> } | { err: string };
+export type Result_5 = { ok: UserMatch } | { err: string };
 export interface User {
 	created: bigint;
 	connect: [[] | [string], boolean];
@@ -30,9 +37,9 @@ export interface User {
 	gender: [[] | [Gender], boolean];
 	birth: [[] | [bigint], boolean];
 	points: bigint;
-	friendRequests: Array<Principal>;
 }
 export interface UserMatch {
+	principal: Principal;
 	connect: [] | [string];
 	about: [] | [string];
 	username: string;
@@ -45,11 +52,12 @@ export type WeightKind = { Like: bigint } | { Dislike: bigint };
 export interface _SERVICE {
 	createQuestion: ActorMethod<[string], Result>;
 	createUser: ActorMethod<[string], Result>;
-	findMatch: ActorMethod<[MatchingFilter], Result_3>;
-	getAnsweredQuestions: ActorMethod<[[] | [bigint]], Result_2>;
-	getAskableQuestions: ActorMethod<[bigint], Result_2>;
-	getUser: ActorMethod<[], Result_1>;
-	sendFriendRequest: ActorMethod<[Principal], Result>;
+	findMatch: ActorMethod<[MatchingFilter], Result_5>;
+	getAnsweredQuestions: ActorMethod<[[] | [bigint]], Result_4>;
+	getAskableQuestions: ActorMethod<[bigint], Result_4>;
+	getFriends: ActorMethod<[], Result_3>;
+	getUser: ActorMethod<[], Result_2>;
+	sendFriendRequest: ActorMethod<[Principal], Result_1>;
 	submitAnswer: ActorMethod<[Hash, AnswerKind], Result>;
 	submitSkip: ActorMethod<[Hash], Result>;
 	submitWeight: ActorMethod<[Hash, WeightKind], Result>;

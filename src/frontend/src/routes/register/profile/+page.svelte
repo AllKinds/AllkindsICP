@@ -46,8 +46,7 @@
 			username: userObj.username,
 			gender: [toNullableGender(userObj.gender), publicGender],
 			birth: [toNullableDate(userObj.birth), publicBirth],
-			points: $user.points,
-			friendRequests: $user.friendRequests
+			points: $user.points
 			//HUGE vulnerability, points shouldn't be part user obj, not a high priority for demo, but NEED to be fixed before any public deployment
 		};
 		await updateProfile(newUserObj);

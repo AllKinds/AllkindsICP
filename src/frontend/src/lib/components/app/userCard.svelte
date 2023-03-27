@@ -1,5 +1,7 @@
 <script lang="ts">
+	import { sendFriendRequest } from '$lib/stores/tasks/sendFriendRequest';
 	import { fromNullable, fromNullableGender } from '$lib/utilities';
+	import type { Principal } from '@dfinity/principal';
 	import type { User, UserMatch } from 'src/declarations/backend/backend.did';
 	import Spinner from '../common/Spinner.svelte';
 
@@ -7,7 +9,8 @@
 	export let match: UserMatch;
 
 	let pending: boolean = false;
-
+	let succes: boolean = false;
+	let userPrincipal: Principal = match.principal;
 	let userName = match.username;
 	let userScore = match.cohesion;
 	let userAbout = fromNullable(match.about);
@@ -20,7 +23,17 @@
 	//TODO : change backend so it doesn't return a User obj,
 	//let it return the values that according user has made init public viewable
 
-	const handleConnectionRequest = async () => {};
+	const handleConnectionRequest = async () => {
+		pending = true;
+		succes = false;
+		await sendFriendRequest(userPrincipal).then((res) => {
+			if (res.ok) {
+				succes = true;
+				console.log('result after request :', res);
+			}
+		});
+		pending = false;
+	};
 </script>
 
 <!-- will only show 1 user for now, one with nearest cohesion score
@@ -28,8 +41,8 @@ TODO : finish this card, and fix cohesion score in backend for a proper result
 TODO : at same time implement this into a friendlist and using same component 
 TODO : backend create friendlist and connection request implementation -->
 
-<div class="sm:w-96 border-main flex flex-col justify-between">
-	<div class="w-full h-64 sm:h-96 mx-auto rounded-md bg-sub">
+<div class="w-72 sm:w-96 border-main flex flex-col justify-between">
+	<div class="w-full h-72 sm:h-96 mx-auto rounded-md bg-sub">
 		<!-- placeholder profile picture -->
 	</div>
 	<div class="p-1 sm:p-2 flex flex-col">
@@ -42,15 +55,19 @@ TODO : backend create friendlist and connection request implementation -->
 		>
 		<span class="p-1 ">{userAbout ? userAbout : ''}</span>
 
+		<!-- {#if succes}
+			<span>Connection request send!</span>
+		{:else} -->
 		<div class="mx-auto fancy-btn-border">
 			<button on:click={handleConnectionRequest} class="fancy-btn bg-main90">
 				{#if pending}
 					<Spinner />
 				{:else}
-					Request contact
+					Connect
 				{/if}
 			</button>
 		</div>
+		<!-- {/if} -->
 
 		{#if answeredQuestions.length > 0}
 			{#each answeredQuestions as q}
