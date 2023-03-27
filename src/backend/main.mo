@@ -127,7 +127,7 @@ actor {
 	};
 
 	//gotta rewrite this arrays prob will be very bad and broken
-	public type UserWScore = (Principal, Int);
+	public type UserWScore = (?Principal, Int);
 
 	public type FriendStatus = {
 		#Requested; //status of user that received request
@@ -384,11 +384,17 @@ actor {
 	//utility functions mostly for filterUsers
 	//could be made more generalized and optimised with switch prob for faster process
 	func sortByScore(t : UserWScore, u : UserWScore) : Order.Order {
-		if (t.1 < u.1) { return #less } else if (t.1 < u.1) { return #greater } else { return #equal };
+		if (t.1 < u.1) {
+			return #less;
+		} else if (t.1 > u.1) {
+			return #greater;
+		} else {
+			return #equal;
+		};
 	};
 
-	func isEqScore(t : (UserWScore), u : (UserWScore)) : Bool {
-		t.1 == u.1;
+	func findCoheFilter(t : UserWScore, u : UserWScore) : Bool {
+		t.0 == u.0;
 	};
 
 	// filter users according to parameters
@@ -397,14 +403,14 @@ actor {
 		let buf = Buffer.Buffer<(UserWScore)>(16);
 		var count = 0;
 		let callerScore : Float = calcScore(p, p);
-		let cohesionEntry : UserWScore = (p, f.cohesion);
+		Debug.print(debug_show ("callerScore", callerScore));
+		Debug.print(debug_show ("userPrinciple", p));
 		//User Loop
 		label ul for (pm : Principal in users.keys()) {
 			if (users.size() == count) break ul;
 			switch (users.get(pm)) {
 				case null ();
 				case (?user) {
-					let _ = (p != pm) else continue ul;
 					//gender
 					switch (f.gender) {
 						case null ();
@@ -426,34 +432,44 @@ actor {
 						case (_)();
 					};
 
-					let score : Float = calcScore(p, pm);
-					let cohesion = Float.toInt(Float.trunc((score / callerScore) * 100));
+					let pmScore : Float = calcScore(p, pm);
+					let pmCohesion = Float.toInt(Float.trunc((pmScore / callerScore) * 100));
 					//maybe fix: check here if user is itself, and if so add cohesion filter to username to solve 2 bugs
-					buf.add(p, cohesion);
+					if (p == pm) {
+
+					} else {
+						buf.add(?pm, pmCohesion);
+					};
 				};
 			};
 			count += 1;
 		}; // end ul
-		//insert filters and sort
-		label f {
-			buf.filterEntries(func(_, (x, y)) = x == p); //TEMP : testing if this does remove principal entries
-			buf.add(cohesionEntry);
-			//sorts by <
-			buf.sort(sortByScore);
-			//find index of filter target
-			let ?indexCohesion = Buffer.indexOf(cohesionEntry, buf, isEqScore) else return null;
-			//takes next Index in score after f.cohesion unless end or start of buf
-			var indexMatch : Nat = switch (indexCohesion) {
-				case 0 Nat.add(indexCohesion, 1);
-				case _ Nat.sub(indexCohesion, 1);
-			};
-			// Debug.print(debug_show ("IndexFilter : ", indexCohesion));
-			// Debug.print(debug_show ("IndexMatch : ", indexMatch));
-			// Debug.print(debug_show (buf.toArray()));
-			let resultMatch = buf.get(indexMatch);
-			return ?resultMatch;
+
+		//let newBuf = Buffer.Buffer<(UserWScore)>(16);
+		//buf.filterEntries(func(_, (x, y)) = x != p); //TEMP : testing if this does remove principal entries
+
+		//insert filters and sort by <
+		buf.add(null, f.cohesion);
+		Debug.print(debug_show ("f.cohesion", f.cohesion));
+		buf.sort(sortByScore);
+		let bufSize = buf.size();
+		//find index of filter target
+		let ?iCo = Buffer.indexOf((null, f.cohesion), buf, findCoheFilter) else return null;
+		//takes next Index in score before f.cohesion unless end or start of buf
+		let iMa : Nat = switch (iCo) {
+			case 0 Nat.add(iCo, 1);
+			case _ Nat.sub(iCo, 1);
 		};
-		return null;
+		// Debug.print(debug_show ("IndexFilter : ", iCo));
+		Debug.print(debug_show ("IndexCohesion : ", iCo));
+		Debug.print(debug_show ("IndexMatch : ", iMa));
+		let clone = Buffer.clone(buf); //temp test
+		Debug.print(debug_show ("arr:", clone.toArray()));
+		let resultMatch = buf.get(iMa);
+		//Debug.print(debug_show ("arr:", buf.toArray()));
+
+		return ?resultMatch;
+
 	};
 
 	func isEqF(x : Friend, y : Friend) : Bool {
@@ -670,35 +686,32 @@ actor {
 
 	//find users based on parameters
 	public shared (msg) func findMatch(para : MatchingFilter) : async Result.Result<UserMatch, Text> {
-		let user = switch (users.get(msg.caller)) {
-			case null return #err("You are not registered!");
-			case (?user) {
-				user;
-			};
-		};
+		let ?user = users.get(msg.caller) else return #err("");
 
 		if (Nat.less(user.points, queryCost)) {
 			return #err("You don't have enough points");
 		};
+		changeUserPoints(msg.caller, (user.points - Int.abs(queryCost)));
 
-		changeUserPoints(msg.caller, (user.points - Int.abs(queryCost))); //might other position
+		//TODO : make generic errors
 		let ?match : ?UserWScore = filterUsers(msg.caller, para) else return #err("Couldn't find any match!");
-		let ?userMatch : ?User = users.get(match.0) else return #err("Matched user not found!");
-		//TODO : optimise with let-else after 0.8.3
-		let matchObj : UserMatch = {
-			principal = match.0;
-			username = user.username;
-			about = checkPublic(user.about);
-			gender = checkPublic(user.gender);
-			birth = checkPublic(user.birth);
-			connect = checkPublic(user.connect);
-			cohesion = match.1;
-			answeredQuestions = getXAnsweredQuestions(match.0, null);
-			//TODO : fix above func getXAnsQues, gives literally only answeredQ bcs ongoing bad weight-like-answer implementation
-			//also filter first on commonQuestions to add a bool to this array for front-end indicating if both answered
-		};
-		return #ok(matchObj);
+		let ?principalMatch = match.0 else return #err("rrreeee");
+		let ?userM : ?User = users.get(principalMatch) else return #err("Matched user not found!");
 
+		return #ok(
+			{
+				principal = principalMatch;
+				username = userM.username;
+				about = checkPublic(userM.about);
+				gender = checkPublic(userM.gender);
+				birth = checkPublic(userM.birth);
+				connect = checkPublic(userM.connect);
+				cohesion = match.1;
+				answeredQuestions = getXAnsweredQuestions(principalMatch, null);
+				//TODO : fix above func getXAnsQues, gives literally only answeredQ bcs ongoing bad weight-like-answer implementation
+				//also filter first on commonQuestions to add a bool to this array for front-end indicating if both answered
+			} : UserMatch
+		);
 	};
 
 	public shared query (msg) func getFriends() : async Result.Result<([Friend]), Text> {
