@@ -127,7 +127,7 @@ actor {
 	};
 
 	//gotta rewrite this arrays prob will be very bad and broken
-	public type UserWScore = (Principal, Int);
+	public type UserWScore = (?Principal, Int);
 
 	public type FriendStatus = {
 		#Requested; //status of user that received request
@@ -384,7 +384,7 @@ actor {
 	//utility functions mostly for filterUsers
 	//could be made more generalized and optimised with switch prob for faster process
 	func sortByScore(t : UserWScore, u : UserWScore) : Order.Order {
-		if (t.1 > u.1) { return #less } else if (t.1 < u.1) { return #greater } else { return #equal };
+		if (t.1 < u.1) { return #less } else if (t.1 < u.1) { return #greater } else { return #equal };
 	};
 
 	func isEqScore(t : (UserWScore), u : (UserWScore)) : Bool {
@@ -392,19 +392,19 @@ actor {
 	};
 
 	// filter users according to parameters
-	func filterUsers(p : Principal, f : MatchingFilter) : (UserWScore) {
+	func filterUsers(p : Principal, f : MatchingFilter) : UserWScore {
 		//TODO : optimize with let-else after 0.8.3 because this is messy
 		let buf = Buffer.Buffer<(UserWScore)>(16);
 		var count = 0;
 		let callerScore : Float = calcScore(p, p);
 		//User Loop
-		label ul for (pm in users.keys()) {
+		label ul for (pm : Principal in users.keys()) {
 			if (users.size() == count) break ul;
-			let user = switch (users.get(pm)) {
+			switch (users.get(pm)) {
 				case null ();
 				case (?user) {
 					//Filter Loop
-					let x = (p == pm) else continue ul;
+					let _ = (p != pm) else continue ul;
 					//gender
 					switch (f.gender) {
 						case null ();
@@ -429,34 +429,37 @@ actor {
 					let score : Float = calcScore(p, pm);
 					let cohesion = Float.toInt(Float.trunc((score / callerScore) * 100));
 					//maybe fix: check here if user is itself, and if so add cohesion filter to username to solve 2 bugs
-					buf.add((pm, cohesion));
-					//end  fl
+					buf.add((null, cohesion));
 				};
 			};
 			count += 1;
 		}; // end ul
-		//TODO : split this part into its own function for readability
-		//TODO : check if cohesion is 100% or 0% , then most of these operations can be skipped and shortened
-		//TEMP brute insert the filter target (p can also be anything), TODO fix as this isnt clean
-		let cohesionFilter : UserWScore = (p, f.cohesion);
+		//insert filters and sort
+		let cohesionFilter : UserWScore = (null, f.cohesion);
 		buf.add(cohesionFilter);
 		buf.sort(sortByScore);
-
 		//find index of filter target
-		//TODO : isEq prob has a cleaner solution or make into util function
-
-		let indexF : ?Nat = Buffer.indexOf(cohesionFilter, buf, isEqScore);
-		//TODO : can be done better with subBuffer
-		let indexM : Nat = switch (indexF) {
-			case null { 1 }; //TODO fix as this isnt clean
-			case (?i) {
-				//takes next Index in score after f.cohesion unless end or start of buf
-				//TODO : optimize by getting both edging values of f.cohesion to return the closest one.
-				if (i >= 0) { i + 1 } else { i - 1 };
-			};
+		var indexF : Nat = 0;
+		let i : Nat = Buffer.indexOf(cohesionFilter, buf, isEqScore);
+		switch(i) {
+			case Nat {indexF == i}; //ughhhhhhhhh!!!
+			case null {};
 		};
-		Debug.print(debug_show (indexF, indexM, buf.toArray()));
-		buf.get(indexM);
+		//takes next Index in score after f.cohesion unless end or start of buf
+		let indexM = switch(indexF) {
+			case 0 Nat.add(indexF, 1);
+			case _ Nat.sub(indexF, 1);
+		};
+		Debug.print(debug_show ("IndexFilter : ", indexF));
+		Debug.print(debug_show ("IndexMatch : ", indexM));
+		Debug.print(debug_show (buf.toArray()));
+		let resultMatch = buf.get(indexM);
+		buf.clear(); //it seemed like buffer was expanding w each search, test bcs I think it shouldnt
+		return resultMatch;
+	};
+
+	func isEqF(x : Friend, y : Friend) : Bool {
+		x.account == y.account;
 	};
 
 	// DATA STORAGE
@@ -680,39 +683,34 @@ actor {
 			return #err("You don't have enough points");
 		};
 
-		try {
+		
 			changeUserPoints(msg.caller, (user.points - Int.abs(queryCost))); //might other position
-			let match : UserWScore = filterUsers(msg.caller, para);
+			let ?match : ?UserWScore = filterUsers(msg.caller, para) else return #err("Couldn't find any match!");
+			let userMatch : User = users.get(match.0) else return #err("Matched user not found!");
 			//TODO : optimise with let-else after 0.8.3
-			switch (users.get(match.0)) {
-				case null { return #err("Matched user not found!") };
-				case (?user) {
-					let matchObj : UserMatch = {
-						principal = match.0;
-						username = user.username;
-						about = checkPublic(user.about);
-						gender = checkPublic(user.gender);
-						birth = checkPublic(user.birth);
-						connect = checkPublic(user.connect);
-						cohesion = match.1;
-						answeredQuestions = getXAnsweredQuestions(match.0, null);
-						//TODO : fix above func getXAnsQues, gives literally only answeredQ bcs ongoing bad weight-like-answer implementation
-						//also filter first on commonQuestions to add a bool to this array for front-end indicating if both answered
-					};
-					return #ok(matchObj);
-				};
+			let matchObj : UserMatch = {
+				principal = match.0;
+				username = user.username;
+				about = checkPublic(user.about);
+				gender = checkPublic(user.gender);
+				birth = checkPublic(user.birth);
+				connect = checkPublic(user.connect);
+				cohesion = match.1;
+				answeredQuestions = getXAnsweredQuestions(match.0, null);
+				//TODO : fix above func getXAnsQues, gives literally only answeredQ bcs ongoing bad weight-like-answer implementation
+				//also filter first on commonQuestions to add a bool to this array for front-end indicating if both answered
 			};
-		} catch err {
-			return #err("Couldn't filter users and/or deduct points");
-		};
+			return #ok(matchObj);
+		
 	};
 
-	public shared (msg) func sendFriendRequest(p : Principal) : async Result.Result<Text, Text> {
-		func isEqF(x : Friend, y : Friend) : Bool {
-			x.account == y.account;
-		};
+	public shared query (msg) func getFriends() : async Result.Result<([Friend]), Text> {
+		let ?friendList = friends.get(msg.caller) else return #err("Something went wrong!");
+		#ok(friendList);
+	};
+
+	public shared (msg) func sendFriendRequest(p : Principal) : async Result.Result<(), Text> {
 		let ?user = users.get(msg.caller) else return #err("You are not registered!");
-		let ?targetUser = users.get(p) else return #err("This user does not exist!");
 		let ?userFriends = friends.get(msg.caller) else return #err("Something went wrong!");
 		let ?targetFriends = friends.get(p) else return #err("Something went wrong!");
 		let buf = Buffer.fromArray<Friend>(userFriends);
@@ -739,28 +737,75 @@ actor {
 		// let b = status == #Waiting else return #err("You already have a pending connection request from this user!");
 		// let c = status == #Approved else return #err("You are already friends with this user!");
 		//fix to let ?_ =
-		let newFriend : Friend = {
-			account = p;
-			status = ?#Requested;
+		try {
+			let newFriend : Friend = {
+				account = p;
+				status = ?#Requested;
+			};
+			buf.add(newFriend);
+			let arr = Buffer.toArray(buf);
+			friends.put(msg.caller, arr);
+
+			//change targetUser friend array w caller
+			let userFriend : Friend = {
+				account = msg.caller;
+				status = ?#Waiting;
+			}; //no need for checks as they logically wouldn't happen here normally
+			let targetBuf = Buffer.fromArray<Friend>(targetFriends);
+			targetBuf.add(userFriend);
+			let targetArr = Buffer.toArray(buf);
+			friends.put(p, targetArr);
+		} catch err {
+			return #err("Failed to update userStates");
 		};
-		buf.add(newFriend);
-		let arr = Buffer.toArray(buf);
-		friends.put(msg.caller, arr);
-
-		//change targetUser friend array w caller
-		let userFriend : Friend = {
-			account = msg.caller;
-			status = ?#Waiting;
-		}; //no need for checks as they logically wouldn't happen here normally
-		let targetBuf = Buffer.fromArray<Friend>(targetFriends);
-		targetBuf.add(userFriend);
-
-		#ok("requested ok ? test");
+		#ok();
 	};
 
-	public shared query (msg) func getFriends() : async Result.Result<([Friend]), Text> {
-		let ?friendList = friends.get(msg.caller) else return #err("Something went wrong!");
-		#ok(friendList);
+	public shared (msg) func answerFriendRequest(p : Principal, b : Bool) : async Result.Result<(), Text> {
+		let ?user = users.get(msg.caller) else return #err("You are not registered!");
+		let ?userFriends = friends.get(msg.caller) else return #err("Something went wrong!");
+		let ?targetFriends = friends.get(p) else return #err("Something went wrong!");
+		let buf = Buffer.fromArray<Friend>(userFriends);
+		var friend : Friend = {
+			account = p;
+			status = ?#Approved;
+		};
+		var newStatus : ?FriendStatus = null;
+		switch (Buffer.indexOf<Friend>(friend, buf, isEqF)) {
+			case (null) { return #err("You have no friend requests from that user!") };
+			case (?i) {
+				let res : Friend = buf.get(i) else return #err("Can't check status of your friend");
+				switch (res.status) {
+					case (?#Requested) return #err("You already requested this user to connect!");
+					case (?#Waiting) {
+						if (b == false) {
+							let _ = buf.remove(i);
+						};
+					};
+					case (?#Approved) return #err("You are already friends with this user!");
+					case (null) return #err("Strange");
+				};
+			};
+		};
+		try {
+			//put array back
+			let arr = Buffer.toArray(buf);
+			friends.put(msg.caller, arr);
+
+			//change your own friendstatus on your friend's list
+			let userFriend : Friend = {
+				account = msg.caller;
+				status = ?#Approved;
+			};
+			let targetBuf = Buffer.fromArray<Friend>(targetFriends);
+			targetBuf.add(userFriend);
+			let targetArr = Buffer.toArray(buf);
+			friends.put(p, targetArr);
+		} catch err {
+			return #err("Failed to update userStates");
+		};
+
+		#ok();
 	};
 
 };

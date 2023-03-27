@@ -24,11 +24,10 @@ export interface Question {
 	points: bigint;
 }
 export type Result = { ok: null } | { err: string };
-export type Result_1 = { ok: string } | { err: string };
-export type Result_2 = { ok: User } | { err: string };
-export type Result_3 = { ok: Array<Friend> } | { err: string };
-export type Result_4 = { ok: Array<Question> } | { err: string };
-export type Result_5 = { ok: UserMatch } | { err: string };
+export type Result_1 = { ok: User } | { err: string };
+export type Result_2 = { ok: Array<Friend> } | { err: string };
+export type Result_3 = { ok: Array<Question> } | { err: string };
+export type Result_4 = { ok: UserMatch } | { err: string };
 export interface User {
 	created: bigint;
 	connect: [[] | [string], boolean];
@@ -50,14 +49,15 @@ export interface UserMatch {
 }
 export type WeightKind = { Like: bigint } | { Dislike: bigint };
 export interface _SERVICE {
+	answerFriendRequest: ActorMethod<[Principal, boolean], Result>;
 	createQuestion: ActorMethod<[string], Result>;
 	createUser: ActorMethod<[string], Result>;
-	findMatch: ActorMethod<[MatchingFilter], Result_5>;
-	getAnsweredQuestions: ActorMethod<[[] | [bigint]], Result_4>;
-	getAskableQuestions: ActorMethod<[bigint], Result_4>;
-	getFriends: ActorMethod<[], Result_3>;
-	getUser: ActorMethod<[], Result_2>;
-	sendFriendRequest: ActorMethod<[Principal], Result_1>;
+	findMatch: ActorMethod<[MatchingFilter], Result_4>;
+	getAnsweredQuestions: ActorMethod<[[] | [bigint]], Result_3>;
+	getAskableQuestions: ActorMethod<[bigint], Result_3>;
+	getFriends: ActorMethod<[], Result_2>;
+	getUser: ActorMethod<[], Result_1>;
+	sendFriendRequest: ActorMethod<[Principal], Result>;
 	submitAnswer: ActorMethod<[Hash, AnswerKind], Result>;
 	submitSkip: ActorMethod<[Hash], Result>;
 	submitWeight: ActorMethod<[Hash, WeightKind], Result>;

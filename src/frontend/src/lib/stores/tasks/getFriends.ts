@@ -2,8 +2,7 @@ import { actor } from '$lib/stores';
 import type { Friend } from 'src/declarations/backend/backend.did';
 import { get, writable } from 'svelte/store';
 
-//export const matchedUsers = writable<Array<[User, BigInt]>>();
-export const foundFriends = writable<Array<[Friend]>>();
+export const foundFriends = writable<Array<Friend>>();
 
 export async function getFriends() {
 	const localActor = get(actor);

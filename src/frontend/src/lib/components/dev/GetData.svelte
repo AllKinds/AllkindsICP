@@ -4,17 +4,16 @@
 	import { foundFriends, getFriends } from '$lib/stores/tasks/getFriends';
 
 	let pending: boolean = false;
-	let friends: Array<Friend> = [];
+	//let friends: Array<[Friend]>  = $foundFriends;
 
 	const handleFindFriends = async () => {
 		pending = true;
 		await getFriends().catch((error) => {
 			console.log('error while getting friends', error);
 		});
-
+		//friends = $foundFriends;
 		pending = false;
 	};
-	friends = $foundFriends;
 </script>
 
 <div class="flex flex-col gap-2 border-main bg-sub30 py-8">
@@ -29,8 +28,8 @@
 	</div>
 
 	<div class="rounded-md flex flex-col mx-auto">
-		{#if friends}
-			{#each friends as friend}
+		{#if $foundFriends}
+			{#each $foundFriends as friend}
 				<div>
 					<span>{friend.account}</span>
 					<span>{friend.status[0]}</span>
