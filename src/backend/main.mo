@@ -127,7 +127,7 @@ actor {
 	};
 
 	//gotta rewrite this arrays prob will be very bad and broken
-	public type UserWScore = (?Principal, Int);
+	public type UserWScore = (Principal, Int);
 
 	public type FriendStatus = {
 		#Requested; //status of user that received request
@@ -392,18 +392,18 @@ actor {
 	};
 
 	// filter users according to parameters
-	func filterUsers(p : Principal, f : MatchingFilter) : UserWScore {
+	func filterUsers(p : Principal, f : MatchingFilter) : ?UserWScore {
 		//TODO : optimize with let-else after 0.8.3 because this is messy
 		let buf = Buffer.Buffer<(UserWScore)>(16);
 		var count = 0;
 		let callerScore : Float = calcScore(p, p);
+		let cohesionEntry : UserWScore = (p, f.cohesion);
 		//User Loop
 		label ul for (pm : Principal in users.keys()) {
 			if (users.size() == count) break ul;
 			switch (users.get(pm)) {
 				case null ();
 				case (?user) {
-					//Filter Loop
 					let _ = (p != pm) else continue ul;
 					//gender
 					switch (f.gender) {
@@ -429,33 +429,31 @@ actor {
 					let score : Float = calcScore(p, pm);
 					let cohesion = Float.toInt(Float.trunc((score / callerScore) * 100));
 					//maybe fix: check here if user is itself, and if so add cohesion filter to username to solve 2 bugs
-					buf.add((null, cohesion));
+					buf.add(p, cohesion);
 				};
 			};
 			count += 1;
 		}; // end ul
 		//insert filters and sort
-		let cohesionFilter : UserWScore = (null, f.cohesion);
-		buf.add(cohesionFilter);
-		buf.sort(sortByScore);
-		//find index of filter target
-		var indexF : Nat = 0;
-		let i : Nat = Buffer.indexOf(cohesionFilter, buf, isEqScore);
-		switch(i) {
-			case Nat {indexF == i}; //ughhhhhhhhh!!!
-			case null {};
+		label f {
+			buf.filterEntries(func(_, (x, y)) = x == p); //TEMP : testing if this does remove principal entries
+			buf.add(cohesionEntry);
+			//sorts by <
+			buf.sort(sortByScore);
+			//find index of filter target
+			let ?indexCohesion = Buffer.indexOf(cohesionEntry, buf, isEqScore) else return null;
+			//takes next Index in score after f.cohesion unless end or start of buf
+			var indexMatch : Nat = switch (indexCohesion) {
+				case 0 Nat.add(indexCohesion, 1);
+				case _ Nat.sub(indexCohesion, 1);
+			};
+			// Debug.print(debug_show ("IndexFilter : ", indexCohesion));
+			// Debug.print(debug_show ("IndexMatch : ", indexMatch));
+			// Debug.print(debug_show (buf.toArray()));
+			let resultMatch = buf.get(indexMatch);
+			return ?resultMatch;
 		};
-		//takes next Index in score after f.cohesion unless end or start of buf
-		let indexM = switch(indexF) {
-			case 0 Nat.add(indexF, 1);
-			case _ Nat.sub(indexF, 1);
-		};
-		Debug.print(debug_show ("IndexFilter : ", indexF));
-		Debug.print(debug_show ("IndexMatch : ", indexM));
-		Debug.print(debug_show (buf.toArray()));
-		let resultMatch = buf.get(indexM);
-		buf.clear(); //it seemed like buffer was expanding w each search, test bcs I think it shouldnt
-		return resultMatch;
+		return null;
 	};
 
 	func isEqF(x : Friend, y : Friend) : Bool {
@@ -683,25 +681,24 @@ actor {
 			return #err("You don't have enough points");
 		};
 
-		
-			changeUserPoints(msg.caller, (user.points - Int.abs(queryCost))); //might other position
-			let ?match : ?UserWScore = filterUsers(msg.caller, para) else return #err("Couldn't find any match!");
-			let userMatch : User = users.get(match.0) else return #err("Matched user not found!");
-			//TODO : optimise with let-else after 0.8.3
-			let matchObj : UserMatch = {
-				principal = match.0;
-				username = user.username;
-				about = checkPublic(user.about);
-				gender = checkPublic(user.gender);
-				birth = checkPublic(user.birth);
-				connect = checkPublic(user.connect);
-				cohesion = match.1;
-				answeredQuestions = getXAnsweredQuestions(match.0, null);
-				//TODO : fix above func getXAnsQues, gives literally only answeredQ bcs ongoing bad weight-like-answer implementation
-				//also filter first on commonQuestions to add a bool to this array for front-end indicating if both answered
-			};
-			return #ok(matchObj);
-		
+		changeUserPoints(msg.caller, (user.points - Int.abs(queryCost))); //might other position
+		let ?match : ?UserWScore = filterUsers(msg.caller, para) else return #err("Couldn't find any match!");
+		let ?userMatch : ?User = users.get(match.0) else return #err("Matched user not found!");
+		//TODO : optimise with let-else after 0.8.3
+		let matchObj : UserMatch = {
+			principal = match.0;
+			username = user.username;
+			about = checkPublic(user.about);
+			gender = checkPublic(user.gender);
+			birth = checkPublic(user.birth);
+			connect = checkPublic(user.connect);
+			cohesion = match.1;
+			answeredQuestions = getXAnsweredQuestions(match.0, null);
+			//TODO : fix above func getXAnsQues, gives literally only answeredQ bcs ongoing bad weight-like-answer implementation
+			//also filter first on commonQuestions to add a bool to this array for front-end indicating if both answered
+		};
+		return #ok(matchObj);
+
 	};
 
 	public shared query (msg) func getFriends() : async Result.Result<([Friend]), Text> {
