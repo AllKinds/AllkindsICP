@@ -3,6 +3,11 @@ import type { Principal } from '@dfinity/principal';
 
 export type AnswerKind = { Bool: boolean };
 export type Color = { Default: null };
+export interface Friend {
+	status: [] | [FriendStatus];
+	account: Principal;
+}
+export type FriendStatus = { Approved: null } | { Waiting: null } | { Requested: null };
 export type Gender = { Male: null } | { Female: null } | { Other: null } | { Queer: null };
 export type Hash = number;
 export interface MatchingFilter {
@@ -20,8 +25,9 @@ export interface Question {
 }
 export type Result = { ok: null } | { err: string };
 export type Result_1 = { ok: User } | { err: string };
-export type Result_2 = { ok: Array<Question> } | { err: string };
-export type Result_3 = { ok: UserMatch } | { err: string };
+export type Result_2 = { ok: Array<Friend> } | { err: string };
+export type Result_3 = { ok: Array<Question> } | { err: string };
+export type Result_4 = { ok: UserMatch } | { err: string };
 export interface User {
 	created: bigint;
 	connect: [[] | [string], boolean];
@@ -32,6 +38,7 @@ export interface User {
 	points: bigint;
 }
 export interface UserMatch {
+	principal: Principal;
 	connect: [] | [string];
 	about: [] | [string];
 	username: string;
@@ -42,12 +49,15 @@ export interface UserMatch {
 }
 export type WeightKind = { Like: bigint } | { Dislike: bigint };
 export interface _SERVICE {
+	answerFriendRequest: ActorMethod<[Principal, boolean], Result>;
 	createQuestion: ActorMethod<[string], Result>;
 	createUser: ActorMethod<[string], Result>;
-	findMatch: ActorMethod<[MatchingFilter], Result_3>;
-	getAnsweredQuestions: ActorMethod<[[] | [bigint]], Result_2>;
-	getAskableQuestions: ActorMethod<[bigint], Result_2>;
+	findMatch: ActorMethod<[MatchingFilter], Result_4>;
+	getAnsweredQuestions: ActorMethod<[[] | [bigint]], Result_3>;
+	getAskableQuestions: ActorMethod<[bigint], Result_3>;
+	getFriends: ActorMethod<[], Result_2>;
 	getUser: ActorMethod<[], Result_1>;
+	sendFriendRequest: ActorMethod<[Principal], Result>;
 	submitAnswer: ActorMethod<[Hash, AnswerKind], Result>;
 	submitSkip: ActorMethod<[Hash], Result>;
 	submitWeight: ActorMethod<[Hash, WeightKind], Result>;
