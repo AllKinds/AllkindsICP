@@ -33,6 +33,7 @@ actor {
 	let answerReward : Nat = 2;
 	let createrReward : Nat = 10;
 	let queryCost : Nat = 30;
+	let answerBaseScore : Nat = 1;
 
 	//DATA TYPES
 
@@ -83,30 +84,13 @@ actor {
 	public type Answer = {
 		user : Principal;
 		question : Hash.Hash;
-		answer : AnswerKind;
-	};
-
-	public type Weight = {
-		user : Principal;
-		question : Hash.Hash;
-		weight : WeightKind; //this would need to become an Int
+		answer : Bool;
+		weight : Int;
 	};
 
 	public type Skip = {
 		user : Principal;
 		question : Hash.Hash;
-	};
-
-	// Only one answer type for now
-	public type AnswerKind = {
-		#Bool : Bool;
-	};
-
-	// Nat indicates a possible amount of tokens / points appointed by the user to to the question
-	public type WeightKind = {
-		//this would need to be removed
-		#Like : Nat;
-		#Dislike : Nat;
 	};
 
 	public type PrincipalQuestionHash = Hash.Hash;
@@ -188,11 +172,6 @@ actor {
 		answers.put(pQ, answer);
 	};
 
-	func putWeight(p : Principal, weight : Weight) : () {
-		let pQ = hashPrincipalQuestion(p, weight.question);
-		weights.put(pQ, weight);
-	};
-
 	func putSkip(p : Principal, skip : Skip) : () {
 		let pQ = hashPrincipalQuestion(p, skip.question);
 		skips.put(pQ, skip);
@@ -204,7 +183,7 @@ actor {
 		label f for (hash in questions.keys()) {
 			if (n == count) break f;
 			let pQ = hashPrincipalQuestion(p, hash);
-			if (null == skips.get(pQ)) if (null == weights.get(pQ)) if (null == answers.get(pQ)) {
+			if (null == skips.get(pQ)) if (null == answers.get(pQ)) {
 				buf.add(hash);
 				count += 1;
 			};
@@ -218,7 +197,7 @@ actor {
 		label f for (hash in questions.keys()) {
 			if (n == ?count) break f;
 			let pQ = hashPrincipalQuestion(p, hash);
-			if (null == skips.get(pQ)) if (null == weights.get(pQ)) if (null != answers.get(pQ)) {
+			if ( (null == skips.get(pQ)) or (null != answers.get(pQ)) ) {
 				buf.add(hash);
 				count += 1;
 			};
@@ -228,53 +207,33 @@ actor {
 
 	// calc score for 2 answers and optional 2 weights
 	//TODO : optimise with let-alse after 0.8.3 and change accordingly after Weight type is revamped
-	func calcQuestionScore(sourceAnswer : Answer, testAnswer : Answer, sourceWeight : ?Weight, testWeight : ?Weight) : Int {
-		assert (sourceAnswer.question == testAnswer.question);
-		// let hasWeights = Option.isSome(sourceWeight) and Option.isSome(testWeight);
-		// let hasNoWeights = Option.isNull(sourceWeight) and Option.isNull(testWeight);
-		let compareAnswers : Bool = sourceAnswer.answer == testAnswer.answer;
-		//let compareWeights : Bool = ...
+	func calcQuestionScore(sourceAnswer : Answer, testAnswer : Answer) : Nat {
+		let ?_ = sourceAnswer.question == testAnswer.question else return 0;
+		let ?_ = sourceAnswer.answer == testAnswer.answer else return 0;
+		
+		// if people didn't vote same answer for a question than we neglect
+		// ( I would recommend a base score value if both answered without weight, can even just 1 )
 
-		if (compareAnswers == false) {
-			//also check for weights here
-			return 0;
-		} else {
-			// let sourceAnswerScore : Int = if (sourceAnswer.answer == #Bool(true)) { 1 } else { -1 };
-			// let testAnswerScore : Int = if (testAnswer.answer == #Bool(true)) { 1 } else { -1 };
-			let sourceWeightScore : Int = switch (sourceWeight) {
-				case (?sourceWeight) {
-					switch (sourceWeight.weight) {
-						case (#Like(score)) { score };
-						case (#Dislike(score)) { - score };
-					};
-				};
-				case null { 0 };
-			};
+		// take this situation where both 'me' & 'you' have voted YES on a question:
+		
+		//Q1: me(0) , you(+5) -> result = 
+		//Q2: me(0), you(-5) -> result = 
+		//Q3: me(-5), you(+5) -> result = 
+		//Q4: me(-5), you(-5) -> result = 
+		//Q5: me(+5), you(-20) -> result = 
+		//Q5: me(+20), you(-5) -> result = 
+		//Q5: me(+20), you(-100) -> result = 
+		//Q6: me(0) , you(0) -> result = 
 
-			let testWeightScore : Int = switch (testWeight) {
-				case (?testWeight) {
-					switch (testWeight.weight) {
-						case (#Like(score)) { score };
-						case (#Dislike(score)) { - score };
-					};
-				};
-				case null { 0 };
-			};
+		let wScore = Nat.add(sourceAnswer.weight, sourceAnswer.weight, answerBaseScore);
 
-			var wScore : Int = 0;
-			wScore += sourceWeightScore + testWeightScore;
-			return wScore;
+		return wScore; //score can 
 		};
 	};
 
 	func hasAnswered(p : Principal, question : Hash.Hash) : ?Answer {
 		let pQ = hashPrincipalQuestion(p, question);
 		return answers.get(pQ);
-	};
-
-	func hasweightd(p : Principal, question : Hash.Hash) : ?Weight {
-		let pQ = hashPrincipalQuestion(p, question);
-		return weights.get(pQ);
 	};
 
 	func commonQuestions(sourceUser : Principal, testUser : Principal) : [CommonQuestion] {
