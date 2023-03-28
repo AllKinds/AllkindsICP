@@ -5,7 +5,6 @@
 	import type { User, UserMatch } from 'src/declarations/backend/backend.did';
 	import Spinner from '../common/Spinner.svelte';
 
-	//export let match: [User, BigInt];
 	export let match: UserMatch;
 
 	let pending: boolean = false;
@@ -20,20 +19,19 @@
 	let ageY = Math.floor(ageMs / (1000 * 3600 * 24) / 365);
 	let answeredQuestions = match.answeredQuestions;
 
-	//TODO : change backend so it doesn't return a User obj,
-	//let it return the values that according user has made init public viewable
-
 	const handleConnectionRequest = async () => {
 		pending = true;
 		succes = false;
 		await sendFriendRequest(userPrincipal).then((res) => {
 			if (res.ok) {
-				succes = true;
-				console.log('result after request :', res);
-			}
+				console.log('result after request :', res);			
+				
+			};
 		});
+		succes = true;
 		pending = false;
 	};
+	//TODO : spinner keeps loading, cant update states after function call? check app/component load states
 </script>
 
 <!-- will only show 1 user for now, one with nearest cohesion score
@@ -55,19 +53,19 @@ TODO : backend create friendlist and connection request implementation -->
 		>
 		<span class="p-1 ">{userAbout ? userAbout : ''}</span>
 
-		<!-- {#if succes}
+		{#if succes}
 			<span>Connection request send!</span>
-		{:else} -->
-		<div class="mx-auto fancy-btn-border">
-			<button on:click={handleConnectionRequest} class="fancy-btn bg-main90">
-				{#if pending}
-					<Spinner />
-				{:else}
-					Connect
-				{/if}
-			</button>
-		</div>
-		<!-- {/if} -->
+		{:else}
+			<div class="mx-auto fancy-btn-border">
+				<button on:click={handleConnectionRequest} class="fancy-btn bg-main90">
+					{#if pending}
+						<Spinner />
+					{:else}
+						Connect
+					{/if}
+				</button>
+			</div>
+		{/if}
 
 		{#if answeredQuestions.length > 0}
 			{#each answeredQuestions as q}
@@ -76,5 +74,4 @@ TODO : backend create friendlist and connection request implementation -->
 		{/if}
 	</div>
 
-	<!-- create and implement a Connection Request btn only when used from /home -->
 </div>

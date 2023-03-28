@@ -130,9 +130,10 @@ actor {
 	public type UserWScore = (?Principal, Int);
 
 	public type FriendStatus = {
-		#Requested; //status of user that received request
-		#Waiting; //status of user that send request
+		#Requested; //status of requested contact in msg.caller friendlist
+		#Waiting; //status of msg.caller in the requested contact friendlist
 		#Approved; //status of both users after
+		//could be added upon and improved (REQ/WAIT might be too confusing, but this makes it ez to track who requested)
 	};
 
 	//obj instead of tuple , bcs it should be expanded in future
@@ -389,8 +390,6 @@ actor {
 		let buf = Buffer.Buffer<(UserWScore)>(16);
 		var count = 0;
 		let callerScore : Float = calcScore(p, p);
-		Debug.print(debug_show ("callerScore", callerScore));
-		Debug.print(debug_show ("userPrinciple", p));
 		//User Loop
 		label ul for (pm : Principal in users.keys()) {
 			if (users.size() == count) break ul;
@@ -417,52 +416,42 @@ actor {
 						};
 						case (_)();
 					};
-
 					let pmScore : Float = calcScore(p, pm);
-					Debug.print(debug_show ("pmScore", pmScore));
 					let pmCohesion = Float.toInt(Float.trunc((pmScore / callerScore) * 100));
 					//maybe fix: check here if user is itself, and if so add cohesion filter to username to solve 2 bugs
-					if (p == pm) {
-
-					} else {
+					if (p != pm) {
 						buf.add(?pm, pmCohesion);
 					};
 				};
 			};
 			count += 1;
 		}; // end ul
-
-		//let newBuf = Buffer.Buffer<(UserWScore)>(16);
-		//buf.filterEntries(func(_, (x, y)) = x != p); //TEMP : testing if this does remove principal entries
-
-		//insert cohesionfilter and sort by <
-
 		Debug.print(debug_show ("f.cohesion", f.cohesion));
+		//insert cohesionfilter and sort by <
+		buf.add(null, f.cohesion);
 		buf.sort(sortByScore);
 		let bufSize = buf.size();
-
-		let iMa = switch (f.cohesion) {
-			case (100) Nat.sub(bufSize, 1);
-			case (0) 0;
-			case (_) {
-				buf.add(null, f.cohesion);
-				buf.sort(sortByScore);
-				let ?iCo = Buffer.indexOf((null, f.cohesion), buf, findCoheFilter) else return null;
-				Debug.print(debug_show ("IndexCohesion : ", iCo));
-				Nat.add(iCo, 1);
-			};
+		let bufSizeX = Nat.sub(bufSize, 1);
+		Debug.print(debug_show ("bufsize", bufSize, bufSizeX));
+		//find index of cohesion filter
+		let ?iCo = Buffer.indexOf((null, f.cohesion), buf, findCoheFilter) else return null;
+		var iMa : Nat = 0;
+		//returns match index (+1), unless 0 or max
+		if (iCo == bufSizeX) {
+			iMa := bufSizeX - 1;
+		} else if (iCo == 0) {
+			iMa := 1;
+		} else {
+			iMa := iCo + 1;
 		};
+		//TODO : +else -> to also compare bordering values for better result
+		//TODO : still some small bugs, especially w sorting when cohesion has same value as usersScores
+		Debug.print(debug_show ("ico", iCo));
+		Debug.print(debug_show ("iMa", iMa));
 
-		// Debug.print(debug_show ("IndexFilter : ", iCo));
-
-		Debug.print(debug_show ("IndexMatch : ", iMa));
-		let clone = Buffer.clone(buf); //temp test
-		Debug.print(debug_show ("arr:", clone.toArray()));
 		let resultMatch = buf.get(iMa);
-		//Debug.print(debug_show ("arr:", buf.toArray()));
-
+		Debug.print(debug_show ("arr", buf.toArray()));
 		return ?resultMatch;
-
 	};
 
 	func isEqF(x : Friend, y : Friend) : Bool {
@@ -539,62 +528,44 @@ actor {
 	};
 
 	public shared query (msg) func getUser() : async Result.Result<User, Text> {
-		switch (users.get(msg.caller)) {
-			case (?user) return #ok(user);
-			case null return #err("User does not exist!");
-		};
-		//TODO : optimise with let-else after 0.8.3
+		let ?user = users.get(msg.caller) else return #err("User does not exist!");
+		#ok(user);
 	};
 
 	public shared (msg) func updateProfile(user : User) : async Result.Result<(), Text> {
-		switch (users.get(msg.caller)) {
-			case null { return #err("User does not exist!") };
-			case (?_) {
-				users.put(msg.caller, user);
-			};
-		};
+		let ?user = users.get(msg.caller) else return #err("User does not exist!");
+		users.put(msg.caller, user);
 		#ok();
-		//TODO : optimise with let-else after 0.8.3
 	};
 
-	// Create a new question with default color
 	public shared (msg) func createQuestion(question : Text) : async Result.Result<(), Text> {
-		switch (users.get(msg.caller)) {
-			case null return #err("User does not exist");
-			case (?user) {
-				putQuestion(msg.caller, question);
-				//might need to check here for put to be success before awarding points, same for other occurrences
-				changeUserPoints(msg.caller, (user.points + createrReward));
-			};
-		};
+		let ?user = users.get(msg.caller) else return #err("User does not exist!");
+		putQuestion(msg.caller, question);
+		changeUserPoints(msg.caller, (user.points + createrReward));
 		#ok();
-		//TODO : optimise with let-else after 0.8.3
 	};
 
 	public shared query (msg) func getAskableQuestions(n : Nat) : async Result.Result<[Question], Text> {
 		let askables = askableQuestions(msg.caller, n);
-
 		func getQuestion(h : Hash.Hash) : ?Question {
 			questions.get(h);
 		};
-
 		let q = Array.mapFilter(askables, getQuestion);
 		#ok(q);
 	};
 
 	public shared query (msg) func getAnsweredQuestions(n : ?Nat) : async Result.Result<[Question], Text> {
 		let answered = answeredQuestions(msg.caller, n);
-
 		func getQuestion(h : Hash.Hash) : ?Question {
 			questions.get(h);
 		};
-
 		let q = Array.mapFilter(answered, getQuestion);
 		#ok(q);
 	};
 
 	// Add an answer
 	public shared (msg) func submitAnswer(question : Hash.Hash, answer : AnswerKind) : async Result.Result<(), Text> {
+		let ?user = users.get(msg.caller) else return #err("User does not exist");
 		let principalQuestion = hashPrincipalQuestion(msg.caller, question);
 		let newAnswer = {
 			user = msg.caller;
@@ -602,7 +573,6 @@ actor {
 			answer;
 		};
 		answers.put(principalQuestion, newAnswer);
-		let ?user = users.get(msg.caller) else return #err("User does not exist");
 		changeUserPoints(msg.caller, (user.points + answerReward));
 		#ok();
 	};
@@ -615,8 +585,6 @@ actor {
 			question;
 			weight;
 		};
-		//TEMP : weights.put line is moved to after points check
-		//TODO : cleanup and extract possible funcs
 		let weightValue : Int = switch (weight) {
 			case (#Like(value)) { value };
 			case (#Dislike(value)) { - value };
@@ -627,10 +595,9 @@ actor {
 		if (Nat.less(user.points, Int.abs(weightValue))) {
 			return #err("You don't have enough points");
 		};
-		//let newPoints = Nat.sub(user.points, weightValue);
 		weights.put(principalQuestion, newWeight);
 		changeUserPoints(msg.caller, (user.points - Int.abs(weightValue)));
-		//check if user !== creater
+		//check if user != creater
 		if (msg.caller != q.creater) {
 			switch (users.get(q.creater)) {
 				case null {}; //do nothing, creater account might have been removed
@@ -708,6 +675,7 @@ actor {
 			};
 		};
 		try {
+			//give REQ status to new friend of msg.caller
 			let newFriend : Friend = {
 				account = p;
 				status = ?#Requested;
@@ -715,8 +683,7 @@ actor {
 			buf.add(newFriend);
 			let arr = Buffer.toArray(buf);
 			friends.put(msg.caller, arr);
-
-			//change targetUser friend array w caller
+			//give WAIT status to msg.caller of new friend
 			let userFriend : Friend = {
 				account = msg.caller;
 				status = ?#Waiting;
@@ -761,7 +728,6 @@ actor {
 			//put array back
 			let arr = Buffer.toArray(buf);
 			friends.put(msg.caller, arr);
-
 			//change your own friendstatus on your friend's list
 			let userFriend : Friend = {
 				account = msg.caller;
@@ -774,7 +740,6 @@ actor {
 		} catch err {
 			return #err("Failed to update userStates");
 		};
-
 		#ok();
 	};
 
