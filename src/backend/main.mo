@@ -246,7 +246,7 @@ actor {
 				case (?sourceWeight) {
 					switch (sourceWeight.weight) {
 						case (#Like(score)) { score };
-						case (#Dislike(score)) { score };
+						case (#Dislike(score)) { - score };
 					};
 				};
 				case null { 0 };
@@ -256,27 +256,13 @@ actor {
 				case (?testWeight) {
 					switch (testWeight.weight) {
 						case (#Like(score)) { score };
-						case (#Dislike(score)) { score };
+						case (#Dislike(score)) { - score };
 					};
 				};
 				case null { 0 };
 			};
 
-			var wScore : Int = 1; //temp ugly fix
-			//rework this: 1) both negative weight should then become positive and added
-			// 2) negative and positive weight could make only count negative (seems logical)
-
-			//init score with 1 so people can match even if they didnt weigh but still answered the same
-
-			// if (sourceWeightScore >= 0 and testWeightScore >= 0) {
-			// 	wScore += sourceWeightScore + testWeightScore;
-			// };
-			// if (sourceWeightScore <= 0 and testWeightScore <= 0) {
-			// 	wScore += sourceWeightScore + testWeightScore;
-			// };
-			// if (sourceWeightScore == 0 and testWeightScore == 0) {
-			// 	wScore += sourceWeightScore + testWeightScore;
-			// };
+			var wScore : Int = 0;
 			wScore += sourceWeightScore + testWeightScore;
 			return wScore;
 		};
@@ -433,6 +419,7 @@ actor {
 					};
 
 					let pmScore : Float = calcScore(p, pm);
+					Debug.print(debug_show ("pmScore", pmScore));
 					let pmCohesion = Float.toInt(Float.trunc((pmScore / callerScore) * 100));
 					//maybe fix: check here if user is itself, and if so add cohesion filter to username to solve 2 bugs
 					if (p == pm) {
@@ -448,20 +435,26 @@ actor {
 		//let newBuf = Buffer.Buffer<(UserWScore)>(16);
 		//buf.filterEntries(func(_, (x, y)) = x != p); //TEMP : testing if this does remove principal entries
 
-		//insert filters and sort by <
-		buf.add(null, f.cohesion);
+		//insert cohesionfilter and sort by <
+
 		Debug.print(debug_show ("f.cohesion", f.cohesion));
 		buf.sort(sortByScore);
 		let bufSize = buf.size();
-		//find index of filter target
-		let ?iCo = Buffer.indexOf((null, f.cohesion), buf, findCoheFilter) else return null;
-		//takes next Index in score before f.cohesion unless end or start of buf
-		let iMa : Nat = switch (iCo) {
-			case 0 Nat.add(iCo, 1);
-			case _ Nat.sub(iCo, 1);
+
+		let iMa = switch (f.cohesion) {
+			case (100) Nat.sub(bufSize, 1);
+			case (0) 0;
+			case (_) {
+				buf.add(null, f.cohesion);
+				buf.sort(sortByScore);
+				let ?iCo = Buffer.indexOf((null, f.cohesion), buf, findCoheFilter) else return null;
+				Debug.print(debug_show ("IndexCohesion : ", iCo));
+				Nat.add(iCo, 1);
+			};
 		};
+
 		// Debug.print(debug_show ("IndexFilter : ", iCo));
-		Debug.print(debug_show ("IndexCohesion : ", iCo));
+
 		Debug.print(debug_show ("IndexMatch : ", iMa));
 		let clone = Buffer.clone(buf); //temp test
 		Debug.print(debug_show ("arr:", clone.toArray()));
@@ -609,14 +602,7 @@ actor {
 			answer;
 		};
 		answers.put(principalQuestion, newAnswer);
-
-		//TODO : optimise with let-else after 0.8.3
-		let user = switch (users.get(msg.caller)) {
-			case null return #err("User does not exist");
-			case (?user) {
-				user;
-			};
-		};
+		let ?user = users.get(msg.caller) else return #err("User does not exist");
 		changeUserPoints(msg.caller, (user.points + answerReward));
 		#ok();
 	};
@@ -635,26 +621,13 @@ actor {
 			case (#Like(value)) { value };
 			case (#Dislike(value)) { - value };
 		};
-		//get user data
-		let user = switch (users.get(msg.caller)) {
-			case null return #err("User does not exist");
-			case (?user) {
-				user;
-			};
-		};
-		//get question data
-		let q : Question = switch (questions.get(question)) {
-			case null return #err("Question does not exist");
-			case (?q) {
-				q;
-			};
-		};
+		let ?user = users.get(msg.caller) else return #err("User does not exist");
+		let ?q : ?Question = questions.get(question) else return #err("Question does not exist");
 		//check if user has enough points
 		if (Nat.less(user.points, Int.abs(weightValue))) {
 			return #err("You don't have enough points");
 		};
 		//let newPoints = Nat.sub(user.points, weightValue);
-
 		weights.put(principalQuestion, newWeight);
 		changeUserPoints(msg.caller, (user.points - Int.abs(weightValue)));
 		//check if user !== creater
@@ -666,9 +639,7 @@ actor {
 				};
 			};
 		};
-
 		changeQuestionPoints(q, (q.points + weightValue));
-
 		#ok();
 		//TODO : optimise with let-else after 0.8.3
 	};
@@ -686,32 +657,28 @@ actor {
 
 	//find users based on parameters
 	public shared (msg) func findMatch(para : MatchingFilter) : async Result.Result<UserMatch, Text> {
-		let ?user = users.get(msg.caller) else return #err("");
-
+		let ?user = users.get(msg.caller) else return #err("Couldn't get User");
 		if (Nat.less(user.points, queryCost)) {
 			return #err("You don't have enough points");
 		};
 		changeUserPoints(msg.caller, (user.points - Int.abs(queryCost)));
-
 		//TODO : make generic errors
 		let ?match : ?UserWScore = filterUsers(msg.caller, para) else return #err("Couldn't find any match!");
 		let ?principalMatch = match.0 else return #err("rrreeee");
 		let ?userM : ?User = users.get(principalMatch) else return #err("Matched user not found!");
 
-		return #ok(
-			{
-				principal = principalMatch;
-				username = userM.username;
-				about = checkPublic(userM.about);
-				gender = checkPublic(userM.gender);
-				birth = checkPublic(userM.birth);
-				connect = checkPublic(userM.connect);
-				cohesion = match.1;
-				answeredQuestions = getXAnsweredQuestions(principalMatch, null);
-				//TODO : fix above func getXAnsQues, gives literally only answeredQ bcs ongoing bad weight-like-answer implementation
-				//also filter first on commonQuestions to add a bool to this array for front-end indicating if both answered
-			} : UserMatch
-		);
+		let result : UserMatch = {
+			principal = principalMatch;
+			username = userM.username;
+			about = checkPublic(userM.about);
+			gender = checkPublic(userM.gender);
+			birth = checkPublic(userM.birth);
+			connect = checkPublic(userM.connect);
+			cohesion = match.1;
+			answeredQuestions = getXAnsweredQuestions(principalMatch, null);
+		}; //TODO : fix above func getXAnsQues, gives literally only answeredQ bcs ongoing bad weight-like-answer implementation
+		//also filter first on commonQuestions to add a bool to this array for front-end indicating if both answered
+		return #ok(result);
 	};
 
 	public shared query (msg) func getFriends() : async Result.Result<([Friend]), Text> {
@@ -740,13 +707,6 @@ actor {
 				};
 			};
 		};
-
-		// let res = buf.get(index);
-		// let ?status = res.status else return #err("Something went wrong! Friend status not found.");
-		// let a = status == #Requested else return #err("You already requested this user to connect!");
-		// let b = status == #Waiting else return #err("You already have a pending connection request from this user!");
-		// let c = status == #Approved else return #err("You are already friends with this user!");
-		//fix to let ?_ =
 		try {
 			let newFriend : Friend = {
 				account = p;
