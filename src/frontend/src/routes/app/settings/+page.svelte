@@ -47,8 +47,8 @@
 			username: userObj.username,
 			gender: [toNullableGender(userObj.gender), publicGender],
 			birth: [toNullableDate(userObj.birth), publicBirth],
-			points: $user.points,
-			friendRequests: $user.friendRequests
+			points: $user.points
+			//TODO : fix vulnerability with points being in userObj
 		};
 		await updateProfile(newUser).catch((error) => {
 			console.log('errorcatch', error);

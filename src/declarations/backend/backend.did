@@ -43,7 +43,7 @@ type Result_3 = variant {
 };
 type Result_2 = variant {
 	err : text;
-	ok : vec Friend;
+	ok : vec FriendlyUserMatch;
 };
 type Result_1 = variant {
 	err : text;
@@ -76,14 +76,21 @@ type Gender = variant {
 	Other;
 	Queer;
 };
+type FriendlyUserMatch = record {
+	about : opt text;
+	answeredQuestions : vec Question;
+	birth : opt int;
+	cohesion : int;
+	connect : opt text;
+	gender : opt Gender;
+	"principal" : principal;
+	status : FriendStatus;
+	username : text;
+};
 type FriendStatus = variant {
 	Approved;
 	Requested;
 	Waiting;
-};
-type Friend = record {
-	account : principal;
-	status : opt FriendStatus;
 };
 type Color = variant { Default };
 type AnswerKind = variant { Bool : bool };

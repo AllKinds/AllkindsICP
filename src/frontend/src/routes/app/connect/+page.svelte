@@ -9,6 +9,7 @@
 
 	let pending: boolean = false;
 	let expandWindow: Boolean = false;
+	//age + cohes based on Slider plugin, see for more info
 	let ageValue = [0, 150];
 	let cohesionValue = [100, 100];
 	let genderValue = 'Everyone';
@@ -21,7 +22,7 @@
 	//TODO : DE-COMPONENT-IALIZE (only what cant be fixed with css classes), and extract the re-occuring CSS
 
 	const handleFindMatches = async () => {
-		pending = true;
+		pending = true; 
 		let filter: MatchingFilter = {
 			cohesion: BigInt(cohesionValue[0]),
 			ageRange: [BigInt(ageValue[0]), BigInt(ageValue[1])],

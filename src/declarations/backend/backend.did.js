@@ -38,11 +38,21 @@ export const idlFactory = ({ IDL }) => {
 		Waiting: IDL.Null,
 		Requested: IDL.Null
 	});
-	const Friend = IDL.Record({
-		status: IDL.Opt(FriendStatus),
-		account: IDL.Principal
+	const FriendlyUserMatch = IDL.Record({
+		status: FriendStatus,
+		principal: IDL.Principal,
+		connect: IDL.Opt(IDL.Text),
+		about: IDL.Opt(IDL.Text),
+		username: IDL.Text,
+		cohesion: IDL.Int,
+		gender: IDL.Opt(Gender),
+		birth: IDL.Opt(IDL.Int),
+		answeredQuestions: IDL.Vec(Question)
 	});
-	const Result_2 = IDL.Variant({ ok: IDL.Vec(Friend), err: IDL.Text });
+	const Result_2 = IDL.Variant({
+		ok: IDL.Vec(FriendlyUserMatch),
+		err: IDL.Text
+	});
 	const User = IDL.Record({
 		created: IDL.Int,
 		connect: IDL.Tuple(IDL.Opt(IDL.Text), IDL.Bool),

@@ -3,11 +3,18 @@ import type { Principal } from '@dfinity/principal';
 
 export type AnswerKind = { Bool: boolean };
 export type Color = { Default: null };
-export interface Friend {
-	status: [] | [FriendStatus];
-	account: Principal;
-}
 export type FriendStatus = { Approved: null } | { Waiting: null } | { Requested: null };
+export interface FriendlyUserMatch {
+	status: FriendStatus;
+	principal: Principal;
+	connect: [] | [string];
+	about: [] | [string];
+	username: string;
+	cohesion: bigint;
+	gender: [] | [Gender];
+	birth: [] | [bigint];
+	answeredQuestions: Array<Question>;
+}
 export type Gender = { Male: null } | { Female: null } | { Other: null } | { Queer: null };
 export type Hash = number;
 export interface MatchingFilter {
@@ -25,7 +32,7 @@ export interface Question {
 }
 export type Result = { ok: null } | { err: string };
 export type Result_1 = { ok: User } | { err: string };
-export type Result_2 = { ok: Array<Friend> } | { err: string };
+export type Result_2 = { ok: Array<FriendlyUserMatch> } | { err: string };
 export type Result_3 = { ok: Array<Question> } | { err: string };
 export type Result_4 = { ok: UserMatch } | { err: string };
 export interface User {

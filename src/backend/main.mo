@@ -22,14 +22,13 @@ import None "mo:base/None";
 
 actor {
 	//TODO : copy and remake functions with moc 8.3 (check also .4 and .5) additions
-	//TODO : use more hashmap functionality instead of buffers for faster calculations
-	//TODO : maybe make and extract some code to types.mo and utils.mo
+	//TODO : use more hashmap functionality instead of buffers for faster calculations?
+	//TODO : maybe make and extract some code to types.mo and utils.mo -> temp broken in moc 0.8?
 	//TODO : integrate more variants (point usages, common errors, etc..)
-	//TODO : should overall be retyped for more cohersiveness, See type operational expressions
+	//TODO : should overall be retyped for more cohesiveness, See type operational expressions
 
 	// CONSTANTS
 	let N = 10;
-	//TODO : change 'points' to 'reward'
 	let initReward : Nat = 10000;
 	let answerReward : Nat = 2;
 	let createrReward : Nat = 10;
@@ -126,7 +125,6 @@ actor {
 		cohesion : Int;
 	};
 
-	//gotta rewrite this arrays prob will be very bad and broken
 	public type UserWScore = (?Principal, Int);
 
 	public type FriendStatus = {
@@ -145,7 +143,7 @@ actor {
 	public type FriendList = [Friend];
 
 	//for viewable data of caller's friends
-	public type FriendlyUserMatch = UserMatch and Friend;
+	public type FriendlyUserMatch = UserMatch and { status : FriendStatus };
 
 	// UTILITY FUNCTIONS
 
@@ -384,10 +382,14 @@ actor {
 		t.0 == u.0;
 	};
 
+	func isEqF(x : Friend, y : Friend) : Bool {
+		x.account == y.account;
+	};
+
 	// filter users according to parameters
 	func filterUsers(p : Principal, f : MatchingFilter) : ?UserWScore {
 		//TODO : optimize with let-else after 0.8.3 because this is messy
-		let buf = Buffer.Buffer<(UserWScore)>(16);
+		let buf = Buffer.Buffer<UserWScore>(16);
 		var count = 0;
 		let callerScore : Float = calcScore(p, p);
 		//User Loop
@@ -438,11 +440,11 @@ actor {
 		var iMa : Nat = 0;
 		//returns match index (+1), unless 0 or max
 		if (iCo == bufSizeX) {
-			iMa := bufSizeX - 1;
+			iMa := Nat.sub(bufSizeX, 1);
 		} else if (iCo == 0) {
 			iMa := 1;
 		} else {
-			iMa := iCo + 1;
+			iMa := Nat.add(iCo, 1);
 		};
 		//TODO : +else -> to also compare bordering values for better result
 		//TODO : still some small bugs, especially w sorting when cohesion has same value as usersScores
@@ -452,10 +454,6 @@ actor {
 		let resultMatch = buf.get(iMa);
 		Debug.print(debug_show ("arr", buf.toArray()));
 		return ?resultMatch;
-	};
-
-	func isEqF(x : Friend, y : Friend) : Bool {
-		x.account == y.account;
 	};
 
 	// DATA STORAGE
@@ -533,8 +531,8 @@ actor {
 	};
 
 	public shared (msg) func updateProfile(user : User) : async Result.Result<(), Text> {
-		let ?user = users.get(msg.caller) else return #err("User does not exist!");
-		users.put(msg.caller, user);
+		let _ = users.get(msg.caller) else return #err("User does not exist!");
+		let _ = users.put(msg.caller, user) else return #err("err");
 		#ok();
 	};
 
@@ -648,11 +646,64 @@ actor {
 		return #ok(result);
 	};
 
-	public shared query (msg) func getFriends() : async Result.Result<([Friend]), Text> {
-		let ?friendList = friends.get(msg.caller) else return #err("Something went wrong!");
-		#ok(friendList);
+	//TODO : change function w result FriendlyUserMatch (= combined type)
+	public shared query (msg) func getFriends() : async Result.Result<([FriendlyUserMatch]), Text> {
+		let buf = Buffer.Buffer<FriendlyUserMatch>(16);
+		let ?friendList = friends.get(msg.caller) else return #err("You don't have any friends :c ");
+		let callerScore = calcScore(msg.caller, msg.caller);
+
+		//build resulting object and add to buffer
+		//label here possibly not RLLY needed, but gives good overview and continue/break support if needed
+		label ul for (f : Friend in friendList.vals()) {
+			let pm : Principal = f.account;
+			let ?userM = users.get(pm) else continue ul; //might be that user has been deleted
+			let ?matchStatus = f.status else return #err("Something went wrong!");
+
+			//TODO : next 2 lines should have their own function (they are re-used)
+			let pmScore = Float.toInt(calcScore(msg.caller, pm));
+			//ENABLE : let pmCohesion = Int.abs(Float.toInt(Float.trunc((pmScore / callerScore) * 100)));
+			//Debug.print(debug_show ("pm score/cohe", pmScore, pmCohesion));
+
+			//TODO : doesnt seem to want to work with mutable var matchObj
+			// matchObj.about :=  checkPublic(userM.about);
+			// matchObj.gender := checkPublic(userM.gender);
+			// matchObj.birth := checkPublic(userM.birth);
+			// matchObj.connect := checkPublic(userM.connect);
+			if (matchStatus != #Approved) {
+				let matchObj : FriendlyUserMatch = {
+					principal = pm;
+					username = userM.username;
+					about = checkPublic(userM.about);
+					gender = checkPublic(userM.gender);
+					birth = checkPublic(userM.birth);
+					connect = checkPublic(userM.connect);
+					cohesion = pmScore; //ENABLE : pmCohesion
+					answeredQuestions = getXAnsweredQuestions(pm, null);
+					status = matchStatus;
+				};
+				buf.add(matchObj);
+			} else {
+				let matchObj : FriendlyUserMatch = {
+					principal = pm;
+					username = userM.username;
+					about = userM.about.0;
+					gender = userM.gender.0;
+					birth = userM.birth.0;
+					connect = userM.connect.0;
+					cohesion = pmScore; //ENABLE : pmCohesion
+					answeredQuestions = getXAnsweredQuestions(pm, null);
+					status = matchStatus;
+				};
+				buf.add(matchObj);
+			};
+
+		};
+		//TODO :  iterate over list, get user data for each user, and return info
+		//!!! NON-#Approved friends ONLY return checkPublic (public viewable data)
+		#ok(buf.toArray());
 	};
 
+	//TODO : extract reusable function from sendFriendRequest and answerFriendRequest
 	public shared (msg) func sendFriendRequest(p : Principal) : async Result.Result<(), Text> {
 		let ?user = users.get(msg.caller) else return #err("You are not registered!");
 		let ?userFriends = friends.get(msg.caller) else return #err("Something went wrong!");
@@ -670,7 +721,7 @@ actor {
 					case (?#Requested) return #err("You already requested this user to connect!");
 					case (?#Waiting) return #err("You already have a pending connection request from this user!");
 					case (?#Approved) return #err("You are already friends with this user!");
-					case (null) return #err("Strange");
+					case (null) return #err("Strange!");
 				};
 			};
 		};

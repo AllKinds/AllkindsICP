@@ -24,14 +24,14 @@
 		succes = false;
 		await sendFriendRequest(userPrincipal).then((res) => {
 			if (res.ok) {
-				console.log('result after request :', res);			
-				
-			};
+				console.log('result after request :', res);
+			}
 		});
 		succes = true;
 		pending = false;
 	};
 	//TODO : spinner keeps loading, cant update states after function call? check app/component load states
+	//myabe bcs no subscribe value here for comp to update
 </script>
 
 <!-- will only show 1 user for now, one with nearest cohesion score
@@ -73,5 +73,4 @@ TODO : backend create friendlist and connection request implementation -->
 			{/each}
 		{/if}
 	</div>
-
 </div>
