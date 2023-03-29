@@ -20,7 +20,7 @@
 	};
 </script>
 
-<div class="flex flex-col gap-2 border-main bg-sub30 py-8">
+<div class="flex flex-col gap-4">
 	<div class="fancy-btn-border mx-auto mb-0">
 		<button on:click={handleFindFriends} class="fancy-btn">
 			{#if pending}
@@ -31,7 +31,7 @@
 		</button>
 	</div>
 
-	<div class="rounded-md flex flex-col mx-auto">
+	<div class="rounded-md flex flex-col">
 		{#if $foundFriends}
 			{#each $foundFriends as friend}
 				<!-- TODO have different column for non-approved friends -->
@@ -44,7 +44,7 @@
 							,{fromNullable(friend.about)}
 						</span>
 					</div>
-					<div>
+					<div class="w-full">
 						{friend.cohesion}
 						{'(' + friend.answeredQuestions.length + ')'}
 					</div>

@@ -246,7 +246,8 @@ actor {
 		let _ = sourceAnswer.question == testAnswer.question else return 0;
 		let _ = sourceAnswer.answer == testAnswer.answer else return 0;
 		let _ = sourceAnswer.weight >= 0 and 0 <= testAnswer.weight else return 0;
-		return (2 + Int.abs(sourceAnswer.weight) + Int.abs(testAnswer.weight) / 2);
+		//TEMP : temporary calculation, not good as it still can result in (p, pm) > (p,p)
+		return (1 + Int.abs(sourceAnswer.weight) + Int.abs(testAnswer.weight) / 2);
 	};
 
 	func calcScore(sourceUser : Principal, testUser : Principal) : Int {

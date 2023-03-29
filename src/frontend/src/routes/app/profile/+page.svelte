@@ -19,7 +19,7 @@
 	});
 </script>
 
-<div class="flex flex-col gap-4 border-main bg-sub30 py-8">
+<div class="flex flex-col gap-4">
 	<div class="w-24 h-24 rounded-full border-main bg-sub mx-auto">
 		<!-- placeholder profile picture -->
 	</div>

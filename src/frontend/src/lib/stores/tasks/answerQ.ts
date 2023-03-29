@@ -1,6 +1,7 @@
 import { actor } from '$lib/stores';
 import type { Hash } from 'src/declarations/backend/backend.did';
 import { get } from 'svelte/store';
+import { syncAuth } from './auth';
 
 export async function answerQ(hash: Hash, answer: boolean, weight: bigint) {
 	const localActor = get(actor);
@@ -8,4 +9,5 @@ export async function answerQ(hash: Hash, answer: boolean, weight: bigint) {
 	await localActor
 		.submitAnswer(hash, answer, weight)
 		.then((res) => console.log('Res after Q skipped :', res));
+	await syncAuth();
 }
