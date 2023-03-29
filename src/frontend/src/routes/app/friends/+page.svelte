@@ -1,4 +1,5 @@
 <script lang="ts">
+	import UserBanner from '$lib/components/app/UserBanner.svelte';
 	import Spinner from '$lib/components/common/Spinner.svelte';
 	import { foundFriends, getFriends } from '$lib/stores/tasks/getFriends';
 	import { fromNullable, fromNullableDate, fromNullableGender } from '$lib/utilities';
@@ -31,25 +32,10 @@
 		</button>
 	</div>
 
-	<div class="rounded-md flex flex-col">
+	<div class="rounded-md flex flex-col gap-y-2">
 		{#if $foundFriends}
-			{#each $foundFriends as friend}
-				<!-- TODO have different column for non-approved friends -->
-				<div class="flex bg-sub90 border-main p-4">
-					<div>
-						<h2>{friend.username}</h2>
-						<span>
-							<!-- {Number(fromNullable(friend.birth)) / 1000000} -->
-							,{fromNullableGender(friend.gender)}
-							,{fromNullable(friend.about)}
-						</span>
-					</div>
-					<div class="w-full">
-						{friend.cohesion}
-						{'(' + friend.answeredQuestions.length + ')'}
-					</div>
-					<!-- <span>Friend status : {friend.status}</span> -->
-				</div>
+			{#each $foundFriends as u}
+        <UserBanner {u}/>
 			{/each}
 		{/if}
 	</div>

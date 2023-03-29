@@ -50,6 +50,7 @@
 <div class="flex flex-col gap-4">
 	<!-- border-main bg-sub30 -->
 	{#if !resultWindow}
+
 		<div class="fancy-btn-border mx-auto my-0">
 			<button on:click={handleFindMatches} class="fancy-btn">
 				{#if pending}
@@ -59,20 +60,19 @@
 				{/if}
 			</button>
 		</div>
-		<div class="w-full py-4 md:w-2/3 mx-auto flex flex-col md:flex-row gap-2 justify-center">
-			<!-- TODO check sourceCode sliders, as they clip over main nav -->
+
+		<!-- FILTER , TODO : check sourceCode sliders, as they clip over main nav, maybe form tag needed -->
+		<div class="w-[300px] md:w-[600px] py-4 mx-auto flex flex-col md:flex-row gap-2 justify-center">		
 			<div class="filter-box">
 				<span class="filter-name">Age</span>
 				<span class="mx-auto">{ageValue[0]} - {ageValue[1]} year</span>
 				<Slider min="0" max="150" step="1" bind:value={ageValue} range order />
 			</div>
-
 			<div class="filter-box">
 				<span class="filter-name">Cohesion</span>
 				<span class="mx-auto">{cohesionValue[0]}%</span>
 				<Slider bind:value={cohesionValue} />
 			</div>
-
 			<!-- TODO : gender options, make like profile settings
       + make global declarations for let genders = ['', 'Male', 'Female', 'Other', 'Queer'];
       + label and for each for reoccuring code -->
@@ -91,8 +91,10 @@
 				</div>
 			</div>
 		</div>
+
 	{:else}
-		<div class="w-full lg:w-3/4 rounded-md flex flex-col gap-2 mx-auto">
+
+		<div class="w-full sm:w-[600px] rounded-md flex flex-col gap-2 mx-auto">
 			<button on:click={() => (resultWindow = false)}>
 				<ArrowLeft class="w-12 hover-circle hover-color" />
 			</button>

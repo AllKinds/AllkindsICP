@@ -3,11 +3,17 @@
 	import { fromNullableDate, fromNullableGender } from '$lib/utilities';
 	import { onMount } from 'svelte';
 	import { getQsAnswered, questionsAnswered } from '$lib/stores/tasks/getQsAnswered';
+	import Qbanner from '$lib/components/app/Qbanner.svelte';
 
 	//TODO make this into ultility function
 	let userBirth = fromNullableDate($user.birth[0]);
 	let ageMs = Number(new Date()) - Number($user.birth[0]) / 1000000;
 	let ageY = Math.floor(ageMs / (1000 * 3600 * 24) / 365);
+
+	let userAge = userBirth ? ageY + ', ' : '';
+	let userGender = fromNullableGender($user.gender[0]) ? fromNullableGender($user.gender[0]) + ', ' : '';
+	let userAbout = $user.about[0] ? $user.about[0] : '';
+	let userConnect = $user.connect[0] ? $user.connect[0] : '';
 
 	console.log('age', userBirth);
 	console.log($user.about[0]);
@@ -27,21 +33,18 @@
 		{$user.username}
 	</span>
 	<span class="p-0 text-xl mx-auto text-zinc-600">
-		<!-- TEMP FIX : check and manually give undefined bcs of date-time issue -->
-		{userBirth ? ageY : 'undefined'} , {fromNullableGender($user.gender[0])}
+		{userAge}{userGender}
+		<span class="p-0 text-base mx-auto text-zinc-600">{userConnect}</span>
 	</span>
-	<span class="mx-auto">{$user.about[0] ? $user.about[0] : ''}</span>
+	
+	<span class="mx-auto">{userAbout}</span>
 
 	<!--TODO :  2 buttons to call AnsweredQ and MyCreatedQ -->
 	<div class=" w-100% rounded-md flex flex-col p-2 md:p-8 gap-2">
 		{#if $questionsAnswered}
 			{#each $questionsAnswered as q}
 				<!--TODO : a more default small question card -->
-				<div class="flex bg-sub90 border-main p-4">
-					{q.question},
-					{q.points},
-					{q.creater}
-				</div>
+				<Qbanner {q}/>
 			{/each}
 		{/if}
 	</div>

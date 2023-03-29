@@ -12,7 +12,7 @@
 	let succes: boolean = false;
 	let userPrincipal: Principal = match.principal;
 	let userName = match.username;
-	let userScore = Number(match.cohesion);
+	let userScore = match.cohesion;
 	let userAbout = fromNullable(match.about);
 	let userGender = fromNullableGender(match.gender);
 	let userBirth = fromNullable(match.birth);
@@ -43,6 +43,7 @@ TODO : finish this card, and fix cohesion score in backend for a proper result
 TODO : at same time implement this into a friendlist and using same component 
 TODO : backend create friendlist and connection request implementation -->
 
+<!-- NOTE: this component sizes according to parent -->
 <div class="w-full flex flex-col justify-between mx-auto">
 	<div class="w-full h-72 sm:h-96 mx-auto rounded-md bg-sub">
 		<!-- placeholder profile picture -->
