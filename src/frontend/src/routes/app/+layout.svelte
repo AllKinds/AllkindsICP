@@ -32,10 +32,8 @@
 			</div> -->
 
 			<!-- main content -->
-			<div class=" h-fit w-full rounded-lg mt-1 min-h-screen">
-				<div class="rounded-lg ">
-					<slot />
-				</div>
+			<div class=" h-fit w-full mt-1 min-h-screen">		
+				<slot />
 			</div>
 
 			<div class="bg-main sticky top-16 h-fit w-44 mx-auto max-lg:hidden rounded-lg">
