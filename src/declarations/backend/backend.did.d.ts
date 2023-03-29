@@ -1,7 +1,6 @@
 import type { ActorMethod } from '@dfinity/agent';
 import type { Principal } from '@dfinity/principal';
 
-export type AnswerKind = { Bool: boolean };
 export type Color = { Default: null };
 export type FriendStatus = { Approved: null } | { Waiting: null } | { Requested: null };
 export interface FriendlyUserMatch {
@@ -54,7 +53,6 @@ export interface UserMatch {
 	birth: [] | [bigint];
 	answeredQuestions: Array<Question>;
 }
-export type WeightKind = { Like: bigint } | { Dislike: bigint };
 export interface _SERVICE {
 	answerFriendRequest: ActorMethod<[Principal, boolean], Result>;
 	createQuestion: ActorMethod<[string], Result>;
@@ -65,8 +63,7 @@ export interface _SERVICE {
 	getFriends: ActorMethod<[], Result_2>;
 	getUser: ActorMethod<[], Result_1>;
 	sendFriendRequest: ActorMethod<[Principal], Result>;
-	submitAnswer: ActorMethod<[Hash, AnswerKind], Result>;
+	submitAnswer: ActorMethod<[Hash, boolean, bigint], Result>;
 	submitSkip: ActorMethod<[Hash], Result>;
-	submitWeight: ActorMethod<[Hash, WeightKind], Result>;
 	updateProfile: ActorMethod<[User], Result>;
 }

@@ -63,8 +63,6 @@ export const idlFactory = ({ IDL }) => {
 		points: IDL.Nat
 	});
 	const Result_1 = IDL.Variant({ ok: User, err: IDL.Text });
-	const AnswerKind = IDL.Variant({ Bool: IDL.Bool });
-	const WeightKind = IDL.Variant({ Like: IDL.Nat, Dislike: IDL.Nat });
 	return IDL.Service({
 		answerFriendRequest: IDL.Func([IDL.Principal, IDL.Bool], [Result], []),
 		createQuestion: IDL.Func([IDL.Text], [Result], []),
@@ -75,9 +73,8 @@ export const idlFactory = ({ IDL }) => {
 		getFriends: IDL.Func([], [Result_2], ['query']),
 		getUser: IDL.Func([], [Result_1], ['query']),
 		sendFriendRequest: IDL.Func([IDL.Principal], [Result], []),
-		submitAnswer: IDL.Func([Hash, AnswerKind], [Result], []),
+		submitAnswer: IDL.Func([Hash, IDL.Bool, IDL.Int], [Result], []),
 		submitSkip: IDL.Func([Hash], [Result], []),
-		submitWeight: IDL.Func([Hash, WeightKind], [Result], []),
 		updateProfile: IDL.Func([User], [Result], [])
 	});
 };

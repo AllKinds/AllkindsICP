@@ -15,6 +15,7 @@
 	let userAbout = fromNullable(match.about);
 	let userGender = fromNullableGender(match.gender);
 	let userBirth = fromNullable(match.birth);
+	//TODO make age utility function
 	let ageMs = Number(new Date()) - Number(match.birth) / 1000000;
 	let ageY = Math.floor(ageMs / (1000 * 3600 * 24) / 365);
 	let answeredQuestions = match.answeredQuestions;

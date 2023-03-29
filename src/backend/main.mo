@@ -33,7 +33,6 @@ actor {
 	let answerReward : Nat = 2;
 	let createrReward : Nat = 10;
 	let queryCost : Nat = 30;
-	let answerBaseScore : Nat = 1;
 
 	//DATA TYPES
 
@@ -99,8 +98,6 @@ actor {
 		question : Hash.Hash;
 		sourceAnswer : Answer;
 		testAnswer : Answer;
-		sourceWeight : ?Weight;
-		testWeight : ?Weight;
 	};
 
 	public type MatchingFilter = {
@@ -197,7 +194,7 @@ actor {
 		label f for (hash in questions.keys()) {
 			if (n == ?count) break f;
 			let pQ = hashPrincipalQuestion(p, hash);
-			if ( (null == skips.get(pQ)) or (null != answers.get(pQ)) ) {
+			if ((null == skips.get(pQ)) or (null != answers.get(pQ))) {
 				buf.add(hash);
 				count += 1;
 			};
@@ -205,30 +202,18 @@ actor {
 		buf.toArray();
 	};
 
-	// calc score for 2 answers and optional 2 weights
-	//TODO : optimise with let-alse after 0.8.3 and change accordingly after Weight type is revamped
-	func calcQuestionScore(sourceAnswer : Answer, testAnswer : Answer) : Nat {
-		let ?_ = sourceAnswer.question == testAnswer.question else return 0;
-		let ?_ = sourceAnswer.answer == testAnswer.answer else return 0;
-		
-		// if people didn't vote same answer for a question than we neglect
-		// ( I would recommend a base score value if both answered without weight, can even just 1 )
-
-		// take this situation where both 'me' & 'you' have voted YES on a question:
-		
-		//Q1: me(0) , you(+5) -> result = 
-		//Q2: me(0), you(-5) -> result = 
-		//Q3: me(-5), you(+5) -> result = 
-		//Q4: me(-5), you(-5) -> result = 
-		//Q5: me(+5), you(-20) -> result = 
-		//Q5: me(+20), you(-5) -> result = 
-		//Q5: me(+20), you(-100) -> result = 
-		//Q6: me(0) , you(0) -> result = 
-
-		let wScore = Nat.add(sourceAnswer.weight, sourceAnswer.weight, answerBaseScore);
-
-		return wScore; //score can 
+	func allAnsweredQuestions(p : Principal, n : ?Nat) : [Hash.Hash] {
+		let buf = Buffer.Buffer<Hash.Hash>(16);
+		var count = 0;
+		label f for (hash in questions.keys()) {
+			if (n == ?count) break f;
+			let pQ = hashPrincipalQuestion(p, hash);
+			if (null == skips.get(pQ)) {
+				buf.add(hash);
+				count += 1;
+			};
 		};
+		buf.toArray();
 	};
 
 	func hasAnswered(p : Principal, question : Hash.Hash) : ?Answer {
@@ -244,41 +229,41 @@ actor {
 			//check
 			let ?sourceAnswer = answers.get(sourcePQ) else continue l;
 			let ?testAnswer = answers.get(testPQ) else continue l;
-			let sourceWeight = weights.get(sourcePQ);
-			let testWeight = weights.get(testPQ);
+
 			//build
 			let commonQuestion : CommonQuestion = {
 				question = hash;
 				sourceAnswer;
 				testAnswer;
-				sourceWeight;
-				testWeight;
 			};
 			buf.add(commonQuestion);
 		};
 		buf.toArray();
 	};
 
-	func calcScore(sourceUser : Principal, testUser : Principal) : Float {
-		let common = commonQuestions(sourceUser, testUser);
-		var score : Int = 0;
-		var qScore : Float = 0;
-		for (q in Iter.fromArray(common)) {
-			score := calcQuestionScore(
-				q.sourceAnswer,
-				q.testAnswer,
-				q.sourceWeight,
-				q.testWeight
-			);
-			//score /= (2 * common.size());
-			//Algorithm calc needs heavy revamp, but atleast its now giving a more normal value
-			qScore += Float.fromInt(score);
-		};
-		qScore;
+	// calc score for 2 answers and optional 2 weights
+	func calcQuestionScore(sourceAnswer : Answer, testAnswer : Answer) : Int {
+		let _ = sourceAnswer.question == testAnswer.question else return 0;
+		let _ = sourceAnswer.answer == testAnswer.answer else return 0;
+		let _ = sourceAnswer.weight >= 0 and 0 <= testAnswer.weight else return 0;
+		return (2 + Int.abs(sourceAnswer.weight) + Int.abs(testAnswer.weight) / 2);
 	};
 
+	func calcScore(sourceUser : Principal, testUser : Principal) : Int {
+		let common = commonQuestions(sourceUser, testUser);
+		var qScore : Int = 0;
+		for (q in Iter.fromArray(common)) {
+			var score = calcQuestionScore(q.sourceAnswer, q.testAnswer);
+			qScore += score;
+		};
+		Debug.print(debug_show ("qscore", qScore));
+
+		return qScore;
+	};
+
+	// todo : change into easier way of ?null checking
 	func changeUserPoints(p : Principal, value : Nat) : () {
-		//change into easier way of ?null checking
+
 		let ?user = users.get(p) else return;
 		let changedUser = {
 			username = user.username;
@@ -315,8 +300,8 @@ actor {
 		};
 	};
 
-	func getXAnsweredQuestions(p : Principal, n : ?Nat) : [Question] {
-		let answered = answeredQuestions(p, n);
+	func getAllAnsweredQuestions(p : Principal, n : ?Nat) : [Question] {
+		let answered = allAnsweredQuestions(p, n);
 
 		func getQuestion(h : Hash.Hash) : ?Question {
 			questions.get(h);
@@ -327,18 +312,27 @@ actor {
 
 	//utility functions mostly for filterUsers
 	//could be made more generalized and optimised with switch prob for faster process
-	func sortByScore(t : UserWScore, u : UserWScore) : Order.Order {
-		if (t.1 < u.1) {
+	func sortByScore(x : UserWScore, y : UserWScore) : Order.Order {
+		if (x.1 < y.1) {
 			return #less;
-		} else if (t.1 > u.1) {
+		} else if (x.1 > y.1) {
 			return #greater;
 		} else {
 			return #equal;
 		};
 	};
 
-	func findCoheFilter(t : UserWScore, u : UserWScore) : Bool {
-		t.0 == u.0;
+	func findCoheFilter(x : UserWScore, y : UserWScore) : Bool {
+		x.0 == y.0;
+	};
+
+	func calcCohesion(x : Int, y : Int) : Int {
+		return Float.toInt(
+			100 * Float.div(
+				Float.fromInt(x),
+				Float.fromInt(y)
+			)
+		);
 	};
 
 	func isEqF(x : Friend, y : Friend) : Bool {
@@ -350,7 +344,7 @@ actor {
 		//TODO : optimize with let-else after 0.8.3 because this is messy
 		let buf = Buffer.Buffer<UserWScore>(16);
 		var count = 0;
-		let callerScore : Float = calcScore(p, p);
+		let callerScore = calcScore(p, p);
 		//User Loop
 		label ul for (pm : Principal in users.keys()) {
 			if (users.size() == count) break ul;
@@ -377,17 +371,19 @@ actor {
 						};
 						case (_)();
 					};
-					let pmScore : Float = calcScore(p, pm);
-					let pmCohesion = Float.toInt(Float.trunc((pmScore / callerScore) * 100));
+					let pmScore = calcScore(p, pm);
+					// match/user * 100
+					let pmCohesion = calcCohesion(pmScore, callerScore);
+					Debug.print(debug_show ("pmcohesion", pmCohesion));
+
 					//maybe fix: check here if user is itself, and if so add cohesion filter to username to solve 2 bugs
 					if (p != pm) {
-						buf.add(?pm, pmCohesion);
+						buf.add(?pm, pmCohesion); //in %
 					};
 				};
 			};
 			count += 1;
 		}; // end ul
-		Debug.print(debug_show ("f.cohesion", f.cohesion));
 		//insert cohesionfilter and sort by <
 		buf.add(null, f.cohesion);
 		buf.sort(sortByScore);
@@ -426,9 +422,6 @@ actor {
 	stable var stableAnswers : [(PrincipalQuestionHash, Answer)] = [];
 	let answers = HashMap.fromIter<PrincipalQuestionHash, Answer>(Iter.fromArray(stableAnswers), 100, Hash.equal, hashhash);
 
-	stable var stableWeights : [(PrincipalQuestionHash, Weight)] = [];
-	let weights = HashMap.fromIter<PrincipalQuestionHash, Weight>(Iter.fromArray(stableWeights), 100, Hash.equal, hashhash);
-
 	stable var stableSkips : [(PrincipalQuestionHash, Skip)] = [];
 	let skips = HashMap.fromIter<PrincipalQuestionHash, Skip>(Iter.fromArray(stableSkips), 100, Hash.equal, hashhash);
 
@@ -440,7 +433,6 @@ actor {
 		stableUsers := Iter.toArray(users.entries());
 		stableQuestions := Iter.toArray(questions.entries());
 		stableAnswers := Iter.toArray(answers.entries());
-		stableWeights := Iter.toArray(weights.entries());
 		stableSkips := Iter.toArray(skips.entries());
 		stableFriends := Iter.toArray(friends.entries());
 	};
@@ -449,7 +441,6 @@ actor {
 		stableUsers := [];
 		stableQuestions := [];
 		stableAnswers := [];
-		stableWeights := [];
 		stableSkips := [];
 		stableFriends := [];
 	};
@@ -521,51 +512,21 @@ actor {
 	};
 
 	// Add an answer
-	public shared (msg) func submitAnswer(question : Hash.Hash, answer : AnswerKind) : async Result.Result<(), Text> {
-		let ?user = users.get(msg.caller) else return #err("User does not exist");
+	public shared (msg) func submitAnswer(question : Hash.Hash, answer : Bool, weight : Int) : async Result.Result<(), Text> {
+		let ?user = users.get(msg.caller) else return #err("User does not exist!");
+		//TODO : check if user has balance to put in weight
+		let _ = Nat.less(user.points, Int.abs(weight)) else return #err("You don't have enough points!");
+
 		let principalQuestion = hashPrincipalQuestion(msg.caller, question);
 		let newAnswer = {
 			user = msg.caller;
 			question;
 			answer;
-		};
-		answers.put(principalQuestion, newAnswer);
-		changeUserPoints(msg.caller, (user.points + answerReward));
-		#ok();
-	};
-
-	// // Add a weight
-	public shared (msg) func submitWeight(question : Hash.Hash, weight : WeightKind) : async Result.Result<(), Text> {
-		let principalQuestion = hashPrincipalQuestion(msg.caller, question);
-		let newWeight = {
-			user = msg.caller;
-			question;
 			weight;
 		};
-		let weightValue : Int = switch (weight) {
-			case (#Like(value)) { value };
-			case (#Dislike(value)) { - value };
-		};
-		let ?user = users.get(msg.caller) else return #err("User does not exist");
-		let ?q : ?Question = questions.get(question) else return #err("Question does not exist");
-		//check if user has enough points
-		if (Nat.less(user.points, Int.abs(weightValue))) {
-			return #err("You don't have enough points");
-		};
-		weights.put(principalQuestion, newWeight);
-		changeUserPoints(msg.caller, (user.points - Int.abs(weightValue)));
-		//check if user != creater
-		if (msg.caller != q.creater) {
-			switch (users.get(q.creater)) {
-				case null {}; //do nothing, creater account might have been removed
-				case (?creater) {
-					changeUserPoints(q.creater, (creater.points + Int.abs(weightValue)));
-				};
-			};
-		};
-		changeQuestionPoints(q, (q.points + weightValue));
+		answers.put(principalQuestion, newAnswer);
+		changeUserPoints(msg.caller, (user.points + answerReward - Int.abs(weight)));
 		#ok();
-		//TODO : optimise with let-else after 0.8.3
 	};
 
 	// Add a skip
@@ -599,7 +560,7 @@ actor {
 			birth = checkPublic(userM.birth);
 			connect = checkPublic(userM.connect);
 			cohesion = match.1;
-			answeredQuestions = getXAnsweredQuestions(principalMatch, null);
+			answeredQuestions = getAllAnsweredQuestions(principalMatch, null);
 		}; //TODO : fix above func getXAnsQues, gives literally only answeredQ bcs ongoing bad weight-like-answer implementation
 		//also filter first on commonQuestions to add a bool to this array for front-end indicating if both answered
 		return #ok(result);
@@ -609,7 +570,7 @@ actor {
 	public shared query (msg) func getFriends() : async Result.Result<([FriendlyUserMatch]), Text> {
 		let buf = Buffer.Buffer<FriendlyUserMatch>(16);
 		let ?friendList = friends.get(msg.caller) else return #err("You don't have any friends :c ");
-		let callerScore = calcScore(msg.caller, msg.caller);
+		//let callerScore = calcScore(msg.caller, msg.caller);
 
 		//build resulting object and add to buffer
 		//label here possibly not RLLY needed, but gives good overview and continue/break support if needed
@@ -619,7 +580,7 @@ actor {
 			let ?matchStatus = f.status else return #err("Something went wrong!");
 
 			//TODO : next 2 lines should have their own function (they are re-used)
-			let pmScore = Float.toInt(calcScore(msg.caller, pm));
+			let pmScore : Int = calcScore(msg.caller, pm);
 			//ENABLE : let pmCohesion = Int.abs(Float.toInt(Float.trunc((pmScore / callerScore) * 100)));
 			//Debug.print(debug_show ("pm score/cohe", pmScore, pmCohesion));
 
@@ -637,7 +598,7 @@ actor {
 					birth = checkPublic(userM.birth);
 					connect = checkPublic(userM.connect);
 					cohesion = pmScore; //ENABLE : pmCohesion
-					answeredQuestions = getXAnsweredQuestions(pm, null);
+					answeredQuestions = getAllAnsweredQuestions(pm, null);
 					status = matchStatus;
 				};
 				buf.add(matchObj);
@@ -650,7 +611,7 @@ actor {
 					birth = userM.birth.0;
 					connect = userM.connect.0;
 					cohesion = pmScore; //ENABLE : pmCohesion
-					answeredQuestions = getXAnsweredQuestions(pm, null);
+					answeredQuestions = getAllAnsweredQuestions(pm, null);
 					status = matchStatus;
 				};
 				buf.add(matchObj);
