@@ -15,6 +15,7 @@
 	let userAbout = fromNullable(match.about);
 	let userGender = fromNullableGender(match.gender);
 	let userBirth = fromNullable(match.birth);
+	//TODO make age utility function
 	let ageMs = Number(new Date()) - Number(match.birth) / 1000000;
 	let ageY = Math.floor(ageMs / (1000 * 3600 * 24) / 365);
 	let answeredQuestions = match.answeredQuestions;
@@ -24,14 +25,14 @@
 		succes = false;
 		await sendFriendRequest(userPrincipal).then((res) => {
 			if (res.ok) {
-				console.log('result after request :', res);			
-				
-			};
+				console.log('result after request :', res);
+			}
 		});
 		succes = true;
 		pending = false;
 	};
 	//TODO : spinner keeps loading, cant update states after function call? check app/component load states
+	//myabe bcs no subscribe value here for comp to update
 </script>
 
 <!-- will only show 1 user for now, one with nearest cohesion score
@@ -73,5 +74,4 @@ TODO : backend create friendlist and connection request implementation -->
 			{/each}
 		{/if}
 	</div>
-
 </div>

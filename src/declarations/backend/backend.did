@@ -1,7 +1,3 @@
-type WeightKind = variant {
-	Dislike : nat;
-	Like : nat;
-};
 type UserMatch = record {
 	about : opt text;
 	answeredQuestions : vec Question;
@@ -43,7 +39,7 @@ type Result_3 = variant {
 };
 type Result_2 = variant {
 	err : text;
-	ok : vec Friend;
+	ok : vec FriendlyUserMatch;
 };
 type Result_1 = variant {
 	err : text;
@@ -76,17 +72,23 @@ type Gender = variant {
 	Other;
 	Queer;
 };
+type FriendlyUserMatch = record {
+	about : opt text;
+	answeredQuestions : vec Question;
+	birth : opt int;
+	cohesion : int;
+	connect : opt text;
+	gender : opt Gender;
+	"principal" : principal;
+	status : FriendStatus;
+	username : text;
+};
 type FriendStatus = variant {
 	Approved;
 	Requested;
 	Waiting;
 };
-type Friend = record {
-	account : principal;
-	status : opt FriendStatus;
-};
 type Color = variant { Default };
-type AnswerKind = variant { Bool : bool };
 service : {
 	answerFriendRequest : (principal, bool) -> (Result);
 	createQuestion : (text) -> (Result);
@@ -97,8 +99,7 @@ service : {
 	getFriends : () -> (Result_2) query;
 	getUser : () -> (Result_1) query;
 	sendFriendRequest : (principal) -> (Result);
-	submitAnswer : (Hash, AnswerKind) -> (Result);
+	submitAnswer : (Hash, bool, int) -> (Result);
 	submitSkip : (Hash) -> (Result);
-	submitWeight : (Hash, WeightKind) -> (Result);
 	updateProfile : (User) -> (Result);
 };

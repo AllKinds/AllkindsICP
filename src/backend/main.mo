@@ -22,14 +22,13 @@ import None "mo:base/None";
 
 actor {
 	//TODO : copy and remake functions with moc 8.3 (check also .4 and .5) additions
-	//TODO : use more hashmap functionality instead of buffers for faster calculations
-	//TODO : maybe make and extract some code to types.mo and utils.mo
+	//TODO : use more hashmap functionality instead of buffers for faster calculations?
+	//TODO : maybe make and extract some code to types.mo and utils.mo -> temp broken in moc 0.8?
 	//TODO : integrate more variants (point usages, common errors, etc..)
-	//TODO : should overall be retyped for more cohersiveness, See type operational expressions
+	//TODO : should overall be retyped for more cohesiveness, See type operational expressions
 
 	// CONSTANTS
 	let N = 10;
-	//TODO : change 'points' to 'reward'
 	let initReward : Nat = 10000;
 	let answerReward : Nat = 2;
 	let createrReward : Nat = 10;
@@ -84,30 +83,13 @@ actor {
 	public type Answer = {
 		user : Principal;
 		question : Hash.Hash;
-		answer : AnswerKind;
-	};
-
-	public type Weight = {
-		user : Principal;
-		question : Hash.Hash;
-		weight : WeightKind; //this would need to become an Int
+		answer : Bool;
+		weight : Int;
 	};
 
 	public type Skip = {
 		user : Principal;
 		question : Hash.Hash;
-	};
-
-	// Only one answer type for now
-	public type AnswerKind = {
-		#Bool : Bool;
-	};
-
-	// Nat indicates a possible amount of tokens / points appointed by the user to to the question
-	public type WeightKind = {
-		//this would need to be removed
-		#Like : Nat;
-		#Dislike : Nat;
 	};
 
 	public type PrincipalQuestionHash = Hash.Hash;
@@ -116,8 +98,6 @@ actor {
 		question : Hash.Hash;
 		sourceAnswer : Answer;
 		testAnswer : Answer;
-		sourceWeight : ?Weight;
-		testWeight : ?Weight;
 	};
 
 	public type MatchingFilter = {
@@ -126,7 +106,6 @@ actor {
 		cohesion : Int;
 	};
 
-	//gotta rewrite this arrays prob will be very bad and broken
 	public type UserWScore = (?Principal, Int);
 
 	public type FriendStatus = {
@@ -145,7 +124,7 @@ actor {
 	public type FriendList = [Friend];
 
 	//for viewable data of caller's friends
-	public type FriendlyUserMatch = UserMatch and Friend;
+	public type FriendlyUserMatch = UserMatch and { status : FriendStatus };
 
 	// UTILITY FUNCTIONS
 
@@ -190,11 +169,6 @@ actor {
 		answers.put(pQ, answer);
 	};
 
-	func putWeight(p : Principal, weight : Weight) : () {
-		let pQ = hashPrincipalQuestion(p, weight.question);
-		weights.put(pQ, weight);
-	};
-
 	func putSkip(p : Principal, skip : Skip) : () {
 		let pQ = hashPrincipalQuestion(p, skip.question);
 		skips.put(pQ, skip);
@@ -206,7 +180,7 @@ actor {
 		label f for (hash in questions.keys()) {
 			if (n == count) break f;
 			let pQ = hashPrincipalQuestion(p, hash);
-			if (null == skips.get(pQ)) if (null == weights.get(pQ)) if (null == answers.get(pQ)) {
+			if (null == skips.get(pQ)) if (null == answers.get(pQ)) {
 				buf.add(hash);
 				count += 1;
 			};
@@ -220,7 +194,7 @@ actor {
 		label f for (hash in questions.keys()) {
 			if (n == ?count) break f;
 			let pQ = hashPrincipalQuestion(p, hash);
-			if (null == skips.get(pQ)) if (null == weights.get(pQ)) if (null != answers.get(pQ)) {
+			if ((null == skips.get(pQ)) or (null != answers.get(pQ))) {
 				buf.add(hash);
 				count += 1;
 			};
@@ -228,55 +202,23 @@ actor {
 		buf.toArray();
 	};
 
-	// calc score for 2 answers and optional 2 weights
-	//TODO : optimise with let-alse after 0.8.3 and change accordingly after Weight type is revamped
-	func calcQuestionScore(sourceAnswer : Answer, testAnswer : Answer, sourceWeight : ?Weight, testWeight : ?Weight) : Int {
-		assert (sourceAnswer.question == testAnswer.question);
-		// let hasWeights = Option.isSome(sourceWeight) and Option.isSome(testWeight);
-		// let hasNoWeights = Option.isNull(sourceWeight) and Option.isNull(testWeight);
-		let compareAnswers : Bool = sourceAnswer.answer == testAnswer.answer;
-		//let compareWeights : Bool = ...
-
-		if (compareAnswers == false) {
-			//also check for weights here
-			return 0;
-		} else {
-			// let sourceAnswerScore : Int = if (sourceAnswer.answer == #Bool(true)) { 1 } else { -1 };
-			// let testAnswerScore : Int = if (testAnswer.answer == #Bool(true)) { 1 } else { -1 };
-			let sourceWeightScore : Int = switch (sourceWeight) {
-				case (?sourceWeight) {
-					switch (sourceWeight.weight) {
-						case (#Like(score)) { score };
-						case (#Dislike(score)) { - score };
-					};
-				};
-				case null { 0 };
+	func allAnsweredQuestions(p : Principal, n : ?Nat) : [Hash.Hash] {
+		let buf = Buffer.Buffer<Hash.Hash>(16);
+		var count = 0;
+		label f for (hash in questions.keys()) {
+			if (n == ?count) break f;
+			let pQ = hashPrincipalQuestion(p, hash);
+			if (null == skips.get(pQ)) {
+				buf.add(hash);
+				count += 1;
 			};
-
-			let testWeightScore : Int = switch (testWeight) {
-				case (?testWeight) {
-					switch (testWeight.weight) {
-						case (#Like(score)) { score };
-						case (#Dislike(score)) { - score };
-					};
-				};
-				case null { 0 };
-			};
-
-			var wScore : Int = 0;
-			wScore += sourceWeightScore + testWeightScore;
-			return wScore;
 		};
+		buf.toArray();
 	};
 
 	func hasAnswered(p : Principal, question : Hash.Hash) : ?Answer {
 		let pQ = hashPrincipalQuestion(p, question);
 		return answers.get(pQ);
-	};
-
-	func hasweightd(p : Principal, question : Hash.Hash) : ?Weight {
-		let pQ = hashPrincipalQuestion(p, question);
-		return weights.get(pQ);
 	};
 
 	func commonQuestions(sourceUser : Principal, testUser : Principal) : [CommonQuestion] {
@@ -287,41 +229,41 @@ actor {
 			//check
 			let ?sourceAnswer = answers.get(sourcePQ) else continue l;
 			let ?testAnswer = answers.get(testPQ) else continue l;
-			let sourceWeight = weights.get(sourcePQ);
-			let testWeight = weights.get(testPQ);
+
 			//build
 			let commonQuestion : CommonQuestion = {
 				question = hash;
 				sourceAnswer;
 				testAnswer;
-				sourceWeight;
-				testWeight;
 			};
 			buf.add(commonQuestion);
 		};
 		buf.toArray();
 	};
 
-	func calcScore(sourceUser : Principal, testUser : Principal) : Float {
-		let common = commonQuestions(sourceUser, testUser);
-		var score : Int = 0;
-		var qScore : Float = 0;
-		for (q in Iter.fromArray(common)) {
-			score := calcQuestionScore(
-				q.sourceAnswer,
-				q.testAnswer,
-				q.sourceWeight,
-				q.testWeight
-			);
-			//score /= (2 * common.size());
-			//Algorithm calc needs heavy revamp, but atleast its now giving a more normal value
-			qScore += Float.fromInt(score);
-		};
-		qScore;
+	// calc score for 2 answers and optional 2 weights
+	func calcQuestionScore(sourceAnswer : Answer, testAnswer : Answer) : Int {
+		let _ = sourceAnswer.question == testAnswer.question else return 0;
+		let _ = sourceAnswer.answer == testAnswer.answer else return 0;
+		let _ = sourceAnswer.weight >= 0 and 0 <= testAnswer.weight else return 0;
+		return (2 + Int.abs(sourceAnswer.weight) + Int.abs(testAnswer.weight) / 2);
 	};
 
+	func calcScore(sourceUser : Principal, testUser : Principal) : Int {
+		let common = commonQuestions(sourceUser, testUser);
+		var qScore : Int = 0;
+		for (q in Iter.fromArray(common)) {
+			var score = calcQuestionScore(q.sourceAnswer, q.testAnswer);
+			qScore += score;
+		};
+		Debug.print(debug_show ("qscore", qScore));
+
+		return qScore;
+	};
+
+	// todo : change into easier way of ?null checking
 	func changeUserPoints(p : Principal, value : Nat) : () {
-		//change into easier way of ?null checking
+
 		let ?user = users.get(p) else return;
 		let changedUser = {
 			username = user.username;
@@ -358,8 +300,8 @@ actor {
 		};
 	};
 
-	func getXAnsweredQuestions(p : Principal, n : ?Nat) : [Question] {
-		let answered = answeredQuestions(p, n);
+	func getAllAnsweredQuestions(p : Principal, n : ?Nat) : [Question] {
+		let answered = allAnsweredQuestions(p, n);
 
 		func getQuestion(h : Hash.Hash) : ?Question {
 			questions.get(h);
@@ -370,26 +312,39 @@ actor {
 
 	//utility functions mostly for filterUsers
 	//could be made more generalized and optimised with switch prob for faster process
-	func sortByScore(t : UserWScore, u : UserWScore) : Order.Order {
-		if (t.1 < u.1) {
+	func sortByScore(x : UserWScore, y : UserWScore) : Order.Order {
+		if (x.1 < y.1) {
 			return #less;
-		} else if (t.1 > u.1) {
+		} else if (x.1 > y.1) {
 			return #greater;
 		} else {
 			return #equal;
 		};
 	};
 
-	func findCoheFilter(t : UserWScore, u : UserWScore) : Bool {
-		t.0 == u.0;
+	func findCoheFilter(x : UserWScore, y : UserWScore) : Bool {
+		x.0 == y.0;
+	};
+
+	func calcCohesion(x : Int, y : Int) : Int {
+		return Float.toInt(
+			100 * Float.div(
+				Float.fromInt(x),
+				Float.fromInt(y)
+			)
+		);
+	};
+
+	func isEqF(x : Friend, y : Friend) : Bool {
+		x.account == y.account;
 	};
 
 	// filter users according to parameters
 	func filterUsers(p : Principal, f : MatchingFilter) : ?UserWScore {
 		//TODO : optimize with let-else after 0.8.3 because this is messy
-		let buf = Buffer.Buffer<(UserWScore)>(16);
+		let buf = Buffer.Buffer<UserWScore>(16);
 		var count = 0;
-		let callerScore : Float = calcScore(p, p);
+		let callerScore = calcScore(p, p);
 		//User Loop
 		label ul for (pm : Principal in users.keys()) {
 			if (users.size() == count) break ul;
@@ -416,17 +371,19 @@ actor {
 						};
 						case (_)();
 					};
-					let pmScore : Float = calcScore(p, pm);
-					let pmCohesion = Float.toInt(Float.trunc((pmScore / callerScore) * 100));
+					let pmScore = calcScore(p, pm);
+					// match/user * 100
+					let pmCohesion = calcCohesion(pmScore, callerScore);
+					Debug.print(debug_show ("pmcohesion", pmCohesion));
+
 					//maybe fix: check here if user is itself, and if so add cohesion filter to username to solve 2 bugs
 					if (p != pm) {
-						buf.add(?pm, pmCohesion);
+						buf.add(?pm, pmCohesion); //in %
 					};
 				};
 			};
 			count += 1;
 		}; // end ul
-		Debug.print(debug_show ("f.cohesion", f.cohesion));
 		//insert cohesionfilter and sort by <
 		buf.add(null, f.cohesion);
 		buf.sort(sortByScore);
@@ -438,11 +395,11 @@ actor {
 		var iMa : Nat = 0;
 		//returns match index (+1), unless 0 or max
 		if (iCo == bufSizeX) {
-			iMa := bufSizeX - 1;
+			iMa := Nat.sub(bufSizeX, 1);
 		} else if (iCo == 0) {
 			iMa := 1;
 		} else {
-			iMa := iCo + 1;
+			iMa := Nat.add(iCo, 1);
 		};
 		//TODO : +else -> to also compare bordering values for better result
 		//TODO : still some small bugs, especially w sorting when cohesion has same value as usersScores
@@ -452,10 +409,6 @@ actor {
 		let resultMatch = buf.get(iMa);
 		Debug.print(debug_show ("arr", buf.toArray()));
 		return ?resultMatch;
-	};
-
-	func isEqF(x : Friend, y : Friend) : Bool {
-		x.account == y.account;
 	};
 
 	// DATA STORAGE
@@ -469,9 +422,6 @@ actor {
 	stable var stableAnswers : [(PrincipalQuestionHash, Answer)] = [];
 	let answers = HashMap.fromIter<PrincipalQuestionHash, Answer>(Iter.fromArray(stableAnswers), 100, Hash.equal, hashhash);
 
-	stable var stableWeights : [(PrincipalQuestionHash, Weight)] = [];
-	let weights = HashMap.fromIter<PrincipalQuestionHash, Weight>(Iter.fromArray(stableWeights), 100, Hash.equal, hashhash);
-
 	stable var stableSkips : [(PrincipalQuestionHash, Skip)] = [];
 	let skips = HashMap.fromIter<PrincipalQuestionHash, Skip>(Iter.fromArray(stableSkips), 100, Hash.equal, hashhash);
 
@@ -483,7 +433,6 @@ actor {
 		stableUsers := Iter.toArray(users.entries());
 		stableQuestions := Iter.toArray(questions.entries());
 		stableAnswers := Iter.toArray(answers.entries());
-		stableWeights := Iter.toArray(weights.entries());
 		stableSkips := Iter.toArray(skips.entries());
 		stableFriends := Iter.toArray(friends.entries());
 	};
@@ -492,7 +441,6 @@ actor {
 		stableUsers := [];
 		stableQuestions := [];
 		stableAnswers := [];
-		stableWeights := [];
 		stableSkips := [];
 		stableFriends := [];
 	};
@@ -533,8 +481,8 @@ actor {
 	};
 
 	public shared (msg) func updateProfile(user : User) : async Result.Result<(), Text> {
-		let ?user = users.get(msg.caller) else return #err("User does not exist!");
-		users.put(msg.caller, user);
+		let _ = users.get(msg.caller) else return #err("User does not exist!");
+		let _ = users.put(msg.caller, user) else return #err("err");
 		#ok();
 	};
 
@@ -564,51 +512,21 @@ actor {
 	};
 
 	// Add an answer
-	public shared (msg) func submitAnswer(question : Hash.Hash, answer : AnswerKind) : async Result.Result<(), Text> {
-		let ?user = users.get(msg.caller) else return #err("User does not exist");
+	public shared (msg) func submitAnswer(question : Hash.Hash, answer : Bool, weight : Int) : async Result.Result<(), Text> {
+		let ?user = users.get(msg.caller) else return #err("User does not exist!");
+		//TODO : check if user has balance to put in weight
+		let _ = Nat.less(user.points, Int.abs(weight)) else return #err("You don't have enough points!");
+
 		let principalQuestion = hashPrincipalQuestion(msg.caller, question);
 		let newAnswer = {
 			user = msg.caller;
 			question;
 			answer;
-		};
-		answers.put(principalQuestion, newAnswer);
-		changeUserPoints(msg.caller, (user.points + answerReward));
-		#ok();
-	};
-
-	// // Add a weight
-	public shared (msg) func submitWeight(question : Hash.Hash, weight : WeightKind) : async Result.Result<(), Text> {
-		let principalQuestion = hashPrincipalQuestion(msg.caller, question);
-		let newWeight = {
-			user = msg.caller;
-			question;
 			weight;
 		};
-		let weightValue : Int = switch (weight) {
-			case (#Like(value)) { value };
-			case (#Dislike(value)) { - value };
-		};
-		let ?user = users.get(msg.caller) else return #err("User does not exist");
-		let ?q : ?Question = questions.get(question) else return #err("Question does not exist");
-		//check if user has enough points
-		if (Nat.less(user.points, Int.abs(weightValue))) {
-			return #err("You don't have enough points");
-		};
-		weights.put(principalQuestion, newWeight);
-		changeUserPoints(msg.caller, (user.points - Int.abs(weightValue)));
-		//check if user != creater
-		if (msg.caller != q.creater) {
-			switch (users.get(q.creater)) {
-				case null {}; //do nothing, creater account might have been removed
-				case (?creater) {
-					changeUserPoints(q.creater, (creater.points + Int.abs(weightValue)));
-				};
-			};
-		};
-		changeQuestionPoints(q, (q.points + weightValue));
+		answers.put(principalQuestion, newAnswer);
+		changeUserPoints(msg.caller, (user.points + answerReward - Int.abs(weight)));
 		#ok();
-		//TODO : optimise with let-else after 0.8.3
 	};
 
 	// Add a skip
@@ -642,17 +560,70 @@ actor {
 			birth = checkPublic(userM.birth);
 			connect = checkPublic(userM.connect);
 			cohesion = match.1;
-			answeredQuestions = getXAnsweredQuestions(principalMatch, null);
+			answeredQuestions = getAllAnsweredQuestions(principalMatch, null);
 		}; //TODO : fix above func getXAnsQues, gives literally only answeredQ bcs ongoing bad weight-like-answer implementation
 		//also filter first on commonQuestions to add a bool to this array for front-end indicating if both answered
 		return #ok(result);
 	};
 
-	public shared query (msg) func getFriends() : async Result.Result<([Friend]), Text> {
-		let ?friendList = friends.get(msg.caller) else return #err("Something went wrong!");
-		#ok(friendList);
+	//TODO : change function w result FriendlyUserMatch (= combined type)
+	public shared query (msg) func getFriends() : async Result.Result<([FriendlyUserMatch]), Text> {
+		let buf = Buffer.Buffer<FriendlyUserMatch>(16);
+		let ?friendList = friends.get(msg.caller) else return #err("You don't have any friends :c ");
+		//let callerScore = calcScore(msg.caller, msg.caller);
+
+		//build resulting object and add to buffer
+		//label here possibly not RLLY needed, but gives good overview and continue/break support if needed
+		label ul for (f : Friend in friendList.vals()) {
+			let pm : Principal = f.account;
+			let ?userM = users.get(pm) else continue ul; //might be that user has been deleted
+			let ?matchStatus = f.status else return #err("Something went wrong!");
+
+			//TODO : next 2 lines should have their own function (they are re-used)
+			let pmScore : Int = calcScore(msg.caller, pm);
+			//ENABLE : let pmCohesion = Int.abs(Float.toInt(Float.trunc((pmScore / callerScore) * 100)));
+			//Debug.print(debug_show ("pm score/cohe", pmScore, pmCohesion));
+
+			//TODO : doesnt seem to want to work with mutable var matchObj
+			// matchObj.about :=  checkPublic(userM.about);
+			// matchObj.gender := checkPublic(userM.gender);
+			// matchObj.birth := checkPublic(userM.birth);
+			// matchObj.connect := checkPublic(userM.connect);
+			if (matchStatus != #Approved) {
+				let matchObj : FriendlyUserMatch = {
+					principal = pm;
+					username = userM.username;
+					about = checkPublic(userM.about);
+					gender = checkPublic(userM.gender);
+					birth = checkPublic(userM.birth);
+					connect = checkPublic(userM.connect);
+					cohesion = pmScore; //ENABLE : pmCohesion
+					answeredQuestions = getAllAnsweredQuestions(pm, null);
+					status = matchStatus;
+				};
+				buf.add(matchObj);
+			} else {
+				let matchObj : FriendlyUserMatch = {
+					principal = pm;
+					username = userM.username;
+					about = userM.about.0;
+					gender = userM.gender.0;
+					birth = userM.birth.0;
+					connect = userM.connect.0;
+					cohesion = pmScore; //ENABLE : pmCohesion
+					answeredQuestions = getAllAnsweredQuestions(pm, null);
+					status = matchStatus;
+				};
+				buf.add(matchObj);
+			};
+
+		};
+		//TODO :  iterate over list, get user data for each user, and return info
+		//!!! NON-#Approved friends ONLY return checkPublic (public viewable data)
+		#ok(buf.toArray());
 	};
 
+	//TODO : extract reusable function from sendFriendRequest and answerFriendRequest
 	public shared (msg) func sendFriendRequest(p : Principal) : async Result.Result<(), Text> {
 		let ?user = users.get(msg.caller) else return #err("You are not registered!");
 		let ?userFriends = friends.get(msg.caller) else return #err("Something went wrong!");
@@ -670,7 +641,7 @@ actor {
 					case (?#Requested) return #err("You already requested this user to connect!");
 					case (?#Waiting) return #err("You already have a pending connection request from this user!");
 					case (?#Approved) return #err("You are already friends with this user!");
-					case (null) return #err("Strange");
+					case (null) return #err("Strange!");
 				};
 			};
 		};

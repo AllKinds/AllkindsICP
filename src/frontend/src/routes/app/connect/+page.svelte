@@ -9,6 +9,7 @@
 
 	let pending: boolean = false;
 	let expandWindow: Boolean = false;
+	//age + cohes based on Slider plugin, see for more info
 	let ageValue = [0, 150];
 	let cohesionValue = [100, 100];
 	let genderValue = 'Everyone';
