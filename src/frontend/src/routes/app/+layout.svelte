@@ -32,7 +32,7 @@
 			</div> -->
 
 			<!-- main content -->
-			<div class=" h-fit w-full mt-1 min-h-screen">		
+			<div class=" h-fit w-full mt-1 min-h-screen">
 				<slot />
 			</div>
 

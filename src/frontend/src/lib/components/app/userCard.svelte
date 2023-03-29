@@ -75,19 +75,15 @@ TODO : backend create friendlist and connection request implementation -->
 			</div>
 		{/if}
 
-		
-			<button class="pb-2 text-left ">
-				<span class="hover-bg hover-color">All Questions{"("}{aQsize > 0 ? aQsize : 0}{")"}</span> 
-			</button>
+		<button class="pb-2 text-left ">
+			<span class="hover-bg hover-color">All Questions{'('}{aQsize > 0 ? aQsize : 0}{')'}</span>
+		</button>
 		{#if aQsize > 0}
 			<div class="flex flex-col gap-2">
 				{#each answeredQuestions as q}
-					<Qbanner {q}/>
+					<Qbanner {q} />
 				{/each}
 			</div>
 		{/if}
-		
-		
 	</div>
-
 </div>

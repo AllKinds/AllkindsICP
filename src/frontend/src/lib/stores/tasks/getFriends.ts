@@ -1,7 +1,6 @@
 import { actor } from '$lib/stores';
 import type { FriendlyUserMatch } from 'src/declarations/backend/backend.did';
 import { get, writable } from 'svelte/store';
-import { syncAuth } from './auth';
 
 export const foundFriends = writable<Array<FriendlyUserMatch>>();
 

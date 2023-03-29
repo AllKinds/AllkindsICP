@@ -1,7 +1,6 @@
 import { actor } from '$lib/stores';
 import type { Question } from 'src/declarations/backend/backend.did';
 import { get, writable } from 'svelte/store';
-import { syncAuth } from './auth';
 
 export const questions = writable<Array<Question>>();
 
@@ -12,7 +11,7 @@ export async function getQs() {
 		console.log('questions: ', res.ok);
 		if (res.ok) {
 			questions.set(res.ok);
-		};
+		}
 	});
 	//await syncAuth();
-};
+}

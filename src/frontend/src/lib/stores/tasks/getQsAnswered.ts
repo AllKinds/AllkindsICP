@@ -15,7 +15,6 @@ export async function getQsAnswered() {
 		if (res.ok) {
 			questionsAnswered.set(res.ok);
 		}
-		
 	});
 	await syncAuth();
 }

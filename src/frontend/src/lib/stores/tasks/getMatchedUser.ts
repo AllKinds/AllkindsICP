@@ -1,5 +1,5 @@
 import { actor } from '$lib/stores';
-import type { MatchingFilter, FriendlyUserMatch } from 'src/declarations/backend/backend.did';
+import type { FriendlyUserMatch, MatchingFilter } from 'src/declarations/backend/backend.did';
 import { get, writable } from 'svelte/store';
 import { syncAuth } from './auth';
 
@@ -16,4 +16,4 @@ export async function getMatchedUser(filter: MatchingFilter) {
 		}
 	});
 	await syncAuth();
-};
+}

@@ -3,11 +3,15 @@
 	import { toNullableGender } from '$lib/utilities';
 	import Spinner from '$lib/components/common/Spinner.svelte';
 	import Slider from '@bulatdashiev/svelte-slider';
-	import type { MatchingFilter, User, FriendlyUserMatch, Result } from 'src/declarations/backend/backend.did';
+	import type {
+		MatchingFilter,
+		User,
+		FriendlyUserMatch,
+		Result
+	} from 'src/declarations/backend/backend.did';
 	import UserCard from '$lib/components/app/UserCard.svelte';
 	import { getMatchedUser, matchedUser } from '$lib/stores/tasks/getMatchedUser';
 	import ArrowLeft from '$lib/assets/icons/arrowLeft.svg?component';
-
 
 	let pending: boolean = false;
 	let resultWindow: Boolean = false;
@@ -16,7 +20,7 @@
 	let cohesionValue = [100, 100];
 	let genderValue = 'Everyone';
 	//let matches: Array<[User, BigInt]>;
-	let match : FriendlyUserMatch;
+	let match: FriendlyUserMatch;
 
 	//this could be moved to some declaration/constant somewhere else
 	let genders = ['Everyone', 'Male', 'Female', 'Other', 'Queer'];
@@ -33,17 +37,18 @@
 		};
 		console.log('filter obj ready: ', filter);
 
-		await getMatchedUser(filter).catch((err : Result) => {
+		await getMatchedUser(filter).catch((err: Result) => {
 			console.log('error while getting matchedUsers', err);
 		});
-		match = $matchedUser
+		match = $matchedUser;
 		console.log($matchedUser, match);
 		pending = false;
 		resultWindow = true;
 	};
 </script>
 
-<div class="flex flex-col gap-4">	<!-- border-main bg-sub30 -->
+<div class="flex flex-col gap-4">
+	<!-- border-main bg-sub30 -->
 	{#if !resultWindow}
 		<div class="fancy-btn-border mx-auto my-0">
 			<button on:click={handleFindMatches} class="fancy-btn">
@@ -86,11 +91,10 @@
 				</div>
 			</div>
 		</div>
-	
 	{:else}
 		<div class="w-full lg:w-3/4 rounded-md flex flex-col gap-2 mx-auto">
 			<button on:click={() => (resultWindow = false)}>
-				<ArrowLeft class="w-12 hover-circle hover-color"/>
+				<ArrowLeft class="w-12 hover-circle hover-color" />
 			</button>
 
 			{#if match}
@@ -101,4 +105,3 @@
 		</div>
 	{/if}
 </div>
-

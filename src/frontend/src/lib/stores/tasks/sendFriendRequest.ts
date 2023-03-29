@@ -10,5 +10,5 @@ export async function sendFriendRequest(p: Principal) {
 		.sendFriendRequest(p)
 		.then((res) => console.log('connection request response:', res));
 	//getQs()
-	await syncAuth(); 
+	await syncAuth();
 }

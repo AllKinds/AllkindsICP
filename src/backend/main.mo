@@ -241,22 +241,32 @@ actor {
 		buf.toArray();
 	};
 
-	// calc score for 2 answers and optional 2 weights
-	func calcQuestionScore(sourceAnswer : Answer, testAnswer : Answer) : Int {
-		let _ = sourceAnswer.question == testAnswer.question else return 0;
-		let _ = sourceAnswer.answer == testAnswer.answer else return 0;
-		let _ = sourceAnswer.weight >= 0 and 0 <= testAnswer.weight else return 0;
-		//TEMP : temporary calculation, not good as it still can result in (p, pm) > (p,p)
-		return (1 + Int.abs(sourceAnswer.weight) + Int.abs(testAnswer.weight) / 2);
+	func calcAnswerScore(sourceAnswer : Answer, testAnswer : Answer) : Int {
+		//check should be alrdy done let _ = sourceAnswer.question == testAnswer.question else return 0;
+		return if (sourceAnswer.answer == testAnswer.answer) {
+			(Int.abs(sourceAnswer.weight) + Int.abs(testAnswer.weight));
+		} else {
+			0;
+		};
+	};
+
+	func calcWeightScore(sourceAnswer : Answer, testAnswer : Answer) : Int {
+		return if ((sourceAnswer.weight >= 0 and 0 <= testAnswer.weight) or (sourceAnswer.weight <= 0 and 0 >= testAnswer.weight)) {
+			(Int.abs(sourceAnswer.weight) + Int.abs(testAnswer.weight));
+		} else {
+			0;
+		};
 	};
 
 	func calcScore(sourceUser : Principal, testUser : Principal) : Int {
 		let common = commonQuestions(sourceUser, testUser);
-		var qScore : Int = 0;
+		var aScore : Int = 0;
+		var wScore : Int = 0;
 		for (q in Iter.fromArray(common)) {
-			var score = calcQuestionScore(q.sourceAnswer, q.testAnswer);
-			qScore += score;
+			aScore += calcAnswerScore(q.sourceAnswer, q.testAnswer);
+			wScore += calcWeightScore(q.sourceAnswer, q.testAnswer);
 		};
+		let qScore : Int = calcCohesion(aScore, wScore);
 		Debug.print(debug_show ("qscore", qScore));
 
 		return qScore;
@@ -331,7 +341,7 @@ actor {
 		return Float.toInt(
 			100 * Float.div(
 				Float.fromInt(x),
-				Float.fromInt(y)
+				Float.fromInt(x + y)
 			)
 		);
 	};
@@ -345,7 +355,6 @@ actor {
 		//TODO : optimize with let-else after 0.8.3 because this is messy
 		let buf = Buffer.Buffer<UserWScore>(16);
 		var count = 0;
-		let callerScore = calcScore(p, p);
 		//User Loop
 		label ul for (pm : Principal in users.keys()) {
 			if (users.size() == count) break ul;
@@ -372,9 +381,7 @@ actor {
 						};
 						case (_)();
 					};
-					let pmScore = calcScore(p, pm);
-					// match/user * 100
-					let pmCohesion = calcCohesion(pmScore, callerScore);
+					let pmCohesion = calcScore(p, pm);
 					Debug.print(debug_show ("pmcohesion", pmCohesion));
 
 					//maybe fix: check here if user is itself, and if so add cohesion filter to username to solve 2 bugs
