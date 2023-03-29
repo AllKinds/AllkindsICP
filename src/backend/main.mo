@@ -242,7 +242,7 @@ actor {
 	};
 
 	func calcAnswerScore(sourceAnswer : Answer, testAnswer : Answer) : Int {
-		//check should be alrdy done let _ = sourceAnswer.question == testAnswer.question else return 0;
+		//check should be alrdy done in common Q so no need prob,  let _ = sourceAnswer.question == testAnswer.question else return 0;
 		return if (sourceAnswer.answer == testAnswer.answer) {
 			(Int.abs(sourceAnswer.weight) + Int.abs(testAnswer.weight));
 		} else {
