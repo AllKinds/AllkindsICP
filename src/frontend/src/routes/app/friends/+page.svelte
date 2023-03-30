@@ -5,31 +5,32 @@
 	import { fromNullable, fromNullableDate, fromNullableGender } from '$lib/utilities';
 	import type { FriendlyUserMatch } from 'src/declarations/backend/backend.did';
 	import { onMount } from 'svelte';
-  import Refresh from '$lib/assets/icons/refresh.svg?component';
-
+	import Refresh from '$lib/assets/icons/refresh.svg?component';
 
 	let pending: boolean = false;
-  let flSize = 0;
+	let flSize = 0;
+  let current = 0;
 
 	const handleFindFriends = async () => {
 		pending = true;
 		await getFriends().catch((error) => {
 			console.log('error while getting friends', error);
 		});
-    //await function for getting all friendrequests
+		//await function for getting all friendrequests
 		pending = false;
-    flSize = $foundFriends.length;
+		flSize = $foundFriends.length;
 	};
-  
-  onMount(async () => {
-		//TODO change into button that then calls answered Q
-		if ($foundFriends) {
+
+  onMount(() => {
+    if (!$foundFriends) {
+      handleFindFriends();
+      console.log("first time load")
+    } else {
       flSize = $foundFriends.length;
-    };
+    }
 	});
 
-let current = 0;
-
+	
 </script>
 
 <div class="flex flex-col gap-4">
@@ -42,33 +43,43 @@ let current = 0;
 			{/if}
 		</button>
 	</div> -->
-  <div class="flex gap-3">
-    <button on:click={() => current = 0} class:currentTab={current === 0} class="pb-2 text-left hover-color hover-circle">
-      <span class="">
-        My Friends{'('}{flSize > 0 ? flSize : 0}{')'}
-      </span>
-    </button>
-    <button on:click={() => current = 1} class:currentTab={current === 1} class="pb-2 text-left hover-color hover-circle">
-      <span class="">
-        Requests{'('}{flSize > 0 ? flSize : 0}{')'}
-      </span>
-    </button> 
-    
-    <button on:click={handleFindFriends} class="cursor-pointer hover-circle hover-color">   
-      {#if pending}
+	<div class="flex gap-3">
+		<button
+			on:click={() => (current = 0)}
+			class:currentTab={current === 0}
+			class="pb-2 text-left hover-color hover-circle"
+		>
+			My Friends{'('}{flSize > 0 ? flSize : 0}{')'}
+		</button>
+		<button
+			on:click={() => (current = 1)}
+			class:currentTab={current === 1}
+			class="pb-2 text-left hover-color hover-circle"
+		>
+			Requests{'('}{flSize > 0 ? flSize : 0}{')'}
+		</button>
+
+		<button on:click={handleFindFriends} class="cursor-pointer hover-circle hover-color">
+			{#if pending}
 				<Spinner />
 			{:else}
 				<Refresh />
 			{/if}
-    </button>
-  </div>
-
+		</button>
+	</div>
 
 	<div class="rounded-md flex flex-col gap-y-2">
-		{#if $foundFriends}
+		{#if $foundFriends && $foundFriends.length > 0}
 			{#each $foundFriends as u}
-        <UserBanner {u}/>
+				<UserBanner {u} />
 			{/each}
+		{:else}
+			<span class="text-slate-700">Oops you don't have any friends yet!</span>
+			<span class="text-slate-700">
+        Try the 
+        <a href="/app/connect" class="link">Connect</a> 
+        page to find people.
+      </span>
 		{/if}
 	</div>
 </div>

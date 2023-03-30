@@ -11,7 +11,9 @@
 	let ageY = Math.floor(ageMs / (1000 * 3600 * 24) / 365);
 
 	let userAge = userBirth ? ageY + ', ' : '';
-	let userGender = fromNullableGender($user.gender[0]) ? fromNullableGender($user.gender[0]) + ', ' : '';
+	let userGender = fromNullableGender($user.gender[0])
+		? fromNullableGender($user.gender[0]) + ', '
+		: '';
 	let userAbout = $user.about[0] ? $user.about[0] : '';
 	let userConnect = $user.connect[0] ? $user.connect[0] : '';
 
@@ -36,7 +38,7 @@
 		{userAge}{userGender}
 		<span class="p-0 text-base mx-auto text-zinc-600">{userConnect}</span>
 	</span>
-	
+
 	<span class="mx-auto">{userAbout}</span>
 
 	<!--TODO :  2 buttons to call AnsweredQ and MyCreatedQ -->
@@ -44,7 +46,7 @@
 		{#if $questionsAnswered}
 			{#each $questionsAnswered as q}
 				<!--TODO : a more default small question card -->
-				<Qbanner {q}/>
+				<Qbanner {q} />
 			{/each}
 		{/if}
 	</div>

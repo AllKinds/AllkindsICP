@@ -260,8 +260,9 @@ actor {
 
 	func calcScore(sourceUser : Principal, testUser : Principal) : Int {
 		let common = commonQuestions(sourceUser, testUser);
-		var aScore : Int = 0;
-		var wScore : Int = 0;
+		Debug.print(debug_show ("common questions", common));
+		var aScore : Int = 1;
+		var wScore : Int = 1;
 		for (q in Iter.fromArray(common)) {
 			aScore += calcAnswerScore(q.sourceAnswer, q.testAnswer);
 			wScore += calcWeightScore(q.sourceAnswer, q.testAnswer);
@@ -338,6 +339,8 @@ actor {
 	};
 
 	func calcCohesion(x : Int, y : Int) : Int {
+		Debug.print(debug_show ("x", x, "y", y));
+		let _ = (x != 0 and 0 != y) else return 0;
 		return Float.toInt(
 			100 * Float.div(
 				Float.fromInt(x),

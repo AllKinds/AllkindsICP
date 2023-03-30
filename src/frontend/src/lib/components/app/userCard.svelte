@@ -13,9 +13,9 @@
 	let userPrincipal: Principal = match.principal;
 	let userName = match.username;
 	let userScore = match.cohesion;
-	let userAbout = fromNullable(match.about);
+	let userAbout = match.about;
 	let userGender = fromNullableGender(match.gender);
-	let userBirth = fromNullable(match.birth);
+	let userBirth = match.birth;
 	//TODO make age utility function
 	let ageMs = Number(new Date()) - Number(match.birth) / 1000000;
 	let ageY = Math.floor(ageMs / (1000 * 3600 * 24) / 365);
@@ -61,7 +61,7 @@ TODO : backend create friendlist and connection request implementation -->
 		<span class="p-1 ">{userAbout ? userAbout : ''}</span>
 
 		{#if succes}
-			<span class="mx-auto text-slate-600">Connection request send!</span>
+			<span class="mx-auto text-slate-600 py-8">Connection request send!</span>
 		{:else}
 			<div class="mx-auto fancy-btn-border">
 				<button on:click={handleConnectionRequest} class="fancy-btn bg-main90">
