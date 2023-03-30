@@ -241,36 +241,53 @@ actor {
 		buf.toArray();
 	};
 
-	func calcAnswerScore(sourceAnswer : Answer, testAnswer : Answer) : Int {
+	func calcSameScore(sourceAnswer : Answer, testAnswer : Answer) : Int {
 		//check should be alrdy done in common Q so no need prob,  let _ = sourceAnswer.question == testAnswer.question else return 0;
 		return if (sourceAnswer.answer == testAnswer.answer) {
-			(Int.abs(sourceAnswer.weight) + Int.abs(testAnswer.weight));
+			//might need Int.abs back here
+			(sourceAnswer.weight + testAnswer.weight);
 		} else {
-			0;
+			(sourceAnswer.weight + testAnswer.weight);
 		};
 	};
 
-	func calcWeightScore(sourceAnswer : Answer, testAnswer : Answer) : Int {
-		return if ((sourceAnswer.weight >= 0 and 0 <= testAnswer.weight) or (sourceAnswer.weight <= 0 and 0 >= testAnswer.weight)) {
-			(Int.abs(sourceAnswer.weight) + Int.abs(testAnswer.weight));
+	func calcDiffScore(sourceAnswer : Answer, testAnswer : Answer) : Int {
+		return if (0 < Int.mul(sourceAnswer.weight, testAnswer.weight)) {
+			(sourceAnswer.weight - testAnswer.weight);
 		} else {
-			0;
+			(Int.abs(sourceAnswer.weight) + Int.abs(testAnswer.weight));
 		};
 	};
 
 	func calcScore(sourceUser : Principal, testUser : Principal) : Int {
 		let common = commonQuestions(sourceUser, testUser);
 		Debug.print(debug_show ("common questions", common));
-		var aScore : Int = 1;
-		var wScore : Int = 1;
+		var aScore : Int = 0;
+		var bScore : Int = 0;
+		var wScore : Int = 0; //distance between 2 weights
 		for (q in Iter.fromArray(common)) {
-			aScore += calcAnswerScore(q.sourceAnswer, q.testAnswer);
-			wScore += calcWeightScore(q.sourceAnswer, q.testAnswer);
+			aScore += calcSameScore(q.sourceAnswer, q.testAnswer);
+			bScore += calcSameScore(q.sourceAnswer, q.testAnswer);
+			wScore += calcDiffScore(q.sourceAnswer, q.testAnswer);
 		};
-		let qScore : Int = calcCohesion(aScore, wScore);
+
+		let qScore : Int = calcCohesion(aScore, bScore, wScore);
 		Debug.print(debug_show ("qscore", qScore));
 
 		return qScore;
+	};
+
+	func calcCohesion(a : Int, b : Int, w : Int) : Int {
+		Debug.print(debug_show ("a", a, "b", b, "w"));
+		let _ = (a != 0) else return 0;
+		let wScore = Float.div(Float.fromInt(w), Float.fromInt(a + b));
+		Debug.print(debug_show ("wScore inside calcCohesion", wScore));
+		return Float.toInt(
+			100 * wScore * Float.div(
+				Float.fromInt(a),
+				Float.fromInt(a + b)
+			)
+		);
 	};
 
 	// todo : change into easier way of ?null checking
@@ -338,17 +355,6 @@ actor {
 		x.0 == y.0;
 	};
 
-	func calcCohesion(x : Int, y : Int) : Int {
-		Debug.print(debug_show ("x", x, "y", y));
-		let _ = (x != 0 and 0 != y) else return 0;
-		return Float.toInt(
-			100 * Float.div(
-				Float.fromInt(x),
-				Float.fromInt(x + y)
-			)
-		);
-	};
-
 	func isEqF(x : Friend, y : Friend) : Bool {
 		x.account == y.account;
 	};
@@ -384,12 +390,11 @@ actor {
 						};
 						case (_)();
 					};
-					let pmCohesion = calcScore(p, pm);
-					Debug.print(debug_show ("pmcohesion", pmCohesion));
+					let pmScore = calcScore(p, pm);
+					Debug.print(debug_show ("pmScore", pmScore));
 
-					//maybe fix: check here if user is itself, and if so add cohesion filter to username to solve 2 bugs
 					if (p != pm) {
-						buf.add(?pm, pmCohesion); //in %
+						buf.add(?pm, pmScore);
 					};
 				};
 			};
@@ -581,25 +586,13 @@ actor {
 	public shared query (msg) func getFriends() : async Result.Result<([FriendlyUserMatch]), Text> {
 		let buf = Buffer.Buffer<FriendlyUserMatch>(16);
 		let ?friendList = friends.get(msg.caller) else return #err("You don't have any friends :c ");
-		//let callerScore = calcScore(msg.caller, msg.caller);
 
-		//build resulting object and add to buffer
-		//label here possibly not RLLY needed, but gives good overview and continue/break support if needed
 		label ul for (f : Friend in friendList.vals()) {
 			let pm : Principal = f.account;
 			let ?userM = users.get(pm) else continue ul; //might be that user has been deleted
 			let ?matchStatus = f.status else return #err("Something went wrong!");
-
-			//TODO : next 2 lines should have their own function (they are re-used)
 			let pmScore : Int = calcScore(msg.caller, pm);
-			//ENABLE : let pmCohesion = Int.abs(Float.toInt(Float.trunc((pmScore / callerScore) * 100)));
-			//Debug.print(debug_show ("pm score/cohe", pmScore, pmCohesion));
 
-			//TODO : doesnt seem to want to work with mutable var matchObj
-			// matchObj.about :=  checkPublic(userM.about);
-			// matchObj.gender := checkPublic(userM.gender);
-			// matchObj.birth := checkPublic(userM.birth);
-			// matchObj.connect := checkPublic(userM.connect);
 			if (matchStatus != #Approved) {
 				let matchObj : FriendlyUserMatch = {
 					principal = pm;
@@ -608,7 +601,7 @@ actor {
 					gender = checkPublic(userM.gender);
 					birth = checkPublic(userM.birth);
 					connect = checkPublic(userM.connect);
-					cohesion = pmScore; //ENABLE : pmCohesion
+					cohesion = pmScore;
 					answeredQuestions = getAllAnsweredQuestions(pm, null);
 					status = matchStatus;
 				};
@@ -621,7 +614,7 @@ actor {
 					gender = userM.gender.0;
 					birth = userM.birth.0;
 					connect = userM.connect.0;
-					cohesion = pmScore; //ENABLE : pmCohesion
+					cohesion = pmScore;
 					answeredQuestions = getAllAnsweredQuestions(pm, null);
 					status = matchStatus;
 				};
@@ -629,8 +622,6 @@ actor {
 			};
 
 		};
-		//TODO :  iterate over list, get user data for each user, and return info
-		//!!! NON-#Approved friends ONLY return checkPublic (public viewable data)
 		#ok(buf.toArray());
 	};
 

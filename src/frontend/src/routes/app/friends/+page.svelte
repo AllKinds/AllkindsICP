@@ -9,7 +9,7 @@
 
 	let pending: boolean = false;
 	let flSize = 0;
-  let current = 0;
+	let current = 0;
 
 	const handleFindFriends = async () => {
 		pending = true;
@@ -21,16 +21,14 @@
 		flSize = $foundFriends.length;
 	};
 
-  onMount(() => {
-    if (!$foundFriends) {
-      handleFindFriends();
-      console.log("first time load")
-    } else {
-      flSize = $foundFriends.length;
-    }
+	onMount(() => {
+		if (!$foundFriends) {
+			handleFindFriends();
+			console.log('first time load');
+		} else {
+			flSize = $foundFriends.length;
+		}
 	});
-
-	
 </script>
 
 <div class="flex flex-col gap-4">
@@ -76,10 +74,10 @@
 		{:else}
 			<span class="text-slate-700">Oops you don't have any friends yet!</span>
 			<span class="text-slate-700">
-        Try the 
-        <a href="/app/connect" class="link">Connect</a> 
-        page to find people.
-      </span>
+				Try the
+				<a href="/app/connect" class="link">Connect</a>
+				page to find people.
+			</span>
 		{/if}
 	</div>
 </div>
