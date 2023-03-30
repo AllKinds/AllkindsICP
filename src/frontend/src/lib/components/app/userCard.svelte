@@ -2,7 +2,7 @@
 	import { sendFriendRequest } from '$lib/stores/tasks/sendFriendRequest';
 	import { fromNullable, fromNullableGender } from '$lib/utilities';
 	import type { Principal } from '@dfinity/principal';
-	import type { User, FriendlyUserMatch } from 'src/declarations/backend/backend.did';
+	import type { FriendlyUserMatch } from 'src/declarations/backend/backend.did';
 	import Spinner from '../common/Spinner.svelte';
 	import Qbanner from './Qbanner.svelte';
 
@@ -26,10 +26,8 @@
 	const handleConnectionRequest = async () => {
 		pending = true;
 		succes = false;
-		await sendFriendRequest(userPrincipal).then((res) => {
-			if (res.ok) {
-				console.log('result after request :', res);
-			}
+		await sendFriendRequest(userPrincipal).catch((err) => {
+			console.log('error while sending connection request', err);
 		});
 		succes = true;
 		pending = false;
@@ -63,7 +61,7 @@ TODO : backend create friendlist and connection request implementation -->
 		<span class="p-1 ">{userAbout ? userAbout : ''}</span>
 
 		{#if succes}
-			<span>Connection request send!</span>
+			<span class="mx-auto text-slate-600">Connection request send!</span>
 		{:else}
 			<div class="mx-auto fancy-btn-border">
 				<button on:click={handleConnectionRequest} class="fancy-btn bg-main90">
@@ -79,6 +77,7 @@ TODO : backend create friendlist and connection request implementation -->
 		<button class="pb-2 text-left ">
 			<span class="hover-bg hover-color">All Questions{'('}{aQsize > 0 ? aQsize : 0}{')'}</span>
 		</button>
+
 		{#if aQsize > 0}
 			<div class="flex flex-col gap-2">
 				{#each answeredQuestions as q}
