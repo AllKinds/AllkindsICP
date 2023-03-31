@@ -241,51 +241,52 @@ actor {
 		buf.toArray();
 	};
 
-	func calcSameScore(sourceAnswer : Answer, testAnswer : Answer) : Int {
-		//check should be alrdy done in common Q so no need prob,  let _ = sourceAnswer.question == testAnswer.question else return 0;
-		return if (sourceAnswer.answer == testAnswer.answer) {
-			//might need Int.abs back here
-			(sourceAnswer.weight + testAnswer.weight);
-		} else {
-			(sourceAnswer.weight + testAnswer.weight);
-		};
-	};
+	// func calcSameScore(sourceAnswer : Answer, testAnswer : Answer) : Int {
+	// 	//let _ = sourceAnswer.question == testAnswer.question else return 0;
+	// 	return if (sourceAnswer.answer == testAnswer.answer) {
+	// 		//might need Int.abs back here
+	// 		(Int.abs(sourceAnswer.weight) + Int.abs(testAnswer.weight));
+	// 	} else {
+	// 		0
+	// 	};
+	// };
 
-	func calcDiffScore(sourceAnswer : Answer, testAnswer : Answer) : Int {
-		return if (0 < Int.mul(sourceAnswer.weight, testAnswer.weight)) {
-			(sourceAnswer.weight - testAnswer.weight);
+	// func calcDiffScore(sourceAnswer : Answer, testAnswer : Answer) : Int {
+	// 	//
+	// 	return if (0 < Int.mul(sourceAnswer.weight, testAnswer.weight)) {
+	// 		(sourceAnswer.weight - testAnswer.weight);
+	// 	} else {
+	// 		(Int.abs(sourceAnswer.weight) + Int.abs(testAnswer.weight));
+	// 	};
+	// };
+
+	func calcQScore(sourceAnswer : Answer, testAnswer : Answer) : Int {
+		let _ = sourceAnswer.question == testAnswer.question else return 0;
+		let _ = (sourceAnswer.weight * testAnswer.weight) > 0 else return 10;
+		if (Int.abs(sourceAnswer.weight) <= Int.abs(testAnswer.weight)) {
+			return Int.abs(sourceAnswer.weight) + 10;
 		} else {
-			(Int.abs(sourceAnswer.weight) + Int.abs(testAnswer.weight));
+			return Int.abs(testAnswer.weight) + 10;
 		};
 	};
 
 	func calcScore(sourceUser : Principal, testUser : Principal) : Int {
 		let common = commonQuestions(sourceUser, testUser);
-		Debug.print(debug_show ("common questions", common));
-		var aScore : Int = 0;
-		var bScore : Int = 0;
-		var wScore : Int = 0; //distance between 2 weights
+		var qScore : Int = 0;
+
 		for (q in Iter.fromArray(common)) {
-			aScore += calcSameScore(q.sourceAnswer, q.testAnswer);
-			bScore += calcSameScore(q.sourceAnswer, q.testAnswer);
-			wScore += calcDiffScore(q.sourceAnswer, q.testAnswer);
+			qScore += calcQScore(q.sourceAnswer, q.testAnswer);
 		};
-
-		let qScore : Int = calcCohesion(aScore, bScore, wScore);
 		Debug.print(debug_show ("qscore", qScore));
-
 		return qScore;
 	};
 
-	func calcCohesion(a : Int, b : Int, w : Int) : Int {
-		Debug.print(debug_show ("a", a, "b", b, "w"));
-		let _ = (a != 0) else return 0;
-		let wScore = Float.div(Float.fromInt(w), Float.fromInt(a + b));
-		Debug.print(debug_show ("wScore inside calcCohesion", wScore));
+	func calcCohesion(a : Int, b : Int) : Int {
+		//let wScore = Float.div(Float.fromInt(w), Float.fromInt(a + b));
 		return Float.toInt(
-			100 * wScore * Float.div(
+			100 * Float.div(
 				Float.fromInt(a),
-				Float.fromInt(a + b)
+				Float.fromInt(b)
 			)
 		);
 	};
@@ -364,6 +365,7 @@ actor {
 		//TODO : optimize with let-else after 0.8.3 because this is messy
 		let buf = Buffer.Buffer<UserWScore>(16);
 		var count = 0;
+		let callerScore = calcScore(p, p);
 		//User Loop
 		label ul for (pm : Principal in users.keys()) {
 			if (users.size() == count) break ul;
@@ -392,9 +394,9 @@ actor {
 					};
 					let pmScore = calcScore(p, pm);
 					Debug.print(debug_show ("pmScore", pmScore));
-
+					let pmCohesion = calcCohesion(pmScore, callerScore);
 					if (p != pm) {
-						buf.add(?pm, pmScore);
+						buf.add(?pm, pmCohesion);
 					};
 				};
 			};
