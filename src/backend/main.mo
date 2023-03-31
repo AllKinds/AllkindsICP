@@ -241,27 +241,11 @@ actor {
 		buf.toArray();
 	};
 
-	// func calcSameScore(sourceAnswer : Answer, testAnswer : Answer) : Int {
-	// 	//let _ = sourceAnswer.question == testAnswer.question else return 0;
-	// 	return if (sourceAnswer.answer == testAnswer.answer) {
-	// 		//might need Int.abs back here
-	// 		(Int.abs(sourceAnswer.weight) + Int.abs(testAnswer.weight));
-	// 	} else {
-	// 		0
-	// 	};
-	// };
-
-	// func calcDiffScore(sourceAnswer : Answer, testAnswer : Answer) : Int {
-	// 	//
-	// 	return if (0 < Int.mul(sourceAnswer.weight, testAnswer.weight)) {
-	// 		(sourceAnswer.weight - testAnswer.weight);
-	// 	} else {
-	// 		(Int.abs(sourceAnswer.weight) + Int.abs(testAnswer.weight));
-	// 	};
-	// };
-
+	//checks 2 common Q.answers. returns 0 if weight/answers are opposite
+	//returns value in weight + 1 that is minimum with both users
+	//this ensures that calcScore(caller, caller) is always max score possible
 	func calcQScore(sourceAnswer : Answer, testAnswer : Answer) : Int {
-		assert (sourceAnswer.question == testAnswer.question);
+		if (sourceAnswer.answer != testAnswer.answer) return 0;
 		if (sourceAnswer.weight * testAnswer.weight < 0) return 0;
 		if (Int.abs(sourceAnswer.weight) <= Int.abs(testAnswer.weight)) {
 			return Int.abs(sourceAnswer.weight) + 1;
@@ -270,6 +254,7 @@ actor {
 		};
 	};
 
+	//calculates a unique score for testUser (match) based on sourceUser (caller)
 	func calcScore(sourceUser : Principal, testUser : Principal) : Int {
 		let common = commonQuestions(sourceUser, testUser);
 		var qScore : Int = 0;
@@ -281,10 +266,9 @@ actor {
 		return qScore;
 	};
 
+	//takes 2 unqiue scores and calculates them into % with 's' as base
 	func calcCohesion(t : Int, s : Int) : Int {
-		//let wScore = Float.div(Float.fromInt(w), Float.fromInt(a + b));
-		Debug.print(debug_show ("test"));
-		//let _ = (s * t != 0) else return 0;
+		assert (s > t);
 		return if (s * t == 0) 0 else {
 			Float.toInt(
 				100 * Float.div(
