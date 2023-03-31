@@ -244,13 +244,13 @@ actor {
 	//checks 2 common Q.answers. returns 0 if weight/answers are opposite
 	//returns value in weight + 1 that is minimum with both users
 	//this ensures that calcScore(caller, caller) is always max score possible
-	func calcQScore(sourceAnswer : Answer, testAnswer : Answer) : Int {
-		if (sourceAnswer.answer != testAnswer.answer) return 0;
-		if (sourceAnswer.weight * testAnswer.weight < 0) return 0;
-		if (Int.abs(sourceAnswer.weight) <= Int.abs(testAnswer.weight)) {
-			return Int.abs(sourceAnswer.weight) + 1;
+	func calcQScore(source : Answer, test : Answer) : Int {
+		if (source.answer != test.answer) return 0;
+		if (source.weight * test.weight < 0) return 0;
+		if (Int.abs(source.weight) <= Int.abs(test.weight)) {
+			return Int.abs(source.weight) + 1;
 		} else {
-			return Int.abs(testAnswer.weight) + 1;
+			return Int.abs(test.weight) + 1;
 		};
 	};
 
@@ -266,14 +266,14 @@ actor {
 		return qScore;
 	};
 
-	//takes 2 unqiue scores and calculates them into % with 's' as base
-	func calcCohesion(t : Int, s : Int) : Int {
-		assert (s > t);
-		return if (s * t == 0) 0 else {
+	//takes 2 unqiue scores and calculates them into % with 'source' as base
+	func calcCohesion(pm : Int, p : Int) : Int {
+		assert (p > pm);
+		return if (p * pm == 0) 0 else {
 			Float.toInt(
 				100 * Float.div(
-					Float.fromInt(t),
-					Float.fromInt(s)
+					Float.fromInt(pm),
+					Float.fromInt(p)
 				)
 			);
 		};
