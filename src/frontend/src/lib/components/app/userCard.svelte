@@ -20,7 +20,7 @@
 	let ageMs = Number(new Date()) - Number(match.birth) / 1000000;
 	let ageY = Math.floor(ageMs / (1000 * 3600 * 24) / 365);
 	//TODO : return all questions (+weight) with indication which had common answer (matched)
-	let answeredQuestions = match.answeredQuestions;
+	let answeredQuestions = match.answered;
 	let aQsize = answeredQuestions.length;
 
 	const handleConnectionRequest = async () => {

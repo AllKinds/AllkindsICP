@@ -27,9 +27,9 @@ export const idlFactory = ({ IDL }) => {
 		about: IDL.Opt(IDL.Text),
 		username: IDL.Text,
 		cohesion: IDL.Int,
+		answered: IDL.Vec(Question),
 		gender: IDL.Opt(Gender),
-		birth: IDL.Opt(IDL.Int),
-		answeredQuestions: IDL.Vec(Question)
+		birth: IDL.Opt(IDL.Int)
 	});
 	const Result_4 = IDL.Variant({ ok: UserMatch, err: IDL.Text });
 	const Result_3 = IDL.Variant({ ok: IDL.Vec(Question), err: IDL.Text });
@@ -45,9 +45,9 @@ export const idlFactory = ({ IDL }) => {
 		about: IDL.Opt(IDL.Text),
 		username: IDL.Text,
 		cohesion: IDL.Int,
+		answered: IDL.Vec(Question),
 		gender: IDL.Opt(Gender),
-		birth: IDL.Opt(IDL.Int),
-		answeredQuestions: IDL.Vec(Question)
+		birth: IDL.Opt(IDL.Int)
 	});
 	const Result_2 = IDL.Variant({
 		ok: IDL.Vec(FriendlyUserMatch),

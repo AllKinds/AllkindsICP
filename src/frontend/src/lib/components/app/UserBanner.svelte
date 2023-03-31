@@ -13,17 +13,8 @@
 	let ageMs = Number(new Date()) - Number(u.birth) / 1000000;
 	let ageY = Math.floor(ageMs / (1000 * 3600 * 24) / 365);
 	//TODO : return all questions (+weight) with indication which had common answer (matched)
-	let answeredQuestions = u.answeredQuestions;
+	let answeredQuestions = u.answered;
 	let aQsize = answeredQuestions.length;
-	{
-		('(');
-	}
-	{
-		aQsize > 0 ? aQsize : 0;
-	}
-	{
-		(')');
-	}
 </script>
 
 <!-- TODO have different column for non-approved friends -->
@@ -43,7 +34,7 @@
 	</div>
 	<div class="border-main h-8 w-fit p-1 px-2 rounded-full border-slate-200 shrink-0">
 		{u.cohesion}
-		{'(' + u.answeredQuestions.length + ')'}
+		{'('}{aQsize > 0 ? aQsize : 0}{')'}
 	</div>
 	<!-- <span>Friend status : {friend.status}</span> -->
 </button>

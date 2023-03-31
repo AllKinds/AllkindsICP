@@ -10,9 +10,9 @@ export interface FriendlyUserMatch {
 	about: [] | [string];
 	username: string;
 	cohesion: bigint;
+	answered: Array<Question>;
 	gender: [] | [Gender];
 	birth: [] | [bigint];
-	answeredQuestions: Array<Question>;
 }
 export type Gender = { Male: null } | { Female: null } | { Other: null } | { Queer: null };
 export type Hash = number;
@@ -49,9 +49,9 @@ export interface UserMatch {
 	about: [] | [string];
 	username: string;
 	cohesion: bigint;
+	answered: Array<Question>;
 	gender: [] | [Gender];
 	birth: [] | [bigint];
-	answeredQuestions: Array<Question>;
 }
 export interface _SERVICE {
 	answerFriendRequest: ActorMethod<[Principal, boolean], Result>;

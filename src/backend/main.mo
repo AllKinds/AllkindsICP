@@ -55,7 +55,7 @@ actor {
 		connect : ?Text;
 		//TODO: (cohesion : Nat;) changed into int for testing,  should always be between 0-100 so nat8 better
 		cohesion : Int;
-		answeredQuestions : [Question];
+		answered : [Question];
 	};
 
 	public type Gender = {
@@ -188,19 +188,19 @@ actor {
 		buf.toArray();
 	};
 
-	func answeredQuestions(p : Principal, n : ?Nat) : [Hash.Hash] {
-		let buf = Buffer.Buffer<Hash.Hash>(16);
-		var count = 0;
-		label f for (hash in questions.keys()) {
-			if (n == ?count) break f;
-			let pQ = hashPrincipalQuestion(p, hash);
-			if ((null == skips.get(pQ)) or (null != answers.get(pQ))) {
-				buf.add(hash);
-				count += 1;
-			};
-		};
-		buf.toArray();
-	};
+	// func getAnsweredQuestions(p : Principal, n : ?Nat) : [Hash.Hash] {
+	// 	let buf = Buffer.Buffer<Hash.Hash>(16);
+	// 	var count = 0;
+	// 	label f for (hash in questions.keys()) {
+	// 		if (n == ?count) break f;
+	// 		let pQ = hashPrincipalQuestion(p, hash);
+	// 		if ((null == skips.get(pQ)) or (null != answers.get(pQ))) {
+	// 			buf.add(hash);
+	// 			count += 1;
+	// 		};
+	// 	};
+	// 	buf.toArray();
+	// };
 
 	func allAnsweredQuestions(p : Principal, n : ?Nat) : [Hash.Hash] {
 		let buf = Buffer.Buffer<Hash.Hash>(16);
@@ -208,7 +208,7 @@ actor {
 		label f for (hash in questions.keys()) {
 			if (n == ?count) break f;
 			let pQ = hashPrincipalQuestion(p, hash);
-			if (null == skips.get(pQ)) {
+			if (null != answers.get(pQ)) {
 				buf.add(hash);
 				count += 1;
 			};
@@ -261,12 +261,12 @@ actor {
 	// };
 
 	func calcQScore(sourceAnswer : Answer, testAnswer : Answer) : Int {
-		let _ = sourceAnswer.question == testAnswer.question else return 0;
-		let _ = (sourceAnswer.weight * testAnswer.weight) > 0 else return 10;
+		assert (sourceAnswer.question == testAnswer.question);
+		if (sourceAnswer.weight * testAnswer.weight < 0) return 0;
 		if (Int.abs(sourceAnswer.weight) <= Int.abs(testAnswer.weight)) {
-			return Int.abs(sourceAnswer.weight) + 10;
+			return Int.abs(sourceAnswer.weight) + 1;
 		} else {
-			return Int.abs(testAnswer.weight) + 10;
+			return Int.abs(testAnswer.weight) + 1;
 		};
 	};
 
@@ -281,19 +281,22 @@ actor {
 		return qScore;
 	};
 
-	func calcCohesion(a : Int, b : Int) : Int {
+	func calcCohesion(t : Int, s : Int) : Int {
 		//let wScore = Float.div(Float.fromInt(w), Float.fromInt(a + b));
-		return Float.toInt(
-			100 * Float.div(
-				Float.fromInt(a),
-				Float.fromInt(b)
-			)
-		);
+		Debug.print(debug_show ("test"));
+		//let _ = (s * t != 0) else return 0;
+		return if (s * t == 0) 0 else {
+			Float.toInt(
+				100 * Float.div(
+					Float.fromInt(t),
+					Float.fromInt(s)
+				)
+			);
+		};
 	};
 
 	// todo : change into easier way of ?null checking
 	func changeUserPoints(p : Principal, value : Nat) : () {
-
 		let ?user = users.get(p) else return;
 		let changedUser = {
 			username = user.username;
@@ -366,6 +369,10 @@ actor {
 		let buf = Buffer.Buffer<UserWScore>(16);
 		var count = 0;
 		let callerScore = calcScore(p, p);
+		if (callerScore == 0) {
+			Debug.print(debug_show ("caller is 0"));
+			return null;
+		};
 		//User Loop
 		label ul for (pm : Principal in users.keys()) {
 			if (users.size() == count) break ul;
@@ -394,7 +401,9 @@ actor {
 					};
 					let pmScore = calcScore(p, pm);
 					Debug.print(debug_show ("pmScore", pmScore));
+					Debug.print(debug_show ("callerScore", callerScore));
 					let pmCohesion = calcCohesion(pmScore, callerScore);
+
 					if (p != pm) {
 						buf.add(?pm, pmCohesion);
 					};
@@ -521,7 +530,7 @@ actor {
 	};
 
 	public shared query (msg) func getAnsweredQuestions(n : ?Nat) : async Result.Result<[Question], Text> {
-		let answered = answeredQuestions(msg.caller, n);
+		let answered = allAnsweredQuestions(msg.caller, n);
 		func getQuestion(h : Hash.Hash) : ?Question {
 			questions.get(h);
 		};
@@ -566,7 +575,7 @@ actor {
 		};
 		changeUserPoints(msg.caller, (user.points - Int.abs(queryCost)));
 		//TODO : make generic errors
-		let ?match : ?UserWScore = filterUsers(msg.caller, para) else return #err("Couldn't find any match!");
+		let ?match : ?UserWScore = filterUsers(msg.caller, para) else return #err("Couldn't find any match! Try answering more questions.");
 		let ?principalMatch = match.0 else return #err("rrreeee");
 		let ?userM : ?User = users.get(principalMatch) else return #err("Matched user not found!");
 
@@ -578,7 +587,7 @@ actor {
 			birth = checkPublic(userM.birth);
 			connect = checkPublic(userM.connect);
 			cohesion = match.1;
-			answeredQuestions = getAllAnsweredQuestions(principalMatch, null);
+			answered = getAllAnsweredQuestions(principalMatch, null);
 		}; //TODO : fix above func getXAnsQues, gives literally only answeredQ bcs ongoing bad weight-like-answer implementation
 		//also filter first on commonQuestions to add a bool to this array for front-end indicating if both answered
 		return #ok(result);
@@ -594,6 +603,7 @@ actor {
 			let ?userM = users.get(pm) else continue ul; //might be that user has been deleted
 			let ?matchStatus = f.status else return #err("Something went wrong!");
 			let pmScore : Int = calcScore(msg.caller, pm);
+			let answeredQ = getAllAnsweredQuestions(pm, null);
 
 			if (matchStatus != #Approved) {
 				let matchObj : FriendlyUserMatch = {
@@ -604,7 +614,7 @@ actor {
 					birth = checkPublic(userM.birth);
 					connect = checkPublic(userM.connect);
 					cohesion = pmScore;
-					answeredQuestions = getAllAnsweredQuestions(pm, null);
+					answered = answeredQ;
 					status = matchStatus;
 				};
 				buf.add(matchObj);
@@ -617,7 +627,7 @@ actor {
 					birth = userM.birth.0;
 					connect = userM.connect.0;
 					cohesion = pmScore;
-					answeredQuestions = getAllAnsweredQuestions(pm, null);
+					answered = answeredQ;
 					status = matchStatus;
 				};
 				buf.add(matchObj);
