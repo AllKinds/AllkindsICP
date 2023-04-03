@@ -660,7 +660,7 @@ actor {
 
 			buf.add(newFriend);
 			targetBuf.add(userFriend);
-			
+
 			let arr = Buffer.toArray(buf);
 			let targetArr = Buffer.toArray(buf);
 			
@@ -677,12 +677,15 @@ actor {
 		let ?userFriends = friends.get(msg.caller) else return #err("Something went wrong!");
 		let ?targetFriends = friends.get(p) else return #err("Something went wrong!");
 		let buf = Buffer.fromArray<Friend>(userFriends);
-		var friend : Friend = {
+		let targetBuf = Buffer.fromArray<Friend>(targetFriends);
+
+		var search : Friend = {
 			account = p;
 			status = ?#Approved;
 		};
+		
 		var newStatus : ?FriendStatus = null;
-		switch (Buffer.indexOf<Friend>(friend, buf, isEqF)) {
+		switch (Buffer.indexOf<Friend>(search, buf, isEqF)) {
 			case (null) { return #err("You have no friend requests from that user!") };
 			case (?i) {
 				let res : Friend = buf.get(i) else return #err("Can't check status of your friend");
@@ -699,17 +702,23 @@ actor {
 			};
 		};
 		try {
-			//put array back
-			let arr = Buffer.toArray(buf);
-			friends.put(msg.caller, arr);
+			var newFriend : Friend = {
+				account = p;
+				status = ?#Approved;
+			};
 			//change your own friendstatus on your friend's list
 			let userFriend : Friend = {
 				account = msg.caller;
 				status = ?#Approved;
 			};
-			let targetBuf = Buffer.fromArray<Friend>(targetFriends);
+
 			targetBuf.add(userFriend);
-			let targetArr = Buffer.toArray(buf);
+			buf.add(newFriend);
+
+			let targetArr = Buffer.toArray(targetBuf);
+			let arr = Buffer.toArray(buf);
+			
+			friends.put(msg.caller, arr);
 			friends.put(p, targetArr);
 		} catch err {
 			return #err("Failed to update userStates");
