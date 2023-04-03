@@ -46,9 +46,6 @@
 	.bg-sub90 {
 		@apply bg-zinc-200/90 dark:bg-zinc-800/90;
 	}
-	.sub-btn {
-		@apply cursor-pointer border-none hover-circle;
-	}
 	.hover-color {
 		@apply text-slate-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200;
 	}
@@ -56,7 +53,7 @@
 		@apply rounded-lg border border-zinc-300 dark:border-zinc-700;
 	}
 	.hover-circle {
-		@apply bg-transparent hover:bg-sub rounded-full p-2;
+		@apply bg-transparent hover:bg-sub rounded-full p-2 cursor-pointer border-none;
 	}
 	.filter-box {
 		@apply md:w-5/12 flex flex-col border-main bg-sub30 p-2 rounded-md gap-2;
@@ -64,8 +61,8 @@
 	.filter-name {
 		@apply font-semibold text-slate-500 mx-auto;
 	}
-	.font-color-sub {
-		@apply text-zinc-600 dark:text-zinc-200;
+	.text-sub {
+		@apply text-zinc-500 dark:text-zinc-400;
 	}
 	.currentTab {
 		@apply bg-sub text-slate-600 dark:text-zinc-200;

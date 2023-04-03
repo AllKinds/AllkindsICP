@@ -627,6 +627,8 @@ actor {
 		let ?userFriends = friends.get(msg.caller) else return #err("Something went wrong!");
 		let ?targetFriends = friends.get(p) else return #err("Something went wrong!");
 		let buf = Buffer.fromArray<Friend>(userFriends);
+		let targetBuf = Buffer.fromArray<Friend>(targetFriends);
+
 		let search : Friend = {
 			account = p;
 			status = null;
@@ -643,26 +645,29 @@ actor {
 				};
 			};
 		};
+
 		try {
 			//give REQ status to new friend of msg.caller
 			let newFriend : Friend = {
 				account = p;
 				status = ?#Requested;
 			};
-			buf.add(newFriend);
-			let arr = Buffer.toArray(buf);
-			friends.put(msg.caller, arr);
 			//give WAIT status to msg.caller of new friend
 			let userFriend : Friend = {
 				account = msg.caller;
 				status = ?#Waiting;
-			}; //no need for checks as they logically wouldn't happen here normally
-			let targetBuf = Buffer.fromArray<Friend>(targetFriends);
+			};
+
+			buf.add(newFriend);
 			targetBuf.add(userFriend);
+			
+			let arr = Buffer.toArray(buf);
 			let targetArr = Buffer.toArray(buf);
+			
 			friends.put(p, targetArr);
+			friends.put(msg.caller, arr);
 		} catch err {
-			return #err("Failed to update userStates");
+			return #err("Failed to update user states");
 		};
 		#ok();
 	};

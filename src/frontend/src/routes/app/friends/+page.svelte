@@ -5,12 +5,8 @@
 	import type { FriendlyUserMatch, FriendStatus } from 'src/declarations/backend/backend.did';
 	import { onMount } from 'svelte';
 	import Refresh from '$lib/assets/icons/refresh.svg?component';
-	import { Type } from '@dfinity/candid/lib/cjs/idl';
-	import { fromNullable } from '$lib/utilities';
-	import { object_without_properties } from 'svelte/internal';
 
 	let pending: boolean = false;
-	let flSize = 0;
   let fA = 0;
   let fW = 0;
   let fR = 0;
@@ -33,28 +29,20 @@
 
 
 	onMount(() => {
-		if (!$friendsApproved || !$friendsWaiting) {
-			handleFindFriends();
-			console.log('first time load');
-		} else {
-			//flSize = $foundFriends.length;
-      fA = $friendsApproved.length;
-      fW = $friendsWaiting.length;
-      fR = $friendsRequested.length;
-		}
+		handleFindFriends();
+		// if (!$friendsApproved || !$friendsWaiting) {
+		// 	handleFindFriends();
+		// 	console.log('first time load');
+		// } else {
+		// 	//flSize = $foundFriends.length;
+    //   fA = $friendsApproved.length;
+    //   fW = $friendsWaiting.length;
+    //   fR = $friendsRequested.length;
+		// }
 	});
 </script>
 
 <div class="flex flex-col gap-4">
-	<!-- <div class="fancy-btn-border mx-auto mb-0">
-		<button on:click={handleFindFriends} class="fancy-btn">
-			{#if pending}
-				<Spinner />
-			{:else}
-				Refresh
-			{/if}
-		</button>
-	</div> -->
 	<div class="flex gap-3">
 		<button
 			on:click={() => (current = 0)}
