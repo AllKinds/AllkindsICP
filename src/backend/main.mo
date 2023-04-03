@@ -113,6 +113,7 @@ actor {
 		#Waiting; //status of msg.caller in the requested contact friendlist
 		#Approved; //status of both users after
 		//could be added upon and improved (REQ/WAIT might be too confusing, but this makes it ez to track who requested)
+		//maybe change req/wait to send/requests (as its similar to ui)
 	};
 
 	//obj instead of tuple , bcs it should be expanded in future
