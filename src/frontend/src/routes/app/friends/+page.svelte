@@ -1,15 +1,20 @@
 <script lang="ts">
 	import UserBanner from '$lib/components/app/UserBanner.svelte';
 	import Spinner from '$lib/components/common/Spinner.svelte';
-	import { getFriends, friendsApproved, friendsWaiting, friendsRequested } from '$lib/stores/tasks/getFriends';
+	import {
+		getFriends,
+		friendsApproved,
+		friendsWaiting,
+		friendsRequested
+	} from '$lib/stores/tasks/getFriends';
 	import type { FriendlyUserMatch, FriendStatus } from 'src/declarations/backend/backend.did';
 	import { onMount } from 'svelte';
 	import Refresh from '$lib/assets/icons/refresh.svg?component';
 
 	let pending: boolean = false;
-  let fA = 0;
-  let fW = 0;
-  let fR = 0;
+	let fA = 0;
+	let fW = 0;
+	let fR = 0;
 	let current = 0;
 
 	const handleFindFriends = async () => {
@@ -20,13 +25,11 @@
 		//await function for getting all friendrequests
 		pending = false;
 		//flSize = $foundFriends.length;
-    fA = $friendsApproved.length;
-    fW = $friendsWaiting.length;
-    fR = $friendsRequested.length;
-    //console.log("sortedApproved test:", $foundFriends)
+		fA = $friendsApproved.length;
+		fW = $friendsWaiting.length;
+		fR = $friendsRequested.length;
+		//console.log("sortedApproved test:", $foundFriends)
 	};
-
-
 
 	onMount(() => {
 		handleFindFriends();
@@ -35,9 +38,9 @@
 		// 	console.log('first time load');
 		// } else {
 		// 	//flSize = $foundFriends.length;
-    //   fA = $friendsApproved.length;
-    //   fW = $friendsWaiting.length;
-    //   fR = $friendsRequested.length;
+		//   fA = $friendsApproved.length;
+		//   fW = $friendsWaiting.length;
+		//   fR = $friendsRequested.length;
 		// }
 	});
 </script>
@@ -58,13 +61,13 @@
 		>
 			Requests{'('}{fW > 0 ? fW : 0}{')'}
 		</button>
-    <button
-    on:click={() => (current = 2)}
-    class:currentTab={current === 2}
-    class="pb-2 text-left hover-color hover-circle"
-  >
-    Send{'('}{fR > 0 ? fR : 0}{')'}
-  </button>
+		<button
+			on:click={() => (current = 2)}
+			class:currentTab={current === 2}
+			class="pb-2 text-left hover-color hover-circle"
+		>
+			Send{'('}{fR > 0 ? fR : 0}{')'}
+		</button>
 
 		<button on:click={handleFindFriends} class="cursor-pointer hover-circle hover-color">
 			{#if pending}
@@ -85,18 +88,18 @@
         {/if}        
 			{/each} -->
 
-    {#if fA > 0 && current == 0}
-      {#each $friendsApproved as u}
-        <UserBanner {u}/>
-      {/each}
-    {:else if fW > 0 && current == 1}
-      {#each $friendsWaiting as u}
-        <UserBanner {u}/>
-      {/each}
-    {:else if fR > 0 && current == 2}
-      {#each $friendsRequested as u}
-        <UserBanner {u}/>
-      {/each}
+		{#if fA > 0 && current == 0}
+			{#each $friendsApproved as u}
+				<UserBanner {u} />
+			{/each}
+		{:else if fW > 0 && current == 1}
+			{#each $friendsWaiting as u}
+				<UserBanner {u} />
+			{/each}
+		{:else if fR > 0 && current == 2}
+			{#each $friendsRequested as u}
+				<UserBanner {u} />
+			{/each}
 		{:else if current == 0}
 			<span class="text-slate-700">Oops you don't have any friends yet!</span>
 			<span class="text-slate-700">
@@ -104,7 +107,8 @@
 				<a href="/app/connect" class="link">Connect</a>
 				page to find people.
 			</span>
-		{/if}  <!-- {#if (u.status == statusApproved ) && current == 0}
+		{/if}
+		<!-- {#if (u.status == statusApproved ) && current == 0}
 				<UserBanner {u}/>
         {:else if (u.status == (statusRequested || statusWaiting))  && current == 1}
         <UserBanner {u}/>

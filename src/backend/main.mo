@@ -269,15 +269,20 @@ actor {
 
 	//takes 2 unqiue scores and calculates them into % with 'source' as base
 	func calcCohesion(pm : Int, p : Int) : Int {
-		assert (p > pm);
-		return if (p * pm == 0) 0 else {
-			Float.toInt(
-				100 * Float.div(
-					Float.fromInt(pm),
-					Float.fromInt(p)
-				)
-			);
+		//assert (p > pm);
+		if (p < pm) {
+			return if (p * pm == 0) 0 else {
+				Float.toInt(
+					100 * Float.div(
+						Float.fromInt(pm),
+						Float.fromInt(p)
+					)
+				);
+			};
+		} else {
+			return 100;
 		};
+
 	};
 
 	// todo : change into easier way of ?null checking
@@ -623,6 +628,7 @@ actor {
 	};
 
 	//TODO : extract reusable function from sendFriendRequest and answerFriendRequest
+
 	public shared (msg) func sendFriendRequest(p : Principal) : async Result.Result<(), Text> {
 		let ?user = users.get(msg.caller) else return #err("You are not registered!");
 		let ?userFriends = friends.get(msg.caller) else return #err("Something went wrong!");
@@ -634,18 +640,20 @@ actor {
 			account = p;
 			status = null;
 		};
-		switch (Buffer.indexOf<Friend>(search, buf, isEqF)) {
-			case (null) {};
-			case (?i) {
-				let res : Friend = buf.get(i) else return #err("Can't check status of your friend");
-				switch (res.status) {
-					case (?#Requested) return #err("You already requested this user to connect!");
-					case (?#Waiting) return #err("You already have a pending connection request from this user!");
-					case (?#Approved) return #err("You are already friends with this user!");
-					case (null) return #err("Strange!");
-				};
-			};
-		};
+		let null = Buffer.indexOf<Friend>(search, buf, isEqF) else return #err("User already has a friend status with you.");
+		// switch (Buffer.indexOf<Friend>(search, buf, isEqF)) {
+		// 	case (null) {};
+		// 	case (?i) {
+
+		// 		let res : Friend = buf.get(i) else return #err("Can't check status of your friend");
+		// 		switch (res.status) {
+		// 			case (?#Requested) return #err("You already requested this user to connect!");
+		// 			case (?#Waiting) return #err("You already have a pending connection request from this user!");
+		// 			case (?#Approved) return #err("You are already friends with this user!");
+		// 			case (null) return #err("Strange!");
+		// 		};
+		// 	};
+		// };
 
 		try {
 			//give REQ status to new friend of msg.caller
@@ -663,8 +671,8 @@ actor {
 			targetBuf.add(userFriend);
 
 			let arr = Buffer.toArray(buf);
-			let targetArr = Buffer.toArray(buf);
-			
+			let targetArr = Buffer.toArray(targetBuf);
+
 			friends.put(p, targetArr);
 			friends.put(msg.caller, arr);
 		} catch err {
@@ -682,26 +690,27 @@ actor {
 
 		var search : Friend = {
 			account = p;
-			status = ?#Approved;
+			status = null;
 		};
-		
-		var newStatus : ?FriendStatus = null;
-		switch (Buffer.indexOf<Friend>(search, buf, isEqF)) {
-			case (null) { return #err("You have no friend requests from that user!") };
-			case (?i) {
-				let res : Friend = buf.get(i) else return #err("Can't check status of your friend");
-				switch (res.status) {
-					case (?#Requested) return #err("You already requested this user to connect!");
-					case (?#Waiting) {
-						if (b == false) {
-							let _ = buf.remove(i);
-						};
-					};
-					case (?#Approved) return #err("You are already friends with this user!");
-					case (null) return #err("Strange");
+
+		//let ?i = Buffer.indexOf<Friend>(search, buf, isEqF);
+		let ?iT = Buffer.indexOf(search, targetBuf, isEqF) else return #err("Strange");
+		let ?i = Buffer.indexOf(search, buf, isEqF) else return #err("You have no friend requests from that user!");
+		let res : Friend = buf.get(i) else return #err("Can't check status of your friend");
+
+		switch (res.status) {
+			case (?#Requested) return #err("You already requested this user to connect!");
+			case (?#Waiting) {
+				let _ = buf.remove(i);
+				let _ = targetBuf.remove(iT);
+				if (b == false) {
+					return #ok(); //rejected
 				};
 			};
+			case (?#Approved) return #err("You are already friends with this user!");
+			case (null) return #err("Strange");
 		};
+
 		try {
 			var newFriend : Friend = {
 				account = p;
@@ -715,10 +724,11 @@ actor {
 
 			targetBuf.add(userFriend);
 			buf.add(newFriend);
-
-			let targetArr = Buffer.toArray(targetBuf);
-			let arr = Buffer.toArray(buf);
 			
+			let arr = Buffer.toArray(buf);
+			let targetArr = Buffer.toArray(targetBuf);
+			
+
 			friends.put(msg.caller, arr);
 			friends.put(p, targetArr);
 		} catch err {

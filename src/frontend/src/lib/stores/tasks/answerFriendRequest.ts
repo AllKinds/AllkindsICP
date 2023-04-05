@@ -3,7 +3,7 @@ import type { Principal } from '@dfinity/principal';
 import { get } from 'svelte/store';
 import { syncAuth } from './auth';
 
-export async function answerFriendRequest(p: Principal, b: boolean,) {
+export async function answerFriendRequest(p: Principal, b: boolean) {
 	const localActor = get(actor);
 	console.log('answering friendrequest connect to :', p);
 	await localActor
