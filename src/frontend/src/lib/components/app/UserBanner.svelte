@@ -5,12 +5,12 @@
 	import XCircle from '$lib/assets/icons/x-circle.svg?component';
 	import { answerFriendRequest } from '$lib/stores/tasks/answerFriendRequest';
 	import Spinner from '../common/Spinner.svelte';
+	import { getFriends } from '$lib/stores/tasks/getFriends';
 
 	export let u: FriendlyUserMatch;
 
 	let userName = u.username;
-	let pending = 0;
-	let answer: boolean;
+	let pending = false;
 	//let userScore = Number(match.cohesion);
 	let userAbout = u.about;
 	let userGender = fromNullableGender(u.gender);
@@ -22,11 +22,13 @@
 	let answeredQuestions = u.answered;
 	let aQsize = answeredQuestions.length;
 
-	const handleRequest = async () => {
-		pending = 1;
+	const handleRequest = async (answer: boolean) => {
+		pending = true;
 		await answerFriendRequest(u.principal, answer).catch((err) => {
 			console.log('error while answering request : ', err);
 		});
+		await getFriends();
+		pending = false;
 	};
 </script>
 
@@ -46,20 +48,25 @@
 		<span class="overflow-clip text-sub">{userAbout}</span>
 	</div>
 	<div class="shrink-0">
-		<div class="border-main h-8 w-fit p-1 px-2 rounded-full border-slate-200">
+		<div class="border-main h-8 w-full p-1 px-2 rounded-full border-slate-200 text-center">
 			{u.cohesion}
 			{'('}{aQsize > 0 ? aQsize : 0}{')'}
 		</div>
 		{#if Object.entries(u.status)[0][0] == 'Waiting'}
-			<Spinner />
-		{:else if pending}
-			<div class="h-8 w-full rounded-full mt-1">
-				<button class="text-red-500/50 hover:text-red-500">
-					<XCircle class="w-8 h-8" />
-				</button>
-				<button class="text-green-500/50 hover:text-green-500">
-					<CheckCircle class="w-8 h-8" />
-				</button>
+			<div class="h-8 w-fit pt-1 mx-auto">
+				{#if pending}
+					<Spinner />
+				{:else}
+					<button on:click={() => handleRequest(false)} class="text-red-500/50 hover:text-red-500">
+						<XCircle class="w-8 h-8" />
+					</button>
+					<button
+						on:click={() => handleRequest(true)}
+						class="text-green-500/50 hover:text-green-500"
+					>
+						<CheckCircle class="w-8 h-8" />
+					</button>
+				{/if}
 			</div>
 		{/if}
 	</div>

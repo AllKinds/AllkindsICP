@@ -692,9 +692,12 @@ actor {
 			account = p;
 			status = null;
 		};
+		var searchT : Friend = {
+			account = msg.caller;
+			status = null;
+		};
 
-		//let ?i = Buffer.indexOf<Friend>(search, buf, isEqF);
-		let ?iT = Buffer.indexOf(search, targetBuf, isEqF) else return #err("Strange");
+		let ?iT = Buffer.indexOf(searchT, targetBuf, isEqF) else return #err("Strange index not found");
 		let ?i = Buffer.indexOf(search, buf, isEqF) else return #err("You have no friend requests from that user!");
 		let res : Friend = buf.get(i) else return #err("Can't check status of your friend");
 
@@ -708,7 +711,7 @@ actor {
 				};
 			};
 			case (?#Approved) return #err("You are already friends with this user!");
-			case (null) return #err("Strange");
+			case (null) return #err("Strange null");
 		};
 
 		try {
@@ -716,7 +719,6 @@ actor {
 				account = p;
 				status = ?#Approved;
 			};
-			//change your own friendstatus on your friend's list
 			let userFriend : Friend = {
 				account = msg.caller;
 				status = ?#Approved;
@@ -724,10 +726,9 @@ actor {
 
 			targetBuf.add(userFriend);
 			buf.add(newFriend);
-			
+
 			let arr = Buffer.toArray(buf);
 			let targetArr = Buffer.toArray(targetBuf);
-			
 
 			friends.put(msg.caller, arr);
 			friends.put(p, targetArr);
