@@ -354,14 +354,22 @@ actor {
 	};
 
 	func getIndexFriend(p : Principal, pm : Principal) : ?Nat {
-		let ?friendsArr = friends.get(p) else return null;
-		let friendsBuf = Buffer.fromArray<Friend>(friendsArr);
+		let ?arr = friends.get(p) else return null;
+		let buf = Buffer.fromArray<Friend>(arr);
 		let search : Friend = {
 			account = pm;
 			status = null;
 		};
-		return Buffer.indexOf<Friend>(search, friendsBuf, isEqF);
+		return Buffer.indexOf<Friend>(search, buf, isEqF);
 	};
+
+	func updateFriend(p : Principal, new : Friend, list : FriendList) {
+		let buf = Buffer.fromArray<Friend>(list);
+		buf.add(new);
+		let res = Buffer.toArray(buf);
+		friends.put(p, res);
+	};
+		
 
 	// filter users according to parameters
 	func filterUsers(p : Principal, f : MatchingFilter) : ?UserWScore {
@@ -437,6 +445,8 @@ actor {
 		Debug.print(debug_show ("arr", buf.toArray()));
 		return ?resultMatch;
 	};
+
+	
 
 	// DATA STORAGE
 
@@ -640,50 +650,29 @@ actor {
 	//TODO : extract reusable function from sendFriendRequest and answerFriendRequest
 
 	public shared (msg) func sendFriendRequest(p : Principal) : async Result.Result<(), Text> {
+		let null = getIndexFriend(msg.caller, p) else return #err("User already has a friend status with you.");
+
 		let ?userFriends = friends.get(msg.caller) else return #err("Something went wrong!");
 		let ?targetFriends = friends.get(p) else return #err("Something went wrong!");
 		let buf = Buffer.fromArray<Friend>(userFriends);
 		let targetBuf = Buffer.fromArray<Friend>(targetFriends);
 
-		let search : Friend = {
-			account = p;
-			status = null;
-		};
-		let null = Buffer.indexOf<Friend>(search, buf, isEqF) else return #err("User already has a friend status with you.");
-		// switch (Buffer.indexOf<Friend>(search, buf, isEqF)) {
-		// 	case (null) {};
-		// 	case (?i) {
-
-		// 		let res : Friend = buf.get(i) else return #err("Can't check status of your friend");
-		// 		switch (res.status) {
-		// 			case (?#Requested) return #err("You already requested this user to connect!");
-		// 			case (?#Waiting) return #err("You already have a pending connection request from this user!");
-		// 			case (?#Approved) return #err("You are already friends with this user!");
-		// 			case (null) return #err("Strange!");
-		// 		};
-		// 	};
-		// };
-
+		//updateFriend
 		try {
 			//give REQ status to new friend of msg.caller
-			let newFriend : Friend = {
+
+			let target : Friend = {
 				account = p;
 				status = ?#Requested;
 			};
-			//give WAIT status to msg.caller of new friend
-			let userFriend : Friend = {
+			let user : Friend = {
 				account = msg.caller;
 				status = ?#Waiting;
 			};
 
-			buf.add(newFriend);
-			targetBuf.add(userFriend);
+			updateFriend(msg.caller, target, userFriends);
+			updateFriend(p, user, targetFriends);
 
-			let arr = Buffer.toArray(buf);
-			let targetArr = Buffer.toArray(targetBuf);
-
-			friends.put(p, targetArr);
-			friends.put(msg.caller, arr);
 		} catch err {
 			return #err("Failed to update user states");
 		};
@@ -696,17 +685,11 @@ actor {
 		let buf = Buffer.fromArray<Friend>(userFriends);
 		let targetBuf = Buffer.fromArray<Friend>(targetFriends);
 
-		var search : Friend = {
-			account = p;
-			status = null;
-		};
-		var searchT : Friend = {
-			account = msg.caller;
-			status = null;
-		};
+		let ?iT = getIndexFriend(p, msg.caller) else return #err("Strange");
+		let ?i = getIndexFriend(msg.caller, p) else return #err("You have no friend requests from that user!");
 
-		let ?iT = Buffer.indexOf(searchT, targetBuf, isEqF) else return #err("Strange index not found");
-		let ?i = Buffer.indexOf(search, buf, isEqF) else return #err("You have no friend requests from that user!");
+		//let ?iT = Buffer.indexOf(searchT, targetBuf, isEqF) else return #err("Strange index not found");
+		//let ?i = Buffer.indexOf(search, buf, isEqF) else return #err("You have no friend requests from that user!");
 		let res : Friend = buf.get(i) else return #err("Can't check status of your friend");
 
 		switch (res.status) {
@@ -715,31 +698,27 @@ actor {
 				let _ = buf.remove(i);
 				let _ = targetBuf.remove(iT);
 				if (b == false) {
-					return #ok(); //rejected
+					//rejected
+					return #ok(); 
 				};
+				//accepted
 			};
 			case (?#Approved) return #err("You are already friends with this user!");
 			case (null) return #err("Strange null");
 		};
 
 		try {
-			var newFriend : Friend = {
+			var target : Friend = {
 				account = p;
 				status = ?#Approved;
 			};
-			let userFriend : Friend = {
+			let user : Friend = {
 				account = msg.caller;
 				status = ?#Approved;
 			};
 
-			targetBuf.add(userFriend);
-			buf.add(newFriend);
-
-			let arr = Buffer.toArray(buf);
-			let targetArr = Buffer.toArray(targetBuf);
-
-			friends.put(msg.caller, arr);
-			friends.put(p, targetArr);
+			updateFriend(msg.caller, target, userFriends);
+			updateFriend(p, user, targetFriends);
 		} catch err {
 			return #err("Failed to update userStates");
 		};
