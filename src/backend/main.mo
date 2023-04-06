@@ -353,6 +353,16 @@ actor {
 		x.account == y.account;
 	};
 
+	func getIndexFriend(p : Principal, pm : Principal) : ?Nat {
+		let ?friendsArr = friends.get(p) else return null;
+		let friendsBuf = Buffer.fromArray<Friend>(friendsArr);
+		let search : Friend = {
+			account = pm;
+			status = null;
+		};
+		return Buffer.indexOf<Friend>(search, friendsBuf, isEqF);
+	};
+
 	// filter users according to parameters
 	func filterUsers(p : Principal, f : MatchingFilter) : ?UserWScore {
 		//TODO : optimize with let-else after 0.8.3 because this is messy
@@ -366,39 +376,39 @@ actor {
 		//User Loop
 		label ul for (pm : Principal in users.keys()) {
 			if (users.size() == count) break ul;
-			switch (users.get(pm)) {
-				case null ();
-				case (?user) {
-					//gender
-					switch (f.gender) {
-						case null ();
-						case (Gender) {
-							if ((f.gender, true) != user.gender) {
-								continue ul;
-							};
-						};
-					};
-					//age
-					switch (user.birth) {
-						case (?birth, _) {
-							//TODO : make birth-age conversion utility func
-							let userAge = birth / (1_000_000_000 * 3600 * 24) / 365;
-							if ((f.ageRange.0 >= userAge) or (f.ageRange.1 <= userAge)) {
-								continue ul;
-							};
-						};
-						case (_)();
-					};
-					let pmScore = calcScore(p, pm);
-					Debug.print(debug_show ("pmScore", pmScore));
-					Debug.print(debug_show ("callerScore", callerScore));
-					let pmCohesion = calcCohesion(pmScore, callerScore);
+			let ?user = users.get(pm) else continue ul;
 
-					if (p != pm) {
-						buf.add(?pm, pmCohesion);
+			let null = getIndexFriend(p, pm) else continue ul;
+			
+			switch (f.gender) {
+				case null ();
+				case (Gender) {
+					if ((f.gender, true) != user.gender) {
+						continue ul;
 					};
 				};
 			};
+			//age
+			switch (user.birth) {
+				case (?birth, _) {
+					//TODO : make birth-age conversion utility func
+					let userAge = birth / (1_000_000_000 * 3600 * 24) / 365;
+					if ((f.ageRange.0 >= userAge) or (f.ageRange.1 <= userAge)) {
+						continue ul;
+					};
+				};
+				case (_)();
+			};
+			let pmScore = calcScore(p, pm);
+
+			Debug.print(debug_show ("pmScore", pmScore, user.username));
+			Debug.print(debug_show ("callerScore", callerScore));
+			let pmCohesion = calcCohesion(pmScore, callerScore);
+
+			if (p != pm) {
+				buf.add(?pm, pmCohesion);
+			};
+
 			count += 1;
 		}; // end ul
 		//insert cohesionfilter and sort by <
@@ -630,7 +640,6 @@ actor {
 	//TODO : extract reusable function from sendFriendRequest and answerFriendRequest
 
 	public shared (msg) func sendFriendRequest(p : Principal) : async Result.Result<(), Text> {
-		let ?user = users.get(msg.caller) else return #err("You are not registered!");
 		let ?userFriends = friends.get(msg.caller) else return #err("Something went wrong!");
 		let ?targetFriends = friends.get(p) else return #err("Something went wrong!");
 		let buf = Buffer.fromArray<Friend>(userFriends);
@@ -682,7 +691,6 @@ actor {
 	};
 
 	public shared (msg) func answerFriendRequest(p : Principal, b : Bool) : async Result.Result<(), Text> {
-		let ?user = users.get(msg.caller) else return #err("You are not registered!");
 		let ?userFriends = friends.get(msg.caller) else return #err("Something went wrong!");
 		let ?targetFriends = friends.get(p) else return #err("Something went wrong!");
 		let buf = Buffer.fromArray<Friend>(userFriends);
