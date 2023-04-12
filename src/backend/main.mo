@@ -55,7 +55,7 @@ actor {
 		connect : ?Text;
 		//TODO: (cohesion : Nat;) changed into int for testing,  should always be between 0-100 so nat8 better
 		cohesion : Int;
-		answered : [Question];
+		answered : [(Question, Bool)];
 	};
 
 	public type Gender = {
@@ -217,6 +217,34 @@ actor {
 		buf.toArray();
 	};
 
+	func getAllAnswered(p : Principal, n : ?Nat) : [Question] {
+		let answered = allAnsweredQuestions(p, n);
+
+		func getQuestion(h : Hash.Hash) : ?Question {
+			questions.get(h);
+		};
+
+		let q = Array.mapFilter(answered, getQuestion);
+	};
+
+	func attachAnswers(p : Principal, pm : Principal, questions : [Question]) : [(Question, Bool)] {
+		func addAnswers(q : Question) : ?(Question, Bool) {
+			let pmQ = hashPrincipalQuestion(pm, q.hash);
+			let pQ = hashPrincipalQuestion(p, q.hash);
+			let ?match : ?Answer = answers.get(pmQ) else return null;
+			let user : ?Answer = answers.get(pQ);
+			let bool = switch (user) {
+				case (null) false;
+				case (?user) {
+					if (match.answer == user.answer) true else false;
+				};
+			};
+			?(q, bool);
+		};
+
+		Array.mapFilter<Question, (Question, Bool)>(questions, addAnswers);
+	};
+
 	func hasAnswered(p : Principal, question : Hash.Hash) : ?Answer {
 		let pQ = hashPrincipalQuestion(p, question);
 		return answers.get(pQ);
@@ -321,16 +349,6 @@ actor {
 				?T;
 			};
 		};
-	};
-
-	func getAllAnsweredQuestions(p : Principal, n : ?Nat) : [Question] {
-		let answered = allAnsweredQuestions(p, n);
-
-		func getQuestion(h : Hash.Hash) : ?Question {
-			questions.get(h);
-		};
-
-		let q = Array.mapFilter(answered, getQuestion);
 	};
 
 	//utility functions mostly for filterUsers
@@ -583,18 +601,19 @@ actor {
 		changeUserPoints(msg.caller, (user.points - Int.abs(queryCost)));
 		//TODO : make generic errors
 		let ?match : ?UserWScore = filterUsers(msg.caller, para) else return #err("Couldn't find any match! Try answering more questions.");
-		let ?principalMatch = match.0 else return #err("rrreeee");
-		let ?userM : ?User = users.get(principalMatch) else return #err("Matched user not found!");
+		let ?principal = match.0 else return #err("rrreeee");
+		let ?userM : ?User = users.get(principal) else return #err("Matched user not found!");
+		let answered = attachAnswers(msg.caller, principal, getAllAnswered(principal, null));
 
 		let result : UserMatch = {
-			principal = principalMatch;
+			principal;
 			username = userM.username;
 			about = checkPublic(userM.about);
 			gender = checkPublic(userM.gender);
 			birth = checkPublic(userM.birth);
 			connect = checkPublic(userM.connect);
 			cohesion = match.1;
-			answered = getAllAnsweredQuestions(principalMatch, null);
+			answered;
 		}; //TODO : fix above func getXAnsQues, gives literally only answeredQ bcs ongoing bad weight-like-answer implementation
 		//also filter first on commonQuestions to add a bool to this array for front-end indicating if both answered
 		return #ok(result);
@@ -613,7 +632,7 @@ actor {
 				calcScore(principal, msg.caller),
 				calcScore(msg.caller, msg.caller)
 			);
-			let answered = getAllAnsweredQuestions(principal, null);
+			let answered = attachAnswers(msg.caller, principal, getAllAnswered(principal, null));
 
 			if (status != #Approved) {
 				let matchObj : FriendlyUserMatch = {

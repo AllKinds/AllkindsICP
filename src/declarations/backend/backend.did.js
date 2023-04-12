@@ -27,7 +27,7 @@ export const idlFactory = ({ IDL }) => {
 		about: IDL.Opt(IDL.Text),
 		username: IDL.Text,
 		cohesion: IDL.Int,
-		answered: IDL.Vec(Question),
+		answered: IDL.Vec(IDL.Tuple(Question, IDL.Bool)),
 		gender: IDL.Opt(Gender),
 		birth: IDL.Opt(IDL.Int)
 	});
@@ -45,7 +45,7 @@ export const idlFactory = ({ IDL }) => {
 		about: IDL.Opt(IDL.Text),
 		username: IDL.Text,
 		cohesion: IDL.Int,
-		answered: IDL.Vec(Question),
+		answered: IDL.Vec(IDL.Tuple(Question, IDL.Bool)),
 		gender: IDL.Opt(Gender),
 		birth: IDL.Opt(IDL.Int)
 	});

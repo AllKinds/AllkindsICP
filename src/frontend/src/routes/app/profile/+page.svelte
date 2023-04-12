@@ -45,8 +45,8 @@
 	<div class=" w-100% rounded-md flex flex-col p-2 md:p-8 gap-2">
 		{#if $questionsAnswered}
 			{#each $questionsAnswered as q}
-				<!--TODO : a more default small question card -->
-				<Qbanner {q} />
+				<!-- REVAMP -->
+				<!-- <Qbanner {q} /> -->
 			{/each}
 		{/if}
 	</div>

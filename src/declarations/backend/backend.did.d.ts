@@ -10,7 +10,7 @@ export interface FriendlyUserMatch {
 	about: [] | [string];
 	username: string;
 	cohesion: bigint;
-	answered: Array<Question>;
+	answered: Array<[Question, boolean]>;
 	gender: [] | [Gender];
 	birth: [] | [bigint];
 }
@@ -49,7 +49,7 @@ export interface UserMatch {
 	about: [] | [string];
 	username: string;
 	cohesion: bigint;
-	answered: Array<Question>;
+	answered: Array<[Question, boolean]>;
 	gender: [] | [Gender];
 	birth: [] | [bigint];
 }

@@ -1,6 +1,9 @@
 type UserMatch = record {
 	about : opt text;
-	answered : vec Question;
+	answered : vec record {
+		Question;
+		bool;
+	};
 	birth : opt int;
 	cohesion : int;
 	connect : opt text;
@@ -74,7 +77,10 @@ type Gender = variant {
 };
 type FriendlyUserMatch = record {
 	about : opt text;
-	answered : vec Question;
+	answered : vec record {
+		Question;
+		bool;
+	};
 	birth : opt int;
 	cohesion : int;
 	connect : opt text;

@@ -20,8 +20,8 @@
 	let ageMs = Number(new Date()) - Number(match.birth) / 1000000;
 	let ageY = Math.floor(ageMs / (1000 * 3600 * 24) / 365);
 	//TODO : return all questions (+weight) with indication which had common answer (matched)
-	let answeredQuestions = match.answered;
-	let aQsize = answeredQuestions.length;
+	let answered = match.answered;
+	let aQsize = answered.length;
 
 	const handleConnectionRequest = async () => {
 		pending = true;
@@ -80,8 +80,8 @@ TODO : backend create friendlist and connection request implementation -->
 
 		{#if aQsize > 0}
 			<div class="flex flex-col gap-2">
-				{#each answeredQuestions as q}
-					<Qbanner {q} />
+				{#each answered as a}
+					<Qbanner q={a[0]} b={a[1]} />
 				{/each}
 			</div>
 		{/if}
