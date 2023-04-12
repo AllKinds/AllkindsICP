@@ -10,6 +10,8 @@
 
 	let pending: boolean = false;
 	let succes: boolean = false;
+	let current = 0;
+
 	let userPrincipal: Principal = match.principal;
 	let userName = match.username;
 	let userScore = match.cohesion;
@@ -21,7 +23,9 @@
 	let ageY = Math.floor(ageMs / (1000 * 3600 * 24) / 365);
 	//TODO : return all questions (+weight) with indication which had common answer (matched)
 	let answered = match.answered;
+	let uncommon = match.uncommon;
 	let aQsize = answered.length;
+	let uQsize = uncommon.length;
 
 	const handleConnectionRequest = async () => {
 		pending = true;
@@ -73,17 +77,33 @@ TODO : backend create friendlist and connection request implementation -->
 				</button>
 			</div>
 		{/if}
+		<div>
+			<button
+				class="pb-2 text-left hover-color hover-circle"
+				on:click={() => (current = 0)}
+				class:currentTab={current === 0}
+			>
+				<span class="hover-bg hover-color">All Questions{'('}{aQsize > 0 ? aQsize : 0}{')'}</span>
+			</button>
+			<button
+				class="pb-2 text-left hover-color hover-circle"
+				on:click={() => (current = 1)}
+				class:currentTab={current === 1}
+			>
+				<span class="hover-bg hover-color">Find out{'('}{uQsize > 0 ? uQsize : 0}{')'}</span>
+			</button>
+		</div>
 
-		<button class="pb-2 text-left ">
-			<span class="hover-bg hover-color">All Questions{'('}{aQsize > 0 ? aQsize : 0}{')'}</span>
-		</button>
-
-		{#if aQsize > 0}
-			<div class="flex flex-col gap-2">
+		<div class="flex flex-col gap-2 mt-3">
+			{#if aQsize > 0 && current == 0}
 				{#each answered as a}
 					<Qbanner q={a[0]} b={a[1]} />
 				{/each}
-			</div>
-		{/if}
+			{:else if uQsize > 0 && current == 1}
+				{#each uncommon as u}
+					<Qbanner q={u} b={false} />
+				{/each}
+			{/if}
+		</div>
 	</div>
 </div>

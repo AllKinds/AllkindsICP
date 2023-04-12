@@ -13,6 +13,7 @@ export interface FriendlyUserMatch {
 	answered: Array<[Question, boolean]>;
 	gender: [] | [Gender];
 	birth: [] | [bigint];
+	uncommon: Array<Question>;
 }
 export type Gender = { Male: null } | { Female: null } | { Other: null } | { Queer: null };
 export type Hash = number;
@@ -52,6 +53,7 @@ export interface UserMatch {
 	answered: Array<[Question, boolean]>;
 	gender: [] | [Gender];
 	birth: [] | [bigint];
+	uncommon: Array<Question>;
 }
 export interface _SERVICE {
 	answerFriendRequest: ActorMethod<[Principal, boolean], Result>;

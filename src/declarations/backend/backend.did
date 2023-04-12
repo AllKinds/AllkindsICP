@@ -9,6 +9,7 @@ type UserMatch = record {
 	connect : opt text;
 	gender : opt Gender;
 	"principal" : principal;
+	uncommon : vec Question;
 	username : text;
 };
 type User = record {
@@ -87,6 +88,7 @@ type FriendlyUserMatch = record {
 	gender : opt Gender;
 	"principal" : principal;
 	status : FriendStatus;
+	uncommon : vec Question;
 	username : text;
 };
 type FriendStatus = variant {

@@ -29,7 +29,8 @@ export const idlFactory = ({ IDL }) => {
 		cohesion: IDL.Int,
 		answered: IDL.Vec(IDL.Tuple(Question, IDL.Bool)),
 		gender: IDL.Opt(Gender),
-		birth: IDL.Opt(IDL.Int)
+		birth: IDL.Opt(IDL.Int),
+		uncommon: IDL.Vec(Question)
 	});
 	const Result_4 = IDL.Variant({ ok: UserMatch, err: IDL.Text });
 	const Result_3 = IDL.Variant({ ok: IDL.Vec(Question), err: IDL.Text });
@@ -47,7 +48,8 @@ export const idlFactory = ({ IDL }) => {
 		cohesion: IDL.Int,
 		answered: IDL.Vec(IDL.Tuple(Question, IDL.Bool)),
 		gender: IDL.Opt(Gender),
-		birth: IDL.Opt(IDL.Int)
+		birth: IDL.Opt(IDL.Int),
+		uncommon: IDL.Vec(Question)
 	});
 	const Result_2 = IDL.Variant({
 		ok: IDL.Vec(FriendlyUserMatch),

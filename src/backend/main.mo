@@ -46,6 +46,7 @@ actor {
 		points : Nat; //Nat bcs user points should not go negative
 	};
 
+	//returnable object of a user that caller requested
 	public type UserMatch = {
 		principal : Principal;
 		username : Text;
@@ -55,7 +56,8 @@ actor {
 		connect : ?Text;
 		//TODO: (cohesion : Nat;) changed into int for testing,  should always be between 0-100 so nat8 better
 		cohesion : Int;
-		answered : [(Question, Bool)];
+		answered : [(Question, Bool)]; //bool indicates comparison with caller answer
+		uncommon : [Question]; //Questions that user has answered but not caller
 	};
 
 	public type Gender = {
@@ -203,6 +205,7 @@ actor {
 	// 	buf.toArray();
 	// };
 
+	//TODO : these functions could use renaming as it might seem to be confusing
 	func allAnsweredQuestions(p : Principal, n : ?Nat) : [Hash.Hash] {
 		let buf = Buffer.Buffer<Hash.Hash>(16);
 		var count = 0;
@@ -227,7 +230,7 @@ actor {
 		let q = Array.mapFilter(answered, getQuestion);
 	};
 
-	func attachAnswers(p : Principal, pm : Principal, questions : [Question]) : [(Question, Bool)] {
+	func attachAnswerComparison(p : Principal, pm : Principal, questions : [Question]) : [(Question, Bool)] {
 		func addAnswers(q : Question) : ?(Question, Bool) {
 			let pmQ = hashPrincipalQuestion(pm, q.hash);
 			let pQ = hashPrincipalQuestion(p, q.hash);
@@ -245,9 +248,44 @@ actor {
 		Array.mapFilter<Question, (Question, Bool)>(questions, addAnswers);
 	};
 
+	//unused?
 	func hasAnswered(p : Principal, question : Hash.Hash) : ?Answer {
 		let pQ = hashPrincipalQuestion(p, question);
 		return answers.get(pQ);
+	};
+
+	func getUnequalQuestions(p : Principal, pm : Principal) : [Question] {
+		let pA = getAllAnswered(p, null);
+		let pmA = getAllAnswered(pm, null);
+		Debug.print(debug_show ("pA", pA.size()));
+		Debug.print(debug_show ("pmA", pmA.size()));
+
+		let arr = Array.mapFilter<Question, Question>(
+			pmA,
+			func qm = if (null == Array.find<Question>(pA, func q = (q.hash != qm.hash))) null else ?qm
+		);
+		Debug.print(debug_show ("unequals", arr.size()));
+
+		// let arr = Array.mapFilter<Question, Question>(hashes, func h = questions.get(h));
+		// Debug.print(debug_show ("uncommons", arr.size()));
+		return arr;
+	};
+
+	func getEqualQuestions(p : Principal, pm : Principal) : [Question] {
+		let pA = getAllAnswered(p, null);
+		let pmA = getAllAnswered(pm, null);
+		Debug.print(debug_show ("pA", pA.size()));
+		Debug.print(debug_show ("pmA", pmA.size()));
+
+		let arr = Array.mapFilter<Question, Question>(
+			pmA,
+			func qm = if (null == Array.find<Question>(pA, func q = (q.hash == qm.hash))) null else ?qm
+		);
+		Debug.print(debug_show ("equals", arr.size()));
+
+		// let arr = Array.mapFilter<Question, Question>(hashes, func h = questions.get(h));
+		// Debug.print(debug_show ("uncommons", arr.size()));
+		return arr;
 	};
 
 	func commonQuestions(sourceUser : Principal, testUser : Principal) : [CommonQuestion] {
@@ -454,7 +492,6 @@ actor {
 			iMa := Nat.add(iCo, 1);
 		};
 		//TODO : +else -> to also compare bordering values for better result
-		//TODO : still some small bugs, especially w sorting when cohesion has same value as usersScores
 		Debug.print(debug_show ("ico", iCo));
 		Debug.print(debug_show ("iMa", iMa));
 
@@ -603,7 +640,8 @@ actor {
 		let ?match : ?UserWScore = filterUsers(msg.caller, para) else return #err("Couldn't find any match! Try answering more questions.");
 		let ?principal = match.0 else return #err("rrreeee");
 		let ?userM : ?User = users.get(principal) else return #err("Matched user not found!");
-		let answered = attachAnswers(msg.caller, principal, getAllAnswered(principal, null));
+		let answered = attachAnswerComparison(msg.caller, principal, getEqualQuestions(msg.caller, principal));
+		let uncommon = getUnequalQuestions(msg.caller, principal);
 
 		let result : UserMatch = {
 			principal;
@@ -614,6 +652,7 @@ actor {
 			connect = checkPublic(userM.connect);
 			cohesion = match.1;
 			answered;
+			uncommon;
 		}; //TODO : fix above func getXAnsQues, gives literally only answeredQ bcs ongoing bad weight-like-answer implementation
 		//also filter first on commonQuestions to add a bool to this array for front-end indicating if both answered
 		return #ok(result);
@@ -632,7 +671,8 @@ actor {
 				calcScore(principal, msg.caller),
 				calcScore(msg.caller, msg.caller)
 			);
-			let answered = attachAnswers(msg.caller, principal, getAllAnswered(principal, null));
+			let answered = attachAnswerComparison(msg.caller, principal, getEqualQuestions(msg.caller, principal));
+			let uncommon = getUnequalQuestions(msg.caller, principal);
 
 			if (status != #Approved) {
 				let matchObj : FriendlyUserMatch = {
@@ -644,6 +684,7 @@ actor {
 					connect = checkPublic(userM.connect);
 					cohesion;
 					answered;
+					uncommon;
 					status;
 				};
 				buf.add(matchObj);
@@ -657,6 +698,7 @@ actor {
 					connect = userM.connect.0;
 					cohesion;
 					answered;
+					uncommon;
 					status;
 				};
 				buf.add(matchObj);
