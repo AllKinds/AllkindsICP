@@ -48,6 +48,7 @@
 			gender: [toNullableGender(userObj.gender), publicGender],
 			birth: [toNullableDate(userObj.birth), publicBirth],
 			points: $user.points
+			//TODO : fix vulnerability with points being in userObj
 		};
 		await updateProfile(newUser).catch((error) => {
 			console.log('errorcatch', error);
@@ -56,8 +57,8 @@
 	};
 </script>
 
-<div class="flex flex-col gap-4 border-main bg-sub30 py-8">
-	<h2 class="p-0 text-center">Profile settings</h2>
+<div class="flex flex-col gap-4">
+	<h2 class="p-0 text-center ">Profile settings</h2>
 	<span class="text-zinc-600 flex justify-center"
 		><Eye /> : Allow what people can initially see about you.</span
 	>

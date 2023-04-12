@@ -30,7 +30,7 @@
 	};
 </script>
 
-<div class=" bg-main flex flex-col gap-4">
+<div class="flex flex-col gap-4">
 	<div class="border-main bg-sub30 w-full mx-auto flex-col padding py-1 justify-between">
 		<button
 			class="w-full flex justify-between items-center"

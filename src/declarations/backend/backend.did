@@ -1,14 +1,11 @@
-type WeightKind = variant {
-	Dislike : nat;
-	Like : nat;
-};
 type UserMatch = record {
 	about : opt text;
-	answeredQuestions : vec Question;
+	answered : vec Question;
 	birth : opt int;
 	cohesion : int;
 	connect : opt text;
 	gender : opt Gender;
+	"principal" : principal;
 	username : text;
 };
 type User = record {
@@ -32,13 +29,17 @@ type User = record {
 	points : nat;
 	username : text;
 };
-type Result_3 = variant {
+type Result_4 = variant {
 	err : text;
 	ok : UserMatch;
 };
-type Result_2 = variant {
+type Result_3 = variant {
 	err : text;
 	ok : vec Question;
+};
+type Result_2 = variant {
+	err : text;
+	ok : vec FriendlyUserMatch;
 };
 type Result_1 = variant {
 	err : text;
@@ -71,17 +72,34 @@ type Gender = variant {
 	Other;
 	Queer;
 };
+type FriendlyUserMatch = record {
+	about : opt text;
+	answered : vec Question;
+	birth : opt int;
+	cohesion : int;
+	connect : opt text;
+	gender : opt Gender;
+	"principal" : principal;
+	status : FriendStatus;
+	username : text;
+};
+type FriendStatus = variant {
+	Approved;
+	Requested;
+	Waiting;
+};
 type Color = variant { Default };
-type AnswerKind = variant { Bool : bool };
 service : {
+	answerFriendRequest : (principal, bool) -> (Result);
 	createQuestion : (text) -> (Result);
 	createUser : (text) -> (Result);
-	findMatch : (MatchingFilter) -> (Result_3);
-	getAnsweredQuestions : (opt nat) -> (Result_2) query;
-	getAskableQuestions : (nat) -> (Result_2) query;
+	findMatch : (MatchingFilter) -> (Result_4);
+	getAnsweredQuestions : (opt nat) -> (Result_3) query;
+	getAskableQuestions : (nat) -> (Result_3) query;
+	getFriends : () -> (Result_2) query;
 	getUser : () -> (Result_1) query;
-	submitAnswer : (Hash, AnswerKind) -> (Result);
+	sendFriendRequest : (principal) -> (Result);
+	submitAnswer : (Hash, bool, int) -> (Result);
 	submitSkip : (Hash) -> (Result);
-	submitWeight : (Hash, WeightKind) -> (Result);
 	updateProfile : (User) -> (Result);
 };

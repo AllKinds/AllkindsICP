@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { AnswerKind, WeightKind, Question } from 'src/declarations/backend/backend.did';
+	import type { Question } from 'src/declarations/backend/backend.did';
 
 	import ChevronDown from '$lib/assets/icons/chevronDown.svg?component';
 	import ChevronUp from '$lib/assets/icons/chevronUp.svg?component';
@@ -9,11 +9,12 @@
 	let expandWindow: boolean = false;
 </script>
 
+<!-- component for Question Card on Home screen -->
 <div
 	class="odd:bg-slate-300/40 even:bg-slate-300/20 dark:odd:bg-slate-700/10 dark:even:bg-slate-700/30 h-fit w-full border-main rounded-lg padding"
 >
 	<button class="flex h-full w-full hover-color " on:click={() => (expandWindow = !expandWindow)}>
-		<span class="text-2xl text-left text-zinc-200 grow">
+		<span class="text-2xl text-left font-color-sub grow">
 			{#if !expandWindow}
 				{question.question}
 				<div class="mt-14" />

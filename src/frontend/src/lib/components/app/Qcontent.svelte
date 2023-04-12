@@ -1,49 +1,33 @@
 <script lang="ts">
-	import { user } from '$lib/stores/index';
 	import { answerQ } from '$lib/stores/tasks/answerQ';
 	import { getQs } from '$lib/stores/tasks/getQs';
 	import { skipQ } from '$lib/stores/tasks/skipQ';
-	import { likeQ } from '$lib/stores/tasks/likeQ';
-	import { fromBigInt } from '$lib/utilities';
-	import type { AnswerKind, WeightKind, Question } from 'src/declarations/backend/backend.did';
+	import type { Question } from 'src/declarations/backend/backend.did';
 	import Spinner from '../common/Spinner.svelte';
 	import PlusCircle from '$lib/assets/icons/plus-circle.svg?component';
 	import MinusCircle from '$lib/assets/icons/minus-circle.svg?component';
 
 	export let question: Question;
-	let likeWeight: number = 0;
+	var likeWeight = 0;
 	let skipPending: boolean = false;
 	let answerPending: boolean | undefined = undefined;
 
 	const submitAnswer = async (bool: boolean) => {
 		answerPending = bool;
-		let answer: AnswerKind = { Bool: bool };
-		let like: WeightKind =
-			likeWeight > 0
-				? { Like: BigInt(Math.abs(likeWeight)) }
-				: { Dislike: BigInt(Math.abs(likeWeight)) };
-
-		const putAnswer = async () =>
-			await answerQ(question.hash, answer).catch((error) => {
+		let answer: boolean = bool;
+		let weight = BigInt(likeWeight);
+		await answerQ(question.hash, answer, weight)
+			.catch((error) => {
 				console.log('errorcatch', error);
+			})
+			.catch((error) => {
+				console.log('errorcatch', error);
+			})
+			.then(async () => {
+				answerPending = undefined;
+				likeWeight = 0;
+				getQs();
 			});
-
-		//TODO : clean up and write more efficient
-		if (likeWeight == 0) {
-			await putAnswer();
-		} else {
-			await likeQ(question.hash, like)
-				.catch((error) => {
-					console.log('errorcatch', error);
-				})
-				.then(async () => await putAnswer());
-
-			//TODO : show errors on questions correctly
-		}
-
-		answerPending = undefined;
-		likeWeight = 0;
-		getQs();
 	};
 
 	const skipQuestion = async () => {

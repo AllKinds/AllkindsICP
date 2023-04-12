@@ -22,16 +22,37 @@ export const idlFactory = ({ IDL }) => {
 		points: IDL.Int
 	});
 	const UserMatch = IDL.Record({
+		principal: IDL.Principal,
 		connect: IDL.Opt(IDL.Text),
 		about: IDL.Opt(IDL.Text),
 		username: IDL.Text,
 		cohesion: IDL.Int,
+		answered: IDL.Vec(Question),
 		gender: IDL.Opt(Gender),
-		birth: IDL.Opt(IDL.Int),
-		answeredQuestions: IDL.Vec(Question)
+		birth: IDL.Opt(IDL.Int)
 	});
-	const Result_3 = IDL.Variant({ ok: UserMatch, err: IDL.Text });
-	const Result_2 = IDL.Variant({ ok: IDL.Vec(Question), err: IDL.Text });
+	const Result_4 = IDL.Variant({ ok: UserMatch, err: IDL.Text });
+	const Result_3 = IDL.Variant({ ok: IDL.Vec(Question), err: IDL.Text });
+	const FriendStatus = IDL.Variant({
+		Approved: IDL.Null,
+		Waiting: IDL.Null,
+		Requested: IDL.Null
+	});
+	const FriendlyUserMatch = IDL.Record({
+		status: FriendStatus,
+		principal: IDL.Principal,
+		connect: IDL.Opt(IDL.Text),
+		about: IDL.Opt(IDL.Text),
+		username: IDL.Text,
+		cohesion: IDL.Int,
+		answered: IDL.Vec(Question),
+		gender: IDL.Opt(Gender),
+		birth: IDL.Opt(IDL.Int)
+	});
+	const Result_2 = IDL.Variant({
+		ok: IDL.Vec(FriendlyUserMatch),
+		err: IDL.Text
+	});
 	const User = IDL.Record({
 		created: IDL.Int,
 		connect: IDL.Tuple(IDL.Opt(IDL.Text), IDL.Bool),
@@ -42,18 +63,18 @@ export const idlFactory = ({ IDL }) => {
 		points: IDL.Nat
 	});
 	const Result_1 = IDL.Variant({ ok: User, err: IDL.Text });
-	const AnswerKind = IDL.Variant({ Bool: IDL.Bool });
-	const WeightKind = IDL.Variant({ Like: IDL.Nat, Dislike: IDL.Nat });
 	return IDL.Service({
+		answerFriendRequest: IDL.Func([IDL.Principal, IDL.Bool], [Result], []),
 		createQuestion: IDL.Func([IDL.Text], [Result], []),
 		createUser: IDL.Func([IDL.Text], [Result], []),
-		findMatch: IDL.Func([MatchingFilter], [Result_3], []),
-		getAnsweredQuestions: IDL.Func([IDL.Opt(IDL.Nat)], [Result_2], ['query']),
-		getAskableQuestions: IDL.Func([IDL.Nat], [Result_2], ['query']),
+		findMatch: IDL.Func([MatchingFilter], [Result_4], []),
+		getAnsweredQuestions: IDL.Func([IDL.Opt(IDL.Nat)], [Result_3], ['query']),
+		getAskableQuestions: IDL.Func([IDL.Nat], [Result_3], ['query']),
+		getFriends: IDL.Func([], [Result_2], ['query']),
 		getUser: IDL.Func([], [Result_1], ['query']),
-		submitAnswer: IDL.Func([Hash, AnswerKind], [Result], []),
+		sendFriendRequest: IDL.Func([IDL.Principal], [Result], []),
+		submitAnswer: IDL.Func([Hash, IDL.Bool, IDL.Int], [Result], []),
 		submitSkip: IDL.Func([Hash], [Result], []),
-		submitWeight: IDL.Func([Hash, WeightKind], [Result], []),
 		updateProfile: IDL.Func([User], [Result], [])
 	});
 };

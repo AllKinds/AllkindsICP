@@ -8,7 +8,7 @@
 		@apply transition-all ease-in-out duration-300;
 	}
 	.fancy-btn {
-		@apply trans-300 rounded-full p-2 px-8 text-zinc-900 bg-zinc-100/90 hover:bg-transparent dark:text-zinc-200 dark:bg-zinc-800/80 dark:hover:bg-transparent;
+		@apply trans-300 rounded-full p-2 px-8 text-zinc-900 bg-zinc-100 hover:bg-transparent dark:text-zinc-200 dark:bg-zinc-800/80 dark:hover:bg-transparent;
 	}
 	.fancy-btn-border {
 		@apply bg-gradient-to-br from-DF-blue via-DF-red to-DF-yellow font-semibold w-fit p-0.5 my-5 md:mx-0 rounded-full;
@@ -32,7 +32,7 @@
 		@apply bg-zinc-100 dark:bg-zinc-900;
 	}
 	.bg-main90 {
-		@apply bg-zinc-100/90 dark:bg-zinc-900/90;
+		@apply bg-zinc-100 dark:bg-zinc-900/90;
 	}
 	.bg-main95 {
 		@apply bg-zinc-100 dark:bg-zinc-900/90;
@@ -46,17 +46,14 @@
 	.bg-sub90 {
 		@apply bg-zinc-200/90 dark:bg-zinc-800/90;
 	}
-	.sub-btn {
-		@apply cursor-pointer border-none hover-circle;
-	}
 	.hover-color {
-		@apply text-slate-700 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200;
+		@apply text-slate-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200;
 	}
 	.border-main {
 		@apply rounded-lg border border-zinc-300 dark:border-zinc-700;
 	}
 	.hover-circle {
-		@apply bg-transparent hover:bg-sub rounded-full p-2;
+		@apply bg-transparent hover:bg-sub rounded-full p-2 cursor-pointer border-none;
 	}
 	.filter-box {
 		@apply md:w-5/12 flex flex-col border-main bg-sub30 p-2 rounded-md gap-2;
@@ -64,8 +61,14 @@
 	.filter-name {
 		@apply font-semibold text-slate-500 mx-auto;
 	}
-	.font-color-sub {
-		@apply text-zinc-600 dark:text-zinc-200;
+	.text-sub {
+		@apply text-zinc-500 dark:text-zinc-400;
+	}
+	.currentTab {
+		@apply bg-sub text-slate-600 dark:text-zinc-200;
+	}
+	.link {
+		@apply hover:underline text-indigo-500 hover:text-violet-500;
 	}
 }
 
