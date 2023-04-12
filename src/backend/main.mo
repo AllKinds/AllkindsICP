@@ -209,7 +209,7 @@ actor {
 		label f for (hash in questions.keys()) {
 			if (n == ?count) break f;
 			let pQ = hashPrincipalQuestion(p, hash);
-			if (null != answers.get(pQ)) {
+			if (null != answers.get(pQ)) if (null == skips.get(pQ)) {
 				buf.add(hash);
 				count += 1;
 			};
@@ -369,7 +369,6 @@ actor {
 		let res = Buffer.toArray(buf);
 		friends.put(p, res);
 	};
-		
 
 	// filter users according to parameters
 	func filterUsers(p : Principal, f : MatchingFilter) : ?UserWScore {
@@ -387,7 +386,7 @@ actor {
 			let ?user = users.get(pm) else continue ul;
 
 			let null = getIndexFriend(p, pm) else continue ul;
-			
+
 			switch (f.gender) {
 				case null ();
 				case (Gender) {
@@ -445,8 +444,6 @@ actor {
 		Debug.print(debug_show ("arr", buf.toArray()));
 		return ?resultMatch;
 	};
-
-	
 
 	// DATA STORAGE
 
@@ -609,36 +606,39 @@ actor {
 		let ?friendList = friends.get(msg.caller) else return #err("You don't have any friends :c ");
 
 		label ul for (f : Friend in friendList.vals()) {
-			let pm : Principal = f.account;
-			let ?userM = users.get(pm) else continue ul; //might be that user has been deleted
-			let ?matchStatus = f.status else return #err("Something went wrong!");
-			let pmScore : Int = calcScore(msg.caller, pm);
-			let answeredQ = getAllAnsweredQuestions(pm, null);
+			let principal = f.account;
+			let ?userM : ?User = users.get(principal) else continue ul; //might be that user has been deleted
+			let ?status : ?FriendStatus = f.status else return #err("Something went wrong!");
+			let cohesion = calcCohesion(
+				calcScore(principal, msg.caller),
+				calcScore(msg.caller, msg.caller)
+			);
+			let answered = getAllAnsweredQuestions(principal, null);
 
-			if (matchStatus != #Approved) {
+			if (status != #Approved) {
 				let matchObj : FriendlyUserMatch = {
-					principal = pm;
+					principal;
 					username = userM.username;
 					about = checkPublic(userM.about);
 					gender = checkPublic(userM.gender);
 					birth = checkPublic(userM.birth);
 					connect = checkPublic(userM.connect);
-					cohesion = pmScore;
-					answered = answeredQ;
-					status = matchStatus;
+					cohesion;
+					answered;
+					status;
 				};
 				buf.add(matchObj);
 			} else {
 				let matchObj : FriendlyUserMatch = {
-					principal = pm;
+					principal;
 					username = userM.username;
 					about = userM.about.0;
 					gender = userM.gender.0;
 					birth = userM.birth.0;
 					connect = userM.connect.0;
-					cohesion = pmScore;
-					answered = answeredQ;
-					status = matchStatus;
+					cohesion;
+					answered;
+					status;
 				};
 				buf.add(matchObj);
 			};
@@ -699,7 +699,7 @@ actor {
 				let _ = targetBuf.remove(iT);
 				if (b == false) {
 					//rejected
-					return #ok(); 
+					return #ok();
 				};
 				//accepted
 			};
