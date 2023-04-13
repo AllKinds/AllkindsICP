@@ -188,22 +188,8 @@ actor {
 				count += 1;
 			};
 		};
-		buf.toArray();
+		Buffer.toArray(buf);
 	};
-
-	// func getAnsweredQuestions(p : Principal, n : ?Nat) : [Hash.Hash] {
-	// 	let buf = Buffer.Buffer<Hash.Hash>(16);
-	// 	var count = 0;
-	// 	label f for (hash in questions.keys()) {
-	// 		if (n == ?count) break f;
-	// 		let pQ = hashPrincipalQuestion(p, hash);
-	// 		if ((null == skips.get(pQ)) or (null != answers.get(pQ))) {
-	// 			buf.add(hash);
-	// 			count += 1;
-	// 		};
-	// 	};
-	// 	buf.toArray();
-	// };
 
 	//TODO : these functions could use renaming as it might seem to be confusing
 	func allAnsweredQuestions(p : Principal, n : ?Nat) : [Hash.Hash] {
@@ -217,7 +203,7 @@ actor {
 				count += 1;
 			};
 		};
-		buf.toArray();
+		Buffer.toArray(buf);
 	};
 
 	func getAllAnswered(p : Principal, n : ?Nat) : [Question] {
@@ -251,41 +237,28 @@ actor {
 	//unused?
 	func hasAnswered(p : Principal, question : Hash.Hash) : ?Answer {
 		let pQ = hashPrincipalQuestion(p, question);
-		return answers.get(pQ);
+		answers.get(pQ);
 	};
 
+	//make 1 function and specify equal/unequal arg
 	func getUnequalQuestions(p : Principal, pm : Principal) : [Question] {
 		let pA = getAllAnswered(p, null);
 		let pmA = getAllAnswered(pm, null);
-		Debug.print(debug_show ("pA", pA.size()));
-		Debug.print(debug_show ("pmA", pmA.size()));
 
-		let arr = Array.mapFilter<Question, Question>(
+		Array.mapFilter<Question, Question>(
 			pmA,
 			func qm = if (null == Array.find<Question>(pA, func q = (q.hash != qm.hash))) null else ?qm
 		);
-		Debug.print(debug_show ("unequals", arr.size()));
-
-		// let arr = Array.mapFilter<Question, Question>(hashes, func h = questions.get(h));
-		// Debug.print(debug_show ("uncommons", arr.size()));
-		return arr;
 	};
 
 	func getEqualQuestions(p : Principal, pm : Principal) : [Question] {
 		let pA = getAllAnswered(p, null);
 		let pmA = getAllAnswered(pm, null);
-		Debug.print(debug_show ("pA", pA.size()));
-		Debug.print(debug_show ("pmA", pmA.size()));
 
-		let arr = Array.mapFilter<Question, Question>(
+		Array.mapFilter<Question, Question>(
 			pmA,
 			func qm = if (null == Array.find<Question>(pA, func q = (q.hash == qm.hash))) null else ?qm
 		);
-		Debug.print(debug_show ("equals", arr.size()));
-
-		// let arr = Array.mapFilter<Question, Question>(hashes, func h = questions.get(h));
-		// Debug.print(debug_show ("uncommons", arr.size()));
-		return arr;
 	};
 
 	func commonQuestions(sourceUser : Principal, testUser : Principal) : [CommonQuestion] {
@@ -305,7 +278,7 @@ actor {
 			};
 			buf.add(commonQuestion);
 		};
-		buf.toArray();
+		Buffer.toArray(buf);
 	};
 
 	//checks 2 common Q.answers. returns 0 if weight/answers are opposite
@@ -329,15 +302,14 @@ actor {
 		for (q in Iter.fromArray(common)) {
 			qScore += calcQScore(q.sourceAnswer, q.testAnswer);
 		};
-		Debug.print(debug_show ("qscore", qScore));
-		return qScore;
+
+		qScore;
 	};
 
 	//takes 2 unqiue scores and calculates them into % with 'source' as base
 	func calcCohesion(pm : Int, p : Int) : Int {
-		//assert (p > pm);
 		if (p < pm) {
-			return if (p * pm == 0) 0 else {
+			if (p * pm == 0) 0 else {
 				Float.toInt(
 					100 * Float.div(
 						Float.fromInt(pm),
@@ -346,9 +318,8 @@ actor {
 				);
 			};
 		} else {
-			return 100;
+			100;
 		};
-
 	};
 
 	// todo : change into easier way of ?null checking
@@ -433,7 +404,6 @@ actor {
 		var count = 0;
 		let callerScore = calcScore(p, p);
 		if (callerScore == 0) {
-			Debug.print(debug_show ("caller is 0"));
 			return null;
 		};
 		//User Loop
@@ -462,10 +432,8 @@ actor {
 				};
 				case (_)();
 			};
-			let pmScore = calcScore(p, pm);
 
-			Debug.print(debug_show ("pmScore", pmScore, user.username));
-			Debug.print(debug_show ("callerScore", callerScore));
+			let pmScore = calcScore(p, pm);
 			let pmCohesion = calcCohesion(pmScore, callerScore);
 
 			if (p != pm) {
@@ -479,7 +447,6 @@ actor {
 		buf.sort(sortByScore);
 		let bufSize = buf.size();
 		let bufSizeX = Nat.sub(bufSize, 1);
-		Debug.print(debug_show ("bufsize", bufSize, bufSizeX));
 		//find index of cohesion filter
 		let ?iCo = Buffer.indexOf((null, f.cohesion), buf, findCoheFilter) else return null;
 		var iMa : Nat = 0;
@@ -492,12 +459,8 @@ actor {
 			iMa := Nat.add(iCo, 1);
 		};
 		//TODO : +else -> to also compare bordering values for better result
-		Debug.print(debug_show ("ico", iCo));
-		Debug.print(debug_show ("iMa", iMa));
 
-		let resultMatch = buf.get(iMa);
-		Debug.print(debug_show ("arr", buf.toArray()));
-		return ?resultMatch;
+		return ?buf.get(iMa);
 	};
 
 	// DATA STORAGE
@@ -640,7 +603,8 @@ actor {
 		let ?match : ?UserWScore = filterUsers(msg.caller, para) else return #err("Couldn't find any match! Try answering more questions.");
 		let ?principal = match.0 else return #err("rrreeee");
 		let ?userM : ?User = users.get(principal) else return #err("Matched user not found!");
-		let answered = attachAnswerComparison(msg.caller, principal, getEqualQuestions(msg.caller, principal));
+		let equalQuestions = getEqualQuestions(msg.caller, principal);
+		let answered = attachAnswerComparison(msg.caller, principal, equalQuestions);
 		let uncommon = getUnequalQuestions(msg.caller, principal);
 
 		let result : UserMatch = {
@@ -705,7 +669,7 @@ actor {
 			};
 
 		};
-		#ok(buf.toArray());
+		#ok(Buffer.toArray(buf));
 	};
 
 	//TODO : extract reusable function from sendFriendRequest and answerFriendRequest
@@ -731,8 +695,8 @@ actor {
 				status = ?#Waiting;
 			};
 
-			updateFriend(msg.caller, target, userFriends);
-			updateFriend(p, user, targetFriends);
+			updateFriend(msg.caller, target, Buffer.toArray(buf));
+			updateFriend(p, user, Buffer.toArray(targetBuf));
 
 		} catch err {
 			return #err("Failed to update user states");
@@ -745,12 +709,9 @@ actor {
 		let ?targetFriends = friends.get(p) else return #err("Something went wrong!");
 		let buf = Buffer.fromArray<Friend>(userFriends);
 		let targetBuf = Buffer.fromArray<Friend>(targetFriends);
-
 		let ?iT = getIndexFriend(p, msg.caller) else return #err("Strange");
 		let ?i = getIndexFriend(msg.caller, p) else return #err("You have no friend requests from that user!");
 
-		//let ?iT = Buffer.indexOf(searchT, targetBuf, isEqF) else return #err("Strange index not found");
-		//let ?i = Buffer.indexOf(search, buf, isEqF) else return #err("You have no friend requests from that user!");
 		let res : Friend = buf.get(i) else return #err("Can't check status of your friend");
 
 		switch (res.status) {
@@ -758,6 +719,7 @@ actor {
 			case (?#Waiting) {
 				let _ = buf.remove(i);
 				let _ = targetBuf.remove(iT);
+
 				if (b == false) {
 					//rejected
 					return #ok();
@@ -778,12 +740,13 @@ actor {
 				status = ?#Approved;
 			};
 
-			updateFriend(msg.caller, target, userFriends);
-			updateFriend(p, user, targetFriends);
+			updateFriend(msg.caller, target, Buffer.toArray(buf));
+			updateFriend(p, user, Buffer.toArray(targetBuf));
+			#ok();
 		} catch err {
 			return #err("Failed to update userStates");
 		};
-		#ok();
+
 	};
 
 };

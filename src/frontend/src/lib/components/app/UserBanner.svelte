@@ -24,10 +24,11 @@
 
 	const handleRequest = async (answer: boolean) => {
 		pending = true;
-		await answerFriendRequest(u.principal, answer).catch((err) => {
-			console.log('error while answering request : ', err);
-		});
-		await getFriends();
+		await answerFriendRequest(u.principal, answer)
+			.catch((err) => {
+				console.log('error while answering request : ', err);
+			})
+			.then(() => getFriends());
 		pending = false;
 	};
 </script>

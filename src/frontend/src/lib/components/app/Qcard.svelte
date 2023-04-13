@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type { Question } from 'src/declarations/backend/backend.did';
-
 	import ChevronDown from '$lib/assets/icons/chevronDown.svg?component';
 	import ChevronUp from '$lib/assets/icons/chevronUp.svg?component';
 	import Qcontent from './Qcontent.svelte';

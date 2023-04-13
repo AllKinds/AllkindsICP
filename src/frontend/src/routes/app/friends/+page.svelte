@@ -33,15 +33,6 @@
 
 	onMount(() => {
 		handleFindFriends();
-		// if (!$friendsApproved || !$friendsWaiting) {
-		// 	handleFindFriends();
-		// 	console.log('first time load');
-		// } else {
-		// 	//flSize = $foundFriends.length;
-		//   fA = $friendsApproved.length;
-		//   fW = $friendsWaiting.length;
-		//   fR = $friendsRequested.length;
-		// }
 	});
 </script>
 

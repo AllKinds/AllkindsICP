@@ -9,6 +9,9 @@ export const friendsRequested = writable<Array<FriendlyUserMatch>>();
 //Requested could also be made
 
 export async function getFriends() {
+	friendsApproved.set([]);
+	friendsWaiting.set([]);
+	friendsRequested.set([]);
 	const localActor = get(actor);
 
 	await localActor.getFriends().then((res) => {

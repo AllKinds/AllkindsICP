@@ -46,7 +46,11 @@
 		{#if $questionsAnswered}
 			{#each $questionsAnswered as q}
 				<!-- REVAMP -->
-				<!-- <Qbanner {q} /> -->
+				<Qbanner {q} b={false}>
+					<!-- <svelte:fragment slot="weight">
+						
+					</svelte:fragment> -->
+				</Qbanner>
 			{/each}
 		{/if}
 	</div>

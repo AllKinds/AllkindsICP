@@ -36,14 +36,7 @@
 		succes = true;
 		pending = false;
 	};
-	//TODO : spinner keeps loading, cant update states after function call? check app/component load states
-	//myabe bcs no subscribe value here for comp to update
 </script>
-
-<!-- will only show 1 user for now, one with nearest cohesion score
-TODO : finish this card, and fix cohesion score in backend for a proper result
-TODO : at same time implement this into a friendlist and using same component 
-TODO : backend create friendlist and connection request implementation -->
 
 <!-- NOTE: this component sizes according to parent -->
 <div class="w-full flex flex-col justify-between mx-auto">
