@@ -1,17 +1,16 @@
 <script lang="ts">
-	import { user } from '$lib/stores/index';
 	import { toNullableGender } from '$lib/utilities';
 	import Spinner from '$lib/components/common/Spinner.svelte';
 	import Slider from '@bulatdashiev/svelte-slider';
 	import type {
 		MatchingFilter,
-		User,
 		FriendlyUserMatch,
 		Result
 	} from 'src/declarations/backend/backend.did';
 	import UserCard from '$lib/components/app/UserCard.svelte';
 	import { getMatchedUser, matchedUser } from '$lib/stores/tasks/getMatchedUser';
 	import ArrowLeft from '$lib/assets/icons/arrowLeft.svg?component';
+	import Heart from '$lib/assets/icons/heart.svg?component';
 
 	let pending: boolean = false;
 	let resultWindow: Boolean = false;
@@ -51,11 +50,12 @@
 	<!-- border-main bg-sub30 -->
 	{#if !resultWindow}
 		<div class="fancy-btn-border mx-auto my-0">
-			<button on:click={handleFindMatches} class="fancy-btn">
+			<button on:click={handleFindMatches} class="fancy-btn flex">
 				{#if pending}
 					<Spinner />
 				{:else}
 					Find a new connection
+					<span class="flex ml-1 text-sub">+5 <Heart class="w-4 h-4 mt-1" /></span>
 				{/if}
 			</button>
 		</div>

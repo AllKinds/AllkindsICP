@@ -31,8 +31,8 @@ actor {
 	let N = 10;
 	let initReward : Nat = 10000;
 	let answerReward : Nat = 2;
-	let createrReward : Nat = 10;
-	let queryCost : Nat = 30;
+	let createrReward : Nat = 5;
+	let queryCost : Nat = 10;
 
 	//DATA TYPES
 

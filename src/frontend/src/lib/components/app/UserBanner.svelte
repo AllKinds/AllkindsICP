@@ -18,7 +18,6 @@
 	//TODO make age utility function
 	let ageMs = Number(new Date()) - Number(u.birth) / 1000000;
 	let ageY = Math.floor(ageMs / (1000 * 3600 * 24) / 365);
-	//TODO : return all questions (+weight) with indication which had common answer (matched)
 	let answered = u.answered;
 	let aQsize = answered.length;
 

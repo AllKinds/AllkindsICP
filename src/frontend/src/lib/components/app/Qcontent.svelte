@@ -54,7 +54,7 @@
 		<button class="sub-btn" on:click={() => likeWeight--}>
 			<MinusCircle />
 		</button>
-		<span class="mt-2">{likeWeight}</span>
+		<span>{likeWeight}</span>
 		<button class="sub-btn" on:click={() => likeWeight++}>
 			<PlusCircle />
 		</button>
