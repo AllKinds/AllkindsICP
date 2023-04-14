@@ -56,7 +56,7 @@
 					<Spinner />
 				{:else}
 					Find a new connection
-					<span class="flex ml-1 text-sub">+5 <Heart class="w-4 h-4 mt-1" /></span>
+					<span class="flex ml-1 text-sub">-10 <Heart class="w-4 h-4 mt-1" /></span>
 				{/if}
 			</button>
 		</div>
