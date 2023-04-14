@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { toNullableGender } from '$lib/utilities';
 	import Spinner from '$lib/components/common/Spinner.svelte';
-	import Slider from '@bulatdashiev/svelte-slider';
 	import type {
 		MatchingFilter,
 		FriendlyUserMatch,
@@ -15,8 +14,10 @@
 	let pending: boolean = false;
 	let resultWindow: Boolean = false;
 	//age + cohes based on Slider plugin, see for more info
-	let ageValue = [0, 150];
-	let cohesionValue = [100, 100];
+	//let ageValue = [0, 150];
+	let cohesionValue = 100;
+	let ageMin = 1;
+	let ageMax = 120;
 	let genderValue = 'Everyone';
 	//let matches: Array<[User, BigInt]>;
 	let match: FriendlyUserMatch;
@@ -30,8 +31,8 @@
 		resultWindow = false;
 		pending = true;
 		let filter: MatchingFilter = {
-			cohesion: BigInt(cohesionValue[0]),
-			ageRange: [BigInt(ageValue[0]), BigInt(ageValue[1])],
+			cohesion: BigInt(cohesionValue),
+			ageRange: [BigInt(ageMin), BigInt(ageMax)],
 			gender: toNullableGender(genderValue == 'Everyone' ? '' : genderValue)
 		};
 		console.log('filter obj ready: ', filter);
@@ -61,18 +62,24 @@
 		</div>
 
 		<!-- FILTER , TODO : check sourceCode sliders, as they clip over main nav, maybe form tag needed -->
-		<form
+		<div
 			class="w-[300px] md:w-[600px] py-4 mx-auto flex flex-col md:flex-row gap-2 justify-center"
 		>
+
 			<div class="filter-box">
 				<span class="filter-name">Age</span>
-				<span class="mx-auto">{ageValue[0]} - {ageValue[1]} year</span>
-				<Slider min="0" max="150" step="1" bind:value={ageValue} range order />
+				
+					<span class="mx-auto">{ageMin} - {ageMax}</span>
+				<div class="flex justify-around">
+					<input type="range" min="1" max="119" bind:value={ageMin} class="slider">
+					<input type="range" min={ageMin} max="120" bind:value={ageMax} class="slider">
+				</div>
+
 			</div>
 			<div class="filter-box">
 				<span class="filter-name">Cohesion</span>
-				<span class="mx-auto">{cohesionValue[0]}%</span>
-				<Slider bind:value={cohesionValue} />
+				<span class="mx-auto">{cohesionValue}%</span>
+				<input type="range" min="0" max="100" bind:value={cohesionValue} class="slider" id="mySlider">
 			</div>
 			<!-- TODO : gender options, make like profile settings
       + make global declarations for let genders = ['', 'Male', 'Female', 'Other', 'Queer'];
@@ -91,7 +98,7 @@
 					{/each}
 				</div>
 			</div>
-		</form>
+		</div>
 	{:else}
 		<div class="w-full sm:w-[600px] rounded-md flex flex-col gap-2 mx-auto">
 			<button on:click={() => (resultWindow = false)}>
