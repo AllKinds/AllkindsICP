@@ -17,7 +17,7 @@ export async function getFriends() {
 	await localActor.getFriends().then((res) => {
 		console.log('found friends: ', res.ok);
 		console.log(res);
-		if (res.ok) {
+		if (res.hasOwnProperty('ok')) {
 			//foundFriends.set(res.ok);
 			let arr = res.ok;
 			const approvedFriends = arr.filter(

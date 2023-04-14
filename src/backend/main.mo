@@ -247,7 +247,7 @@ actor {
 
 		Array.mapFilter<Question, Question>(
 			pmA,
-			func qm = if (null == Array.find<Question>(pA, func q = (q.hash != qm.hash))) null else ?qm
+			func qm = if (null != Array.find<Question>(pA, func q = (q.hash == qm.hash))) null else ?qm
 		);
 	};
 

@@ -62,8 +62,8 @@
 						{#if pending}
 							<Spinner />
 						{:else}
-								Submit 
-								<span class="flex ml-1 text-sub">+5 <Heart class="w-4 h-4 mt-1" /></span>
+							Submit
+							<span class="flex ml-1 text-sub">+5 <Heart class="w-4 h-4 mt-1" /></span>
 						{/if}
 					</button>
 				</div>
