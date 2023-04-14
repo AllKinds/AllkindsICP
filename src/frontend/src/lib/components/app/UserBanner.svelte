@@ -18,16 +18,16 @@
 	//TODO make age utility function
 	let ageMs = Number(new Date()) - Number(u.birth) / 1000000;
 	let ageY = Math.floor(ageMs / (1000 * 3600 * 24) / 365);
-	//TODO : return all questions (+weight) with indication which had common answer (matched)
-	let answeredQuestions = u.answered;
-	let aQsize = answeredQuestions.length;
+	let answered = u.answered;
+	let aQsize = answered.length;
 
 	const handleRequest = async (answer: boolean) => {
 		pending = true;
-		await answerFriendRequest(u.principal, answer).catch((err) => {
-			console.log('error while answering request : ', err);
-		});
-		await getFriends();
+		await answerFriendRequest(u.principal, answer)
+			.catch((err) => {
+				console.log('error while answering request : ', err);
+			})
+			.then(() => getFriends());
 		pending = false;
 	};
 </script>

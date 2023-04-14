@@ -70,6 +70,9 @@
 	.link {
 		@apply hover:underline text-indigo-500 hover:text-violet-500;
 	}
+	.same-answer {
+		@apply bg-green-400 dark:bg-green-400/50;
+	}
 }
 
 @layer base {
@@ -84,5 +87,8 @@
 	}
 	p {
 		@apply text-xl py-4 max-w-2xl font-semibold;
+	}
+	a {
+		@apply hover-color;
 	}
 }

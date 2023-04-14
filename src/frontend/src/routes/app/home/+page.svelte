@@ -3,6 +3,7 @@
 	import Add from '$lib/assets/icons/plus-circle.svg?component';
 	import ChevronUp from '$lib/assets/icons/chevronUp.svg?component';
 	import ChevronDown from '$lib/assets/icons/chevronDown.svg?component';
+	import Heart from '$lib/assets/icons/heart.svg?component';
 	import { onMount } from 'svelte';
 	import { createQ } from '$lib/stores/tasks/createQ';
 	import { getQs, questions } from '$lib/stores/tasks/getQs';
@@ -57,11 +58,12 @@
 				/>
 
 				<div class="fancy-btn-border">
-					<button on:click={submit} class="fancy-btn">
+					<button on:click={submit} class="fancy-btn flex">
 						{#if pending}
 							<Spinner />
 						{:else}
 							Submit
+							<span class="flex ml-1 text-sub">+5 <Heart class="w-4 h-4 mt-1" /></span>
 						{/if}
 					</button>
 				</div>

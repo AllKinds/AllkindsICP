@@ -1,23 +1,23 @@
 <script lang="ts">
-	import { user } from '$lib/stores/index';
 	import { toNullableGender } from '$lib/utilities';
 	import Spinner from '$lib/components/common/Spinner.svelte';
-	import Slider from '@bulatdashiev/svelte-slider';
 	import type {
 		MatchingFilter,
-		User,
 		FriendlyUserMatch,
 		Result
 	} from 'src/declarations/backend/backend.did';
 	import UserCard from '$lib/components/app/UserCard.svelte';
 	import { getMatchedUser, matchedUser } from '$lib/stores/tasks/getMatchedUser';
 	import ArrowLeft from '$lib/assets/icons/arrowLeft.svg?component';
+	import Heart from '$lib/assets/icons/heart.svg?component';
 
 	let pending: boolean = false;
 	let resultWindow: Boolean = false;
 	//age + cohes based on Slider plugin, see for more info
-	let ageValue = [0, 150];
-	let cohesionValue = [100, 100];
+	//let ageValue = [0, 150];
+	let cohesionValue = 100;
+	let ageMin = 1;
+	let ageMax = 120;
 	let genderValue = 'Everyone';
 	//let matches: Array<[User, BigInt]>;
 	let match: FriendlyUserMatch;
@@ -31,8 +31,8 @@
 		resultWindow = false;
 		pending = true;
 		let filter: MatchingFilter = {
-			cohesion: BigInt(cohesionValue[0]),
-			ageRange: [BigInt(ageValue[0]), BigInt(ageValue[1])],
+			cohesion: BigInt(cohesionValue),
+			ageRange: [BigInt(ageMin), BigInt(ageMax)],
 			gender: toNullableGender(genderValue == 'Everyone' ? '' : genderValue)
 		};
 		console.log('filter obj ready: ', filter);
@@ -51,32 +51,36 @@
 	<!-- border-main bg-sub30 -->
 	{#if !resultWindow}
 		<div class="fancy-btn-border mx-auto my-0">
-			<button on:click={handleFindMatches} class="fancy-btn">
+			<button on:click={handleFindMatches} class="fancy-btn flex">
 				{#if pending}
 					<Spinner />
 				{:else}
 					Find a new connection
+					<span class="flex ml-1 text-sub">-10 <Heart class="w-4 h-4 mt-1" /></span>
 				{/if}
 			</button>
 		</div>
 
-		<!-- FILTER , TODO : check sourceCode sliders, as they clip over main nav, maybe form tag needed -->
-		<form
-			class="w-[300px] md:w-[600px] py-4 mx-auto flex flex-col md:flex-row gap-2 justify-center"
-		>
+		<div class="w-[300px] md:w-[600px] py-4 mx-auto flex flex-col md:flex-row gap-2 justify-center">
+			
 			<div class="filter-box">
 				<span class="filter-name">Age</span>
-				<span class="mx-auto">{ageValue[0]} - {ageValue[1]} year</span>
-				<Slider min="0" max="150" step="1" bind:value={ageValue} range order />
+				<span class="mx-auto">{ageMin} - {ageMax}</span>			
+				<input type="range" min="1" max="119" bind:value={ageMin}/>
+				<input type="range" min={ageMin} max="120" bind:value={ageMax} />
 			</div>
+
 			<div class="filter-box">
 				<span class="filter-name">Cohesion</span>
-				<span class="mx-auto">{cohesionValue[0]}%</span>
-				<Slider bind:value={cohesionValue} />
+				<span class="mx-auto">{cohesionValue}%</span>
+				<input
+					type="range"
+					min="0"
+					max="100"
+					bind:value={cohesionValue}
+				/>
 			</div>
-			<!-- TODO : gender options, make like profile settings
-      + make global declarations for let genders = ['', 'Male', 'Female', 'Other', 'Queer'];
-      + label and for each for reoccuring code -->
+
 			<div class="filter-box">
 				<span class="filter-name">Gender</span>
 				<div class="grid grid-cols-2 gap-2">
@@ -91,7 +95,8 @@
 					{/each}
 				</div>
 			</div>
-		</form>
+
+		</div>
 	{:else}
 		<div class="w-full sm:w-[600px] rounded-md flex flex-col gap-2 mx-auto">
 			<button on:click={() => (resultWindow = false)}>

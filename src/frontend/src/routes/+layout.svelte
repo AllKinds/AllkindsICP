@@ -4,6 +4,7 @@
 	import { goto } from '$app/navigation';
 	import { rootStore, authStore, user, actor } from '$lib/stores/';
 	import { RootState, AuthState } from '$lib/stores/types';
+	import Footer from '$lib/components/common/Footer.svelte';
 
 	$: {
 		//can be changed in future to make landing accessible while being logged in
@@ -38,6 +39,7 @@
 		{goto("/app/questions")}
 	{/if} -->
 	<slot />
+	<Footer />
 {:else}
 	{console.error('Not in a browser!')}
 {/if}

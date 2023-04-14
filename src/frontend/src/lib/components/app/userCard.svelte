@@ -10,6 +10,8 @@
 
 	let pending: boolean = false;
 	let succes: boolean = false;
+	let current = 0;
+
 	let userPrincipal: Principal = match.principal;
 	let userName = match.username;
 	let userScore = match.cohesion;
@@ -20,8 +22,10 @@
 	let ageMs = Number(new Date()) - Number(match.birth) / 1000000;
 	let ageY = Math.floor(ageMs / (1000 * 3600 * 24) / 365);
 	//TODO : return all questions (+weight) with indication which had common answer (matched)
-	let answeredQuestions = match.answered;
-	let aQsize = answeredQuestions.length;
+	let answered = match.answered;
+	let uncommon = match.uncommon;
+	let aQsize = answered.length;
+	let uQsize = uncommon.length;
 
 	const handleConnectionRequest = async () => {
 		pending = true;
@@ -32,14 +36,7 @@
 		succes = true;
 		pending = false;
 	};
-	//TODO : spinner keeps loading, cant update states after function call? check app/component load states
-	//myabe bcs no subscribe value here for comp to update
 </script>
-
-<!-- will only show 1 user for now, one with nearest cohesion score
-TODO : finish this card, and fix cohesion score in backend for a proper result
-TODO : at same time implement this into a friendlist and using same component 
-TODO : backend create friendlist and connection request implementation -->
 
 <!-- NOTE: this component sizes according to parent -->
 <div class="w-full flex flex-col justify-between mx-auto">
@@ -73,17 +70,33 @@ TODO : backend create friendlist and connection request implementation -->
 				</button>
 			</div>
 		{/if}
+		<div>
+			<button
+				class="pb-2 text-left hover-color hover-circle"
+				on:click={() => (current = 0)}
+				class:currentTab={current === 0}
+			>
+				<span class="hover-bg hover-color">All Questions{'('}{aQsize > 0 ? aQsize : 0}{')'}</span>
+			</button>
+			<button
+				class="pb-2 text-left hover-color hover-circle"
+				on:click={() => (current = 1)}
+				class:currentTab={current === 1}
+			>
+				<span class="hover-bg hover-color">Find out{'('}{uQsize > 0 ? uQsize : 0}{')'}</span>
+			</button>
+		</div>
 
-		<button class="pb-2 text-left ">
-			<span class="hover-bg hover-color">All Questions{'('}{aQsize > 0 ? aQsize : 0}{')'}</span>
-		</button>
-
-		{#if aQsize > 0}
-			<div class="flex flex-col gap-2">
-				{#each answeredQuestions as q}
-					<Qbanner {q} />
+		<div class="flex flex-col gap-2 mt-3">
+			{#if aQsize > 0 && current == 0}
+				{#each answered as a}
+					<Qbanner q={a[0]} b={a[1]} />
 				{/each}
-			</div>
-		{/if}
+			{:else if uQsize > 0 && current == 1}
+				{#each uncommon as u}
+					<Qbanner q={u} b={false} />
+				{/each}
+			{/if}
+		</div>
 	</div>
 </div>

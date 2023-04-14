@@ -9,12 +9,15 @@ export const friendsRequested = writable<Array<FriendlyUserMatch>>();
 //Requested could also be made
 
 export async function getFriends() {
+	friendsApproved.set([]);
+	friendsWaiting.set([]);
+	friendsRequested.set([]);
 	const localActor = get(actor);
 
 	await localActor.getFriends().then((res) => {
 		console.log('found friends: ', res.ok);
 		console.log(res);
-		if (res.ok) {
+		if (res.hasOwnProperty('ok')) {
 			//foundFriends.set(res.ok);
 			let arr = res.ok;
 			const approvedFriends = arr.filter(
