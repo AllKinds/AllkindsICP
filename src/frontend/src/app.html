@@ -20,12 +20,6 @@
 			rel="stylesheet"
 		/>
 		<!-- some fonts might are unused -->
-
-		<!-- <script lang="ts">
-			 if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-			document.documentElement.classList.add('dark')
-		}
-		</script> -->
 		<script>
 			try {
 				const isDarkPreferred = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -38,7 +32,6 @@
 						: JSON.parse(localStorage.nnsTheme);
 
 				document.documentElement.classList.add(currentTheme ?? (isDarkPreferred ? 'dark' : ''));
-				// document.documentElement.classList.add(currentTheme ?? (isDarkPreferred ? "dark" : ""));
 			} catch (error) {
 				console.error('Error initializing theme', error);
 			}

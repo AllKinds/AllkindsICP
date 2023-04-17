@@ -22,10 +22,6 @@ import None "mo:base/None";
 
 import T "Types";
 
-//TODO : revamp entire structure with consistancy and seperation of functionalities/utils in modules
-//more complex types and tility functions!
-//TODO : make generic errors
-
 actor {
 
 	// CONSTANTS
@@ -621,7 +617,7 @@ actor {
 		let ?targetFriends = friends.get(p) else return #err("Something went wrong!");
 		let buf = Buffer.fromArray<Friend>(userFriends);
 		let targetBuf = Buffer.fromArray<Friend>(targetFriends);
-		
+
 		let ?iT = getIndexFriend(p, msg.caller) else return #err("Strange");
 		let ?i = getIndexFriend(msg.caller, p) else return #err("You have no friend requests from that user!");
 		let friend = buf.get(i) else return #err("Can't check status of your friend");
