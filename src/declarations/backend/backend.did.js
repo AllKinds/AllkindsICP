@@ -33,7 +33,18 @@ export const idlFactory = ({ IDL }) => {
 		uncommon: IDL.Vec(Question)
 	});
 	const Result_4 = IDL.Variant({ ok: UserMatch, err: IDL.Text });
-	const Result_3 = IDL.Variant({ ok: IDL.Vec(Question), err: IDL.Text });
+	const Question__1 = IDL.Record({
+		created: IDL.Int,
+		creater: IDL.Principal,
+		question: IDL.Text,
+		hash: Hash,
+		color: IDL.Opt(Color),
+		points: IDL.Int
+	});
+	const Result_3 = IDL.Variant({
+		ok: IDL.Vec(Question__1),
+		err: IDL.Text
+	});
 	const FriendStatus = IDL.Variant({
 		Approved: IDL.Null,
 		Waiting: IDL.Null,

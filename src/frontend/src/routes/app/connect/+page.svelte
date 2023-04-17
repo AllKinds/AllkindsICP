@@ -62,23 +62,17 @@
 		</div>
 
 		<div class="w-[300px] md:w-[600px] py-4 mx-auto flex flex-col md:flex-row gap-2 justify-center">
-			
 			<div class="filter-box">
 				<span class="filter-name">Age</span>
-				<span class="mx-auto">{ageMin} - {ageMax}</span>			
-				<input type="range" min="1" max="119" bind:value={ageMin}/>
+				<span class="mx-auto">{ageMin} - {ageMax}</span>
+				<input type="range" min="1" max="119" bind:value={ageMin} />
 				<input type="range" min={ageMin} max="120" bind:value={ageMax} />
 			</div>
 
 			<div class="filter-box">
 				<span class="filter-name">Cohesion</span>
 				<span class="mx-auto">{cohesionValue}%</span>
-				<input
-					type="range"
-					min="0"
-					max="100"
-					bind:value={cohesionValue}
-				/>
+				<input type="range" min="0" max="100" bind:value={cohesionValue} />
 			</div>
 
 			<div class="filter-box">
@@ -95,7 +89,6 @@
 					{/each}
 				</div>
 			</div>
-
 		</div>
 	{:else}
 		<div class="w-full sm:w-[600px] rounded-md flex flex-col gap-2 mx-auto">

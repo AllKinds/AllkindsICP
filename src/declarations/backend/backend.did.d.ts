@@ -30,10 +30,18 @@ export interface Question {
 	color: [] | [Color];
 	points: bigint;
 }
+export interface Question__1 {
+	created: bigint;
+	creater: Principal;
+	question: string;
+	hash: Hash;
+	color: [] | [Color];
+	points: bigint;
+}
 export type Result = { ok: null } | { err: string };
 export type Result_1 = { ok: User } | { err: string };
 export type Result_2 = { ok: Array<FriendlyUserMatch> } | { err: string };
-export type Result_3 = { ok: Array<Question> } | { err: string };
+export type Result_3 = { ok: Array<Question__1> } | { err: string };
 export type Result_4 = { ok: UserMatch } | { err: string };
 export interface User {
 	created: bigint;
