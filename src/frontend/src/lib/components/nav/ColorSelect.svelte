@@ -1,5 +1,19 @@
 <script lang="ts">
+  const colors = ['red', 'green', 'blue'];
 
-//array of DF-color , also make store or check html theme
+  let selectedColor = localStorage.getItem('selectedColor') || 'red';
 
+  function setSelectedColor() {
+    localStorage.setItem('selectedColor', selectedColor);
+  }
+
+  function handleChange() {
+    setSelectedColor();
+  }
 </script>
+
+<select bind:value={selectedColor} on:change={handleChange}>
+  {#each colors as color}
+    <option value={color}>{color}</option>
+  {/each}
+</select>
