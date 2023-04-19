@@ -5,14 +5,20 @@
 	import Heart from '$lib/assets/icons/heart.svg?component';
 	import { authStore } from '$lib/stores/';
 	import { AuthState } from '$lib/stores/types';
+	import ColorSelect from './ColorSelect.svelte';
+	import { styleStore } from '$lib/stores/tasks/colorSelect';
 
 	export let data: any;
 	export let path: any;
 </script>
 
 <!-- border-main if not using fancy bg -->
-<div class="bg-fancy rounded-lg w-40 mx-auto p-0.5 border-main">
-	<div class="flex flex-col bg-main95 rounded-lg trans-300 p-2 text-lg items-start ">
+<!--  shadow-sm shadow-[color:var(--primary-color)]-->
+<div style={$styleStore} class="
+	bg-gradient-to-br from-[color:var(--primary-color)] to-[color:var(--secondary-color)] 
+	rounded-lg w-40 mx-auto p-[1px] 
+">
+	<div class="flex flex-col bg-main rounded-lg trans-300 p-2 text-lg items-start ">
 		{#if $authStore === AuthState.Registered}
 			<!-- bg-clip-text text-transparent bg-fancy  -->
 			<span class="font-semibold">
@@ -24,7 +30,7 @@
 				</span>
 				{$user.points}
 			</div>
-			<div class="bg-fancy2 h-0.5 my-2 px-3 w-full" />
+			<div style={$styleStore} class="border-main h-0.5 my-2 px-3 w-full" />
 		{/if}
 
 		{#if data}
@@ -37,10 +43,11 @@
 					{section.title}
 				</a>
 			{/each}
-			<div class="bg-fancy2 h-0.5 my-2 px-3 w-full" />
+			<div style={$styleStore} class="border-main h-0.5 my-2 px-3 w-full" />
 		{/if}
 
 		<LoginBtn />
 		<DarkMode />
+		<ColorSelect/>
 	</div>
 </div>

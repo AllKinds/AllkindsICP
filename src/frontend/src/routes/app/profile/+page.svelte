@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 	import { getQsAnswered, questionsAnswered } from '$lib/stores/tasks/getQsAnswered';
 	import Qbanner from '$lib/components/app/Qbanner.svelte';
+	import { styleStore } from '$lib/stores/tasks/colorSelect';
 
 	//TODO make this into ultility function
 	let userBirth = fromNullableDate($user.birth[0]);
@@ -31,7 +32,8 @@
 	<div class="w-24 h-24 rounded-full border-main bg-sub mx-auto">
 		<!-- placeholder profile picture -->
 	</div>
-	<span class=" text-4xl font-semibold mx-auto bg-clip-text text-transparent bg-fancy">
+	<span class="text-4xl font-semibold mx-auto bg-clip-text text-transparent bg-gradient-to-r from-[color:var(--primary-color)] to-[color:var(--secondary-color)] drop-shadow-[0_0_50px_var(--primary-color)]"
+	style={$styleStore}>
 		{$user.username}
 	</span>
 	<span class="p-0 text-xl mx-auto text-zinc-600">

@@ -1,19 +1,17 @@
 <script lang="ts">
-  const colors = ['red', 'green', 'blue'];
+	import { hueStore, setColor, styleStore } from "$lib/stores/tasks/colorSelect";
 
-  let selectedColor = localStorage.getItem('selectedColor') || 'red';
+  //const colors = ['red', 'green', 'blue'];
 
+  let selectedHue = parseInt($hueStore);
+  //localStorage.getItem('selectedColor') || 'red';
+//hsl(214, 100%, 66.47%)
   function setSelectedColor() {
-    localStorage.setItem('selectedColor', selectedColor);
-  }
-
-  function handleChange() {
-    setSelectedColor();
+    localStorage.setItem('selectedHue', `${selectedHue}`);
+    setColor(selectedHue);
   }
 </script>
 
-<select bind:value={selectedColor} on:change={handleChange}>
-  {#each colors as color}
-    <option value={color}>{color}</option>
-  {/each}
-</select>
+<input type="range" min="0" max="360" bind:value={selectedHue} on:change={setSelectedColor}/>
+
+

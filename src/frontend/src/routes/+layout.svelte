@@ -4,7 +4,8 @@
 	import { goto } from '$app/navigation';
 	import { rootStore, authStore, user, actor } from '$lib/stores/';
 	import { RootState, AuthState } from '$lib/stores/types';
-	import Footer from '$lib/components/common/Footer.svelte';
+	import { onMount } from 'svelte';
+	import { getColor } from '$lib/stores/tasks/colorSelect';
 
 	$: {
 		//can be changed in future to make landing accessible while being logged in
@@ -18,6 +19,9 @@
 	}
 
 	console.log('user:', { $user });
+	onMount(() => {
+		getColor();
+	})
 
 	// // make user logout onDestroy component
 	// 	onDestroy( () => {
@@ -39,7 +43,6 @@
 		{goto("/app/questions")}
 	{/if} -->
 	<slot />
-	<Footer />
 {:else}
 	{console.error('Not in a browser!')}
 {/if}

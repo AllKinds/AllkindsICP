@@ -10,6 +10,7 @@ const config = {
 				'DF-yellow': '#FBB03B',
 				'DF-orange': '#F15A24',
 				'DF-navy': '#0E031F',
+				'red': '#D9F73F'
 			},
 			fontFamily: {
 				'noto-sans': ['Noto-sans', 'sans-serif'],

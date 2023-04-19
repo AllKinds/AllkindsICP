@@ -8,10 +8,10 @@
 		@apply transition-all ease-in-out duration-300;
 	}
 	.fancy-btn {
-		@apply trans-300 rounded-full p-2 px-8 text-zinc-900 bg-zinc-100 hover:bg-transparent dark:text-zinc-200 dark:bg-zinc-800/80 dark:hover:bg-transparent;
+		@apply trans-300 rounded-full p-2 px-8 text-zinc-900 bg-zinc-100 hover:bg-transparent dark:text-zinc-200 dark:bg-transparent dark:hover:bg-zinc-800/80;
 	}
 	.fancy-btn-border {
-		@apply bg-gradient-to-br from-DF-blue via-DF-red to-DF-yellow font-semibold w-fit p-0.5 my-5 md:mx-0 rounded-full;
+		@apply border-main font-semibold w-fit p-0.5 my-5 md:mx-0 rounded-full;
 	}
 	.iconbtn {
 		@apply w-6 md:w-8 cursor-pointer border-none;
@@ -35,7 +35,7 @@
 		@apply bg-zinc-100 dark:bg-zinc-900/90;
 	}
 	.bg-main95 {
-		@apply bg-zinc-100 dark:bg-zinc-900/90;
+		@apply bg-zinc-100 dark:bg-zinc-900/95;
 	}
 	.bg-sub {
 		@apply bg-zinc-200 dark:bg-zinc-800;
@@ -76,7 +76,6 @@
 }
 
 @layer base {
-	//TODO : revamp and asign to ui in app better
 	h1 {
 		@apply text-7xl md:text-9xl font-semibold py-2 md:py-6 -ml-2;
 	}

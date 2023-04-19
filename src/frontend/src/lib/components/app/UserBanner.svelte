@@ -42,7 +42,7 @@
 		<span class="text-xl">{userName}</span>
 		<span class="text-sub">
 			{ageY}
-			{userGender}
+			{userGender ? userGender : ""}
 			<!--TODO :  shorten this about string-->
 		</span>
 		<span class="overflow-clip text-sub">{userAbout}</span>

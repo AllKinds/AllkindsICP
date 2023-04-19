@@ -3,6 +3,7 @@
 	import NavX from '$lib/assets/icons/navX.svg?component';
 	import Nav from './Nav.svelte';
 	import type { LayoutData } from '../../../routes/$types';
+	import { styleStore } from '$lib/stores/tasks/colorSelect';
 
 	let visible: boolean = false;
 	export let data: LayoutData;
