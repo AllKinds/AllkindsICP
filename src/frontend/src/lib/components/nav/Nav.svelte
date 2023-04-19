@@ -17,7 +17,7 @@
 <div style={$styleStore} class="
 	bg-gradient-to-br from-[color:var(--primary-color)] to-[color:var(--secondary-color)] 
 	rounded-lg w-40 mx-auto p-[1px] 
-	drop-shadow-[0_0_5px_var(--glow-color)]
+	dark:drop-shadow-[0_0_5px_var(--glow-color)]
 ">
 	<div class="flex flex-col bg-main rounded-lg trans-300 p-2 text-lg items-start ">
 		{#if $authStore === AuthState.Registered}
@@ -37,7 +37,7 @@
 		{#if data}
 			{#each data.sections as section}
 				<a
-					class="hover:bg-sub w-fit  decoration-transparent rounded-md p-1 flex"
+					class="hover:bg-sub w-fit decoration-transparent rounded-md p-1 flex"
 					href="{path}{section.slug}"
 				>
 					<svelte:component this={section.icon} class="w-6 mr-1 -ml-1" />

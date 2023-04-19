@@ -27,7 +27,7 @@
 	</button>
 
 	{#if visible}
-		<div class="px-4 fixed h-screen right-0 top-14 top bg-main" on:mouseleave={toggleVissible}>
+		<div class="right-0 top-16 top" on:mouseleave={toggleVissible}>
 			<Nav {data} path="" />
 		</div>
 	{/if}
