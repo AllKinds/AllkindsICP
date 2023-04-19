@@ -7,11 +7,17 @@
 	.trans-300 {
 		@apply transition-all ease-in-out duration-300;
 	}
+	.default-btn {
+		@apply border-main rounded-full p-2 bg-main hover:bg-zinc-300/80 dark:hover:bg-zinc-800/70 hover:border-[color:var(--primary-color)] dark:hover:text-[color:var(--primary-color)];
+	}
 	.fancy-btn {
-		@apply trans-300 rounded-full p-2 px-8 text-zinc-900 bg-zinc-100 hover:bg-transparent dark:text-zinc-200 dark:bg-transparent dark:hover:bg-zinc-800/80;
+		@apply trans-300 rounded-full p-2 px-8 bg-main dark:hover:bg-transparent hover:bg-transparent dark:hover:text-zinc-900;
 	}
 	.fancy-btn-border {
-		@apply border-main font-semibold w-fit p-0.5 my-5 md:mx-0 rounded-full;
+		@apply bg-fancy font-semibold w-fit p-0.5 dark:p-[1px] my-5 md:mx-0 rounded-full dark:drop-shadow-[0_0_80px_var(--glow-color)];
+	}
+	.sub-btn {
+		@apply hover:bg-zinc-300/50 dark:hover:bg-transparent dark:hover:drop-shadow-[0_0_10px_var(--primary-color)] p-0.5 rounded-full;
 	}
 	.iconbtn {
 		@apply w-6 md:w-8 cursor-pointer border-none;
@@ -19,14 +25,11 @@
 	.active {
 		@apply bg-zinc-400 dark:bg-zinc-700;
 	}
-	.bg-fancy {
-		@apply bg-gradient-to-br from-DF-blue via-DF-red to-DF-yellow;
-	}
-	.bg-fancy2 {
-		@apply bg-gradient-to-r from-DF-red to-DF-yellow;
-	}
 	.padding {
 		@apply p-2 md:p-3 lg:p-6;
+	}
+	.bg-fancy {
+		@apply bg-gradient-to-br from-[color:var(--primary-color)] to-[color:var(--secondary-color)];
 	}
 	.bg-main {
 		@apply bg-zinc-100 dark:bg-zinc-900;
@@ -53,7 +56,7 @@
 		@apply rounded-lg border border-zinc-300 dark:border-zinc-700;
 	}
 	.hover-circle {
-		@apply bg-transparent hover:bg-sub rounded-full p-2 cursor-pointer border-none;
+		@apply dark:hover:bg-transparent hover:bg-zinc-300/50 dark:hover:drop-shadow-[0_0_10px_var(--primary-color)] rounded-full p-2 cursor-pointer border-none;
 	}
 	.filter-box {
 		@apply md:w-5/12 flex flex-col border-main bg-sub30 p-2 rounded-md gap-2;

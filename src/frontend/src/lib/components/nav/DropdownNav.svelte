@@ -13,7 +13,8 @@
 	}
 </script>
 
-<!-- TODO : rethink the nav components as this is almost equal to sidepanelnav.svelte -->
+<!-- TODO : rethink the nav components as this is almost equal to sidepanelnav.svelte
+used for landing -->
 <div class="flex flex-col items-end">
 	<button
 		class="mt-2 shrink-0 self-end cursor-pointer hover-circle"

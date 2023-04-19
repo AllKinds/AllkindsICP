@@ -3,15 +3,21 @@
 	import ChevronDown from '$lib/assets/icons/chevronDown.svg?component';
 	import ChevronUp from '$lib/assets/icons/chevronUp.svg?component';
 	import Qcontent from './Qcontent.svelte';
+	import { styleStore } from '$lib/stores/tasks/colorSelect';
 
 	export let question: Question;
 	let expandWindow: boolean = false;
 </script>
 
 <!-- component for Question Card on Home screen -->
-<div
+<!-- <div
 	class="odd:bg-slate-300/40 even:bg-slate-300/20 dark:odd:bg-slate-700/10 dark:even:bg-slate-700/30 h-fit w-full border-main rounded-lg padding"
+> -->
+<div style={$styleStore}
+	class="bg-gradient-to-br from-[color:var(--primary-color)] to-[color:var(--secondary-color)] 
+	h-fit w-full rounded-lg padding p-[1px]"
 >
+	<div class="bg-zinc-100/40 dark:bg-zinc-900/95 rounded-lg p-2">
 	<button class="flex h-full w-full hover-color " on:click={() => (expandWindow = !expandWindow)}>
 		<span class="text-2xl text-left font-color-sub grow">
 			{#if !expandWindow}
@@ -32,4 +38,5 @@
 	{#if expandWindow}
 		<Qcontent {question} />
 	{/if}
+	</div>
 </div>

@@ -8,6 +8,7 @@
 	import { createQ } from '$lib/stores/tasks/createQ';
 	import { getQs, questions } from '$lib/stores/tasks/getQs';
 	import Spinner from '$lib/components/common/Spinner.svelte';
+	import { styleStore } from '$lib/stores/tasks/colorSelect';
 
 	let expandWindow: boolean = false;
 	let newQ: string;
@@ -31,7 +32,7 @@
 	};
 </script>
 
-<div class="flex flex-col gap-4">
+<div style={$styleStore} class="flex flex-col gap-4">
 	<div class="border-main bg-sub30 w-full mx-auto flex-col padding py-1 justify-between">
 		<button
 			class="w-full flex justify-between items-center"
@@ -63,9 +64,10 @@
 							<Spinner />
 						{:else}
 							Submit
-							<span class="flex ml-1 text-sub">+5 <Heart class="w-4 h-4 mt-1" /></span>
+							<span class="flex ml-1 ">+5 <Heart class="w-4 h-4 mt-1" /></span>
 						{/if}
 					</button>
+					
 				</div>
 			</div>
 		{/if}

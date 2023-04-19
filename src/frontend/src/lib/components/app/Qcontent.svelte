@@ -50,7 +50,7 @@
 		<p class="text-slate-500 text-sm p-0">By: {question.creater}</p>
 		<span>Color: {question.color[0]}</span>
 		 -->
-	<div class="flex gap-2 my-5">
+	<div class="flex gap-2 my-5 items-center">
 		<button class="sub-btn" on:click={() => likeWeight--}>
 			<MinusCircle />
 		</button>
@@ -63,27 +63,10 @@
 	<div
 		class="w-full flex flex-col md:flex-row justify-center items-center dark:text-slate-500 gap-3"
 	>
-		<div class="m-0 fancy-btn-border flex h-10 w-36 md:order-last">
-			<button
-				on:click={() => submitAnswer(true)}
-				disabled={skipPending || answerPending}
-				class=" fancy-btn w-full flex justify-center items-center"
-			>
-				<span>
-					{#if answerPending == true}
-						<Spinner />
-					{:else}
-						YES
-					{/if}
-				</span>
-			</button>
-		</div>
-
-		<div class="m-0 fancy-btn-border flex h-10 w-36">
 			<button
 				on:click={() => submitAnswer(false)}
 				disabled={skipPending || answerPending}
-				class="fancy-btn w-full flex justify-center items-center "
+				class="default-btn w-32 flex justify-center items-center "
 			>
 				<span>
 					{#if answerPending == false}
@@ -93,12 +76,25 @@
 					{/if}
 				</span>
 			</button>
-		</div>
 
-		<button
+			<button
+				on:click={() => submitAnswer(true)}
+				disabled={skipPending || answerPending}
+				class="default-btn w-32 flex justify-center items-center md:-order-first"
+			>
+				<span>
+					{#if answerPending == true}
+						<Spinner />
+					{:else}
+						YES
+					{/if}
+				</span>
+			</button>
+		
+			<button
 			on:click={skipQuestion}
 			disabled={skipPending || answerPending}
-			class=" md:w-36 flex justify-center sub-btn "
+			class="p-2 flex justify-center sub-btn w-fit dark:hover:text-[color:var(--primary-color)]"
 		>
 			<span>
 				{#if !skipPending}
@@ -109,7 +105,6 @@
 			</span>
 		</button>
 	</div>
-
 	<!-- OLD wrong way of likeweight, leaving it in just in case
 		{#if likePending !== undefined} 
 		 

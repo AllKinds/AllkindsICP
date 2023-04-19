@@ -8,7 +8,6 @@
 	import Users from '$lib/assets/icons/users.svg?component';
 	import User from '$lib/assets/icons/user.svg?component';
 	import GlobeAlt from '$lib/assets/icons/globe-alt.svg?component';
-	import { goto } from '$app/navigation';
 
 	export let data: LayoutData;
 </script>

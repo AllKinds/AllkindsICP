@@ -13,7 +13,7 @@
 	}
 </script>
 
-<div class="flex flex-col items-end">
+<div style={$styleStore} class="flex flex-col items-end h-screen">
 	<button
 		class="mt-2 shrink-0 self-end lg:hidden hover-circle cursor-pointer"
 		on:click={toggleVissible}
@@ -27,7 +27,7 @@
 	</button>
 
 	{#if visible}
-		<div class="p-3 h-screen right-0 top-12" on:mouseleave={toggleVissible}>
+		<div class="px-4 fixed h-screen right-0 top-14 top bg-main" on:mouseleave={toggleVissible}>
 			<Nav {data} path="" />
 		</div>
 	{/if}
