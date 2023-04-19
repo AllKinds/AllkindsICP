@@ -4,7 +4,7 @@
 	import Logo from "./Logo.svelte";
 </script>
 
-<div class="mx-auto min-h-screen flex flex-col scroll-smooth px-2 md:px-5">
+<div class="mx-auto min-h-screen flex flex-col scroll-smooth w-11/12">
 	<!-- header/nav -->
 
 		<div class="mx-auto bg-transparent flex justify-between h-12 w-full">
@@ -15,7 +15,7 @@
 	
 
 	<!-- main content -->
-	<div class="mx-auto pt-7 pb-24 w-full">
+	<div class="mx-auto pb-24 w-full">
 		<slot name="main" />
 	</div>
 
