@@ -8,6 +8,7 @@ type UserMatch = record {
 	cohesion : int;
 	connect : opt text;
 	gender : opt Gender;
+	picture : opt blob;
 	"principal" : principal;
 	uncommon : vec Question;
 	username : text;
@@ -28,6 +29,10 @@ type User = record {
 	created : int;
 	gender : record {
 		opt Gender;
+		bool;
+	};
+	picture : record {
+		opt blob;
 		bool;
 	};
 	points : nat;
@@ -94,6 +99,7 @@ type FriendlyUserMatch = record {
 	cohesion : int;
 	connect : opt text;
 	gender : opt Gender;
+	picture : opt blob;
 	"principal" : principal;
 	status : FriendStatus;
 	uncommon : vec Question;
@@ -109,7 +115,7 @@ service : {
 	createQuestion : (text, nat) -> (Result);
 	createUser : (text) -> (Result);
 	findMatch : (MatchingFilter) -> (Result_4);
-	getAnsweredQuestions : (opt nat) -> (Result_3) query;
+	getAnsweredQuestions : () -> (Result_3) query;
 	getAskableQuestions : (nat) -> (Result_3) query;
 	getFriends : () -> (Result_2) query;
 	getUser : () -> (Result_1) query;
@@ -117,4 +123,5 @@ service : {
 	submitAnswer : (Hash, bool, int) -> (Result);
 	submitSkip : (Hash) -> (Result);
 	updateProfile : (User) -> (Result);
+	whoami : () -> (principal) query;
 };

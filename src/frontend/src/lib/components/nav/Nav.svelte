@@ -17,9 +17,8 @@
 <div
 	class="
 	bg-gradient-to-br from-[color:var(--primary-color)] to-[color:var(--secondary-color)] 
-	rounded-lg w-40 mx-auto p-[1px] 
+	rounded-lg w-40 mx-auto p-[1px]
 	drop-shadow-[0_0_5px_var(--glow-color)]
-
 "
 >
 	<div class="flex flex-col bg-main rounded-lg trans-300 p-2 text-lg items-start ">

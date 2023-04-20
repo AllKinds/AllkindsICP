@@ -27,6 +27,7 @@ export const idlFactory = ({ IDL }) => {
 		username: IDL.Text,
 		cohesion: IDL.Int,
 		answered: IDL.Vec(IDL.Tuple(Question, IDL.Bool)),
+		picture: IDL.Opt(IDL.Vec(IDL.Nat8)),
 		gender: IDL.Opt(Gender),
 		birth: IDL.Opt(IDL.Int),
 		uncommon: IDL.Vec(Question)
@@ -57,6 +58,7 @@ export const idlFactory = ({ IDL }) => {
 		username: IDL.Text,
 		cohesion: IDL.Int,
 		answered: IDL.Vec(IDL.Tuple(Question, IDL.Bool)),
+		picture: IDL.Opt(IDL.Vec(IDL.Nat8)),
 		gender: IDL.Opt(Gender),
 		birth: IDL.Opt(IDL.Int),
 		uncommon: IDL.Vec(Question)
@@ -70,6 +72,7 @@ export const idlFactory = ({ IDL }) => {
 		connect: IDL.Tuple(IDL.Opt(IDL.Text), IDL.Bool),
 		about: IDL.Tuple(IDL.Opt(IDL.Text), IDL.Bool),
 		username: IDL.Text,
+		picture: IDL.Tuple(IDL.Opt(IDL.Vec(IDL.Nat8)), IDL.Bool),
 		gender: IDL.Tuple(IDL.Opt(Gender), IDL.Bool),
 		birth: IDL.Tuple(IDL.Opt(IDL.Int), IDL.Bool),
 		points: IDL.Nat
@@ -80,14 +83,15 @@ export const idlFactory = ({ IDL }) => {
 		createQuestion: IDL.Func([IDL.Text, IDL.Nat], [Result], []),
 		createUser: IDL.Func([IDL.Text], [Result], []),
 		findMatch: IDL.Func([MatchingFilter], [Result_4], []),
-		getAnsweredQuestions: IDL.Func([IDL.Opt(IDL.Nat)], [Result_3], ['query']),
+		getAnsweredQuestions: IDL.Func([], [Result_3], ['query']),
 		getAskableQuestions: IDL.Func([IDL.Nat], [Result_3], ['query']),
 		getFriends: IDL.Func([], [Result_2], ['query']),
 		getUser: IDL.Func([], [Result_1], ['query']),
 		sendFriendRequest: IDL.Func([IDL.Principal], [Result], []),
 		submitAnswer: IDL.Func([Hash, IDL.Bool, IDL.Int], [Result], []),
 		submitSkip: IDL.Func([Hash], [Result], []),
-		updateProfile: IDL.Func([User], [Result], [])
+		updateProfile: IDL.Func([User], [Result], []),
+		whoami: IDL.Func([], [IDL.Principal], ['query'])
 	});
 };
 export const init = ({ IDL }) => {

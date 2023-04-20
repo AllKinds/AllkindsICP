@@ -1,5 +1,6 @@
 import { Actor, HttpAgent, type Identity } from '@dfinity/agent';
 import { AuthClient } from '@dfinity/auth-client';
+import type { Principal } from '@dfinity/principal';
 import type { User } from 'src/declarations/backend/backend.did';
 import { get, writable } from 'svelte/store';
 import { idlFactory } from '../../../../../declarations/backend';
@@ -8,6 +9,7 @@ import { AuthState, type BackendActor } from '../types';
 export const authStore = writable<AuthState>();
 export let actor = writable<BackendActor>();
 export let user = writable<User>();
+export let caller = writable<Principal>();
 
 let authClient: AuthClient = await AuthClient.create();
 
@@ -49,10 +51,13 @@ async function createActor() {
 async function checkRegistration(): Promise<void> {
 	await createActor();
 	const localActor = get(actor);
+	let p = await localActor.whoami();
 	let result = await localActor.getUser();
 	if (result.hasOwnProperty('ok')) {
 		user.set(result.ok);
 		authStore.set(AuthState.Registered);
+		caller.set(p);
+		console.log(p);
 	} else if (result.hasOwnProperty('err')) {
 		user = writable<User>();
 		authStore.set(AuthState.LoggedIn);

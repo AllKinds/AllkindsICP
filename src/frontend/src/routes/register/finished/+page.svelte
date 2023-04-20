@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { rootStore } from '$lib/stores/';
+	import { styleStore } from '$lib/stores/tasks/colorSelect';
 	import { RootState } from '$lib/stores/types';
 
 	async function submit() {
@@ -7,7 +8,7 @@
 	}
 </script>
 
-<div class="flex flex-col justify-center items-center">
+<div style={$styleStore} class="flex flex-col justify-center items-center">
 	<h2>Well done!</h2>
 	<span>Profile finished</span>
 	<div class="w-fit h-fit mx-auto">

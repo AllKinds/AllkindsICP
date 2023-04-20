@@ -248,6 +248,7 @@ actor {
 			birth = user.birth;
 			connect = user.connect;
 			points = value;
+			picture = user.picture;
 		};
 		users.put(p, changedUser);
 	};
@@ -409,6 +410,9 @@ actor {
 	};
 
 	// PUBLIC API
+	public query ({ caller }) func whoami() : async Principal {
+		caller;
+	};
 
 	// Create default new user with only a username
 	public shared (msg) func createUser(username : Text) : async Result.Result<(), Text> {
@@ -427,6 +431,7 @@ actor {
 					birth = (null, false);
 					connect = (null, false);
 					points = initReward; //nat
+					picture = (null, false);
 				};
 
 				// Mutate storage for users data
@@ -445,7 +450,7 @@ actor {
 
 	public shared (msg) func updateProfile(user : User) : async Result.Result<(), Text> {
 		let _ = users.get(msg.caller) else return #err("User does not exist!");
-		let _ = users.put(msg.caller, user) else return #err("err");
+		let _ = users.put(msg.caller, user) else return #err("Could not update!");
 		#ok();
 	};
 
@@ -468,8 +473,8 @@ actor {
 		#ok(q);
 	};
 
-	public shared query (msg) func getAnsweredQuestions(n : ?Nat) : async Result.Result<[Question], Text> {
-		let answered = allAnsweredQuestions(msg.caller, n);
+	public shared query (msg) func getAnsweredQuestions() : async Result.Result<[Question], Text> {
+		let answered = allAnsweredQuestions(msg.caller, null);
 		func getQuestion(h : Hash.Hash) : ?Question {
 			questions.get(h);
 		};
@@ -527,6 +532,7 @@ actor {
 			gender = checkPublic(userM.gender);
 			birth = checkPublic(userM.birth);
 			connect = checkPublic(userM.connect);
+			picture = checkPublic(userM.picture);
 			cohesion = match.1;
 			answered;
 			uncommon;
@@ -558,10 +564,12 @@ actor {
 					gender = checkPublic(userM.gender);
 					birth = checkPublic(userM.birth);
 					connect = checkPublic(userM.connect);
+					picture = checkPublic(userM.picture);
 					cohesion;
 					answered;
 					uncommon;
 					status;
+
 				};
 				buf.add(matchObj);
 			} else {
@@ -572,6 +580,7 @@ actor {
 					gender = userM.gender.0;
 					birth = userM.birth.0;
 					connect = userM.connect.0;
+					picture = userM.picture.0;
 					cohesion;
 					answered;
 					uncommon;

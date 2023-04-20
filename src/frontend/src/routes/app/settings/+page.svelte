@@ -8,7 +8,8 @@
 		toNullableDate,
 		fromNullableDate,
 		toNullableGender,
-		fromNullableGender
+		fromNullableGender,
+		convertImageToUInt8Array
 	} from '$lib/utilities';
 	import PublicToggle from '$lib/components/common/PublicToggle.svelte';
 	import Eye from '$lib/assets/icons/eye.svg?component';
@@ -26,6 +27,7 @@
 	let publicConnect: boolean = $user.connect[1];
 	let publicBirth: boolean = $user.birth[1];
 	let publicGender: boolean = $user.gender[1];
+	let publicPicture: boolean = $user.picture[1];
 
 	//a user object to temporary store and change OUR values , this has NO User interface
 	let userObj = {
@@ -34,8 +36,21 @@
 		about: fromNullable($user.about[0]),
 		username: $user.username,
 		gender: fromNullableGender($user.gender[0]), //biiitch
-		birth: fromNullableDate($user.birth[0])
+		birth: fromNullableDate($user.birth[0]),
+		picture: fromNullable($user.picture[0])
 	};
+
+	let file : any;
+	let imgSrc : any;
+	let testBlob : any;
+
+	const handleFileInput = async () => {
+    const uint8Array = await convertImageToUInt8Array(file);
+    const blob = new Blob([uint8Array], { type: file.type });
+		testBlob = blob;
+		userObj.picture = uint8Array;
+    imgSrc = URL.createObjectURL(blob);
+  }
 
 	const update = async () => {
 		pending = true;
@@ -47,7 +62,8 @@
 			username: userObj.username,
 			gender: [toNullableGender(userObj.gender), publicGender],
 			birth: [toNullableDate(userObj.birth), publicBirth],
-			points: $user.points
+			points: $user.points,
+			picture: [toNullable(userObj.picture), publicPicture]	
 			//TODO : fix vulnerability with points being in userObj
 		};
 		await updateProfile(newUser).catch((error) => {
@@ -55,6 +71,11 @@
 		});
 		pending = false;
 	};
+	$: {
+		console.log('pic : ',userObj.picture);
+		console.log('img : ', imgSrc);
+		console.log('blob : ', testBlob);
+	}
 </script>
 
 <div class="flex flex-col gap-4">
@@ -115,6 +136,14 @@
 				<textarea id="about" class="inputfield h-48 w-60 border-main" bind:value={userObj.about} />
 				<PublicToggle bind:checked={publicAbout} />
 			</label>
+
+			<span>Profile picture</span>
+			<label for="picture">
+				<input type="file" bind:this={file} on:change={handleFileInput}/>
+				<PublicToggle bind:checked={publicPicture} />
+				<img src={imgSrc} alt=""/>
+			</label>
+
 		</div>
 
 		<div class="flex flex-col justify-center items-center">
@@ -132,13 +161,13 @@
 </div>
 
 <style style lang="postcss">
+	/* was needed for fixing gender options */
 	label {
 		@apply flex my-2;
 	}
 	span {
 		@apply grow;
 	}
-
 	.inputfield,
 	option,
 	select,

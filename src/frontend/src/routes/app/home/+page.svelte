@@ -14,7 +14,7 @@
 	let expandWindow: boolean = false;
 	let newQ: string;
 	let pending: boolean = false;
-	
+
 	onMount(async () => {
 		await getQs();
 	});
@@ -22,7 +22,7 @@
 	const submit = async () => {
 		pending = true;
 		let hue = BigInt($hueStore);
-		console.log('hue is', hue)
+		console.log('hue is', hue);
 		await createQ(newQ, hue).catch((error) => {
 			console.log('errorcatch', error);
 		});

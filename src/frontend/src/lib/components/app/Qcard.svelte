@@ -17,7 +17,6 @@
 	$: styleValues = Object.entries(cssVariables)
 		.map(([key, value]) => `--${key}:${value}`)
 		.join(';');
-
 </script>
 
 <!-- component for Question Card on Home screen -->

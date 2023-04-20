@@ -34,3 +34,21 @@ export const fromNullableGender = (value?: [] | [Gender]): string | undefined =>
 	const m = value !== undefined ? value?.[0] : undefined;
 	return m !== undefined ? Object.entries(m)[0][0] : m;
 };
+
+// export function convertImageToUInt8Array(file: File): Promise<Uint8Array> {
+//   return new Promise<Uint8Array>((resolve, reject) => {
+//     const reader = new FileReader();
+//     reader.onload = () => {
+//       if (reader.result instanceof ArrayBuffer) {
+//         const uint8Array = new Uint8Array(reader.result);
+//         resolve(uint8Array);
+//       } else {
+//         reject(new Error('Unable to convert file to UInt8Array'));
+//       }
+//     };
+//     reader.onerror = () => {
+//       reject(reader.error);
+//     };
+//     reader.readAsArrayBuffer(file);
+//   });
+// }

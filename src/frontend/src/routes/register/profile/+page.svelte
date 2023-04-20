@@ -16,6 +16,7 @@
 	import Input from '$lib/components/common/Input.svelte';
 	import PublicToggle from '$lib/components/common/PublicToggle.svelte';
 	import Spinner from '$lib/components/common/Spinner.svelte';
+	import { styleStore } from '$lib/stores/tasks/colorSelect';
 
 	//TODO : RECYCLE CODE (see other profile file)
 	//TODO : DECOMPONENTIALISE parts that could be used in future
@@ -46,7 +47,8 @@
 			username: userObj.username,
 			gender: [toNullableGender(userObj.gender), publicGender],
 			birth: [toNullableDate(userObj.birth), publicBirth],
-			points: $user.points
+			points: $user.points,
+			picture: $user.picture
 			//HUGE vulnerability, points shouldn't be part user obj, not a high priority for demo, but NEED to be fixed before any public deployment
 		};
 		await updateProfile(newUserObj);
@@ -55,7 +57,7 @@
 	}
 </script>
 
-<div class="flex flex-col justify-center items-center">
+<div style={$styleStore} class="flex flex-col justify-center items-center">
 	<h2>Setup your profile</h2>
 	<span>(You can also do this later)</span>
 

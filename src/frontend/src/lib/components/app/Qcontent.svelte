@@ -29,10 +29,9 @@
 
 	const skipQuestion = async () => {
 		skipPending = true;
-		await skipQ(question.hash)
-			.catch((error) => {
-				console.log('errorcatch', error);
-			});
+		await skipQ(question.hash).catch((error) => {
+			console.log('errorcatch', error);
+		});
 		skipPending = false;
 		getQs();
 	};

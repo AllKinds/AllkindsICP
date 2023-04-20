@@ -13,6 +13,7 @@ module T {
 		birth : (?Int, Bool);
 		connect : (?Text, Bool); //= email or social media link
 		points : Nat;
+		picture : (?Blob, Bool);
 	};
 
 	public type Gender = {
@@ -31,6 +32,7 @@ module T {
 		birth : ?Int;
 		connect : ?Text;
 		cohesion : Int;
+		picture : ?Blob;
 		answered : [(Question, Bool)]; //bool indicates comparison with caller answer
 		uncommon : [Question]; //Questions that user has answered but not caller
 	};
@@ -41,7 +43,7 @@ module T {
 		creater : Principal;
 		question : Text;
 		hash : Hash.Hash;
-		color : Nat; //represented as a value between 20-380 for selecting hue in ui
+		color : Nat; //represents a hue value
 		points : Int; //int bcs question points should be able to go negative
 	};
 
