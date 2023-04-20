@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { login } from '$lib/stores/tasks/index';
-	import appscreen from '$lib/assets/images/appscreen.png?url';
+	//import appscreen from '$lib/assets/images/appscreen.png?url';
 	import Segment from '$lib/components/landing/Segment.svelte';
 	import Grid from '$lib/components/landing/Grid.svelte';
 	import { styleStore } from '$lib/stores/tasks/colorSelect';
@@ -68,7 +68,7 @@ should be done alot cleaner with datatype structure objects I think -->
 		</div>
 	</svelte:fragment>
 	<svelte:fragment slot="img">
-		<img class="w-72" src={appscreen} alt="Screenshot of Allkinds Dapp" />
+		<!-- <img class="w-72" src={appscreen} alt="Screenshot of Allkinds Dapp" /> -->
 	</svelte:fragment>
 </Segment>
 

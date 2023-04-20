@@ -12,15 +12,11 @@
 	}
 </script>
 
-<div>
-	{$hueStore}
-	{selectedHue}
-	<input
-		class="w-32"
-		type="range"
-		min="1"
-		max="360"
-		bind:value={selectedHue}
-		on:change={setSelectedColor}
-	/>
-</div>
+<input
+	class="w-32"
+	type="range"
+	min="1"
+	max="360"
+	bind:value={selectedHue}
+	on:change={setSelectedColor}
+/>

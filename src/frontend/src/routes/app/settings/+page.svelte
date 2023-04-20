@@ -46,10 +46,12 @@
 
 	const handleFileInput = async () => {
     const uint8Array = await convertImageToUInt8Array(file);
-    const blob = new Blob([uint8Array], { type: file.type });
-		testBlob = blob;
-		userObj.picture = uint8Array;
-    imgSrc = URL.createObjectURL(blob);
+    //const blob = new Blob([uint8Array], { type: file.type });
+		// testBlob = blob;
+		// userObj.picture = uint8Array;
+    // imgSrc = URL.createObjectURL(blob);
+		console.log("blob",uint8Array)
+		console.log("file", file)
   }
 
 	const update = async () => {
@@ -71,11 +73,12 @@
 		});
 		pending = false;
 	};
-	$: {
-		console.log('pic : ',userObj.picture);
-		console.log('img : ', imgSrc);
-		console.log('blob : ', testBlob);
-	}
+	// $: {
+	// 	console.log('file : ',userObj.picture);
+	// 	console.log('pic : ',userObj.picture);
+	// 	console.log('img : ', imgSrc);
+	// 	console.log('blob : ', testBlob);
+	// }
 </script>
 
 <div class="flex flex-col gap-4">
@@ -137,8 +140,9 @@
 				<PublicToggle bind:checked={publicAbout} />
 			</label>
 
-			<span>Profile picture</span>
+			<span>Profile picture(Doesn't work yet!)</span>
 			<label for="picture">
+				
 				<input type="file" bind:this={file} on:change={handleFileInput}/>
 				<PublicToggle bind:checked={publicPicture} />
 				<img src={imgSrc} alt=""/>

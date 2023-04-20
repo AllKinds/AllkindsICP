@@ -10,6 +10,7 @@
 	import Spinner from '$lib/components/common/Spinner.svelte';
 	import { hueStore, styleStore } from '$lib/stores/tasks/colorSelect';
 	import { toBigInt } from '$lib/utilities';
+	import ColorSelect from '$lib/components/nav/ColorSelect.svelte';
 
 	let expandWindow: boolean = false;
 	let newQ: string;
@@ -60,6 +61,7 @@
 					disabled={pending}
 					bind:value={newQ}
 				/>
+				<ColorSelect />
 
 				<div class="fancy-btn-border">
 					<button on:click={submit} class="fancy-btn flex">
