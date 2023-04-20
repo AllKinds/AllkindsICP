@@ -31,13 +31,13 @@ actor {
 	let answerReward : Nat = 2;
 	let createrReward : Nat = 5;
 	let queryCost : Nat = 10;
+	let minimumQuestionSize : Nat = 5;
 
 	//TYPES INDEX
 	public type User = T.User;
 	public type Gender = T.Gender;
 	public type UserMatch = T.UserMatch;
 	public type Question = T.Question;
-	public type Color = T.Color;
 	public type Answer = T.Answer;
 	public type Skip = T.Skip;
 	public type PrincipalQuestionHash = T.PrincipalQuestionHash;
@@ -65,11 +65,10 @@ actor {
 
 	func hashhash(h : Hash.Hash) : Hash.Hash { h };
 
-	func putQuestion(p : Principal, question : Text) : () {
+	func putQuestion(p : Principal, question : Text, color : Nat) : () {
 		let created = Time.now();
 		let creater = p;
 		let hash = hashQuestion(created, creater, question);
-		let color = ?#Default;
 		let points : Int = 0;
 
 		let q : Question = {
@@ -450,10 +449,12 @@ actor {
 		#ok();
 	};
 
-	public shared (msg) func createQuestion(question : Text) : async Result.Result<(), Text> {
+	public shared (msg) func createQuestion(question : Text, color : Nat) : async Result.Result<(), Text> {
 		let ?user = users.get(msg.caller) else return #err("User does not exist!");
-		if (question.size() < 5) return #err("Question too short!");
-		putQuestion(msg.caller, question);
+		if (question.size() < minimumQuestionSize) return #err("Question too short!");
+		try { putQuestion(msg.caller, question, color) } catch err {
+			return #err("Could not create Question!");
+		};
 		changeUserPoints(msg.caller, (user.points + createrReward));
 		#ok();
 	};
@@ -511,7 +512,7 @@ actor {
 			return #err("You don't have enough points");
 		};
 		changeUserPoints(msg.caller, (user.points - Int.abs(queryCost)));
-	
+
 		let ?match : ?UserWScore = filterUsers(msg.caller, para) else return #err("Couldn't find any match! Try answering more questions.");
 		let ?p = match.0 else return #err("rrreeee");
 		let ?userM : ?User = users.get(p) else return #err("Matched user not found!");
@@ -529,7 +530,7 @@ actor {
 			cohesion = match.1;
 			answered;
 			uncommon;
-		}; 
+		};
 		return #ok(result);
 	};
 

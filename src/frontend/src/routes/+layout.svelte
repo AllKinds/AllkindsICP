@@ -21,7 +21,7 @@
 	console.log('user:', { $user });
 	onMount(() => {
 		getColor();
-	})
+	});
 
 	// // make user logout onDestroy component
 	// 	onDestroy( () => {

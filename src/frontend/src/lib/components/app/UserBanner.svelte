@@ -42,7 +42,7 @@
 		<span class="text-xl">{userName}</span>
 		<span class="text-sub">
 			{ageY}
-			{userGender ? userGender : ""}
+			{userGender ? userGender : ''}
 			<!--TODO :  shorten this about string-->
 		</span>
 		<span class="overflow-clip text-sub">{userAbout}</span>
@@ -60,7 +60,10 @@
 					<button on:click={() => handleRequest(false)} class="text-red-500/50 hover:text-red-500">
 						<XCircle class="w-8 h-8" />
 					</button>
-					<button on:click={() => handleRequest(true)} class="text-green-500/50 hover:text-green-500">
+					<button
+						on:click={() => handleRequest(true)}
+						class="text-green-500/50 hover:text-green-500"
+					>
 						<CheckCircle class="w-8 h-8" />
 					</button>
 				{/if}

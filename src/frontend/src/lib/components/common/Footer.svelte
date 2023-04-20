@@ -1,7 +1,7 @@
 <script>
-	import Logo from "./Logo.svelte";
-
+	import Logo from './Logo.svelte';
 </script>
+
 <div class="border-t-[1px] border-zinc-700 m-2 flex flex-col pb-10 p-4 gap-3">
 	<Logo />
 	<div class="text-sub">

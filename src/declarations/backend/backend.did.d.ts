@@ -1,7 +1,6 @@
 import type { ActorMethod } from '@dfinity/agent';
 import type { Principal } from '@dfinity/principal';
 
-export type Color = { Default: null };
 export type FriendStatus = { Approved: null } | { Waiting: null } | { Requested: null };
 export interface FriendlyUserMatch {
 	status: FriendStatus;
@@ -27,7 +26,7 @@ export interface Question {
 	creater: Principal;
 	question: string;
 	hash: Hash;
-	color: [] | [Color];
+	color: bigint;
 	points: bigint;
 }
 export interface Question__1 {
@@ -35,7 +34,7 @@ export interface Question__1 {
 	creater: Principal;
 	question: string;
 	hash: Hash;
-	color: [] | [Color];
+	color: bigint;
 	points: bigint;
 }
 export type Result = { ok: null } | { err: string };
@@ -65,7 +64,7 @@ export interface UserMatch {
 }
 export interface _SERVICE {
 	answerFriendRequest: ActorMethod<[Principal, boolean], Result>;
-	createQuestion: ActorMethod<[string], Result>;
+	createQuestion: ActorMethod<[string, bigint], Result>;
 	createUser: ActorMethod<[string], Result>;
 	findMatch: ActorMethod<[MatchingFilter], Result_4>;
 	getAnsweredQuestions: ActorMethod<[[] | [bigint]], Result_3>;

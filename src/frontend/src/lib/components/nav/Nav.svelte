@@ -14,11 +14,14 @@
 
 <!-- border-main if not using fancy bg -->
 <!--  shadow-sm shadow-[color:var(--primary-color)]-->
-<div style={$styleStore} class="
+<div
+	class="
 	bg-gradient-to-br from-[color:var(--primary-color)] to-[color:var(--secondary-color)] 
 	rounded-lg w-40 mx-auto p-[1px] 
-	dark:drop-shadow-[0_0_5px_var(--glow-color)]
-">
+	drop-shadow-[0_0_5px_var(--glow-color)]
+
+"
+>
 	<div class="flex flex-col bg-main rounded-lg trans-300 p-2 text-lg items-start ">
 		{#if $authStore === AuthState.Registered}
 			<!-- bg-clip-text text-transparent bg-fancy  -->
@@ -49,6 +52,6 @@
 
 		<LoginBtn />
 		<DarkMode />
-		<ColorSelect/>
+		<ColorSelect />
 	</div>
 </div>

@@ -4,6 +4,7 @@
 	import NavX from '$lib/assets/icons/navX.svg?component';
 	import Nav from './Nav.svelte';
 	import type { LayoutData } from '../../../routes/$types';
+	import { styleStore } from '$lib/stores/tasks/colorSelect';
 
 	let visible: boolean = false;
 	export let data: LayoutData | undefined;
@@ -15,7 +16,7 @@
 
 <!-- TODO : rethink the nav components as this is almost equal to sidepanelnav.svelte
 used for landing -->
-<div class="flex flex-col items-end">
+<div style={$styleStore} class="flex flex-col items-end">
 	<button
 		class="mt-2 shrink-0 self-end cursor-pointer hover-circle"
 		on:click={toggleVissible}

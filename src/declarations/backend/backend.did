@@ -54,7 +54,7 @@ type Result = variant {
 	ok;
 };
 type Question__1 = record {
-	color : opt Color;
+	color : nat;
 	created : int;
 	creater : principal;
 	hash : Hash;
@@ -62,7 +62,7 @@ type Question__1 = record {
 	question : text;
 };
 type Question = record {
-	color : opt Color;
+	color : nat;
 	created : int;
 	creater : principal;
 	hash : Hash;
@@ -104,10 +104,9 @@ type FriendStatus = variant {
 	Requested;
 	Waiting;
 };
-type Color = variant { Default };
 service : {
 	answerFriendRequest : (principal, bool) -> (Result);
-	createQuestion : (text) -> (Result);
+	createQuestion : (text, nat) -> (Result);
 	createUser : (text) -> (Result);
 	findMatch : (MatchingFilter) -> (Result_4);
 	getAnsweredQuestions : (opt nat) -> (Result_3) query;

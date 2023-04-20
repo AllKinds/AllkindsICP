@@ -12,13 +12,12 @@ export const idlFactory = ({ IDL }) => {
 		gender: IDL.Opt(Gender)
 	});
 	const Hash = IDL.Nat32;
-	const Color = IDL.Variant({ Default: IDL.Null });
 	const Question = IDL.Record({
 		created: IDL.Int,
 		creater: IDL.Principal,
 		question: IDL.Text,
 		hash: Hash,
-		color: IDL.Opt(Color),
+		color: IDL.Nat,
 		points: IDL.Int
 	});
 	const UserMatch = IDL.Record({
@@ -38,7 +37,7 @@ export const idlFactory = ({ IDL }) => {
 		creater: IDL.Principal,
 		question: IDL.Text,
 		hash: Hash,
-		color: IDL.Opt(Color),
+		color: IDL.Nat,
 		points: IDL.Int
 	});
 	const Result_3 = IDL.Variant({
@@ -78,7 +77,7 @@ export const idlFactory = ({ IDL }) => {
 	const Result_1 = IDL.Variant({ ok: User, err: IDL.Text });
 	return IDL.Service({
 		answerFriendRequest: IDL.Func([IDL.Principal, IDL.Bool], [Result], []),
-		createQuestion: IDL.Func([IDL.Text], [Result], []),
+		createQuestion: IDL.Func([IDL.Text, IDL.Nat], [Result], []),
 		createUser: IDL.Func([IDL.Text], [Result], []),
 		findMatch: IDL.Func([MatchingFilter], [Result_4], []),
 		getAnsweredQuestions: IDL.Func([IDL.Opt(IDL.Nat)], [Result_3], ['query']),

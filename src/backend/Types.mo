@@ -41,14 +41,14 @@ module T {
 		creater : Principal;
 		question : Text;
 		hash : Hash.Hash;
-		color : ?Color;
+		color : Nat; //represented as a value between 20-380 for selecting hue in ui
 		points : Int; //int bcs question points should be able to go negative
 	};
 
 	// Only one color for now
-	public type Color = {
-		#Default;
-	};
+	// public type Color = {
+	// 	#Default;
+	// };
 
 	public type Answer = {
 		user : Principal;

@@ -20,9 +20,6 @@
 			.catch((error) => {
 				console.log('errorcatch', error);
 			})
-			.catch((error) => {
-				console.log('errorcatch', error);
-			})
 			.then(async () => {
 				answerPending = undefined;
 				likeWeight = 0;
@@ -32,9 +29,10 @@
 
 	const skipQuestion = async () => {
 		skipPending = true;
-		await skipQ(question.hash).catch((error) => {
-			console.log('errorcatch', error);
-		});
+		await skipQ(question.hash)
+			.catch((error) => {
+				console.log('errorcatch', error);
+			});
 		skipPending = false;
 		getQs();
 	};
@@ -63,35 +61,35 @@
 	<div
 		class="w-full flex flex-col md:flex-row justify-center items-center dark:text-slate-500 gap-3"
 	>
-			<button
-				on:click={() => submitAnswer(false)}
-				disabled={skipPending || answerPending}
-				class="default-btn w-32 flex justify-center items-center "
-			>
-				<span>
-					{#if answerPending == false}
-						<Spinner />
-					{:else}
-						NO
-					{/if}
-				</span>
-			</button>
+		<button
+			on:click={() => submitAnswer(false)}
+			disabled={skipPending || answerPending}
+			class="default-btn w-32 flex justify-center items-center "
+		>
+			<span>
+				{#if answerPending == false}
+					<Spinner />
+				{:else}
+					NO
+				{/if}
+			</span>
+		</button>
 
-			<button
-				on:click={() => submitAnswer(true)}
-				disabled={skipPending || answerPending}
-				class="default-btn w-32 flex justify-center items-center md:-order-first"
-			>
-				<span>
-					{#if answerPending == true}
-						<Spinner />
-					{:else}
-						YES
-					{/if}
-				</span>
-			</button>
-		
-			<button
+		<button
+			on:click={() => submitAnswer(true)}
+			disabled={skipPending || answerPending}
+			class="default-btn w-32 flex justify-center items-center md:-order-first"
+		>
+			<span>
+				{#if answerPending == true}
+					<Spinner />
+				{:else}
+					YES
+				{/if}
+			</span>
+		</button>
+
+		<button
 			on:click={skipQuestion}
 			disabled={skipPending || answerPending}
 			class="p-2 flex justify-center sub-btn w-fit dark:hover:text-[color:var(--primary-color)]"

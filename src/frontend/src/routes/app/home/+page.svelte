@@ -8,25 +8,28 @@
 	import { createQ } from '$lib/stores/tasks/createQ';
 	import { getQs, questions } from '$lib/stores/tasks/getQs';
 	import Spinner from '$lib/components/common/Spinner.svelte';
-	import { styleStore } from '$lib/stores/tasks/colorSelect';
+	import { hueStore, styleStore } from '$lib/stores/tasks/colorSelect';
+	import { toBigInt } from '$lib/utilities';
 
 	let expandWindow: boolean = false;
 	let newQ: string;
 	let pending: boolean = false;
-
+	
 	onMount(async () => {
 		await getQs();
 	});
 
 	const submit = async () => {
 		pending = true;
-		await createQ(newQ).catch((error) => {
+		let hue = BigInt($hueStore);
+		console.log('hue is', hue)
+		await createQ(newQ, hue).catch((error) => {
 			console.log('errorcatch', error);
 		});
 		pending = false;
 		newQ = '';
 		getQs();
-		window.setTimeout(() => (expandWindow = false), 1500);
+		//window.setTimeout(() => (expandWindow = false), 1500);
 		// 1500ms seems a balanced time for window to retract,
 		//this might unconsciously help for the user to lessen Q spamming
 	};
@@ -67,7 +70,6 @@
 							<span class="flex ml-1 ">+5 <Heart class="w-4 h-4 mt-1" /></span>
 						{/if}
 					</button>
-					
 				</div>
 			</div>
 		{/if}
