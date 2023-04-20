@@ -33,11 +33,13 @@
 	<div class="w-24 h-24 rounded-full border-main bg-sub mx-auto">
 		<!-- placeholder profile picture -->
 	</div>
+
 	<span
 		class="text-4xl z-0 font-semibold mx-auto bg-clip-text text-transparent bg-fancy drop-shadow-[0_0_50px_var(--primary-color)]"
 	>
 		{$user.username}
 	</span>
+
 	<span class="p-0 text-xl mx-auto text-zinc-600">
 		{userAge}{userGender}
 		<span class="p-0 text-base mx-auto text-zinc-600">{userConnect}</span>
@@ -72,13 +74,5 @@
 				<Qbanner {q} b={false} />
 			{/each}
 		{/if}
-		<!-- {#if $questionsAnswered}
-			{#each $questionsAnswered as q}
-			
-				<Qbanner {q} b={false}>
-					
-				</Qbanner>
-			{/each}
-		{/if} -->
 	</div>
 </div>

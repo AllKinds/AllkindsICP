@@ -5,8 +5,8 @@ export const styleStore = writable<string>();
 
 export async function setColor(hue: number) {
 	let cssVariables = {
-		'primary-color': `hsl(${hue} 100% 70%)`,
-		'secondary-color': `hsl(${hue} 100% 50%)`,
+		'primary-color': `hsl(${hue} 100% 60%)`,
+		'secondary-color': `hsl(${hue} 100% 40%)`,
 		'glow-color': `hsl(${hue} 20% 30%)`
 	};
 

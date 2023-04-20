@@ -17,7 +17,7 @@ export async function getQsAnswered() {
 			console.log(arr);
 			//const answered = arr.filter((q: Question) => q.creater.toString() !== p.toString());
 			const my = arr.filter((q: Question) => q.creater.toString() === p.toString());
-			answeredQuestions.set(arr);
+			answeredQuestions.set(arr); // same as answered
 			myQuestions.set(my);
 			console.log(p.toString());
 			console.log(arr[1].creater.toString());

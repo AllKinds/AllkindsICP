@@ -8,7 +8,7 @@
 		@apply transition-all ease-in-out duration-300;
 	}
 	.default-btn {
-		@apply border-main rounded-full p-2 bg-main hover:bg-zinc-300/80 dark:hover:bg-zinc-800/70 hover:border-[color:var(--primary-color)] dark:hover:text-[color:var(--primary-color)];
+		@apply border-main rounded-full p-2 bg-transparent hover:bg-zinc-300/80 dark:hover:bg-zinc-900/90 hover:border-[color:var(--primary-color)] dark:hover:text-[color:var(--primary-color)];
 	}
 	.fancy-btn {
 		@apply trans-300 rounded-full p-2 px-8 bg-main dark:hover:bg-transparent hover:bg-transparent dark:hover:text-zinc-900;
@@ -17,7 +17,7 @@
 		@apply bg-fancy font-semibold w-fit p-0.5 dark:p-[1px] my-5 md:mx-0 rounded-full dark:drop-shadow-[0_0_80px_var(--glow-color)];
 	}
 	.sub-btn {
-		@apply hover:bg-zinc-300/50 dark:hover:bg-transparent dark:hover:drop-shadow-[0_0_10px_var(--primary-color)] p-0.5 rounded-full;
+		@apply hover:bg-zinc-300/50 dark:hover:bg-zinc-800/40 p-0.5 rounded-full;
 	}
 	.iconbtn {
 		@apply w-6 md:w-8 cursor-pointer border-none;
@@ -74,7 +74,7 @@
 		@apply hover:underline text-indigo-500 hover:text-violet-500;
 	}
 	.same-answer {
-		@apply bg-green-400 dark:bg-green-400/50;
+		@apply border-green-500 border-4;
 	}
 }
 

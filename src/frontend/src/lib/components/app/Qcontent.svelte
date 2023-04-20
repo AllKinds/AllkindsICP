@@ -38,7 +38,7 @@
 </script>
 
 <!-- TODO : fix a minimum height here -->
-<div class="2xl:w-9/12 mx-auto h-fit rounded-md flex flex-col justify-center items-center">
+<div class="2xl:w-9/12 mx-auto h-fit rounded-md flex flex-col justify-center items-center text-zinc-900">
 	<p class="text-4xl w-fit text-center">
 		{question.question}
 	</p>
@@ -58,7 +58,7 @@
 	</div>
 
 	<div
-		class="w-full flex flex-col md:flex-row justify-center items-center dark:text-slate-500 gap-3"
+		class="w-full flex flex-col md:flex-row justify-center items-center gap-3"
 	>
 		<button
 			on:click={() => submitAnswer(false)}
@@ -91,7 +91,7 @@
 		<button
 			on:click={skipQuestion}
 			disabled={skipPending || answerPending}
-			class="p-2 flex justify-center sub-btn w-fit dark:hover:text-[color:var(--primary-color)]"
+			class="p-2 flex justify-center sub-btn w-fit"
 		>
 			<span>
 				{#if !skipPending}
