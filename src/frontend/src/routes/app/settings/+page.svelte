@@ -8,8 +8,8 @@
 		toNullableDate,
 		fromNullableDate,
 		toNullableGender,
-		fromNullableGender,
-		convertImageToUInt8Array
+		fromNullableGender
+		//convertImageToUInt8Array
 	} from '$lib/utilities';
 	import PublicToggle from '$lib/components/common/PublicToggle.svelte';
 	import Eye from '$lib/assets/icons/eye.svg?component';
@@ -45,12 +45,12 @@
 	let testBlob: any;
 
 	const handleFileInput = async () => {
-		const uint8Array = await convertImageToUInt8Array(file);
+		//const uint8Array = await convertImageToUInt8Array(file);
 		//const blob = new Blob([uint8Array], { type: file.type });
 		// testBlob = blob;
 		// userObj.picture = uint8Array;
 		// imgSrc = URL.createObjectURL(blob);
-		console.log('blob', uint8Array);
+		//console.log('blob', uint8Array);
 		console.log('file', file);
 	};
 
