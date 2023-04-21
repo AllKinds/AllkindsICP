@@ -38,7 +38,9 @@
 </script>
 
 <!-- TODO : fix a minimum height here -->
-<div class="2xl:w-9/12 mx-auto h-fit rounded-md flex flex-col justify-center items-center text-zinc-900">
+<div
+	class="2xl:w-9/12 mx-auto h-fit rounded-md flex flex-col justify-center items-center text-zinc-900"
+>
 	<p class="text-4xl w-fit text-center">
 		{question.question}
 	</p>
@@ -57,9 +59,7 @@
 		</button>
 	</div>
 
-	<div
-		class="w-full flex flex-col md:flex-row justify-center items-center gap-3"
-	>
+	<div class="w-full flex flex-col md:flex-row justify-center items-center gap-3">
 		<button
 			on:click={() => submitAnswer(false)}
 			disabled={skipPending || answerPending}

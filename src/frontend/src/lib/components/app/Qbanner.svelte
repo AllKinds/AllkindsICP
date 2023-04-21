@@ -24,7 +24,11 @@
 </script>
 
 <!-- component for Question Banner Card on a User Profile  -->
-<div style={styleValues} class="h-18 w-full flex justify-between rounded-lg padding border-main bg-fancy text-zinc-900" id="banner">
+<div
+	style={styleValues}
+	class="h-18 w-full flex justify-between rounded-lg px-2 py-1 bg-fancy text-zinc-900"
+	id="banner"
+>
 	{q.question}
 	<!-- <slot name="weight" /> -->
 </div>

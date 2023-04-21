@@ -14,7 +14,7 @@
 		@apply trans-300 rounded-full p-2 px-8 bg-main dark:hover:bg-transparent hover:bg-transparent dark:hover:text-zinc-900;
 	}
 	.fancy-btn-border {
-		@apply bg-fancy font-semibold w-fit p-0.5 dark:p-[1px] my-5 md:mx-0 rounded-full dark:drop-shadow-[0_0_80px_var(--glow-color)];
+		@apply bg-fancy font-semibold w-fit p-0.5 dark:p-[1px] my-5 md:mx-0 rounded-full dark:drop-shadow-[0_0_40px_var(--glow-color)];
 	}
 	.sub-btn {
 		@apply hover:bg-zinc-300/50 dark:hover:bg-zinc-800/40 p-0.5 rounded-full;
@@ -30,6 +30,9 @@
 	}
 	.bg-fancy {
 		@apply bg-gradient-to-br from-[color:var(--primary-color)] to-[color:var(--secondary-color)];
+	}
+	.bg-rainbow {
+		@apply bg-gradient-to-br from-DF-blue via-DF-red to-DF-yellow;
 	}
 	.bg-main {
 		@apply bg-zinc-100 dark:bg-zinc-900;

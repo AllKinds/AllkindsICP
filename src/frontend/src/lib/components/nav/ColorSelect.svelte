@@ -13,7 +13,7 @@
 </script>
 
 <input
-	class="w-32"
+	class="w-full max-w-lg"
 	type="range"
 	min="1"
 	max="360"

@@ -40,19 +40,19 @@
 		picture: fromNullable($user.picture[0])
 	};
 
-	let file : any;
-	let imgSrc : any;
-	let testBlob : any;
+	let file: any;
+	let imgSrc: any;
+	let testBlob: any;
 
 	const handleFileInput = async () => {
-    const uint8Array = await convertImageToUInt8Array(file);
-    //const blob = new Blob([uint8Array], { type: file.type });
+		const uint8Array = await convertImageToUInt8Array(file);
+		//const blob = new Blob([uint8Array], { type: file.type });
 		// testBlob = blob;
 		// userObj.picture = uint8Array;
-    // imgSrc = URL.createObjectURL(blob);
-		console.log("blob",uint8Array)
-		console.log("file", file)
-  }
+		// imgSrc = URL.createObjectURL(blob);
+		console.log('blob', uint8Array);
+		console.log('file', file);
+	};
 
 	const update = async () => {
 		pending = true;
@@ -65,7 +65,7 @@
 			gender: [toNullableGender(userObj.gender), publicGender],
 			birth: [toNullableDate(userObj.birth), publicBirth],
 			points: $user.points,
-			picture: [toNullable(userObj.picture), publicPicture]	
+			picture: [toNullable(userObj.picture), publicPicture]
 			//TODO : fix vulnerability with points being in userObj
 		};
 		await updateProfile(newUser).catch((error) => {
@@ -142,12 +142,10 @@
 
 			<span>Profile picture(Doesn't work yet!)</span>
 			<label for="picture">
-				
-				<input type="file" bind:this={file} on:change={handleFileInput}/>
+				<input type="file" bind:this={file} on:change={handleFileInput} />
 				<PublicToggle bind:checked={publicPicture} />
-				<img src={imgSrc} alt=""/>
+				<img src={imgSrc} alt="" />
 			</label>
-
 		</div>
 
 		<div class="flex flex-col justify-center items-center">

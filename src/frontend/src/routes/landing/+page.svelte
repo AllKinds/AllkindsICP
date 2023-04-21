@@ -64,7 +64,7 @@ should be done alot cleaner with datatype structure objects I think -->
 	</p>
 	<svelte:fragment slot="extra">
 		<div style={$styleStore} class="fancy-btn-border mx-auto md:mx-0">
-			<button on:click={login} class="fancy-btn">Join Alpha #0</button>
+			<button on:click={login} class="fancy-btn">Join Alpha Test</button>
 		</div>
 	</svelte:fragment>
 	<svelte:fragment slot="img">
