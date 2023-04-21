@@ -1,6 +1,7 @@
 # Allkinds
 
 Alpha v0.2
+[Test live!](https://tp4bo-yaaaa-aaaap-aa5la-cai.icp0.io/), Don't overconsume cycles pls
 
 ## Test out
 
