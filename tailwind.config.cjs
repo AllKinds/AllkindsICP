@@ -12,11 +12,7 @@ const config = {
 				'DF-navy': '#0E031F'
 			},
 			fontFamily: {
-				'noto-sans': ['Noto-sans', 'sans-serif'],
-				roboto: ['Roboto', 'sans-serif'],
-				montserrat: ['Montserrat', 'sans-serif'],
-				montserratAlt: ['Montserrat Alternates', 'sans-serif']
-				// some are unused
+				//todo
 			}
 		}
 	},

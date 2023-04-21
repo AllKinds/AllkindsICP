@@ -27,5 +27,3 @@ declare module '*.svg?dataurl' {
 	const content: string;
 	export default content;
 }
-
-declare module '@bulatdashiev/svelte-slider';

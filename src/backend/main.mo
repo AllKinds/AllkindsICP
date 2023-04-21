@@ -19,120 +19,38 @@ import Array "mo:base/Array";
 import Float "mo:base/Float";
 import Order "mo:base/Order";
 import None "mo:base/None";
+import Cycles "mo:base/ExperimentalCycles";
+
+import T "Types";
 
 actor {
-	//TODO : copy and remake functions with moc 8.3 (check also .4 and .5) additions
-	//TODO : use more hashmap functionality instead of buffers for faster calculations?
-	//TODO : maybe make and extract some code to types.mo and utils.mo -> temp broken in moc 0.8?
-	//TODO : integrate more variants (point usages, common errors, etc..)
-	//TODO : should overall be retyped for more cohesiveness, See type operational expressions
 
 	// CONSTANTS
 	let N = 10;
-	let initReward : Nat = 10000;
+	let initReward : Nat = 2000;
+	//!!!! CHANGE init to 100 BEFORE DEPLOY !!!!!
 	let answerReward : Nat = 2;
 	let createrReward : Nat = 5;
 	let queryCost : Nat = 10;
+	let minimumQuestionSize : Nat = 5;
 
-	//DATA TYPES
-
-	public type User = {
-		username : Text;
-		created : Int;
-		about : (?Text, Bool);
-		gender : (?Gender, Bool);
-		birth : (?Int, Bool);
-		connect : (?Text, Bool); //= email or social media link
-		points : Nat; //Nat bcs user points should not go negative
-	};
-
-	//returnable object of a user that caller requested
-	public type UserMatch = {
-		principal : Principal;
-		username : Text;
-		about : ?Text;
-		gender : ?Gender;
-		birth : ?Int;
-		connect : ?Text;
-		//TODO: (cohesion : Nat;) changed into int for testing,  should always be between 0-100 so nat8 better
-		cohesion : Int;
-		answered : [(Question, Bool)]; //bool indicates comparison with caller answer
-		uncommon : [Question]; //Questions that user has answered but not caller
-	};
-
-	public type Gender = {
-		#Male;
-		#Female;
-		#Queer;
-		#Other;
-	};
-
-	// Color indicates optional background color for the question
-	public type Question = {
-		created : Int;
-		creater : Principal;
-		question : Text;
-		hash : Hash.Hash;
-		color : ?Color;
-		points : Int; //int bcs question points should be able to go negative
-	};
-
-	// Only one color for now
-	public type Color = {
-		#Default;
-	};
-
-	public type Answer = {
-		user : Principal;
-		question : Hash.Hash;
-		answer : Bool;
-		weight : Int;
-	};
-
-	public type Skip = {
-		user : Principal;
-		question : Hash.Hash;
-	};
-
-	public type PrincipalQuestionHash = Hash.Hash;
-
-	public type CommonQuestion = {
-		question : Hash.Hash;
-		sourceAnswer : Answer;
-		testAnswer : Answer;
-	};
-
-	public type MatchingFilter = {
-		ageRange : (Nat, Nat);
-		gender : ?Gender;
-		cohesion : Int;
-	};
-
-	public type UserWScore = (?Principal, Int);
-
-	public type FriendStatus = {
-		#Requested; //status of requested contact in msg.caller friendlist
-		#Waiting; //status of msg.caller in the requested contact friendlist
-		#Approved; //status of both users after
-		//could be added upon and improved (REQ/WAIT might be too confusing, but this makes it ez to track who requested)
-		//maybe change req/wait to send/requests (as its similar to ui)
-	};
-
-	//obj instead of tuple , bcs it should be expanded in future
-	public type Friend = {
-		account : Principal;
-		status : ?FriendStatus;
-	};
-
-	public type FriendList = [Friend];
-
-	//for viewable data of caller's friends
-	public type FriendlyUserMatch = UserMatch and { status : FriendStatus };
+	//TYPES INDEX
+	public type User = T.User;
+	public type Gender = T.Gender;
+	public type UserMatch = T.UserMatch;
+	public type Question = T.Question;
+	public type Answer = T.Answer;
+	public type Skip = T.Skip;
+	public type PrincipalQuestionHash = T.PrincipalQuestionHash;
+	public type CommonQuestion = T.CommonQuestion;
+	public type MatchingFilter = T.MatchingFilter;
+	public type UserWScore = T.UserWScore;
+	public type FriendStatus = T.FriendStatus;
+	public type Friend = T.Friend;
+	public type FriendList = T.FriendList;
+	public type FriendlyUserMatch = T.FriendlyUserMatch;
 
 	// UTILITY FUNCTIONS
-
-	//create hashmaps for friends stuff
-
 	func hashQuestion(created : Int, creater : Principal, question : Text) : Hash.Hash {
 		let t1 = Int.toText(created);
 		let t2 = Principal.toText(creater);
@@ -148,11 +66,10 @@ actor {
 
 	func hashhash(h : Hash.Hash) : Hash.Hash { h };
 
-	func putQuestion(p : Principal, question : Text) : () {
+	func putQuestion(p : Principal, question : Text, color : Nat) : () {
 		let created = Time.now();
 		let creater = p;
 		let hash = hashQuestion(created, creater, question);
-		let color = ?#Default;
 		let points : Int = 0;
 
 		let q : Question = {
@@ -191,7 +108,6 @@ actor {
 		Buffer.toArray(buf);
 	};
 
-	//TODO : these functions could use renaming as it might seem to be confusing
 	func allAnsweredQuestions(p : Principal, n : ?Nat) : [Hash.Hash] {
 		let buf = Buffer.Buffer<Hash.Hash>(16);
 		var count = 0;
@@ -284,13 +200,15 @@ actor {
 	//checks 2 common Q.answers. returns 0 if weight/answers are opposite
 	//returns value in weight + 1 that is minimum with both users
 	//this ensures that calcScore(caller, caller) is always max score possible
+	// X = a base weight for current simple algorithm making it more balanced
 	func calcQScore(source : Answer, test : Answer) : Int {
+		let x = 3;
 		if (source.answer != test.answer) return 0;
 		if (source.weight * test.weight < 0) return 0;
 		if (Int.abs(source.weight) <= Int.abs(test.weight)) {
-			return Int.abs(source.weight) + 1;
+			return Int.abs(source.weight) + x;
 		} else {
-			return Int.abs(test.weight) + 1;
+			return Int.abs(test.weight) + x;
 		};
 	};
 
@@ -306,9 +224,8 @@ actor {
 		qScore;
 	};
 
-	//takes 2 unqiue scores and calculates them into % with 'source' as base
 	func calcCohesion(pm : Int, p : Int) : Int {
-		if (p < pm) {
+		if (p > pm) {
 			if (p * pm == 0) 0 else {
 				Float.toInt(
 					100 * Float.div(
@@ -322,7 +239,6 @@ actor {
 		};
 	};
 
-	// todo : change into easier way of ?null checking
 	func changeUserPoints(p : Principal, value : Nat) : () {
 		let ?user = users.get(p) else return;
 		let changedUser = {
@@ -332,7 +248,8 @@ actor {
 			gender = user.gender;
 			birth = user.birth;
 			connect = user.connect;
-			points = value; //nat
+			points = value;
+			picture = user.picture;
 		};
 		users.put(p, changedUser);
 	};
@@ -360,15 +277,13 @@ actor {
 		};
 	};
 
-	//utility functions mostly for filterUsers
-	//could be made more generalized and optimised with switch prob for faster process
 	func sortByScore(x : UserWScore, y : UserWScore) : Order.Order {
 		if (x.1 < y.1) {
-			return #less;
+			#less;
 		} else if (x.1 > y.1) {
-			return #greater;
+			#greater;
 		} else {
-			return #equal;
+			#equal;
 		};
 	};
 
@@ -387,7 +302,7 @@ actor {
 			account = pm;
 			status = null;
 		};
-		return Buffer.indexOf<Friend>(search, buf, isEqF);
+		Buffer.indexOf<Friend>(search, buf, isEqF);
 	};
 
 	func updateFriend(p : Principal, new : Friend, list : FriendList) {
@@ -453,8 +368,6 @@ actor {
 		//returns match index (+1), unless 0 or max
 		if (iCo == bufSizeX) {
 			iMa := Nat.sub(bufSizeX, 1);
-		} else if (iCo == 0) {
-			iMa := 1;
 		} else {
 			iMa := Nat.add(iCo, 1);
 		};
@@ -498,6 +411,9 @@ actor {
 	};
 
 	// PUBLIC API
+	public query ({ caller }) func whoami() : async Principal {
+		caller;
+	};
 
 	// Create default new user with only a username
 	public shared (msg) func createUser(username : Text) : async Result.Result<(), Text> {
@@ -516,12 +432,14 @@ actor {
 					birth = (null, false);
 					connect = (null, false);
 					points = initReward; //nat
+					picture = (null, false);
 				};
 
 				// Mutate storage for users data
 				friends.put(caller, []);
 				users.put(caller, user);
 				//friends.put(caller, friendList);
+				Debug.print("Balance: " # debug_show (Cycles.balance()));
 				#ok();
 			};
 		};
@@ -529,19 +447,25 @@ actor {
 
 	public shared query (msg) func getUser() : async Result.Result<User, Text> {
 		let ?user = users.get(msg.caller) else return #err("User does not exist!");
+		Debug.print("Balance: " # debug_show (Cycles.balance()));
 		#ok(user);
 	};
 
 	public shared (msg) func updateProfile(user : User) : async Result.Result<(), Text> {
 		let _ = users.get(msg.caller) else return #err("User does not exist!");
-		let _ = users.put(msg.caller, user) else return #err("err");
+		let _ = users.put(msg.caller, user) else return #err("Could not update!");
+		Debug.print("Balance: " # debug_show (Cycles.balance()));
 		#ok();
 	};
 
-	public shared (msg) func createQuestion(question : Text) : async Result.Result<(), Text> {
+	public shared (msg) func createQuestion(question : Text, color : Nat) : async Result.Result<(), Text> {
 		let ?user = users.get(msg.caller) else return #err("User does not exist!");
-		putQuestion(msg.caller, question);
+		if (question.size() < minimumQuestionSize) return #err("Question too short!");
+		try { putQuestion(msg.caller, question, color) } catch err {
+			return #err("Could not create Question!");
+		};
 		changeUserPoints(msg.caller, (user.points + createrReward));
+		Debug.print("Balance: " # debug_show (Cycles.balance()));
 		#ok();
 	};
 
@@ -551,22 +475,23 @@ actor {
 			questions.get(h);
 		};
 		let q = Array.mapFilter(askables, getQuestion);
+		Debug.print("Balance: " # debug_show (Cycles.balance()));
 		#ok(q);
 	};
 
-	public shared query (msg) func getAnsweredQuestions(n : ?Nat) : async Result.Result<[Question], Text> {
-		let answered = allAnsweredQuestions(msg.caller, n);
+	public shared query (msg) func getAnsweredQuestions() : async Result.Result<[Question], Text> {
+		let answered = allAnsweredQuestions(msg.caller, null);
 		func getQuestion(h : Hash.Hash) : ?Question {
 			questions.get(h);
 		};
 		let q = Array.mapFilter(answered, getQuestion);
+		Debug.print("Balance: " # debug_show (Cycles.balance()));
 		#ok(q);
 	};
 
 	// Add an answer
 	public shared (msg) func submitAnswer(question : Hash.Hash, answer : Bool, weight : Int) : async Result.Result<(), Text> {
 		let ?user = users.get(msg.caller) else return #err("User does not exist!");
-		//TODO : check if user has balance to put in weight
 		let _ = Nat.less(user.points, Int.abs(weight)) else return #err("You don't have enough points!");
 
 		let principalQuestion = hashPrincipalQuestion(msg.caller, question);
@@ -578,6 +503,7 @@ actor {
 		};
 		answers.put(principalQuestion, newAnswer);
 		changeUserPoints(msg.caller, (user.points + answerReward - Int.abs(weight)));
+		Debug.print("Balance: " # debug_show (Cycles.balance()));
 		#ok();
 	};
 
@@ -589,6 +515,7 @@ actor {
 			question;
 		};
 		skips.put(principalQuestion, skip);
+		Debug.print("Balance: " # debug_show (Cycles.balance()));
 		#ok();
 	};
 
@@ -599,67 +526,71 @@ actor {
 			return #err("You don't have enough points");
 		};
 		changeUserPoints(msg.caller, (user.points - Int.abs(queryCost)));
-		//TODO : make generic errors
+
 		let ?match : ?UserWScore = filterUsers(msg.caller, para) else return #err("Couldn't find any match! Try answering more questions.");
-		let ?principal = match.0 else return #err("rrreeee");
-		let ?userM : ?User = users.get(principal) else return #err("Matched user not found!");
-		let equalQuestions = getEqualQuestions(msg.caller, principal);
-		let answered = attachAnswerComparison(msg.caller, principal, equalQuestions);
-		let uncommon = getUnequalQuestions(msg.caller, principal);
+		let ?p = match.0 else return #err("rrreeee");
+		let ?userM : ?User = users.get(p) else return #err("Matched user not found!");
+		let equalQuestions = getEqualQuestions(msg.caller, p);
+		let answered = attachAnswerComparison(msg.caller, p, equalQuestions);
+		let uncommon = getUnequalQuestions(msg.caller, p);
 
 		let result : UserMatch = {
-			principal;
+			principal = p;
 			username = userM.username;
 			about = checkPublic(userM.about);
 			gender = checkPublic(userM.gender);
 			birth = checkPublic(userM.birth);
 			connect = checkPublic(userM.connect);
+			picture = checkPublic(userM.picture);
 			cohesion = match.1;
 			answered;
 			uncommon;
-		}; //TODO : fix above func getXAnsQues, gives literally only answeredQ bcs ongoing bad weight-like-answer implementation
-		//also filter first on commonQuestions to add a bool to this array for front-end indicating if both answered
+		};
+		Debug.print("Balance: " # debug_show (Cycles.balance()));
 		return #ok(result);
 	};
 
-	//TODO : change function w result FriendlyUserMatch (= combined type)
+	//returns both Approved and Unapproved friends
 	public shared query (msg) func getFriends() : async Result.Result<([FriendlyUserMatch]), Text> {
 		let buf = Buffer.Buffer<FriendlyUserMatch>(16);
 		let ?friendList = friends.get(msg.caller) else return #err("You don't have any friends :c ");
 
 		label ul for (f : Friend in friendList.vals()) {
-			let principal = f.account;
-			let ?userM : ?User = users.get(principal) else continue ul; //might be that user has been deleted
+			let p = f.account;
+			let ?userM : ?User = users.get(p) else continue ul; //might be that user has been deleted
 			let ?status : ?FriendStatus = f.status else return #err("Something went wrong!");
 			let cohesion = calcCohesion(
-				calcScore(principal, msg.caller),
+				calcScore(p, msg.caller),
 				calcScore(msg.caller, msg.caller)
 			);
-			let answered = attachAnswerComparison(msg.caller, principal, getEqualQuestions(msg.caller, principal));
-			let uncommon = getUnequalQuestions(msg.caller, principal);
+			let answered = attachAnswerComparison(msg.caller, p, getEqualQuestions(msg.caller, p));
+			let uncommon = getUnequalQuestions(msg.caller, p);
 
 			if (status != #Approved) {
 				let matchObj : FriendlyUserMatch = {
-					principal;
+					principal = p;
 					username = userM.username;
 					about = checkPublic(userM.about);
 					gender = checkPublic(userM.gender);
 					birth = checkPublic(userM.birth);
 					connect = checkPublic(userM.connect);
+					picture = checkPublic(userM.picture);
 					cohesion;
 					answered;
 					uncommon;
 					status;
+
 				};
 				buf.add(matchObj);
 			} else {
 				let matchObj : FriendlyUserMatch = {
-					principal;
+					principal = p;
 					username = userM.username;
 					about = userM.about.0;
 					gender = userM.gender.0;
 					birth = userM.birth.0;
 					connect = userM.connect.0;
+					picture = userM.picture.0;
 					cohesion;
 					answered;
 					uncommon;
@@ -669,6 +600,7 @@ actor {
 			};
 
 		};
+		Debug.print("Balance: " # debug_show (Cycles.balance()));
 		#ok(Buffer.toArray(buf));
 	};
 
@@ -676,31 +608,29 @@ actor {
 
 	public shared (msg) func sendFriendRequest(p : Principal) : async Result.Result<(), Text> {
 		let null = getIndexFriend(msg.caller, p) else return #err("User already has a friend status with you.");
-
 		let ?userFriends = friends.get(msg.caller) else return #err("Something went wrong!");
 		let ?targetFriends = friends.get(p) else return #err("Something went wrong!");
 		let buf = Buffer.fromArray<Friend>(userFriends);
 		let targetBuf = Buffer.fromArray<Friend>(targetFriends);
 
+		//give REQ status to new friend of msg.caller friendlist
+		let target : Friend = {
+			account = p;
+			status = ?#Requested;
+		};
+		let user : Friend = {
+			account = msg.caller;
+			status = ?#Waiting;
+		};
+
 		//updateFriend
 		try {
-			//give REQ status to new friend of msg.caller
-
-			let target : Friend = {
-				account = p;
-				status = ?#Requested;
-			};
-			let user : Friend = {
-				account = msg.caller;
-				status = ?#Waiting;
-			};
-
 			updateFriend(msg.caller, target, Buffer.toArray(buf));
 			updateFriend(p, user, Buffer.toArray(targetBuf));
-
 		} catch err {
 			return #err("Failed to update user states");
 		};
+		Debug.print("Balance: " # debug_show (Cycles.balance()));
 		#ok();
 	};
 
@@ -709,17 +639,16 @@ actor {
 		let ?targetFriends = friends.get(p) else return #err("Something went wrong!");
 		let buf = Buffer.fromArray<Friend>(userFriends);
 		let targetBuf = Buffer.fromArray<Friend>(targetFriends);
+
 		let ?iT = getIndexFriend(p, msg.caller) else return #err("Strange");
 		let ?i = getIndexFriend(msg.caller, p) else return #err("You have no friend requests from that user!");
+		let friend = buf.get(i) else return #err("Can't check status of your friend");
 
-		let res : Friend = buf.get(i) else return #err("Can't check status of your friend");
-
-		switch (res.status) {
+		switch (friend.status) {
 			case (?#Requested) return #err("You already requested this user to connect!");
 			case (?#Waiting) {
 				let _ = buf.remove(i);
 				let _ = targetBuf.remove(iT);
-
 				if (b == false) {
 					//rejected
 					return #ok();
@@ -730,23 +659,23 @@ actor {
 			case (null) return #err("Strange null");
 		};
 
-		try {
-			var target : Friend = {
-				account = p;
-				status = ?#Approved;
-			};
-			let user : Friend = {
-				account = msg.caller;
-				status = ?#Approved;
-			};
+		var target : Friend = {
+			account = p;
+			status = ?#Approved;
+		};
+		let user : Friend = {
+			account = msg.caller;
+			status = ?#Approved;
+		};
 
+		try {
 			updateFriend(msg.caller, target, Buffer.toArray(buf));
 			updateFriend(p, user, Buffer.toArray(targetBuf));
-			#ok();
 		} catch err {
 			return #err("Failed to update userStates");
 		};
-
+		Debug.print("Balance: " # debug_show (Cycles.balance()));
+		#ok();
 	};
 
 };

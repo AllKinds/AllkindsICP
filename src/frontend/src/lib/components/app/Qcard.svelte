@@ -3,33 +3,44 @@
 	import ChevronDown from '$lib/assets/icons/chevronDown.svg?component';
 	import ChevronUp from '$lib/assets/icons/chevronUp.svg?component';
 	import Qcontent from './Qcontent.svelte';
+	import { styleStore } from '$lib/stores/tasks/colorSelect';
+	import { onMount } from 'svelte';
 
 	export let question: Question;
 	let expandWindow: boolean = false;
+
+	$: hue = Number(question.color);
+	$: cssVariables = {
+		'primary-color': `hsl(${hue} 100% 70%)`,
+		'secondary-color': `hsl(${hue} 100% 60%)`
+	};
+
+	$: styleValues = Object.entries(cssVariables)
+		.map(([key, value]) => `--${key}:${value}`)
+		.join(';');
 </script>
 
-<!-- component for Question Card on Home screen -->
-<div
-	class="odd:bg-slate-300/40 even:bg-slate-300/20 dark:odd:bg-slate-700/10 dark:even:bg-slate-700/30 h-fit w-full border-main rounded-lg padding"
->
-	<button class="flex h-full w-full hover-color " on:click={() => (expandWindow = !expandWindow)}>
-		<span class="text-2xl text-left font-color-sub grow">
-			{#if !expandWindow}
-				{question.question}
-				<div class="mt-14" />
-			{/if}
-		</span>
+<div style={styleValues} class="bg-fancy h-fit w-full rounded-lg padding p-[1px]">
+	<div class="bg-transparent rounded-lg p-2">
+		<button class="flex h-full w-full hover-color " on:click={() => (expandWindow = !expandWindow)}>
+			<span class="text-2xl text-left grow text-zinc-900">
+				{#if !expandWindow}
+					{question.question}
+					<div class="mt-14" />
+				{/if}
+			</span>
 
-		<div class="hover-circle">
-			{#if !expandWindow}
-				<ChevronDown />
-			{:else}
-				<ChevronUp />
-			{/if}
-		</div>
-	</button>
+			<div class="sub-btn h-fit text-zinc-900">
+				{#if !expandWindow}
+					<ChevronDown />
+				{:else}
+					<ChevronUp />
+				{/if}
+			</div>
+		</button>
 
-	{#if expandWindow}
-		<Qcontent {question} />
-	{/if}
+		{#if expandWindow}
+			<Qcontent {question} />
+		{/if}
+	</div>
 </div>

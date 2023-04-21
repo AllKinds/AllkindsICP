@@ -8,6 +8,9 @@
 	import { createQ } from '$lib/stores/tasks/createQ';
 	import { getQs, questions } from '$lib/stores/tasks/getQs';
 	import Spinner from '$lib/components/common/Spinner.svelte';
+	import { hueStore, styleStore } from '$lib/stores/tasks/colorSelect';
+	import { toBigInt } from '$lib/utilities';
+	import ColorSelect from '$lib/components/nav/ColorSelect.svelte';
 
 	let expandWindow: boolean = false;
 	let newQ: string;
@@ -19,19 +22,21 @@
 
 	const submit = async () => {
 		pending = true;
-		await createQ(newQ).catch((error) => {
+		let hue = BigInt($hueStore);
+		console.log('hue is', hue);
+		await createQ(newQ, hue).catch((error) => {
 			console.log('errorcatch', error);
 		});
 		pending = false;
 		newQ = '';
 		getQs();
-		window.setTimeout(() => (expandWindow = false), 1500);
+		//window.setTimeout(() => (expandWindow = false), 1500);
 		// 1500ms seems a balanced time for window to retract,
 		//this might unconsciously help for the user to lessen Q spamming
 	};
 </script>
 
-<div class="flex flex-col gap-4">
+<div style={$styleStore} class="flex flex-col gap-4">
 	<div class="border-main bg-sub30 w-full mx-auto flex-col padding py-1 justify-between">
 		<button
 			class="w-full flex justify-between items-center"
@@ -56,6 +61,7 @@
 					disabled={pending}
 					bind:value={newQ}
 				/>
+				<ColorSelect />
 
 				<div class="fancy-btn-border">
 					<button on:click={submit} class="fancy-btn flex">
@@ -63,7 +69,7 @@
 							<Spinner />
 						{:else}
 							Submit
-							<span class="flex ml-1 text-sub">+5 <Heart class="w-4 h-4 mt-1" /></span>
+							<span class="flex ml-1 ">+5 <Heart class="w-4 h-4 mt-1" /></span>
 						{/if}
 					</button>
 				</div>

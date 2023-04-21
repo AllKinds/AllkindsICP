@@ -8,7 +8,7 @@
 	import Users from '$lib/assets/icons/users.svg?component';
 	import User from '$lib/assets/icons/user.svg?component';
 	import GlobeAlt from '$lib/assets/icons/globe-alt.svg?component';
-	import { goto } from '$app/navigation';
+	import { styleStore } from '$lib/stores/tasks/colorSelect';
 
 	export let data: LayoutData;
 </script>
@@ -20,7 +20,7 @@
 	</svelte:fragment>
 
 	<svelte:fragment slot="main">
-		<div class="flex flex-row justify-center mt-8 gap-4">
+		<div style={$styleStore} class="flex flex-row justify-center mt-8 gap-4">
 			<!-- left sided col, possible for menu icon shortcuts  -->
 			<!-- <div
 				class="sticky top-16 h-fit rounded-lg max-sm:hidden flex flex-col items-center gap-4"

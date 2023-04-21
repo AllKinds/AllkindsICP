@@ -1,20 +1,15 @@
+<script>
+	import Logo from './Logo.svelte';
+	import IcBadge from '$lib/assets/images/ic-badge.svg?component';
+</script>
+
 <div class="border-t-[1px] border-zinc-700 m-2 flex flex-col pb-10 p-4 gap-3">
-	<div
-		class="
-    w-fit
-    font-semibold 
-    text-lg 
-    bg-clip-text 
-    text-transparent 
-    bg-gradient-to-r from-DF-blue via-DF-red to-DF-yellow
-  "
-	>
-		Allkinds
-	</div>
+	<Logo />
 	<div class="text-sub">
 		<a href="https://twitter.com/Allkinds12">Twitter</a> |
 		<a href="https://discord.gg/kXAYeYWR5E">Discord</a> |
 		<a href="https://github.com/AllKinds">Github</a>
 	</div>
+	<IcBadge />
 	<snap class="text-sub">© 2023 Allkinds. All rights reserved.</snap>
 </div>

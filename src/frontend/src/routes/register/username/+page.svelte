@@ -2,6 +2,7 @@
 	import Spinner from '$lib/components/common/Spinner.svelte';
 	import { regiStore, actor } from '$lib/stores/';
 	import { syncAuth } from '$lib/stores/tasks/';
+	import { styleStore } from '$lib/stores/tasks/colorSelect';
 	import { RegiState } from '$lib/stores/types';
 
 	let username: string;
@@ -22,12 +23,10 @@
 	}
 </script>
 
-<div class="flex flex-col justify-center items-center">
+<div style={$styleStore} class="flex flex-col justify-center items-center">
 	<h2>Choose a username</h2>
 	<div class="flex p-2">
-		<div
-			class="flex flex-col p-0.5 rounded-lg bg-gradient-to-br from-DF-blue via-DF-red to-DF-yellow"
-		>
+		<div class="flex flex-col p-0.5 rounded-lg bg-fancy">
 			<input
 				type="text"
 				disabled={pending}
