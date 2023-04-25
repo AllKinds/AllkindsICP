@@ -1,22 +1,30 @@
 <script lang="ts">
-	import { hueStore, setColor, styleStore } from '$lib/stores/tasks/colorSelect';
+	import { color } from "$lib/stores/tasks/colorSelect";
 
-	//const colors = ['red', 'green', 'blue'];
+	//colourfull colors will use main text color as default based on dark/light mode
+	let colors = [
+		'bg-black text-zinc-200',
+		'bg-zinc-800 text-zinc-300',
+		'bg-zinc-400 text-zinc-900',
+		'bg-zinc-200 text-zinc-800', 
+		'bg-purple-400', 
+		'bg-red-400', 
+		'bg-green-400', 
+		'bg-blue-400',
+		'bg-cyan-400',
+		'bg-yellow-400',
+		'bg-orange-400',
+		'bg-pink-400'
+	];
 
-	let selectedHue = Number($hueStore);
-	//localStorage.getItem('selectedColor') || 'red';
-	//hsl(214, 100%, 66.47%)
-	function setSelectedColor() {
-		localStorage.setItem('selectedHue', `${selectedHue}`);
-		setColor(selectedHue);
+	const changeColor = (c: string) => {
+		color.set(c)
+		console.log($color);
 	}
 </script>
 
-<input
-	class="w-full max-w-lg"
-	type="range"
-	min="1"
-	max="360"
-	bind:value={selectedHue}
-	on:change={setSelectedColor}
-/>
+<div class="flex flex-row gap-1 w-full justify-center">
+	{#each colors as c}
+		<button class="w-10 h-14 rounded-full border-main hover:border-4 {c}" on:click={() => changeColor(c)}/>
+	{/each}
+</div>
