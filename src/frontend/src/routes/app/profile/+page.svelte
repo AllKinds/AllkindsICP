@@ -35,7 +35,7 @@
 	</div>
 
 	<span
-		class="text-4xl z-0 font-semibold mx-auto bg-clip-text text-transparent bg-fancy drop-shadow-[0_0_50px_var(--primary-color)]"
+		class="text-4xl -z-10 font-semibold mx-auto bg-clip-text text-transparent bg-fancy drop-shadow-[0_0_50px_var(--primary-color)]"
 	>
 		{$user.username}
 	</span>
