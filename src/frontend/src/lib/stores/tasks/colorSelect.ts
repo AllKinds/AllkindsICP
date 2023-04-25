@@ -19,6 +19,5 @@ export async function setColor(hue: number) {
 
 export async function getColor() {
 	const hue = localStorage.getItem('selectedHue') || '1';
-	console.log('localStroage hue:', hue);
 	setColor(parseInt(hue));
 }
