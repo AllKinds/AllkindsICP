@@ -59,7 +59,7 @@
 		</button>
 	</div>
 
-	<div class="w-full flex flex-col md:flex-row justify-center items-center gap-3">
+	<div class="w-full flex flex-row justify-center items-center gap-3">
 		<button
 			on:click={() => submitAnswer(false)}
 			disabled={skipPending || answerPending}
@@ -70,20 +70,6 @@
 					<Spinner />
 				{:else}
 					NO
-				{/if}
-			</span>
-		</button>
-
-		<button
-			on:click={() => submitAnswer(true)}
-			disabled={skipPending || answerPending}
-			class="default-btn w-32 flex justify-center items-center md:-order-first"
-		>
-			<span>
-				{#if answerPending == true}
-					<Spinner />
-				{:else}
-					YES
 				{/if}
 			</span>
 		</button>
@@ -101,21 +87,21 @@
 				{/if}
 			</span>
 		</button>
+
+		<button
+			on:click={() => submitAnswer(true)}
+			disabled={skipPending || answerPending}
+			class="default-btn w-32 flex justify-center items-center"
+		>
+			<span>
+				{#if answerPending == true}
+					<Spinner />
+				{:else}
+					YES
+				{/if}
+			</span>
+		</button>
+
 	</div>
-	<!-- OLD wrong way of likeweight, leaving it in just in case
-		{#if likePending !== undefined} 
-		 
-		<p class="text-slate-500 text-sm p-0 my-1">Optionally: Rate how important this is for you.</p>
-			<div class="flex gap-2">
-				{#each Array(10) as _, index}
-				<label class="flex flex-col bg-slate-600 justify-content-center p-1 rounded-md">
-					<input type=radio bind:group={likeWeight} value={index + 1}>
-					<span class="mx-auto text-slate-500">{index + 1}</span>
-				</label>
-					
-					 
-				{/each}
-			</div>
-		{/if}
--->
+	
 </div>
