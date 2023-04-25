@@ -4,6 +4,7 @@
 	import Segment from '$lib/components/landing/Segment.svelte';
 	import Grid from '$lib/components/landing/Grid.svelte';
 	import { styleStore } from '$lib/stores/tasks/colorSelect';
+	import Footer from '$lib/components/common/Footer.svelte';
 
 	// these arrays with text could be put in a own directory in future
 	const howWorksArr = [
@@ -148,3 +149,5 @@ should be done alot cleaner with datatype structure objects I think -->
 	<h2 slot="title" id="contact">Contact</h2>
 	<p slot="text1">Coming soon...</p>
 </Segment>
+
+<Footer />

@@ -1,6 +1,4 @@
 <script lang="ts">
-	import { styleStore } from '$lib/stores/tasks/colorSelect';
-	import Footer from './Footer.svelte';
 	import Logo from './Logo.svelte';
 </script>
 
@@ -17,6 +15,4 @@
 	<div class="mx-auto pb-24 w-full">
 		<slot name="main" />
 	</div>
-
-	<Footer />
 </div>

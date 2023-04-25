@@ -1,4 +1,5 @@
 # Notes
+
 Big vulnerability in changeUserProfile because of having points be part of user object.
 -> solution to change func or have own stable var for points
 
