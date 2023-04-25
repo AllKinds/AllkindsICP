@@ -5,8 +5,6 @@
 	import Heart from '$lib/assets/icons/heart.svg?component';
 	import { authStore } from '$lib/stores/';
 	import { AuthState } from '$lib/stores/types';
-	import ColorSelect from './ColorSelect.svelte';
-	import { styleStore } from '$lib/stores/tasks/colorSelect';
 
 	export let data: any;
 	export let path: any;
@@ -15,10 +13,7 @@
 <!-- border-main if not using fancy bg -->
 <!--  shadow-sm shadow-[color:var(--primary-color)]-->
 <div
-	class="
-	bg-gradient-to-br from-[color:var(--primary-color)] to-[color:var(--secondary-color)] 
-	rounded-lg w-40 mx-auto p-[1px]
-	drop-shadow-[0_0_5px_var(--glow-color)]
+	class="bg-rainbow-br rounded-lg w-40 mt-3 mx-auto p-0.5
 "
 >
 	<div class="flex flex-col bg-main rounded-lg trans-300 p-2 text-lg items-start ">
@@ -51,6 +46,5 @@
 
 		<LoginBtn />
 		<DarkMode />
-		<ColorSelect />
 	</div>
 </div>

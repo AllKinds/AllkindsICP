@@ -10,7 +10,7 @@
 
 <Layout>
 	<svelte:fragment slot="logo">
-		<button class="logo" on:click={() => goto("/landing")} >Allkinds</button> 
+		<button class="logo" on:click={() => goto('/landing')}>Allkinds</button>
 	</svelte:fragment>
 	<svelte:fragment slot="nav">
 		<DropdownNav {data} />

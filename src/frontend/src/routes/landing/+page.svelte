@@ -3,7 +3,6 @@
 	//import appscreen from '$lib/assets/images/appscreen.png?url';
 	import Segment from '$lib/components/landing/Segment.svelte';
 	import Grid from '$lib/components/landing/Grid.svelte';
-	import { styleStore } from '$lib/stores/tasks/colorSelect';
 	import Footer from '$lib/components/common/Footer.svelte';
 
 	// these arrays with text could be put in a own directory in future
@@ -64,7 +63,7 @@ should be done alot cleaner with datatype structure objects I think -->
 		to social services.
 	</p>
 	<svelte:fragment slot="extra">
-		<div style={$styleStore} class="fancy-btn-border mx-auto md:mx-0">
+		<div class="fancy-btn-border mx-auto md:mx-0">
 			<button on:click={login} class="fancy-btn">Join Alpha Test</button>
 		</div>
 	</svelte:fragment>

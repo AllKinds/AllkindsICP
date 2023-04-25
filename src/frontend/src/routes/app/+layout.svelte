@@ -1,15 +1,14 @@
 <script lang="ts">
 	import type { LayoutData } from './$types';
 	import Layout from '$lib/components/common/Layout.svelte';
-	import SidepanelNav from '$lib/components/nav/SidepanelNav.svelte';
 	import Nav from '$lib/components/nav/Nav.svelte';
 	import Home from '$lib/assets/icons/home.svg?component';
 	import Cogwheel from '$lib/assets/icons/cogwheel.svg?component';
 	import Users from '$lib/assets/icons/users.svg?component';
 	import User from '$lib/assets/icons/user.svg?component';
 	import GlobeAlt from '$lib/assets/icons/globe-alt.svg?component';
-	import { styleStore } from '$lib/stores/tasks/colorSelect';
 	import { goto } from '$app/navigation';
+	import DropdownNav from '$lib/components/nav/DropdownNav.svelte';
 
 	export let data: LayoutData;
 </script>
@@ -17,14 +16,15 @@
 <Layout>
 	<!-- right sided main app nav -->
 	<svelte:fragment slot="logo">
-		<button class="logo" on:click={() => goto("/app/home")} >Allkinds</button>
+		<button class="logo" on:click={() => goto('/app/home')}>Allkinds</button>
 	</svelte:fragment>
+
 	<svelte:fragment slot="nav">
-		<SidepanelNav {data} />
+		<DropdownNav {data} />
 	</svelte:fragment>
 
 	<svelte:fragment slot="main">
-		<div style={$styleStore} class="flex flex-row justify-center mt-8 gap-4">
+		<div class="flex flex-row justify-center mt-8 gap-4">
 			<!-- left sided col, possible for menu icon shortcuts  -->
 			<!-- <div
 				class="sticky top-16 h-fit rounded-lg max-sm:hidden flex flex-col items-center gap-4"

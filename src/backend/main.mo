@@ -66,7 +66,7 @@ actor {
 
 	func hashhash(h : Hash.Hash) : Hash.Hash { h };
 
-	func putQuestion(p : Principal, question : Text, color : Nat) : () {
+	func putQuestion(p : Principal, question : Text, color : Text) : () {
 		let created = Time.now();
 		let creater = p;
 		let hash = hashQuestion(created, creater, question);
@@ -455,7 +455,7 @@ actor {
 		#ok();
 	};
 
-	public shared (msg) func createQuestion(question : Text, color : Nat) : async Result.Result<(), Text> {
+	public shared (msg) func createQuestion(question : Text, color : Text) : async Result.Result<(), Text> {
 		let ?user = users.get(msg.caller) else return #err("User does not exist!");
 		if (question.size() < minimumQuestionSize) return #err("Question too short!");
 		try { putQuestion(msg.caller, question, color) } catch err {

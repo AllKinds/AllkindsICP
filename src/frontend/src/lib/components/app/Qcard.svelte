@@ -6,29 +6,21 @@
 
 	export let question: Question;
 	let expandWindow: boolean = false;
+	let qColor = question.color;
 
-	$: hue = Number(question.color);
-	$: cssVariables = {
-		'primary-color': `hsl(${hue} 100% 70%)`,
-		'secondary-color': `hsl(${hue} 100% 60%)`
-	};
-
-	$: styleValues = Object.entries(cssVariables)
-		.map(([key, value]) => `--${key}:${value}`)
-		.join(';');
 </script>
 
-<div style={styleValues} class="bg-fancy h-fit w-full rounded-lg padding p-[1px]">
+<div class="{qColor} h-fit w-full rounded-lg padding p-[1px] border-main">
 	<div class="bg-transparent rounded-lg p-2">
-		<button class="flex h-full w-full hover-color " on:click={() => (expandWindow = !expandWindow)}>
-			<span class="text-2xl text-left grow text-zinc-900">
+		<button class="flex h-full w-full" on:click={() => (expandWindow = !expandWindow)}>
+			<span class="text-2xl text-left grow {qColor}">
 				{#if !expandWindow}
 					{question.question}
 					<div class="mt-14" />
 				{/if}
 			</span>
 
-			<div class="sub-btn h-fit text-zinc-900">
+			<div class="sub-btn h-fit {qColor}">
 				{#if !expandWindow}
 					<ChevronDown />
 				{:else}

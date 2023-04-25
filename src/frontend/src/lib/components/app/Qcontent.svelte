@@ -11,6 +11,7 @@
 	var likeWeight = 0;
 	let skipPending: boolean = false;
 	let answerPending: boolean | undefined = undefined;
+	let qColor = question.color;
 
 	const submitAnswer = async (bool: boolean) => {
 		answerPending = bool;
@@ -39,7 +40,7 @@
 
 <!-- TODO : fix a minimum height here -->
 <div
-	class="2xl:w-9/12 mx-auto h-fit rounded-md flex flex-col justify-center items-center text-zinc-900"
+	class="2xl:w-9/12 mx-auto h-fit rounded-md flex flex-col justify-center items-center {qColor}"
 >
 	<p class="text-4xl w-fit text-center">
 		{question.question}
@@ -101,7 +102,5 @@
 				{/if}
 			</span>
 		</button>
-
 	</div>
-	
 </div>

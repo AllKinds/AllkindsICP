@@ -15,7 +15,7 @@
 	let pending: boolean = false;
 	let resultWindow: Boolean = false;
 	//age + cohes based on Slider plugin, see for more info
-	//let ageValue = [0, 150];
+
 	let cohesionValue = [100, 100];
 	let ageValue = [1, 120];
 	let genderValue = 'Everyone';
@@ -26,7 +26,7 @@
 	let genders = ['Everyone', 'Male', 'Female', 'Other', 'Queer'];
 
 	//TODO : DE-COMPONENT-IALIZE (only what cant be fixed with css classes), and extract the re-occuring CSS
- 
+
 	const handleFindMatches = async () => {
 		resultWindow = false;
 		pending = true;
@@ -50,11 +50,11 @@
 <div class="flex flex-col gap-4">
 	<!-- border-main bg-sub30 -->
 	{#if !resultWindow}
-		<div class="w-[300px] md:w-[600px] -z-10 py-4 mx-auto flex flex-col md:flex-row gap-2 justify-center">
+		<div class="w-[300px] md:w-[600px] py-4 mx-auto flex flex-col md:flex-row gap-2 justify-center">
 			<div class="filter-box">
 				<span class="filter-name">Age</span>
 				<span class="mx-auto">{ageValue[0]} - {ageValue[1]}</span>
-				<Slider max="120" step="1" bind:value={ageValue} range order/>
+				<Slider max="120" step="1" bind:value={ageValue} range order />
 			</div>
 
 			<div class="filter-box">
@@ -77,7 +77,6 @@
 					{/each}
 				</div>
 			</div>
-
 		</div>
 
 		<div class="fancy-btn-border mx-auto my-0">

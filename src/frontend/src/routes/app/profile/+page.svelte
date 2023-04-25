@@ -4,7 +4,6 @@
 	import { onMount } from 'svelte';
 	import { getQsAnswered, answeredQuestions, myQuestions } from '$lib/stores/tasks/getQsAnswered';
 	import Qbanner from '$lib/components/app/Qbanner.svelte';
-	import { styleStore } from '$lib/stores/tasks/colorSelect';
 
 	//TODO make this into ultility function
 	let current = 0;
@@ -29,13 +28,13 @@
 	});
 </script>
 
-<div style={$styleStore} class="flex flex-col gap-4">
+<div class="flex flex-col gap-4">
 	<div class="w-24 h-24 rounded-full border-main bg-sub mx-auto">
 		<!-- placeholder profile picture -->
 	</div>
 
 	<span
-		class="text-4xl -z-10 font-semibold mx-auto bg-clip-text text-transparent bg-fancy drop-shadow-[0_0_50px_var(--primary-color)]"
+		class="text-4xl font-semibold mx-auto bg-clip-text text-transparent bg-rainbow-r drop-shadow-[0_0_20px_#404040]"
 	>
 		{$user.username}
 	</span>
