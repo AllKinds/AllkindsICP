@@ -1,12 +1,12 @@
 <script lang="ts">
-	import Logo from './Logo.svelte';
 </script>
 
 <div class="mx-auto min-h-screen flex flex-col scroll-smooth px-2 md:px-10">
 	<!-- header/nav -->
 
-	<div class="mx-auto bg-transparent flex justify-between h-12 w-full">
-		<span class="self-center"><Logo /></span>
+	<div class="mx-auto bg-transparent flex justify-between h-10 w-full">
+		
+		<slot name="logo" />
 
 		<slot name="nav" />
 	</div>

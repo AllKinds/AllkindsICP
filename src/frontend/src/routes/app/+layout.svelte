@@ -9,12 +9,16 @@
 	import User from '$lib/assets/icons/user.svg?component';
 	import GlobeAlt from '$lib/assets/icons/globe-alt.svg?component';
 	import { styleStore } from '$lib/stores/tasks/colorSelect';
+	import { goto } from '$app/navigation';
 
 	export let data: LayoutData;
 </script>
 
 <Layout>
 	<!-- right sided main app nav -->
+	<svelte:fragment slot="logo">
+		<button class="logo" on:click={() => goto("/app/home")} >Allkinds</button>
+	</svelte:fragment>
 	<svelte:fragment slot="nav">
 		<SidepanelNav {data} />
 	</svelte:fragment>

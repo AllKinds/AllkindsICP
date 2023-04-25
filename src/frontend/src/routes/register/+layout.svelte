@@ -18,6 +18,9 @@
 </script>
 
 <Layout>
+	<svelte:fragment slot="logo">
+		<button class="logo">Allkinds</button>
+	</svelte:fragment>
 	<svelte:fragment slot="nav">
 		<DropdownNav data={undefined} />
 	</svelte:fragment>
