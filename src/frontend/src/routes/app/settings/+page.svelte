@@ -86,8 +86,8 @@
 	<span class="text-zinc-600 flex justify-center"
 		><Eye /> : Allow what people can initially see about you.</span
 	>
-	<div class=" w-full rounded-md flex flex-col p-2 md:p-8">
-		<div class="flex flex-col w-10/12">
+	<div class=" w-full rounded-md flex flex-col p-2 md:p-8  ">
+		<div class="flex flex-col w-fit  mx-auto">
 			<span>Username</span>
 			<label for="username" class="pr-8">
 				<input
@@ -141,11 +141,12 @@
 			</label>
 
 			<span>Profile picture(Doesn't work yet!)</span>
+			
 			<label for="picture">
 				<input type="file" bind:this={file} on:change={handleFileInput} />
-				<PublicToggle bind:checked={publicPicture} />
-				<img src={imgSrc} alt="" />
+				<!-- <img src={imgSrc} alt="" /> -->
 			</label>
+			<PublicToggle bind:checked={publicPicture} />
 		</div>
 
 		<div class="flex flex-col justify-center items-center">
@@ -174,6 +175,6 @@
 	option,
 	select,
 	textarea {
-		@apply bg-zinc-500/20 p-1 rounded-md mr-1 outline-none;
+		@apply bg-zinc-500/20 p-1 rounded-md mr-1 outline-none w-60;
 	}
 </style>
