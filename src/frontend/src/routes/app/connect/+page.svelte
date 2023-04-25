@@ -10,14 +10,14 @@
 	import { getMatchedUser, matchedUser } from '$lib/stores/tasks/getMatchedUser';
 	import ArrowLeft from '$lib/assets/icons/arrowLeft.svg?component';
 	import Heart from '$lib/assets/icons/heart.svg?component';
+	import Slider from '@bulatdashiev/svelte-slider';
 
 	let pending: boolean = false;
 	let resultWindow: Boolean = false;
 	//age + cohes based on Slider plugin, see for more info
 	//let ageValue = [0, 150];
-	let cohesionValue = 100;
-	let ageMin = 1;
-	let ageMax = 120;
+	let cohesionValue = [100, 100];
+	let ageValue = [1, 120];
 	let genderValue = 'Everyone';
 	//let matches: Array<[User, BigInt]>;
 	let match: FriendlyUserMatch;
@@ -26,13 +26,13 @@
 	let genders = ['Everyone', 'Male', 'Female', 'Other', 'Queer'];
 
 	//TODO : DE-COMPONENT-IALIZE (only what cant be fixed with css classes), and extract the re-occuring CSS
-
+ 
 	const handleFindMatches = async () => {
 		resultWindow = false;
 		pending = true;
 		let filter: MatchingFilter = {
-			cohesion: BigInt(cohesionValue),
-			ageRange: [BigInt(ageMin), BigInt(ageMax)],
+			cohesion: BigInt(cohesionValue[0]),
+			ageRange: [BigInt(ageValue[0]), BigInt(ageValue[1])],
 			gender: toNullableGender(genderValue == 'Everyone' ? '' : genderValue)
 		};
 		console.log('filter obj ready: ', filter);
@@ -50,18 +50,17 @@
 <div class="flex flex-col gap-4">
 	<!-- border-main bg-sub30 -->
 	{#if !resultWindow}
-		<div class="w-[300px] md:w-[600px] py-4 mx-auto flex flex-col md:flex-row gap-2 justify-center">
+		<div class="w-[300px] md:w-[600px] -z-10 py-4 mx-auto flex flex-col md:flex-row gap-2 justify-center">
 			<div class="filter-box">
 				<span class="filter-name">Age</span>
-				<span class="mx-auto">{ageMin} - {ageMax}</span>
-				<input type="range" min="1" max="119" bind:value={ageMin} />
-				<input type="range" min={ageMin} max="120" bind:value={ageMax} />
+				<span class="mx-auto">{ageValue[0]} - {ageValue[1]}</span>
+				<Slider max="120" step="1" bind:value={ageValue} range order/>
 			</div>
 
 			<div class="filter-box">
 				<span class="filter-name">Cohesion</span>
-				<span class="mx-auto">{cohesionValue}%</span>
-				<input type="range" min="0" max="100" bind:value={cohesionValue} />
+				<span class="mx-auto">{cohesionValue[0]}%</span>
+				<Slider bind:value={cohesionValue} />
 			</div>
 
 			<div class="filter-box">
@@ -78,6 +77,7 @@
 					{/each}
 				</div>
 			</div>
+
 		</div>
 
 		<div class="fancy-btn-border mx-auto my-0">
