@@ -1,5 +1,4 @@
 <script>
-	import Logo from './Logo.svelte';
 	import IcBadge from '$lib/assets/images/ic-badge.svg?component';
 	import { goto } from '$app/navigation';
 </script>
