@@ -9,7 +9,6 @@
 	import { getQs, questions } from '$lib/stores/tasks/getQs';
 	import Spinner from '$lib/components/common/Spinner.svelte';
 	import { hueStore, styleStore } from '$lib/stores/tasks/colorSelect';
-	import { toBigInt } from '$lib/utilities';
 	import ColorSelect from '$lib/components/nav/ColorSelect.svelte';
 
 	let expandWindow: boolean = false;
