@@ -13,7 +13,7 @@
 <!-- border-main if not using fancy bg -->
 <!--  shadow-sm shadow-[color:var(--primary-color)]-->
 <div
-	class="bg-rainbow-br rounded-lg w-40 mt-3 mx-auto p-0.5
+	class="bg-rainbow-br rounded-lg w-40 mt-1 mx-auto p-0.5
 "
 >
 	<div class="flex flex-col bg-main rounded-lg trans-300 p-2 text-lg items-start ">
