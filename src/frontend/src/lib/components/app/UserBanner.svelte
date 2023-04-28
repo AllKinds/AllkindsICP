@@ -17,6 +17,7 @@
 	let userGender = fromNullableGender(u.gender);
 	//let userBirth = u.birth;
 	//TODO make age utility function
+	console.log("userBirth", u.birth)
 	let ageMs = Number(new Date()) - Number(u.birth) / 1000000;
 	let ageY = Math.floor(ageMs / (1000 * 3600 * 24) / 365);
 	let answered = u.answered;
@@ -45,7 +46,7 @@
 	<div class="grow text-sm flex flex-col">
 		<span class="text-xl">{userName}</span>
 		<span class="text-sub">
-			{ageY}
+			{u.birth.length ? ageY : ''}
 			{userGender ? userGender : ''}
 			<!--TODO :  shorten this about string-->
 		</span>

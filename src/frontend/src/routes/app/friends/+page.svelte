@@ -30,6 +30,7 @@
 
 <div class="flex flex-col gap-4">
 	<div class="flex gap-3">
+		
 		<button
 			on:click={() => (current = 0)}
 			class:currentTab={current === 0}
@@ -52,24 +53,9 @@
 			Send{'('}{fR > 0 ? fR : 0}{')'}
 		</button>
 
-		<!-- <button on:click={handleFindFriends} class="cursor-pointer hover-circle hover-color">
-			{#if pending}
-				<Spinner />
-			{:else}
-				<Refresh />
-			{/if}
-		</button> -->
 	</div>
 
 	<div class="rounded-md flex flex-col gap-y-2">
-		<!-- {#if $foundFriends && $foundFriends.length > 0}
-			{#each $foundFriends as u}
-        {#if (Object.entries(u.status)[0][0] == "Approved") && (current == 0)}
-				  <UserBanner {u}/>
-        {:else if (Object.entries(u.status)[0][0] == "Waiting")  && (current == 1)}
-          <UserBanner {u}/>
-        {/if}        
-			{/each} -->
 
 		{#if fA > 0 && current == 0}
 			{#each $friendsApproved as u}
@@ -91,10 +77,6 @@
 				page to find people.
 			</span>
 		{/if}
-		<!-- {#if (u.status == statusApproved ) && current == 0}
-				<UserBanner {u}/>
-        {:else if (u.status == (statusRequested || statusWaiting))  && current == 1}
-        <UserBanner {u}/>
-        {/if} -->
+
 	</div>
 </div>
