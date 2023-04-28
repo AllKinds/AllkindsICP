@@ -6,6 +6,7 @@
 	import PlaceholderPic from '$lib/assets/icons/placeholder-pic.svg?component';
 	import Spinner from '../common/Spinner.svelte';
 	import Qbanner from './Qbanner.svelte';
+	import QbannerNoColor from './QbannerNoColor.svelte';
 
 	export let match: FriendlyUserMatch;
 
@@ -91,11 +92,11 @@
 		<div class="flex flex-col gap-2 mt-3">
 			{#if aQsize > 0 && current == 0}
 				{#each answered as a}
-					<Qbanner q={a[0]} b={a[1]} />
+					<QbannerNoColor q={a[0]} b={a[1]} />
 				{/each}
 			{:else if uQsize > 0 && current == 1}
 				{#each uncommon as u}
-					<Qbanner q={u} b={false} />
+					<Qbanner q={u} />
 				{/each}
 			{/if}
 		</div>

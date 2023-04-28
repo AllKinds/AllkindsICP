@@ -67,11 +67,11 @@
 	<div class="w-100% rounded-md flex flex-col p-2 md:p-8 gap-2">
 		{#if $myQuestions && current == 0}
 			{#each $myQuestions as q}
-				<Qbanner {q} b={false} />
+				<Qbanner {q}/>
 			{/each}
 		{:else if $answeredQuestions && current == 1}
 			{#each $answeredQuestions as q}
-				<Qbanner {q} b={false} />
+				<Qbanner {q}/>
 			{/each}
 		{/if}
 	</div>
