@@ -2,6 +2,7 @@
 	import { fromNullableGender } from '$lib/utilities';
 	import type { FriendlyUserMatch } from 'src/declarations/backend/backend.did';
 	import CheckCircle from '$lib/assets/icons/check-circle.svg?component';
+	import PlaceholderPic from '$lib/assets/icons/placeholder-pic.svg?component';
 	import XCircle from '$lib/assets/icons/x-circle.svg?component';
 	import { answerFriendRequest } from '$lib/stores/tasks/answerFriendRequest';
 	import Spinner from '../common/Spinner.svelte';
@@ -34,8 +35,8 @@
 
 <!-- TODO have different column for non-approved friends -->
 <button class="flex bg-sub30 rounded-xl gap-2 p-2 hover:bg-sub text-left">
-	<div class="w-16 h-16  min-w-min rounded-full border-main bg-sub shrink-0">
-		<!-- placeholder profile picture -->
+	<div class="w-16 h-16  min-w-min rounded-full border-main bg-sub shrink-0 overflow-clip">
+		<PlaceholderPic class="w-12 mx-auto mt-4"/>
 	</div>
 
 	<div class="grow text-sm flex flex-col">

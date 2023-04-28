@@ -3,6 +3,7 @@
 	import { fromNullable, fromNullableGender } from '$lib/utilities';
 	import type { Principal } from '@dfinity/principal';
 	import type { FriendlyUserMatch } from 'src/declarations/backend/backend.did';
+	import PlaceholderPic from '$lib/assets/icons/placeholder-pic.svg?component';
 	import Spinner from '../common/Spinner.svelte';
 	import Qbanner from './Qbanner.svelte';
 
@@ -40,8 +41,8 @@
 
 <!-- NOTE: this component sizes according to parent -->
 <div class="w-full flex flex-col justify-between mx-auto">
-	<div class="w-full h-72 sm:h-96 mx-auto rounded-md bg-sub">
-		<!-- placeholder profile picture -->
+	<div class="w-full h-72 sm:h-96 mx-auto rounded-md bg-sub overflow-clip">
+		<PlaceholderPic class=" h-56 sm:h-72 mx-auto mt-24"/>
 	</div>
 
 	<div class="p-1 sm:p-2 flex flex-col">

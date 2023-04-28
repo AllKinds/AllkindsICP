@@ -4,6 +4,7 @@
 	import { onMount } from 'svelte';
 	import { getQsAnswered, answeredQuestions, myQuestions } from '$lib/stores/tasks/getQsAnswered';
 	import Qbanner from '$lib/components/app/Qbanner.svelte';
+	import PlaceholderPic from '$lib/assets/icons/placeholder-pic.svg?component';
 
 	//TODO make this into ultility function
 	let current = 0;
@@ -29,8 +30,8 @@
 </script>
 
 <div class="flex flex-col gap-4">
-	<div class="w-24 h-24 rounded-full border-main bg-sub mx-auto">
-		<!-- placeholder profile picture -->
+	<div class=" w-48 h-48 rounded-full border-main bg-sub mx-auto overflow-clip">
+		<PlaceholderPic class=" w-36 h-36 mx-auto mt-12"/>
 	</div>
 
 	<span
