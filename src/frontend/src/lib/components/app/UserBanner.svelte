@@ -27,8 +27,11 @@
 		await answerFriendRequest(u.principal, answer)
 			.catch((err) => {
 				console.log('error while answering request : ', err);
-			})
-			.then(() => getFriends());
+			});
+		await getFriends().catch((error) => {
+			console.log('error while getting friends', error);
+		});
+			
 		pending = false;
 	};
 </script>
@@ -53,6 +56,7 @@
 			{u.cohesion}
 			{'('}{aQsize > 0 ? aQsize : 0}{')'}
 		</div>
+		<!-- show accept & reject control when target user requested to connect -->
 		{#if Object.entries(u.status)[0][0] == 'Waiting'}
 			<div class="h-8 w-fit pt-1 mx-auto">
 				{#if pending}

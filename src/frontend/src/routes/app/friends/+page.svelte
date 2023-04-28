@@ -1,20 +1,14 @@
 <script lang="ts">
 	import UserBanner from '$lib/components/app/UserBanner.svelte';
-	import Spinner from '$lib/components/common/Spinner.svelte';
 	import {
 		getFriends,
 		friendsApproved,
 		friendsWaiting,
 		friendsRequested
 	} from '$lib/stores/tasks/getFriends';
-	import type { FriendlyUserMatch, FriendStatus } from 'src/declarations/backend/backend.did';
 	import { onMount } from 'svelte';
-	import Refresh from '$lib/assets/icons/refresh.svg?component';
 
 	let pending: boolean = false;
-	let fA = 0;
-	let fW = 0;
-	let fR = 0;
 	let current = 0;
 
 	const handleFindFriends = async () => {
@@ -22,14 +16,12 @@
 		await getFriends().catch((error) => {
 			console.log('error while getting friends', error);
 		});
-		//await function for getting all friendrequests
 		pending = false;
-		//flSize = $foundFriends.length;
-		fA = $friendsApproved.length;
-		fW = $friendsWaiting.length;
-		fR = $friendsRequested.length;
-		//console.log("sortedApproved test:", $foundFriends)
 	};
+
+	$: fA = $friendsApproved ? $friendsApproved.length : 0;
+	$: fW = $friendsWaiting ? $friendsWaiting.length : 0;
+	$: fR = $friendsRequested ? $friendsRequested.length : 0;
 
 	onMount(() => {
 		handleFindFriends();
@@ -60,13 +52,13 @@
 			Send{'('}{fR > 0 ? fR : 0}{')'}
 		</button>
 
-		<button on:click={handleFindFriends} class="cursor-pointer hover-circle hover-color">
+		<!-- <button on:click={handleFindFriends} class="cursor-pointer hover-circle hover-color">
 			{#if pending}
 				<Spinner />
 			{:else}
 				<Refresh />
 			{/if}
-		</button>
+		</button> -->
 	</div>
 
 	<div class="rounded-md flex flex-col gap-y-2">

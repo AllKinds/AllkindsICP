@@ -11,7 +11,7 @@
 	var likeWeight = 0;
 	let skipPending: boolean = false;
 	let answerPending: boolean | undefined = undefined;
-	let qColor = question.color;
+	$: qColor = question.color;
 
 	const submitAnswer = async (bool: boolean) => {
 		answerPending = bool;
@@ -25,6 +25,7 @@
 				answerPending = undefined;
 				likeWeight = 0;
 				getQs();
+				//needs to be removed as we want to have a cache of questions and check when cache is almost empty, then we call for more questions
 			});
 	};
 

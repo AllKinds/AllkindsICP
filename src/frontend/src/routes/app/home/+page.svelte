@@ -35,7 +35,7 @@
 </script>
 
 <div class="flex flex-col gap-4">
-	<div class="border-main {$color} w-full mx-auto flex-col px-2 justify-between">
+	<div class="border-main {$color} w-full mx-auto flex-col p-2 justify-between">
 		<button
 			class="w-full flex justify-between items-center"
 			on:click={() => (expandWindow = !expandWindow)}
@@ -48,9 +48,9 @@
 		</span>
 			{#if !expandWindow}
 				<!-- <ChevronDown class="w-9 cursor-pointerborder-none" /> -->
-				<Add class="w-12 hover-circle" />
+				<Add class="w-10 sub-btn" />
 			{:else if expandWindow}
-				<ChevronUp class="w-12 hover-circle" />
+				<ChevronUp class="w-10 sub-btn" />
 			{/if}
 		</button>
 

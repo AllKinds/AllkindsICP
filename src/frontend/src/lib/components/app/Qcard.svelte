@@ -3,10 +3,11 @@
 	import ChevronDown from '$lib/assets/icons/chevronDown.svg?component';
 	import ChevronUp from '$lib/assets/icons/chevronUp.svg?component';
 	import Qcontent from './Qcontent.svelte';
+	import { onMount } from 'svelte';
 
 	export let question: Question;
 	let expandWindow: boolean = false;
-	let qColor = question.color;
+	$: qColor = question.color;
 
 </script>
 
