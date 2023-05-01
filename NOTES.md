@@ -14,13 +14,15 @@ Should have a subscribe method or caching system for showing question feed while
 
 Backend:
 
+- revamp algorithm and show information about it on app
 - revamp entire structure with consistancy and seperation of functionalities/utils in modules with complex types and utility functions
 - generic errors for ui
 - unit testing setup w cycle consumption data
 
 Frontend:
 
-- component extractions
-- code consistancy
-- wallet support
-- consider going back to svelte or integrate dynamic loading features in svelteKit
+- more component extractions
+- more code consistancy
+- multi wallet support (ic2c?)
+- consider going back to svelteJs or integrate dynamic loading feature in svelteKit for questions and users
+- order/streamline backend api's and append calls together were possible
