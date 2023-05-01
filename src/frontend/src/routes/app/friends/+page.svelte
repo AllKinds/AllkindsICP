@@ -1,33 +1,52 @@
 <script lang="ts">
 	import UserBanner from '$lib/components/app/UserBanner.svelte';
+	import CustomTabs from '$lib/components/common/CustomTabs.svelte';
 	import {
 		getFriends,
 		friendsApproved,
 		friendsWaiting,
 		friendsRequested
 	} from '$lib/stores/tasks/getFriends';
+	import type { FriendlyUserMatch } from 'src/declarations/backend/backend.did';
 	import { onMount } from 'svelte';
 
-	let pending: boolean = false;
-	let current = 0;
+	//let current = 0;
 
 	const handleFindFriends = async () => {
-		pending = true;
 		await getFriends().catch((error) => {
 			console.log('error while getting friends', error);
 		});
-		pending = false;
 	};
 
-	$: fA = $friendsApproved ? $friendsApproved.length : 0;
-	$: fW = $friendsWaiting ? $friendsWaiting.length : 0;
-	$: fR = $friendsRequested ? $friendsRequested.length : 0;
+	let lists: Array<{arr : Array<any>, title : String}>  = [
+		{
+			arr : $friendsApproved,
+			title : "My Friends"
+		},
+		{
+			arr : $friendsWaiting,
+			title : "Requests"
+		},
+		{
+			arr : $friendsRequested,
+			title : "Send"
+		}
+	]
 
 	onMount(() => {
 		handleFindFriends();
 	});
+
 </script>
 
+<CustomTabs {lists} >
+	<svelte:fragment slot="item" let:item>
+		<UserBanner match={item}/>
+	</svelte:fragment>
+</CustomTabs>
+
+
+<!-- 
 <div class="flex flex-col gap-4">
 
 	<div class="flex gap-3">
@@ -77,4 +96,4 @@
 		{/if}
 	</div>
 
-</div>
+</div> -->

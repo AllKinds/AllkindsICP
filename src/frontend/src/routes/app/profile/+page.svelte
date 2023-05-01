@@ -5,9 +5,9 @@
 	import { getQsAnswered, answeredQuestions, myQuestions } from '$lib/stores/tasks/getQsAnswered';
 	import Qbanner from '$lib/components/app/Qbanner.svelte';
 	import PlaceholderPic from '$lib/assets/icons/placeholder-pic.svg?component';
+	import CustomTabs from '$lib/components/common/CustomTabs.svelte';
 
-	//TODO make this into ultility function
-	let current = 0;
+	//TODO make age/birth into ultility function
 
 	let userBirth = fromNullableDate($user.birth[0]);
 	let ageMs = Number(new Date()) - Number($user.birth[0]) / 1000000;
@@ -23,6 +23,18 @@
 	console.log('age', userBirth);
 	console.log($user.about[0]);
 
+
+
+	let lists: Array<{arr : Array<any>, title : String}>  = [
+		{
+			arr : $myQuestions,
+			title : "My Questions"
+		},
+		{
+			arr : $answeredQuestions,
+			title : "All Answered"
+		}
+	]	
 	onMount(async () => {
 		//TODO change into button that then calls answered Q
 		await getQsAnswered();
@@ -47,32 +59,9 @@
 
 	<span class="mx-auto">{userAbout}</span>
 
-	<div class="flex gap-3">
-		<button
-			on:click={() => (current = 0)}
-			class:currentTab={current === 0}
-			class="pb-2 text-left hover-color hover-circle"
-		>
-			My Questions
-		</button>
-		<button
-			on:click={() => (current = 1)}
-			class:currentTab={current === 1}
-			class="pb-2 text-left hover-color hover-circle"
-		>
-			All Answered
-		</button>
-	</div>
-
-	<div class="w-100% rounded-md flex flex-col p-2 md:p-8 gap-2">
-		{#if $myQuestions && current == 0}
-			{#each $myQuestions as q}
-				<Qbanner {q}/>
-			{/each}
-		{:else if $answeredQuestions && current == 1}
-			{#each $answeredQuestions as q}
-				<Qbanner {q}/>
-			{/each}
-		{/if}
-	</div>
+	<CustomTabs {lists} >
+		<svelte:fragment slot="item" let:item>
+			<Qbanner q={item}/>
+		</svelte:fragment>
+	</CustomTabs>
 </div>

@@ -7,6 +7,7 @@
 	import Spinner from '../common/Spinner.svelte';
 	import Qbanner from './Qbanner.svelte';
 	import QbannerNoColor from './QbannerNoColor.svelte';
+	import CustomTabs from '../common/CustomTabs.svelte';
 
 	export let match: FriendlyUserMatch;
 
@@ -38,6 +39,17 @@
 		succes = true;
 		pending = false;
 	};
+
+	let lists: Array<{arr : Array<any>, title : String}>  = [
+		{
+			arr : answered,
+			title : "All Questions"
+		},
+		{
+			arr : uncommon,
+			title : "Find Out"
+		}
+	]
 </script>
 
 <!-- NOTE: this component sizes according to parent -->
@@ -72,33 +84,15 @@
 				</button>
 			</div>
 		{/if}
-		<div>
-			<button
-				class="pb-2 text-left hover-color hover-circle"
-				on:click={() => (current = 0)}
-				class:currentTab={current === 0}
-			>
-				<span class="hover-bg hover-color">All Questions{'('}{aQsize > 0 ? aQsize : 0}{')'}</span>
-			</button>
-			<button
-				class="pb-2 text-left hover-color hover-circle"
-				on:click={() => (current = 1)}
-				class:currentTab={current === 1}
-			>
-				<span class="hover-bg hover-color">Find out{'('}{uQsize > 0 ? uQsize : 0}{')'}</span>
-			</button>
-		</div>
 
-		<div class="flex flex-col gap-2 mt-3">
-			{#if aQsize > 0 && current == 0}
-				{#each answered as a}
-					<QbannerNoColor q={a[0]} b={a[1]} />
-				{/each}
-			{:else if uQsize > 0 && current == 1}
-				{#each uncommon as u}
-					<Qbanner q={u} />
-				{/each}
-			{/if}
-		</div>
-	</div>
+		<CustomTabs {lists}>
+			<svelte:fragment slot="item" let:item>
+				{#if item[1]}
+					<QbannerNoColor q={item[0]} b={item[1]} />
+				{:else}
+					<Qbanner q={item} />
+				{/if}
+			</svelte:fragment>
+		</CustomTabs>
+	</div> 
 </div>

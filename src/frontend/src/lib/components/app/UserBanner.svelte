@@ -12,7 +12,7 @@
 	import NavX from '$lib/assets/icons/navX.svg?component';
 	import UserCard from './UserCard.svelte';
 
-	export let match: FriendlyUserMatch;
+	export let match: any;
 
 	let userCardWindow: boolean = false;
 
@@ -23,7 +23,7 @@
 	let userGender = fromNullableGender(match.gender);
 	//let userBirth = u.birth;
 	//TODO make age utility function
-	console.log("userBirth", match.birth)
+
 	let ageMs = Number(new Date()) - Number(match.birth) / 1000000;
 	let ageY = Math.floor(ageMs / (1000 * 3600 * 24) / 365);
 	let answered = match.answered;
