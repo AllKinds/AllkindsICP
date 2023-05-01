@@ -29,8 +29,8 @@
 </script>
 
 <div class="flex flex-col gap-4">
+
 	<div class="flex gap-3">
-		
 		<button
 			on:click={() => (current = 0)}
 			class:currentTab={current === 0}
@@ -52,22 +52,20 @@
 		>
 			Send{'('}{fR > 0 ? fR : 0}{')'}
 		</button>
-
 	</div>
 
 	<div class="rounded-md flex flex-col gap-y-2">
-
 		{#if fA > 0 && current == 0}
-			{#each $friendsApproved as u}
-				<UserBanner {u} />
+			{#each $friendsApproved as match}
+				<UserBanner {match} />
 			{/each}
 		{:else if fW > 0 && current == 1}
-			{#each $friendsWaiting as u}
-				<UserBanner {u} />
+			{#each $friendsWaiting as match}
+				<UserBanner {match} />
 			{/each}
 		{:else if fR > 0 && current == 2}
-			{#each $friendsRequested as u}
-				<UserBanner {u} />
+			{#each $friendsRequested as match}
+				<UserBanner {match} />
 			{/each}
 		{:else if current == 0}
 			<span class="text-slate-700">Oops you don't have any friends yet!</span>
@@ -77,6 +75,6 @@
 				page to find people.
 			</span>
 		{/if}
-
 	</div>
+
 </div>

@@ -144,9 +144,5 @@ should be done alot cleaner with datatype structure objects I think -->
 	<p slot="text1">Coming soon...</p>
 </Segment>
 
-<Segment>
-	<h2 slot="title" id="contact">Contact</h2>
-	<p slot="text1">Coming soon...</p>
-</Segment>
-
+<span id="contact"/>
 <Footer />

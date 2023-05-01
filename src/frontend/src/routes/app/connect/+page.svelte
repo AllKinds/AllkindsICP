@@ -98,7 +98,7 @@
 			{#if match}
 				<UserCard {match} />
 			{:else}
-				<span class="text-slate-700 mx-auto">Oops, Something went wrong!.</span>
+				<span class="text-slate-700 mx-auto">Oops, Something went wrong!</span>
 			{/if}
 		</div>
 	{/if}

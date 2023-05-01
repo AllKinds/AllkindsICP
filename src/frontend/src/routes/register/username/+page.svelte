@@ -25,7 +25,7 @@
 <div class="flex flex-col justify-center items-center">
 	<h2>Choose a username</h2>
 	<div class="flex p-2">
-		<div class="flex flex-col p-0.5 rounded-lg bg-fancy">
+		<div class="flex flex-col rounded-lg">
 			<input
 				type="text"
 				disabled={pending}
