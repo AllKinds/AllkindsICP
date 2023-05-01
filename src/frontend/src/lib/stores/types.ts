@@ -25,8 +25,7 @@ export enum AppState {
 	Home,
 	People,
 	User,
-	Profile,
-	Dev
+	Profile
 }
 
 //Others

@@ -43,7 +43,7 @@ module T {
 		creater : Principal;
 		question : Text;
 		hash : Hash.Hash;
-		color : Nat; //represents a hue value
+		color : Text;
 		points : Int; //int bcs question points should be able to go negative
 	};
 

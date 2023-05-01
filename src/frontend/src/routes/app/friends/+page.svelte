@@ -1,42 +1,52 @@
 <script lang="ts">
 	import UserBanner from '$lib/components/app/UserBanner.svelte';
-	import Spinner from '$lib/components/common/Spinner.svelte';
+	import CustomTabs from '$lib/components/common/CustomTabs.svelte';
 	import {
 		getFriends,
 		friendsApproved,
 		friendsWaiting,
 		friendsRequested
 	} from '$lib/stores/tasks/getFriends';
-	import type { FriendlyUserMatch, FriendStatus } from 'src/declarations/backend/backend.did';
+	import type { FriendlyUserMatch } from 'src/declarations/backend/backend.did';
 	import { onMount } from 'svelte';
-	import Refresh from '$lib/assets/icons/refresh.svg?component';
 
-	let pending: boolean = false;
-	let fA = 0;
-	let fW = 0;
-	let fR = 0;
-	let current = 0;
+	//let current = 0;
 
 	const handleFindFriends = async () => {
-		pending = true;
 		await getFriends().catch((error) => {
 			console.log('error while getting friends', error);
 		});
-		//await function for getting all friendrequests
-		pending = false;
-		//flSize = $foundFriends.length;
-		fA = $friendsApproved.length;
-		fW = $friendsWaiting.length;
-		fR = $friendsRequested.length;
-		//console.log("sortedApproved test:", $foundFriends)
 	};
+
+	let lists: Array<{ arr: Array<any>; title: String }> = [
+		{
+			arr: $friendsApproved,
+			title: 'My Friends'
+		},
+		{
+			arr: $friendsWaiting,
+			title: 'Requests'
+		},
+		{
+			arr: $friendsRequested,
+			title: 'Send'
+		}
+	];
 
 	onMount(() => {
 		handleFindFriends();
 	});
 </script>
 
+<CustomTabs {lists}>
+	<svelte:fragment slot="item" let:item>
+		<UserBanner match={item} />
+	</svelte:fragment>
+</CustomTabs>
+
+<!-- 
 <div class="flex flex-col gap-4">
+
 	<div class="flex gap-3">
 		<button
 			on:click={() => (current = 0)}
@@ -59,37 +69,20 @@
 		>
 			Send{'('}{fR > 0 ? fR : 0}{')'}
 		</button>
-
-		<button on:click={handleFindFriends} class="cursor-pointer hover-circle hover-color">
-			{#if pending}
-				<Spinner />
-			{:else}
-				<Refresh />
-			{/if}
-		</button>
 	</div>
 
 	<div class="rounded-md flex flex-col gap-y-2">
-		<!-- {#if $foundFriends && $foundFriends.length > 0}
-			{#each $foundFriends as u}
-        {#if (Object.entries(u.status)[0][0] == "Approved") && (current == 0)}
-				  <UserBanner {u}/>
-        {:else if (Object.entries(u.status)[0][0] == "Waiting")  && (current == 1)}
-          <UserBanner {u}/>
-        {/if}        
-			{/each} -->
-
 		{#if fA > 0 && current == 0}
-			{#each $friendsApproved as u}
-				<UserBanner {u} />
+			{#each $friendsApproved as match}
+				<UserBanner {match} />
 			{/each}
 		{:else if fW > 0 && current == 1}
-			{#each $friendsWaiting as u}
-				<UserBanner {u} />
+			{#each $friendsWaiting as match}
+				<UserBanner {match} />
 			{/each}
 		{:else if fR > 0 && current == 2}
-			{#each $friendsRequested as u}
-				<UserBanner {u} />
+			{#each $friendsRequested as match}
+				<UserBanner {match} />
 			{/each}
 		{:else if current == 0}
 			<span class="text-slate-700">Oops you don't have any friends yet!</span>
@@ -99,10 +92,6 @@
 				page to find people.
 			</span>
 		{/if}
-		<!-- {#if (u.status == statusApproved ) && current == 0}
-				<UserBanner {u}/>
-        {:else if (u.status == (statusRequested || statusWaiting))  && current == 1}
-        <UserBanner {u}/>
-        {/if} -->
 	</div>
-</div>
+
+</div> -->

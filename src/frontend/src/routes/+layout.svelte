@@ -4,8 +4,8 @@
 	import { goto } from '$app/navigation';
 	import { rootStore, authStore, user, actor } from '$lib/stores/';
 	import { RootState, AuthState } from '$lib/stores/types';
-	import { onMount } from 'svelte';
-	import { getColor } from '$lib/stores/tasks/colorSelect';
+	import { onDestroy, onMount } from 'svelte';
+	import { logout, syncAuth } from '$lib/stores/tasks';
 
 	$: {
 		//can be changed in future to make landing accessible while being logged in
@@ -18,15 +18,13 @@
 		}
 	}
 
-	console.log('user:', { $user });
-	onMount(() => {
-		getColor();
-	});
-
 	// // make user logout onDestroy component
-	// 	onDestroy( () => {
-	// 		logout()
-	// 	})
+	onDestroy(() => {
+		logout();
+	});
+	// onMount(() => {
+	// 	syncAuth();
+	// })
 </script>
 
 {#if browser}

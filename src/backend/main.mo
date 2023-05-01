@@ -66,7 +66,7 @@ actor {
 
 	func hashhash(h : Hash.Hash) : Hash.Hash { h };
 
-	func putQuestion(p : Principal, question : Text, color : Nat) : () {
+	func putQuestion(p : Principal, question : Text, color : Text) : () {
 		let created = Time.now();
 		let creater = p;
 		let hash = hashQuestion(created, creater, question);
@@ -439,7 +439,6 @@ actor {
 				friends.put(caller, []);
 				users.put(caller, user);
 				//friends.put(caller, friendList);
-				Debug.print("Balance: " # debug_show (Cycles.balance()));
 				#ok();
 			};
 		};
@@ -447,25 +446,22 @@ actor {
 
 	public shared query (msg) func getUser() : async Result.Result<User, Text> {
 		let ?user = users.get(msg.caller) else return #err("User does not exist!");
-		Debug.print("Balance: " # debug_show (Cycles.balance()));
 		#ok(user);
 	};
 
 	public shared (msg) func updateProfile(user : User) : async Result.Result<(), Text> {
 		let _ = users.get(msg.caller) else return #err("User does not exist!");
 		let _ = users.put(msg.caller, user) else return #err("Could not update!");
-		Debug.print("Balance: " # debug_show (Cycles.balance()));
 		#ok();
 	};
 
-	public shared (msg) func createQuestion(question : Text, color : Nat) : async Result.Result<(), Text> {
+	public shared (msg) func createQuestion(question : Text, color : Text) : async Result.Result<(), Text> {
 		let ?user = users.get(msg.caller) else return #err("User does not exist!");
 		if (question.size() < minimumQuestionSize) return #err("Question too short!");
 		try { putQuestion(msg.caller, question, color) } catch err {
 			return #err("Could not create Question!");
 		};
 		changeUserPoints(msg.caller, (user.points + createrReward));
-		Debug.print("Balance: " # debug_show (Cycles.balance()));
 		#ok();
 	};
 
@@ -475,7 +471,6 @@ actor {
 			questions.get(h);
 		};
 		let q = Array.mapFilter(askables, getQuestion);
-		Debug.print("Balance: " # debug_show (Cycles.balance()));
 		#ok(q);
 	};
 
@@ -485,7 +480,6 @@ actor {
 			questions.get(h);
 		};
 		let q = Array.mapFilter(answered, getQuestion);
-		Debug.print("Balance: " # debug_show (Cycles.balance()));
 		#ok(q);
 	};
 
@@ -503,7 +497,6 @@ actor {
 		};
 		answers.put(principalQuestion, newAnswer);
 		changeUserPoints(msg.caller, (user.points + answerReward - Int.abs(weight)));
-		Debug.print("Balance: " # debug_show (Cycles.balance()));
 		#ok();
 	};
 
@@ -515,7 +508,6 @@ actor {
 			question;
 		};
 		skips.put(principalQuestion, skip);
-		Debug.print("Balance: " # debug_show (Cycles.balance()));
 		#ok();
 	};
 
@@ -546,7 +538,6 @@ actor {
 			answered;
 			uncommon;
 		};
-		Debug.print("Balance: " # debug_show (Cycles.balance()));
 		return #ok(result);
 	};
 
@@ -600,7 +591,6 @@ actor {
 			};
 
 		};
-		Debug.print("Balance: " # debug_show (Cycles.balance()));
 		#ok(Buffer.toArray(buf));
 	};
 
@@ -630,7 +620,6 @@ actor {
 		} catch err {
 			return #err("Failed to update user states");
 		};
-		Debug.print("Balance: " # debug_show (Cycles.balance()));
 		#ok();
 	};
 
@@ -674,7 +663,6 @@ actor {
 		} catch err {
 			return #err("Failed to update userStates");
 		};
-		Debug.print("Balance: " # debug_show (Cycles.balance()));
 		#ok();
 	};
 

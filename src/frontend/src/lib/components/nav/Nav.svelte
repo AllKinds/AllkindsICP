@@ -3,10 +3,9 @@
 	import DarkMode from './DarkMode.svelte';
 	import LoginBtn from './LoginBtn.svelte';
 	import Heart from '$lib/assets/icons/heart.svg?component';
+	import GithubLogo from '$lib/assets/icons/gh.svg?component';
 	import { authStore } from '$lib/stores/';
 	import { AuthState } from '$lib/stores/types';
-	import ColorSelect from './ColorSelect.svelte';
-	import { styleStore } from '$lib/stores/tasks/colorSelect';
 
 	export let data: any;
 	export let path: any;
@@ -15,10 +14,7 @@
 <!-- border-main if not using fancy bg -->
 <!--  shadow-sm shadow-[color:var(--primary-color)]-->
 <div
-	class="
-	bg-gradient-to-br from-[color:var(--primary-color)] to-[color:var(--secondary-color)] 
-	rounded-lg w-40 mx-auto p-[1px]
-	drop-shadow-[0_0_5px_var(--glow-color)]
+	class="bg-rainbow-br rounded-lg w-40 mt-1 mx-auto p-0.5
 "
 >
 	<div class="flex flex-col bg-main rounded-lg trans-300 p-2 text-lg items-start ">
@@ -51,6 +47,13 @@
 
 		<LoginBtn />
 		<DarkMode />
-		<ColorSelect />
+		<div class="border-main h-0.5 my-2 px-3 w-full" />
+		<a
+			href="https://github.com/Allkinds/AllkindsICP"
+			class="flex gap-1 text-sm p-1 hover:bg-sub rounded-md"
+		>
+			<GithubLogo class="w-5 dark:bg-zinc-200 rounded-full" />
+			<span class="m-auto">Allkinds v0.2.1</span>
+		</a>
 	</div>
 </div>

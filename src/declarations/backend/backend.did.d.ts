@@ -27,7 +27,7 @@ export interface Question {
 	creater: Principal;
 	question: string;
 	hash: Hash;
-	color: bigint;
+	color: string;
 	points: bigint;
 }
 export interface Question__1 {
@@ -35,7 +35,7 @@ export interface Question__1 {
 	creater: Principal;
 	question: string;
 	hash: Hash;
-	color: bigint;
+	color: string;
 	points: bigint;
 }
 export type Result = { ok: null } | { err: string };
@@ -67,7 +67,7 @@ export interface UserMatch {
 }
 export interface _SERVICE {
 	answerFriendRequest: ActorMethod<[Principal, boolean], Result>;
-	createQuestion: ActorMethod<[string, bigint], Result>;
+	createQuestion: ActorMethod<[string, string], Result>;
 	createUser: ActorMethod<[string], Result>;
 	findMatch: ActorMethod<[MatchingFilter], Result_4>;
 	getAnsweredQuestions: ActorMethod<[], Result_3>;
