@@ -40,22 +40,22 @@
 		pending = false;
 	};
 
-	let lists: Array<{arr : Array<any>, title : String}>  = [
+	let lists: Array<{ arr: Array<any>; title: String }> = [
 		{
-			arr : answered,
-			title : "All Questions"
+			arr: answered,
+			title: 'All Questions'
 		},
 		{
-			arr : uncommon,
-			title : "Find Out"
+			arr: uncommon,
+			title: 'Find Out'
 		}
-	]
+	];
 </script>
 
 <!-- NOTE: this component sizes according to parent -->
 <div class="w-full flex flex-col justify-between mx-auto">
 	<div class="w-full h-72 sm:h-96 mx-auto rounded-md bg-sub overflow-clip">
-		<PlaceholderPic class=" h-56 sm:h-72 mx-auto mt-24"/>
+		<PlaceholderPic class=" h-56 sm:h-72 mx-auto mt-24" />
 	</div>
 
 	<div class="p-1 sm:p-2 flex flex-col">
@@ -94,5 +94,5 @@
 				{/if}
 			</svelte:fragment>
 		</CustomTabs>
-	</div> 
+	</div>
 </div>

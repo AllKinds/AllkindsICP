@@ -18,33 +18,31 @@
 		});
 	};
 
-	let lists: Array<{arr : Array<any>, title : String}>  = [
+	let lists: Array<{ arr: Array<any>; title: String }> = [
 		{
-			arr : $friendsApproved,
-			title : "My Friends"
+			arr: $friendsApproved,
+			title: 'My Friends'
 		},
 		{
-			arr : $friendsWaiting,
-			title : "Requests"
+			arr: $friendsWaiting,
+			title: 'Requests'
 		},
 		{
-			arr : $friendsRequested,
-			title : "Send"
+			arr: $friendsRequested,
+			title: 'Send'
 		}
-	]
+	];
 
 	onMount(() => {
 		handleFindFriends();
 	});
-
 </script>
 
-<CustomTabs {lists} >
+<CustomTabs {lists}>
 	<svelte:fragment slot="item" let:item>
-		<UserBanner match={item}/>
+		<UserBanner match={item} />
 	</svelte:fragment>
 </CustomTabs>
-
 
 <!-- 
 <div class="flex flex-col gap-4">

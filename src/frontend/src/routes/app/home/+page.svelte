@@ -40,12 +40,11 @@
 			class="w-full flex justify-between items-center"
 			on:click={() => (expandWindow = !expandWindow)}
 		>
-		<span>
-			{#if !expandWindow}
-				Ask a Yes/No question...
-
-			{/if}
-		</span>
+			<span>
+				{#if !expandWindow}
+					Ask a Yes/No question...
+				{/if}
+			</span>
 			{#if !expandWindow}
 				<!-- <ChevronDown class="w-9 cursor-pointerborder-none" /> -->
 				<Add class="w-10 sub-btn" />

@@ -23,18 +23,16 @@
 	console.log('age', userBirth);
 	console.log($user.about[0]);
 
-
-
-	let lists: Array<{arr : Array<any>, title : String}>  = [
+	let lists: Array<{ arr: Array<any>; title: String }> = [
 		{
-			arr : $myQuestions,
-			title : "My Questions"
+			arr: $myQuestions,
+			title: 'My Questions'
 		},
 		{
-			arr : $answeredQuestions,
-			title : "All Answered"
+			arr: $answeredQuestions,
+			title: 'All Answered'
 		}
-	]	
+	];
 	onMount(async () => {
 		//TODO change into button that then calls answered Q
 		await getQsAnswered();
@@ -43,7 +41,7 @@
 
 <div class="flex flex-col gap-4">
 	<div class=" w-48 h-48 rounded-full border-main bg-sub mx-auto overflow-clip">
-		<PlaceholderPic class=" w-36 h-36 mx-auto mt-12"/>
+		<PlaceholderPic class=" w-36 h-36 mx-auto mt-12" />
 	</div>
 
 	<span
@@ -59,9 +57,9 @@
 
 	<span class="mx-auto">{userAbout}</span>
 
-	<CustomTabs {lists} >
+	<CustomTabs {lists}>
 		<svelte:fragment slot="item" let:item>
-			<Qbanner q={item}/>
+			<Qbanner q={item} />
 		</svelte:fragment>
 	</CustomTabs>
 </div>

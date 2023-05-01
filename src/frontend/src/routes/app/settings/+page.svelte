@@ -141,7 +141,7 @@
 			</label>
 
 			<span>Profile picture(Doesn't work yet!)</span>
-			
+
 			<label for="picture">
 				<input type="file" bind:this={file} on:change={handleFileInput} />
 				<!-- <img src={imgSrc} alt="" /> -->

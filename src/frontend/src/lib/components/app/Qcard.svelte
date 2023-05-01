@@ -8,7 +8,6 @@
 	export let question: Question;
 	let expandWindow: boolean = false;
 	$: qColor = question.color;
-
 </script>
 
 <div class="{qColor} h-fit w-full rounded-lg padding p-[1px] border-main">

@@ -18,7 +18,6 @@
 	</svelte:fragment>
 	<svelte:fragment slot="main">
 		<div class="flex flex-row justify-center mt-8 gap-4">
-
 			<!-- main content -->
 			<div class=" h-fit w-full mt-1 min-h-screen">
 				<slot />
@@ -29,5 +28,4 @@
 			</div>
 		</div>
 	</svelte:fragment>
-
 </Layout>

@@ -95,9 +95,7 @@ should be done alot cleaner with datatype structure objects I think -->
 	<h2 slot="title">Powered by ICP</h2>
 	<p slot="text1">
 		Allkinds is build on the
-		<a class="link hover:underline" href="https://www.internetcomputer.org"
-			>Internet Computer</a
-		>
+		<a class="link hover:underline" href="https://www.internetcomputer.org">Internet Computer</a>
 	</p>
 </Segment>
 
@@ -124,7 +122,8 @@ should be done alot cleaner with datatype structure objects I think -->
 <Segment>
 	<h2 slot="title">Allkinds DAO</h2>
 	<p slot="text1">
-		We plan to integrate NNS to create a DAO which will be used to govern and decide the development and dapp related constant like algorithms for Allkinds.
+		We plan to integrate NNS to create a DAO which will be used to govern and decide the development
+		and dapp related constant like algorithms for Allkinds.
 	</p>
 </Segment>
 
@@ -138,5 +137,5 @@ should be done alot cleaner with datatype structure objects I think -->
 	<p slot="text1">Coming soon...</p>
 </Segment>
 
-<span id="contact"/>
+<span id="contact" />
 <Footer />

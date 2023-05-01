@@ -1,10 +1,12 @@
 # Allkinds
+
 [Mainnet deployed Dapp](https://tp4bo-yaaaa-aaaap-aa5la-cai.icp0.io/)
 Have fun testing ^^ , Don't overconsume cycles pls
 
 ## Releases
 
 Alpha v0.2.1 (BREAKING CHANGE: ONLY questions have been reset)
+
 - Reverted UI colors back and removed custom accent slider
 - Added color selection instead of slider for questions
 - Removed footer from /app sections
@@ -15,9 +17,8 @@ Alpha v0.2.1 (BREAKING CHANGE: ONLY questions have been reset)
 - Several smaller bug fixes/UI tweaks
 
 Alpha v0.2.0
+
 - first live deploy
-
-
 
 ## Testing out locally
 

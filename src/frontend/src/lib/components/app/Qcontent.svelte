@@ -40,9 +40,7 @@
 </script>
 
 <!-- TODO : fix a minimum height here -->
-<div
-	class="2xl:w-9/12 mx-auto h-fit rounded-md flex flex-col justify-center items-center {qColor}"
->
+<div class="2xl:w-9/12 mx-auto h-fit rounded-md flex flex-col justify-center items-center {qColor}">
 	<p class="text-4xl w-fit text-center">
 		{question.question}
 	</p>

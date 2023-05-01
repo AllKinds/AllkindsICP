@@ -48,8 +48,11 @@
 		<LoginBtn />
 		<DarkMode />
 		<div class="border-main h-0.5 my-2 px-3 w-full" />
-		<a href="https://github.com/Allkinds/AllkindsICP" class="flex gap-1 text-sm p-1 hover:bg-sub rounded-md">
-			<GithubLogo class="w-5 dark:bg-zinc-200 rounded-full"/>
+		<a
+			href="https://github.com/Allkinds/AllkindsICP"
+			class="flex gap-1 text-sm p-1 hover:bg-sub rounded-md"
+		>
+			<GithubLogo class="w-5 dark:bg-zinc-200 rounded-full" />
 			<span class="m-auto">Allkinds v0.2.1</span>
 		</a>
 	</div>
