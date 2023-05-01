@@ -7,7 +7,7 @@
 	import { createQ } from '$lib/stores/tasks/createQ';
 	import { getQs, questions } from '$lib/stores/tasks/getQs';
 	import Spinner from '$lib/components/common/Spinner.svelte';
-	import ColorSelect from '$lib/components/nav/ColorSelect.svelte';
+	import ColorSelect from '$lib/components/app/ColorSelect.svelte';
 	import { color } from '$lib/stores/tasks/colorSelect';
 
 	let expandWindow: boolean = false;

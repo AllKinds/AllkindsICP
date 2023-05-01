@@ -10,6 +10,6 @@
 		<a href="https://discord.gg/kXAYeYWR5E">Discord</a> |
 		<a href="https://github.com/AllKinds">Github</a>
 	</div>
-	<IcBadge />
+	<a href="https://internetcomputer.org/" class="w-fit"><IcBadge /></a>
 	<snap class="text-sub">© 2023 Allkinds. All rights reserved.</snap>
 </div>

@@ -79,7 +79,7 @@ should be done alot cleaner with datatype structure objects I think -->
 		meta profiles against other people, companies, or places and find those who resonate more.
 	</p>
 	<p slot="text2">
-		All data is encrypted and we use zkp algorithms to be able to compare meta-profiles without
+		All data is encrypted and we use simple algorithms to be able to compare meta-profiles without
 		revealing the information behind it.
 	</p>
 </Segment>
@@ -95,7 +95,7 @@ should be done alot cleaner with datatype structure objects I think -->
 	<h2 slot="title">Powered by ICP</h2>
 	<p slot="text1">
 		Allkinds is build on the
-		<a class="text-purple-600 hover:underline" href="https://www.internetcomputer.org"
+		<a class="link hover:underline" href="https://www.internetcomputer.org"
 			>Internet Computer</a
 		>
 	</p>
@@ -111,12 +111,12 @@ should be done alot cleaner with datatype structure objects I think -->
 <Segment>
 	<h2 slot="title">Allkinds protocol</h2>
 	<p slot="text1">
-		We plan to research both NLP/ML and semantic web ontology structures to understand
+		We plan to research both NLP/ML AI and semantic web ontology structures to understand
 		questions/answers and build or update meta profiles out of it.
 	</p>
 	<p slot="text2">
-		By building a standard for canisters containing user data it would greatly benefit the IC
-		community but also allow easy integration with outside networks and apps using semantic data
+		By utilizing a standard for canisters containing user data it would greatly benefit the IC
+		community but also allow easy integration with outside networks and apps using social graph
 		practices.
 	</p>
 </Segment>
@@ -124,18 +124,12 @@ should be done alot cleaner with datatype structure objects I think -->
 <Segment>
 	<h2 slot="title">Allkinds DAO</h2>
 	<p slot="text1">
-		We plan to integrate NNS to create a DAO which will be used to govern and decide the development
-		for Allkinds.
+		We plan to integrate NNS to create a DAO which will be used to govern and decide the development and dapp related constant like algorithms for Allkinds.
 	</p>
 </Segment>
 
 <Segment>
 	<h2 slot="title" id="roadmap">Roadmap</h2>
-	<p slot="text1">Coming soon...</p>
-</Segment>
-
-<Segment>
-	<h2 slot="title" id="whitepaper">Whitepaper</h2>
 	<p slot="text1">Coming soon...</p>
 </Segment>
 

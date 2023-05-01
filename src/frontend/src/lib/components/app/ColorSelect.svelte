@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { color } from "$lib/stores/tasks/colorSelect";
 
-	//colourfull colors will use main text color as default based on dark/light mode
+	//optionally give text color as second argument for readability
 	let colors = [
 		'bg-black text-zinc-200',
 		'bg-zinc-800 text-zinc-300',
