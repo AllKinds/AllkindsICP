@@ -10,12 +10,24 @@ export const authStore = writable<AuthState>();
 export let actor = writable<BackendActor>();
 export let user = writable<User>();
 export let caller = writable<Principal>();
+let authClient: AuthClient;
 
-let authClient: AuthClient = await AuthClient.create();
+// let authClient: AuthClient = await AuthClient.create();
 
-(await authClient.isAuthenticated())
-	? await checkRegistration()
-	: authStore.set(AuthState.LoggedOut);
+// (await authClient.isAuthenticated())
+// 	? await checkRegistration()
+// 	: authStore.set(AuthState.LoggedOut);
+async function start() {
+	let authClient: AuthClient = await AuthClient.create();
+
+	if (await authClient.isAuthenticated()) {
+		await checkRegistration();
+	} else {
+		authStore.set(AuthState.LoggedOut);
+	}
+}
+
+start();
 
 async function createActor() {
 	const isAuthenticated = await authClient.isAuthenticated();

@@ -6,6 +6,7 @@
 	import Nav from '$lib/components/nav/Nav.svelte';
 
 	export let data: LayoutData;
+
 	// layout is actually not needed because landing is a single page, but still using it for possible future additions
 </script>
 
@@ -17,7 +18,7 @@
 		<DropdownNav {data} />
 	</svelte:fragment>
 	<svelte:fragment slot="main">
-		<div class="flex flex-row justify-center mt-8 gap-4">
+		<div class="flex flex-row justify-center mt-5 gap-4">
 			<!-- main content -->
 			<div class=" h-fit w-full mt-1 min-h-screen">
 				<slot />
