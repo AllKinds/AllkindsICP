@@ -9,7 +9,7 @@ declare namespace App {
 }
 
 declare module '*.svg?component' {
-	const content: ConstructorOfATypedSvelteComponent;
+	const content: SvelteComponentTyped;
 	export default content;
 }
 

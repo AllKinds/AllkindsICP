@@ -14,7 +14,6 @@ import Nat8 "mo:base/Nat8";
 import Nat "mo:base/Nat";
 import Int8 "mo:base/Int8";
 import Int32 "mo:base/Int32";
-import Debug "mo:base/Debug";
 import Array "mo:base/Array";
 import Float "mo:base/Float";
 import Order "mo:base/Order";

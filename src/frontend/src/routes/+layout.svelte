@@ -28,18 +28,6 @@
 </script>
 
 {#if browser}
-	<!-- authStore: {$authStore}<br>
-	user: {$user}<br>
-	actor: {$actor}<br> -->
-
-	<!-- {#if $authStore === AuthState.LoggedOut}
-		{goto("/")}
-	{:else if $authStore === AuthState.LoggedIn}
-		
-		{goto("/register")}
-	{:else if $authStore === AuthState.Registered}
-		{goto("/app/questions")}
-	{/if} -->
 	<slot />
 {:else}
 	{console.error('Not in a browser!')}
