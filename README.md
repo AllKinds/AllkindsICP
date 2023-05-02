@@ -5,7 +5,7 @@ Have fun testing ^^ , Don't overconsume cycles pls
 
 ## Releases
 
-Alpha v0.2.1 (BREAKING CHANGE: ONLY questions have been reset)
+Alpha v0.2.1 (1/05/23) (BREAKING CHANGE: ONLY questions have been reset)
 
 - Reverted UI colors back and removed custom accent slider
 - Added color selection instead of slider for questions
@@ -15,6 +15,7 @@ Alpha v0.2.1 (BREAKING CHANGE: ONLY questions have been reset)
 - Fixed slider issues at matchingFilter
 - Fixed age bug when birth was not set
 - Several smaller bug fixes/UI tweaks
+- + fixed app not working on safari, esbuild bug (2/05/23)
 
 Alpha v0.2.0
 
