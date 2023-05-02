@@ -17,11 +17,10 @@
 			goto('/app/home');
 		}
 	}
-
 	// // make user logout onDestroy component
-	onDestroy(() => {
-		logout();
-	});
+	// onDestroy(() => {
+	// 	logout();
+	// });
 	// onMount(() => {
 	// 	syncAuth();
 	// })
