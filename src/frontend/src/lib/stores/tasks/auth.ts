@@ -11,14 +11,13 @@ export let actor = writable<BackendActor>();
 export let user = writable<User>();
 export let caller = writable<Principal>();
 let authClient: AuthClient;
-
 // let authClient: AuthClient = await AuthClient.create();
 
 // (await authClient.isAuthenticated())
 // 	? await checkRegistration()
 // 	: authStore.set(AuthState.LoggedOut);
-async function start() {
-	let authClient: AuthClient = await AuthClient.create();
+export async function start() {
+	authClient = await AuthClient.create();
 
 	if (await authClient.isAuthenticated()) {
 		await checkRegistration();
@@ -26,7 +25,6 @@ async function start() {
 		authStore.set(AuthState.LoggedOut);
 	}
 }
-
 start();
 
 async function createActor() {
