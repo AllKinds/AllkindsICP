@@ -1,3 +1,4 @@
+import { fromNullable } from '$lib/utilities';
 import { Actor, HttpAgent, type Identity } from '@dfinity/agent';
 import { AuthClient } from '@dfinity/auth-client';
 import type { Principal } from '@dfinity/principal';
@@ -9,6 +10,7 @@ import { AuthState, type BackendActor } from '../types';
 export const authStore = writable<AuthState>();
 export let actor = writable<BackendActor>();
 export let user = writable<User>();
+export let avatar = writable<any>();
 export let caller = writable<Principal>();
 let authClient: AuthClient;
 // let authClient: AuthClient = await AuthClient.create();
@@ -68,6 +70,21 @@ async function checkRegistration(): Promise<void> {
 		authStore.set(AuthState.Registered);
 		caller.set(p);
 		console.log(p);
+
+		let userData = get(user);
+		let a = fromNullable(userData.picture[0]);
+		if (a != undefined) {
+			let image = new Uint8Array(a);
+			let blob = new Blob([image], { type: 'image/png' });
+			let reader = new FileReader();
+			reader.readAsDataURL(blob);
+			reader.onload = (res) => {
+				avatar.set(res.target?.result);
+			};
+			console.log(avatar);
+		} else {
+			avatar.set(null);
+		}
 	} else if (result.hasOwnProperty('err')) {
 		user = writable<User>();
 		authStore.set(AuthState.LoggedIn);
@@ -86,7 +103,8 @@ export async function login() {
 		identityProvider:
 			import.meta.env.VITE_DFX_NETWORK === 'ic'
 				? 'https://identity.ic0.app/'
-				: 'http://qhbym-qaaaa-aaaaa-aaafq-cai.localhost:8080/',
+				: 'http://127.0.0.1:8080/?canisterId=q4eej-kyaaa-aaaaa-aaaha-cai',
+		//local dev II has changed, broken for now
 		onSuccess: async () => await checkRegistration()
 	});
 }

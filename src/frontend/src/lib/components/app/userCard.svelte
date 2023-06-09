@@ -8,6 +8,7 @@
 	import Qbanner from './Qbanner.svelte';
 	import QbannerNoColor from './QbannerNoColor.svelte';
 	import CustomTabs from '../common/CustomTabs.svelte';
+	import { onMount } from 'svelte';
 
 	export let match: FriendlyUserMatch;
 
@@ -15,6 +16,7 @@
 	let succes: boolean = false;
 	let current = 0;
 
+	let userPicture: any;
 	let userPrincipal: Principal = match.principal;
 	let userName = match.username;
 	let userScore = match.cohesion;
@@ -39,6 +41,22 @@
 		succes = true;
 		pending = false;
 	};
+	//console.log("PIC TEST", match)
+
+	let a = fromNullable(match.picture);
+	console.log(match.picture);
+	if (a != undefined) {
+		let image = new Uint8Array(a);
+		let blob = new Blob([image], { type: 'image/png' });
+		let reader = new FileReader();
+		reader.readAsDataURL(blob);
+		reader.onload = (res) => {
+			userPicture = res.target?.result;
+		};
+		console.log('userpic', userPicture);
+	} else {
+		userPicture = undefined;
+	}
 
 	let lists: Array<{ arr: Array<any>; title: String }> = [
 		{
@@ -54,8 +72,15 @@
 
 <!-- NOTE: this component sizes according to parent -->
 <div class="w-full flex flex-col justify-between mx-auto">
-	<div class="w-full h-72 sm:h-96 mx-auto rounded-md bg-sub overflow-clip">
+	<!-- <div class="w-full h-72 sm:h-96 mx-auto rounded-md bg-sub overflow-clip">
 		<PlaceholderPic class=" h-56 sm:h-72 mx-auto mt-24" />
+	</div> -->
+	<div class=" w-40 h-40 rounded-full border-main bg-sub mx-auto overflow-clip">
+		{#if userPicture == undefined}
+			<PlaceholderPic class=" w-36 h-36 mx-auto mt-12" />
+		{:else}
+			<img src={userPicture} alt="." class="w-auto h-auto mx-auto rounded-full" />
+		{/if}
 	</div>
 
 	<div class="p-1 sm:p-2 flex flex-col">

@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { user } from '$lib/stores/index';
-	import { fromNullableDate, fromNullableGender } from '$lib/utilities';
+	import { user, avatar } from '$lib/stores/index';
+	import { fromNullable, fromNullableDate, fromNullableGender } from '$lib/utilities';
 	import { onMount } from 'svelte';
 	import { getQsAnswered, answeredQuestions, myQuestions } from '$lib/stores/tasks/getQsAnswered';
 	import Qbanner from '$lib/components/app/Qbanner.svelte';
@@ -19,6 +19,7 @@
 		: '';
 	let userAbout = $user.about[0] ? $user.about[0] : '';
 	let userConnect = $user.connect[0] ? $user.connect[0] : '';
+	let userPicture = $avatar;
 
 	console.log('age', userBirth);
 	console.log($user.about[0]);
@@ -35,13 +36,18 @@
 	];
 	onMount(async () => {
 		//TODO change into button that then calls answered Q
+		console.log('temptest:::', userPicture);
 		await getQsAnswered();
 	});
 </script>
 
 <div class="flex flex-col gap-4">
-	<div class=" w-48 h-48 rounded-full border-main bg-sub mx-auto overflow-clip">
-		<PlaceholderPic class=" w-36 h-36 mx-auto mt-12" />
+	<div class=" w-40 h-40 rounded-full border-main bg-sub mx-auto overflow-clip">
+		{#if userPicture == undefined}
+			<PlaceholderPic class=" w-36 h-36 mx-auto mt-12" />
+		{:else}
+			<img src={userPicture} alt="." class="w-auto h-auto mx-auto rounded-full" />
+		{/if}
 	</div>
 
 	<span

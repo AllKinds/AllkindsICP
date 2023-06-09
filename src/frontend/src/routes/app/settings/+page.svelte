@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { user } from '$lib/stores/index';
+	import { avatar, user } from '$lib/stores/index';
 	import type { User } from 'src/declarations/backend/backend.did';
 	import { updateProfile } from '$lib/stores/tasks/updateProfile';
 	import {
@@ -13,12 +13,16 @@
 	} from '$lib/utilities';
 	import PublicToggle from '$lib/components/common/PublicToggle.svelte';
 	import Eye from '$lib/assets/icons/eye.svg?component';
+	import PlaceholderPic from '$lib/assets/icons/placeholder-pic.svg?component';
+
 	import Spinner from '$lib/components/common/Spinner.svelte';
 
 	//TODO : RECYCLE CODE (see other profile file)
 	//TODO : DECOMPONENTIALISE parts that could be used in future
 
 	let pending: boolean = false;
+	let _avatar = $avatar;
+	let fileInput: any;
 	//this could be moved to some declaration/constant somewhere else
 	let genders = ['', 'Male', 'Female', 'Other', 'Queer'];
 
@@ -40,18 +44,28 @@
 		picture: fromNullable($user.picture[0])
 	};
 
-	let file: any;
-	let imgSrc: any;
-	let testBlob: any;
+	// let file: any;
+	// let imgSrc: any;
+	// let testBlob: any;
 
-	const handleFileInput = async () => {
-		//const uint8Array = await convertImageToUInt8Array(file);
-		//const blob = new Blob([uint8Array], { type: file.type });
-		// testBlob = blob;
-		// userObj.picture = uint8Array;
-		// imgSrc = URL.createObjectURL(blob);
-		//console.log('blob', uint8Array);
-		console.log('file', file);
+	const onFileSelected = (e: any) => {
+		//reads file and shows in UI
+		let image = e.target?.files[0];
+		let reader = new FileReader();
+		reader.readAsDataURL(image);
+		reader.onload = (res) => {
+			_avatar = res.target?.result;
+		};
+		console.log('avatar', avatar);
+
+		//transforms file to array for backend
+		let writer = new FileReader();
+		writer.readAsArrayBuffer(image);
+		writer.onload = (res) => {
+			let avatarArr: any = res.target?.result;
+			userObj.picture = new Uint8Array(avatarArr);
+		};
+		console.log('userObj.picture :', userObj.picture);
 	};
 
 	const update = async () => {
@@ -73,93 +87,111 @@
 		});
 		pending = false;
 	};
-	// $: {
-	// 	console.log('file : ',userObj.picture);
-	// 	console.log('pic : ',userObj.picture);
-	// 	console.log('img : ', imgSrc);
-	// 	console.log('blob : ', testBlob);
-	// }
 </script>
 
-<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-2">
 	<h2 class="p-0 text-center ">Profile settings</h2>
-	<span class="text-zinc-600 flex justify-center"
-		><Eye /> : Allow what people can initially see about you.</span
-	>
-	<div class=" w-full rounded-md flex flex-col p-2 md:p-8  ">
-		<div class="flex flex-col w-fit  mx-auto">
-			<span>Username</span>
-			<label for="username" class="pr-8">
-				<input
-					type="text"
-					id="username"
-					class="inputfield border-main"
-					bind:value={userObj.username}
-				/>
-			</label>
+	<span class="text-zinc-600 flex justify-center">
+		<Eye />
+		: Allow what people can initially see about you.
+	</span>
 
-			<span>Gender</span>
-			<label for="gender">
-				<select bind:value={userObj.gender}>
-					{#each genders as gender}
-						<option value={gender}>
-							{gender}
-						</option>
-					{/each}
-				</select>
-				<PublicToggle bind:checked={publicGender} />
-			</label>
+	<div class="flex flex-col justify-center items-center">
+		<div class="fancy-btn-border">
+			<button on:click={update} class="fancy-btn">
+				{#if pending}
+					<Spinner />
+				{:else}
+					Update
+				{/if}
+			</button>
+		</div>
+	</div>
 
-			<span>Birthday</span>
-			<label for="birth">
-				<input
-					type="date"
-					id="birth"
-					class="inputfield border-main"
-					bind:value={userObj.birth}
-					min="1920-01-01"
-					max="2022-01-01"
-				/>
-				<PublicToggle bind:checked={publicBirth} />
-			</label>
+	<div class=" w-fit rounded-md flex flex-col p-2 md:p-8 mx-auto">
+		<span>Username</span>
+		<label for="username" class="pr-8">
+			<input
+				type="text"
+				id="username"
+				class="inputfield border-main"
+				bind:value={userObj.username}
+			/>
+		</label>
 
-			<span>Email</span>
-			<label for="connect">
-				<input
-					type="email"
-					id="connect"
-					class="inputfield border-main"
-					bind:value={userObj.connect}
-				/>
-				<PublicToggle bind:checked={publicConnect} />
-			</label>
+		<span>Gender</span>
+		<label for="gender">
+			<select bind:value={userObj.gender}>
+				{#each genders as gender}
+					<option value={gender}>
+						{gender}
+					</option>
+				{/each}
+			</select>
+			<PublicToggle bind:checked={publicGender} />
+		</label>
 
-			<span>About</span>
-			<label for="about">
-				<textarea id="about" class="inputfield h-48 w-60 border-main" bind:value={userObj.about} />
-				<PublicToggle bind:checked={publicAbout} />
-			</label>
+		<span>Birthday</span>
+		<label for="birth">
+			<input
+				type="date"
+				id="birth"
+				class="inputfield border-main"
+				bind:value={userObj.birth}
+				min="1920-01-01"
+				max="2022-01-01"
+			/>
+			<PublicToggle bind:checked={publicBirth} />
+		</label>
 
-			<span>Profile picture(Doesn't work yet!)</span>
+		<span>Email</span>
+		<label for="connect">
+			<input
+				type="email"
+				id="connect"
+				class="inputfield border-main"
+				bind:value={userObj.connect}
+			/>
+			<PublicToggle bind:checked={publicConnect} />
+		</label>
 
-			<label for="picture">
+		<span>About</span>
+		<label for="about">
+			<textarea id="about" class="inputfield h-48 w-60 border-main" bind:value={userObj.about} />
+			<PublicToggle bind:checked={publicAbout} />
+		</label>
+
+		<span>Profile picture</span>
+
+		<!-- <label for="picture">
 				<input type="file" bind:this={file} on:change={handleFileInput} />
-				<!-- <img src={imgSrc} alt="" /> -->
+				<img src={imgSrc} alt="" />
 			</label>
-			<PublicToggle bind:checked={publicPicture} />
-		</div>
+			 -->
 
-		<div class="flex flex-col justify-center items-center">
-			<div class="fancy-btn-border">
-				<button on:click={update} class="fancy-btn">
-					{#if pending}
-						<Spinner />
-					{:else}
-						Update
-					{/if}
-				</button>
+		<button
+			class=""
+			on:click={() => {
+				fileInput.click();
+			}}
+		>
+			<div class=" w-40 h-40 rounded-full border-main bg-sub mx-auto overflow-clip">
+				{#if _avatar == undefined}
+					<PlaceholderPic class=" w-36 h-36 mx-auto mt-12" />
+				{:else}
+					<img src={_avatar} alt="." class="w-auto h-auto mx-auto rounded-full" />
+				{/if}
 			</div>
-		</div>
+			<input
+				style="display:none"
+				type="file"
+				accept=".jpg, .jpeg, .png"
+				on:change={(e) => onFileSelected(e)}
+				bind:this={fileInput}
+				disabled={pending}
+			/>
+		</button>
+		<PublicToggle bind:checked={publicPicture} />
 	</div>
 </div>
 
