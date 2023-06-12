@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fromNullableGender } from '$lib/utilities';
+	import { fromNullable, fromNullableGender } from '$lib/utilities';
 	import type { FriendlyUserMatch } from 'src/declarations/backend/backend.did';
 	import CheckCircle from '$lib/assets/icons/check-circle.svg?component';
 	import PlaceholderPic from '$lib/assets/icons/placeholder-pic.svg?component';
@@ -11,12 +11,14 @@
 	import EllipsisVertical from '$lib/assets/icons/ellipsis-vertical.svg?component';
 	import NavX from '$lib/assets/icons/navX.svg?component';
 	import UserCard from './UserCard.svelte';
+	import { syncAuth } from '$lib/stores/tasks';
 
 	export let match: any;
 
 	let userCardWindow: boolean = false;
 
 	let userName = match.username;
+	let userPicture: any;
 	let pending = false;
 	//let userScore = Number(match.cohesion);
 	let userAbout = match.about;
@@ -40,6 +42,21 @@
 
 		pending = false;
 	};
+
+	let a = fromNullable(match.picture);
+	console.log(match.picture);
+	if (a != undefined) {
+		let image = new Uint8Array(a);
+		let blob = new Blob([image], { type: 'image/png' });
+		let reader = new FileReader();
+		reader.readAsDataURL(blob);
+		reader.onload = (res) => {
+			userPicture = res.target?.result;
+		};
+		console.log('userpic', userPicture);
+	} else {
+		userPicture = undefined;
+	}
 </script>
 
 <div class="flex bg-sub30 rounded-xl gap-2 p-2 text-left">
@@ -47,8 +64,15 @@
 		<button on:click={() => (userCardWindow = true)}>
 			<EllipsisVertical class="w-10 hover-circle hover-color" />
 		</button>
-		<div class="w-16 h-16  min-w-min rounded-full border-main bg-sub shrink-0 overflow-clip">
+		<!-- <div class="w-16 h-16  min-w-min rounded-full border-main bg-sub shrink-0 overflow-clip">
 			<PlaceholderPic class="w-12 mx-auto mt-4" />
+		</div> -->
+		<div class=" w-16 h-16 rounded-full border-main bg-sub mx-auto overflow-clip">
+			{#if userPicture == undefined}
+				<PlaceholderPic class=" w-12 h-12 mx-auto" />
+			{:else}
+				<img src={userPicture} alt="." class="w-auto h-auto mx-auto rounded-full" />
+			{/if}
 		</div>
 		<div class="grow text-sm flex flex-col">
 			<span class="text-xl">{userName}</span>

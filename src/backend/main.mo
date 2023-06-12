@@ -19,6 +19,8 @@ import Float "mo:base/Float";
 import Order "mo:base/Order";
 import None "mo:base/None";
 import Cycles "mo:base/ExperimentalCycles";
+import Blob "mo:base/Blob";
+import Debug "mo:base/Debug";
 
 import T "Types";
 
@@ -326,7 +328,7 @@ actor {
 			let ?user = users.get(pm) else continue ul;
 
 			let null = getIndexFriend(p, pm) else continue ul;
-
+			//gender
 			switch (f.gender) {
 				case null ();
 				case (Gender) {
@@ -335,6 +337,7 @@ actor {
 					};
 				};
 			};
+
 			//age
 			switch (user.birth) {
 				case (?birth, _) {
@@ -426,12 +429,12 @@ actor {
 				let user : User = {
 					username;
 					created;
-					about = (null, false);
-					gender = (null, false);
-					birth = (null, false);
-					connect = (null, false);
+					about = (null, true);
+					gender = (null, true);
+					birth = (null, true);
+					connect = (null, true);
 					points = initReward; //nat
-					picture = (null, false);
+					picture = (null, true);
 				};
 
 				// Mutate storage for users data
