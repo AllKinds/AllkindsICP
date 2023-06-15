@@ -27,7 +27,7 @@
 		},
 		{
 			arr: $friendsRequested,
-			title: 'Send'
+			title: 'Requests sent'
 		}
 	];
 
