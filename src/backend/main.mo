@@ -455,14 +455,15 @@ actor {
   };
 
   public shared (msg) func updateProfile(user : User) : async Result<(), Text> {
-    let _ = users.get(msg.caller) else return #err("User does not exist!");
-    let _ = users.put(msg.caller, user) else return #err("Could not update!");
+    if(users.get(msg.caller) == null) return #err("User does not exist!");
+    users.put(msg.caller, user);
     #ok();
   };
 
   public shared (msg) func createQuestion(question : Text, color : Text) : async Result<(), Text> {
     let ?user = users.get(msg.caller) else return #err("User does not exist!");
     if (question.size() < minimumQuestionSize) return #err("Question too short!");
+	
     try { putQuestion(msg.caller, question, color) } catch err {
       return #err("Could not create Question!");
     };
