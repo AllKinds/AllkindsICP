@@ -6,7 +6,7 @@
 		FriendlyUserMatch,
 		Result
 	} from 'src/declarations/backend/backend.did';
-	import UserCard from '$lib/components/app/UserCard.svelte';
+	import UserCard from '$lib/components/app/userCard.svelte';
 	import { getMatchedUser, matchedUser } from '$lib/stores/tasks/getMatchedUser';
 	import ArrowLeft from '$lib/assets/icons/arrowLeft.svg?component';
 	import Heart from '$lib/assets/icons/heart.svg?component';

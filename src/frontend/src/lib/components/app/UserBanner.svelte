@@ -10,7 +10,7 @@
 	import ArrowLeft from '$lib/assets/icons/arrowLeft.svg?component';
 	import EllipsisVertical from '$lib/assets/icons/ellipsis-vertical.svg?component';
 	import NavX from '$lib/assets/icons/navX.svg?component';
-	import UserCard from './UserCard.svelte';
+	import UserCard from './userCard.svelte';
 	import { syncAuth } from '$lib/stores/tasks';
 
 	export let match: any;

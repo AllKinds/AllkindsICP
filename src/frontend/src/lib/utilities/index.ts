@@ -8,12 +8,12 @@ export const fromNullable = <T>(value: [] | [T]): T | undefined => {
 	return value?.[0];
 };
 
-export function fromBigInt(utc: bigint) {
+export function fromBigInt(utc: bigint): string {
 	utc /= BigInt(1000000);
 	return new Date(Number(utc)).toISOString().slice(0, 10);
 }
 
-export function toBigInt(date: string) {
+export function toBigInt(date: string): bigint {
 	return BigInt(Number(new Date(date)) * 1000000);
 }
 

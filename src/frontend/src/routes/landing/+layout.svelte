@@ -5,7 +5,7 @@
 	import { goto } from '$app/navigation';
 	import Nav from '$lib/components/nav/Nav.svelte';
 
-	export let data: LayoutData;
+	//export let data: LayoutData;
 
 	// layout is actually not needed because landing is a single page, but still using it for possible future additions
 </script>

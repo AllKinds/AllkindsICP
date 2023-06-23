@@ -3,6 +3,13 @@ export const idlFactory = ({ IDL }) => {
 	const BatchId = IDL.Nat;
 	const Key = IDL.Text;
 	const HeaderField = IDL.Tuple(IDL.Text, IDL.Text);
+	const SetAssetPropertiesArguments = IDL.Record({
+		key: Key,
+		headers: IDL.Opt(IDL.Opt(IDL.Vec(HeaderField))),
+		is_aliased: IDL.Opt(IDL.Opt(IDL.Bool)),
+		allow_raw_access: IDL.Opt(IDL.Opt(IDL.Bool)),
+		max_age: IDL.Opt(IDL.Opt(IDL.Nat64))
+	});
 	const CreateAssetArguments = IDL.Record({
 		key: Key,
 		content_type: IDL.Text,
@@ -24,12 +31,26 @@ export const idlFactory = ({ IDL }) => {
 		content_encoding: IDL.Text
 	});
 	const BatchOperationKind = IDL.Variant({
+		SetAssetProperties: SetAssetPropertiesArguments,
 		CreateAsset: CreateAssetArguments,
 		UnsetAssetContent: UnsetAssetContentArguments,
 		DeleteAsset: DeleteAssetArguments,
 		SetAssetContent: SetAssetContentArguments,
 		Clear: ClearArguments
 	});
+	const CommitBatchArguments = IDL.Record({
+		batch_id: BatchId,
+		operations: IDL.Vec(BatchOperationKind)
+	});
+	const CommitProposedBatchArguments = IDL.Record({
+		batch_id: BatchId,
+		evidence: IDL.Vec(IDL.Nat8)
+	});
+	const ComputeEvidenceArguments = IDL.Record({
+		batch_id: BatchId,
+		max_iterations: IDL.Opt(IDL.Nat16)
+	});
+	const DeleteBatchArguments = IDL.Record({ batch_id: BatchId });
 	const Permission = IDL.Variant({
 		Prepare: IDL.Null,
 		ManagePermissions: IDL.Null,
@@ -43,7 +64,8 @@ export const idlFactory = ({ IDL }) => {
 		url: IDL.Text,
 		method: IDL.Text,
 		body: IDL.Vec(IDL.Nat8),
-		headers: IDL.Vec(HeaderField)
+		headers: IDL.Vec(HeaderField),
+		certificate_version: IDL.Opt(IDL.Nat16)
 	});
 	const StreamingCallbackToken = IDL.Record({
 		key: Key,
@@ -77,14 +99,9 @@ export const idlFactory = ({ IDL }) => {
 		permission: Permission,
 		of_principal: IDL.Principal
 	});
-	const SetAssetPropertiesArguments = IDL.Record({
-		key: Key,
-		headers: IDL.Opt(IDL.Opt(IDL.Vec(HeaderField))),
-		allow_raw_access: IDL.Opt(IDL.Opt(IDL.Bool)),
-		max_age: IDL.Opt(IDL.Opt(IDL.Nat64))
-	});
 	const ValidationResult = IDL.Variant({ Ok: IDL.Text, Err: IDL.Text });
 	return IDL.Service({
+		api_version: IDL.Func([], [IDL.Nat16], ['query']),
 		authorize: IDL.Func([IDL.Principal], [], []),
 		certified_tree: IDL.Func(
 			[IDL.Record({})],
@@ -97,16 +114,9 @@ export const idlFactory = ({ IDL }) => {
 			['query']
 		),
 		clear: IDL.Func([ClearArguments], [], []),
-		commit_batch: IDL.Func(
-			[
-				IDL.Record({
-					batch_id: BatchId,
-					operations: IDL.Vec(BatchOperationKind)
-				})
-			],
-			[],
-			[]
-		),
+		commit_batch: IDL.Func([CommitBatchArguments], [], []),
+		commit_proposed_batch: IDL.Func([CommitProposedBatchArguments], [], []),
+		compute_evidence: IDL.Func([ComputeEvidenceArguments], [IDL.Opt(IDL.Vec(IDL.Nat8))], []),
 		create_asset: IDL.Func([CreateAssetArguments], [], []),
 		create_batch: IDL.Func([IDL.Record({})], [IDL.Record({ batch_id: BatchId })], []),
 		create_chunk: IDL.Func(
@@ -116,6 +126,7 @@ export const idlFactory = ({ IDL }) => {
 		),
 		deauthorize: IDL.Func([IDL.Principal], [], []),
 		delete_asset: IDL.Func([DeleteAssetArguments], [], []),
+		delete_batch: IDL.Func([DeleteBatchArguments], [], []),
 		get: IDL.Func(
 			[IDL.Record({ key: Key, accept_encodings: IDL.Vec(IDL.Text) })],
 			[
@@ -134,6 +145,7 @@ export const idlFactory = ({ IDL }) => {
 			[
 				IDL.Record({
 					headers: IDL.Opt(IDL.Vec(HeaderField)),
+					is_aliased: IDL.Opt(IDL.Bool),
 					allow_raw_access: IDL.Opt(IDL.Bool),
 					max_age: IDL.Opt(IDL.Nat64)
 				})
@@ -181,6 +193,7 @@ export const idlFactory = ({ IDL }) => {
 		),
 		list_authorized: IDL.Func([], [IDL.Vec(IDL.Principal)], ['query']),
 		list_permitted: IDL.Func([ListPermitted], [IDL.Vec(IDL.Principal)], ['query']),
+		propose_commit_batch: IDL.Func([CommitBatchArguments], [], []),
 		revoke_permission: IDL.Func([RevokePermission], [], []),
 		set_asset_content: IDL.Func([SetAssetContentArguments], [], []),
 		set_asset_properties: IDL.Func([SetAssetPropertiesArguments], [], []),
@@ -199,8 +212,14 @@ export const idlFactory = ({ IDL }) => {
 		),
 		take_ownership: IDL.Func([], [], []),
 		unset_asset_content: IDL.Func([UnsetAssetContentArguments], [], []),
+		validate_commit_proposed_batch: IDL.Func(
+			[CommitProposedBatchArguments],
+			[ValidationResult],
+			[]
+		),
 		validate_grant_permission: IDL.Func([GrantPermission], [ValidationResult], []),
-		validate_revoke_permission: IDL.Func([RevokePermission], [ValidationResult], [])
+		validate_revoke_permission: IDL.Func([RevokePermission], [ValidationResult], []),
+		validate_take_ownership: IDL.Func([], [ValidationResult], [])
 	});
 };
 export const init = ({ IDL }) => {
