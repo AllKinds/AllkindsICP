@@ -463,10 +463,9 @@ actor {
   public shared (msg) func createQuestion(question : Text, color : Text) : async Result<(), Text> {
     let ?user = users.get(msg.caller) else return #err("User does not exist!");
     if (question.size() < minimumQuestionSize) return #err("Question too short!");
-	
-    try { putQuestion(msg.caller, question, color) } catch err {
-      return #err("Could not create Question!");
-    };
+
+    putQuestion(msg.caller, question, color);
+
     changeUserPoints(msg.caller, (user.points + createrReward));
     #ok();
   };
@@ -620,12 +619,8 @@ actor {
     };
 
     //updateFriend
-    try {
-      updateFriend(msg.caller, target, Buffer.toArray(buf));
-      updateFriend(p, user, Buffer.toArray(targetBuf));
-    } catch err {
-      return #err("Failed to update user states");
-    };
+	updateFriend(msg.caller, target, Buffer.toArray(buf));
+	updateFriend(p, user, Buffer.toArray(targetBuf));
     #ok();
   };
 
@@ -663,12 +658,8 @@ actor {
       status = ? #Approved;
     };
 
-    try {
-      updateFriend(msg.caller, target, Buffer.toArray(buf));
-      updateFriend(p, user, Buffer.toArray(targetBuf));
-    } catch err {
-      return #err("Failed to update userStates");
-    };
+	updateFriend(msg.caller, target, Buffer.toArray(buf));
+	updateFriend(p, user, Buffer.toArray(targetBuf));
     #ok();
   };
 
