@@ -23,6 +23,7 @@ import Blob "mo:base/Blob";
 import Debug "mo:base/Debug";
 
 import T "Types";
+import Question "Question";
 
 actor {
 
@@ -39,7 +40,7 @@ actor {
   type User = T.User;
   type Gender = T.Gender;
   type UserMatch = T.UserMatch;
-  type Question = T.Question;
+  type Question = Question.Question;
   type Answer = T.Answer;
   type Skip = T.Skip;
   type PrincipalQuestionHash = T.PrincipalQuestionHash;
@@ -55,12 +56,6 @@ actor {
   type Result<T, E> = Result.Result<T, E>;
 
   // UTILITY FUNCTIONS
-  func hashQuestion(created : Int, creater : Principal, question : Text) : Hash {
-    let t1 = Int.toText(created);
-    let t2 = Principal.toText(creater);
-    let t3 = question;
-    Text.hash(t1 # t2 # t3);
-  };
 
   func hashPrincipalQuestion(p : Principal, questionHash : Hash) : Hash {
     let t1 = Principal.toText(p);
@@ -71,20 +66,8 @@ actor {
   func hashhash(h : Hash) : Hash { h };
 
   func putQuestion(p : Principal, question : Text, color : Text) : () {
-    let created = Time.now();
-    let creater = p;
-    let hash = hashQuestion(created, creater, question);
-    let points : Int = 0;
-
-    let q : Question = {
-      created;
-      creater;
-      question;
-      hash;
-      color;
-      points;
-    };
-
+    let q = Question.create(question, color, p);
+    let hash = Question.hash(q);
     questions.put(hash, q);
   };
 
@@ -138,8 +121,8 @@ actor {
 
   func attachAnswerComparison(p : Principal, pm : Principal, questions : [Question]) : [(Question, Bool)] {
     func addAnswers(q : Question) : ?(Question, Bool) {
-      let pmQ = hashPrincipalQuestion(pm, q.hash);
-      let pQ = hashPrincipalQuestion(p, q.hash);
+      let pmQ = hashPrincipalQuestion(pm, Question.hash(q));
+      let pQ = hashPrincipalQuestion(p, Question.hash(q));
       let ?match : ?Answer = answers.get(pmQ) else return null;
       let user : ?Answer = answers.get(pQ);
       let bool = switch (user) {
@@ -167,7 +150,7 @@ actor {
 
     Array.mapFilter<Question, Question>(
       pmA,
-      func qm = if (null != Array.find<Question>(pA, func q = (q.hash == qm.hash))) null else ?qm,
+      func qm = if (null != Array.find<Question>(pA, func q = (Question.hash(q) == Question.hash(qm)))) null else ?qm,
     );
   };
 
@@ -177,7 +160,7 @@ actor {
 
     Array.mapFilter<Question, Question>(
       pmA,
-      func qm = if (null == Array.find<Question>(pA, func q = (q.hash == qm.hash))) null else ?qm,
+      func qm = if (null == Array.find<Question>(pA, func q = (Question.hash(q) == Question.hash(qm)))) null else ?qm,
     );
   };
 
@@ -263,11 +246,10 @@ actor {
       created = q.created;
       creater = q.creater;
       question = q.question;
-      hash = q.hash;
       color = q.color;
       points = value;
     };
-    questions.put(q.hash, newQ);
+    questions.put(Question.hash(newQ), newQ);
   };
 
   //returns user info opt property if not undefined and public viewable
@@ -275,9 +257,7 @@ actor {
     switch (prop) {
       case (null, _) { null };
       case (?T, false) { null };
-      case (?T, true) {
-        ?T;
-      };
+      case (?T, true) { ?T };
     };
   };
 
@@ -455,7 +435,7 @@ actor {
   };
 
   public shared (msg) func updateProfile(user : User) : async Result<(), Text> {
-    if(users.get(msg.caller) == null) return #err("User does not exist!");
+    if (users.get(msg.caller) == null) return #err("User does not exist!");
     users.put(msg.caller, user);
     #ok();
   };
@@ -619,12 +599,19 @@ actor {
     };
 
     //updateFriend
-	updateFriend(msg.caller, target, Buffer.toArray(buf));
-	updateFriend(p, user, Buffer.toArray(targetBuf));
+    updateFriend(msg.caller, target, Buffer.toArray(buf));
+    updateFriend(p, user, Buffer.toArray(targetBuf));
     #ok();
   };
 
-  public shared (msg) func answerFriendRequest(p : Principal, b : Bool) : async Result<(), Text> {
+  public shared ({ caller }) func newAnswerFriendRequest(friend : Principal, accept : Bool) : async Result<(), Text> {
+    let ?user = users.get(caller) else return #err("User not registerd");
+    let ?other = users.get(friend) else return #err("User not registered");
+    //User.addFriend(user, friend);
+    Debug.trap("not implemented");
+  };
+
+  public shared (msg) func oldAnswerFriendRequest(p : Principal, b : Bool) : async Result<(), Text> {
     let ?userFriends = friends.get(msg.caller) else return #err("Something went wrong!");
     let ?targetFriends = friends.get(p) else return #err("Something went wrong!");
     let buf = Buffer.fromArray<Friend>(userFriends);
@@ -637,8 +624,8 @@ actor {
     switch (friend.status) {
       case (? #Requested) return #err("You already requested this user to connect!");
       case (? #Waiting) {
-        let _ = buf.remove(i);
-        let _ = targetBuf.remove(iT);
+        ignore buf.remove(i);
+        ignore targetBuf.remove(iT);
         if (b == false) {
           //rejected
           return #ok();
@@ -658,8 +645,8 @@ actor {
       status = ? #Approved;
     };
 
-	updateFriend(msg.caller, target, Buffer.toArray(buf));
-	updateFriend(p, user, Buffer.toArray(targetBuf));
+    updateFriend(msg.caller, target, Buffer.toArray(buf));
+    updateFriend(p, user, Buffer.toArray(targetBuf));
     #ok();
   };
 

@@ -1,13 +1,16 @@
 import Hash "mo:base/Hash";
+import Time "mo:base/Time";
 
 //TODO : integrate more variants (point usages, common errors, etc..)
 //TODO : should overall be retyped for more cohesiveness, See type operational expressions
 
 module T {
 
+  type Time = Time.Time;
+
   public type User = {
     username : Text;
-    created : Int;
+    created : Time;
     about : (?Text, Bool);
     gender : (?Gender, Bool);
     birth : (?Int, Bool);
@@ -39,10 +42,9 @@ module T {
 
   // Color indicates optional background color for the question
   public type Question = {
-    created : Int;
+    created : Time;
     creater : Principal;
     question : Text;
-    hash : Hash.Hash;
     color : Text;
     points : Int; //int bcs question points should be able to go negative
   };
@@ -54,7 +56,7 @@ module T {
 
   public type Answer = {
     user : Principal;
-    question : Hash.Hash;
+    question : Hash.Hash; // TODO: this should use a unique ID, Hash doesn't gurantee this
     answer : Bool;
     weight : Int;
   };
