@@ -13,6 +13,25 @@ export let user = writable<User>();
 export let avatar = writable<any>();
 export let caller = writable<Principal>();
 let authClient: AuthClient;
+
+//NFID
+// Your application's name (URI encoded)
+const APPLICATION_NAME = 'Allkinds';
+
+// URL to 37x37px logo of your application (URI encoded)
+const APPLICATION_LOGO_URL = 'https://nfid.one/icons/favicon-96x96.png';
+
+const AUTH_PATH =
+	'/authenticate/?applicationName=' +
+	APPLICATION_NAME +
+	'&applicationLogo=' +
+	APPLICATION_LOGO_URL +
+	'#authorize';
+
+// Replace https://identity.ic0.app with NFID_AUTH_URL
+// as the identityProvider for authClient.login({})
+const NFID_AUTH_URL = 'https://nfid.one' + AUTH_PATH;
+
 // let authClient: AuthClient = await AuthClient.create();
 
 // (await authClient.isAuthenticated())
@@ -101,9 +120,9 @@ export async function syncAuth() {
 export async function login() {
 	await authClient.login({
 		identityProvider:
-			import.meta.env.VITE_DFX_NETWORK === 'ic'
-				? 'https://identity.ic0.app/'
-				: 'http://127.0.0.1:8080/?canisterId=q4eej-kyaaa-aaaaa-aaaha-cai',
+			import.meta.env.VITE_DFX_NETWORK === 'ic' 
+			? "https://nfid.one" + AUTH_PATH
+      : "http://r7inp-6aaaa-aaaaa-aaabq-cai.localhost:8080/",
 		//local dev II has changed, broken for now
 		onSuccess: async () => await checkRegistration()
 	});

@@ -8,7 +8,7 @@
 		"lint": "prettier --plugin-search-dir . --check . && eslint .",
 		"format": "prettier --plugin-search-dir . --write .",
 		"prebuild": "npm run generate",
-		"generate": "dfx generate && node ./update.types.mjs && npm run format"
+		"generate": "dfx generate && node ./update.types.mjs"
 	},
 	"devDependencies": {
 		"@bulatdashiev/svelte-slider": "^1.0.3",
