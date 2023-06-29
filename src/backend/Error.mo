@@ -5,6 +5,10 @@ module {
     #validationError;
     #notRegistered;
 
+    #userNotFound;
+    #friendRequestAlreadySend;
+    #friendAlreadyConnected;
+
     #insufficientFunds;
     #tooShort;
     #tooLong;

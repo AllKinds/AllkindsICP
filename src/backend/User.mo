@@ -98,8 +98,12 @@ module {
     Map.get(users.info, phash, id);
   };
 
+  public func getPrincipal(users : UserDB, name : Text) : ?Principal {
+    Map.get(users.byUsername, thash, name);
+  };
+
   public func getByName(users : UserDB, name : Text) : ?User {
-    let ?id = Map.get(users.byUsername, thash, name) else return null;
+    let ?id = getPrincipal(users, name) else return null;
     get(users, id);
   };
 

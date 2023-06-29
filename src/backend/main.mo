@@ -38,7 +38,7 @@ actor {
   type Question = Question.Question;
   type Answer = Question.Answer;
   type Skip = Question.Skip;
-  type Friend = Friend.Friend;
+  type FriendStatus = Friend.FriendStatus;
   type Error = Error.Error;
 
   type UserDB = User.UserDB;
@@ -176,86 +176,29 @@ actor {
   };
 
   //returns both Approved and Unapproved friends
-  public shared query (msg) func getFriends() : async Result<([UserMatch]), Text> {
-    let buf = Buffer.Buffer<UserMatch>(16);
-    let ?friendList = friends.get(msg.caller) else return #err("You don't have any friends :c ");
+  public shared query ({ caller }) func getFriends() : async Result<([UserMatch]), Error> {
+    let userFriends = Friend.get(friends, caller);
 
-    label ul for (f : Friend in friendList.vals()) {
-      let p = f.account;
-      let ?userM : ?User = users.get(p) else continue ul; //might be that user has been deleted
-      let ?status : ?FriendStatus = f.status else return #err("Something went wrong!");
-      let cohesion = calcCohesion(
-        calcScore(p, msg.caller),
-        calcScore(msg.caller, msg.caller),
-      );
-      let answered = attachAnswerComparison(msg.caller, p, getEqualQuestions(msg.caller, p));
-      let uncommon = getUnequalQuestions(msg.caller, p);
+    let filtered = IterTools.mapFilter<(Principal, FriendStatus), UserMatch>(
+      userFriends,
+      func(p, status) = Matching.compare(
+        User.get(users, p)
+      ),
+    );
 
-      if (status != #Approved) {
-        let matchObj : FriendlyUserMatch = {
-          principal = p;
-          username = userM.username;
-          about = checkPublic(userM.about);
-          gender = checkPublic(userM.gender);
-          birth = checkPublic(userM.birth);
-          connect = checkPublic(userM.connect);
-          picture = checkPublic(userM.picture);
-          cohesion;
-          answered;
-          uncommon;
-          status;
-
-        };
-        buf.add(matchObj);
-      } else {
-        let matchObj : FriendlyUserMatch = {
-          principal = p;
-          username = userM.username;
-          about = userM.about.0;
-          gender = userM.gender.0;
-          birth = userM.birth.0;
-          connect = userM.connect.0;
-          picture = userM.picture.0;
-          cohesion;
-          answered;
-          uncommon;
-          status;
-        };
-        buf.add(matchObj);
-      };
-
-    };
-    #ok(Buffer.toArray(buf));
+    #ok(Iter.toArray(filtered));
   };
 
   //TODO : extract reusable function from sendFriendRequest and answerFriendRequest
 
-  public shared (msg) func sendFriendRequest(p : Principal) : async Result<(), Text> {
-    let null = getIndexFriend(msg.caller, p) else return #err("User already has a friend status with you.");
-    let ?userFriends = friends.get(msg.caller) else return #err("Something went wrong!");
-    let ?targetFriends = friends.get(p) else return #err("Something went wrong!");
-    let buf = Buffer.fromArray<Friend>(userFriends);
-    let targetBuf = Buffer.fromArray<Friend>(targetFriends);
-
-    //give REQ status to new friend of msg.caller friendlist
-    let target : Friend = {
-      account = p;
-      status = ? #Requested;
-    };
-    let user : Friend = {
-      account = msg.caller;
-      status = ? #Waiting;
-    };
-
-    //updateFriend
-    updateFriend(msg.caller, target, Buffer.toArray(buf));
-    updateFriend(p, user, Buffer.toArray(targetBuf));
-    #ok();
+  public shared ({ caller }) func sendFriendRequest(username : Text) : async Result<(), Error> {
+    let ?id = User.getPrincipal(users, username) else return #err(#userNotFound);
+    Friend.request(friends, caller, id);
   };
 
-  public shared ({ caller }) func newAnswerFriendRequest(friend : Principal, accept : Bool) : async Result<(), Text> {
-    let ?user = users.get(caller) else return #err("User not registerd");
-    let ?other = users.get(friend) else return #err("User not registered");
+  public shared ({ caller }) func newAnswerFriendRequest(friend : Text, accept : Bool) : async Result<(), Error> {
+    let ?user = User.get(users, caller) else return #err("User not registerd");
+    let ?other = User.getByName(users, friend) else return #err("User not registered");
     //User.addFriend(user, friend);
     Debug.trap("not implemented");
   };

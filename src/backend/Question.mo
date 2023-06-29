@@ -114,7 +114,11 @@ module {
     };
   };
 
-  public func compare(answerA : Answer, answerB : Answer) : AnswerDiff {
+  public func get(questions : QuestionDB, id : QuestionID) : Question {
+    Buffer.get(questions, id);
+  };
+
+  func compare(answerA : Answer, answerB : Answer) : AnswerDiff {
     assert (answerA.question == answerB.question);
     let sameAnswer = answerA.answer == answerB.answer;
 
@@ -123,9 +127,16 @@ module {
     { question = answerA.question; sameAnswer; weight };
   };
 
-  public func common(answersA : UserAnswers, answersB : UserAnswers) : [AnswerDiff] {
+  func common(answersA : UserAnswers, answersB : UserAnswers) : [AnswerDiff] {
     let common = Trie.join<Nat, Answer, Answer, AnswerDiff>(answersA, answersB, Nat.equal, compare);
     Trie.toArray<Nat, AnswerDiff, AnswerDiff>(common, func(_, x) = x);
+  };
+
+  public func getCommon(answers : AnswerDB, userA : Principal, userB : Principal) : [AnswerDiff] {
+    let answersA = getAnswers(answers, userA);
+    let answersB = getAnswers(answers, userB);
+
+    common(answersA, answersB);
   };
 
   public func answered(questions : QuestionDB, answers : AnswerDB, user : Principal) : Iter<(Question, Answer)> {
@@ -144,7 +155,7 @@ module {
     let userSkips = getSkips(skips, user);
 
     // filter out answered questions
-    let newAndSkipped = Iter.filter<Question>(all, func q = Trie.get<Nat, Answer>(userAnswers, key(q.id), Nat.equal) != null);
+    let newAndSkipped = Iter.filter<Question>(all, func q = Trie.get<Nat, Answer>(userAnswers, key(q.id), Nat.equal) != null); // TODO replace func with has()
     // filter out skipped questions
     let new = Iter.filter<Question>(all, func q = Trie.get<Nat, Skip>(userSkips, key(q.id), Nat.equal) != null);
 
@@ -157,12 +168,16 @@ module {
 
   /// Get user answers from db.
   /// Returns an empty trie if user has no answers in the db.
-  func getAnswers(answers : AnswerDB, user : Principal) : UserAnswers {
+  public func getAnswers(answers : AnswerDB, user : Principal) : UserAnswers {
     Option.get(Map.get(answers, phash, user), Trie.empty<Nat, Answer>());
   };
 
   func putAnswers(answers : AnswerDB, user : Principal, userAnswers : UserAnswers) {
     Map.set(answers, phash, user, userAnswers);
+  };
+
+  public func has(answers : UserAnswers, question : QuestionID) : Bool {
+    Trie.get<Nat, Answer>(answers, key(question), Nat.equal) != null;
   };
 
   /// Get user skips from db.
