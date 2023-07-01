@@ -18,6 +18,7 @@
 </script>
 
 <Layout>
+	
 	<svelte:fragment slot="logo">
 		<button class="logo">Allkinds</button>
 	</svelte:fragment>
@@ -28,4 +29,5 @@
 	<svelte:fragment slot="main">
 		<slot />
 	</svelte:fragment>
+	
 </Layout>

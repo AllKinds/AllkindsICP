@@ -1,7 +1,7 @@
 //NOT everything is USED ANYMORE, leaving in for future reference or use
 import { writable } from 'svelte/store';
 
-export const color = writable<string>('bg-zinc-800');
+export const color = writable<string>('bg-zinc-200');
 
 // export const hueStore = writable<string>();
 // export const styleStore = writable<string>();
