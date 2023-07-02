@@ -1,127 +1,186 @@
-type UserMatch = record {
-	about : opt text;
-	answered : vec record {
-		Question;
-		bool;
-	};
-	birth : opt int;
-	cohesion : int;
-	connect : opt text;
-	gender : opt Gender;
-	picture : opt blob;
-	"principal" : principal;
-	uncommon : vec Question;
-	username : text;
-};
-type User = record {
-	about : record {
-		opt text;
-		bool;
-	};
-	birth : record {
-		opt int;
-		bool;
-	};
-	connect : record {
-		opt text;
-		bool;
-	};
-	created : int;
-	gender : record {
-		opt Gender;
-		bool;
-	};
-	picture : record {
-		opt blob;
-		bool;
-	};
-	points : nat;
-	username : text;
-};
-type Result_4 = variant {
-	err : text;
-	ok : UserMatch;
-};
-type Result_3 = variant {
-	err : text;
-	ok : vec Question__1;
-};
-type Result_2 = variant {
-	err : text;
-	ok : vec FriendlyUserMatch;
-};
-type Result_1 = variant {
-	err : text;
-	ok : User;
-};
-type Result = variant {
-	err : text;
-	ok;
-};
-type Question__1 = record {
-	color : text;
-	created : int;
-	creater : principal;
-	hash : Hash;
-	points : int;
-	question : text;
-};
-type Question = record {
-	color : text;
-	created : int;
-	creater : principal;
-	hash : Hash;
-	points : int;
-	question : text;
-};
-type MatchingFilter = record {
-	ageRange : record {
-		nat;
-		nat;
-	};
-	cohesion : int;
-	gender : opt Gender;
-};
-type Hash = nat32;
-type Gender = variant {
-	Female;
-	Male;
-	Other;
-	Queer;
-};
-type FriendlyUserMatch = record {
-	about : opt text;
-	answered : vec record {
-		Question;
-		bool;
-	};
-	birth : opt int;
-	cohesion : int;
-	connect : opt text;
-	gender : opt Gender;
-	picture : opt blob;
-	"principal" : principal;
-	status : FriendStatus;
-	uncommon : vec Question;
-	username : text;
-};
-type FriendStatus = variant {
-	Approved;
-	Requested;
-	Waiting;
-};
+type UserMatch = 
+ record {
+   answered: vec record {
+                   Question;
+                   AnswerDiff;
+                 };
+   cohesion: nat8;
+   uncommon: vec Question;
+   user: UserInfo;
+ };
+type UserInfo = 
+ record {
+   about: opt text;
+   birth: opt Time;
+   gender: opt Gender;
+   picture: opt blob;
+   socials: vec Social;
+   username: text;
+ };
+type UserFilter = 
+ record {
+   gender: opt Gender;
+   maxBirth: Time;
+   minBirth: Time;
+ };
+type User = 
+ record {
+   about: record {
+            opt text;
+            IsPublic;
+          };
+   birth: record {
+            opt Time;
+            IsPublic;
+          };
+   created: Time;
+   gender: record {
+             opt Gender;
+             IsPublic;
+           };
+   picture: record {
+              opt blob;
+              IsPublic;
+            };
+   points: nat;
+   socials: vec record {
+                  Social;
+                  IsPublic;
+                };
+   username: text;
+ };
+type Time__1 = int;
+type Time = int;
+type SocialNetwork = 
+ variant {
+   distrikt;
+   dscvr;
+   email;
+   mastodon;
+   phone;
+   twitter;
+ };
+type Social = 
+ record {
+   handle: text;
+   network: SocialNetwork;
+ };
+type Skip = 
+ record {
+   question: nat;
+   reason: variant {
+             flag;
+             skip;
+           };
+ };
+type Result_6 = 
+ variant {
+   err: Error;
+   ok: Question__1;
+ };
+type Result_5 = 
+ variant {
+   err: Error;
+   ok: UserMatch;
+ };
+type Result_4 = 
+ variant {
+   err: Error;
+   ok: vec UserMatch;
+ };
+type Result_3 = 
+ variant {
+   err: Error;
+   ok;
+ };
+type Result_2 = 
+ variant {
+   err: Error;
+   ok: Answer;
+ };
+type Result_1 = 
+ variant {
+   err: Error;
+   ok: Skip;
+ };
+type Result = 
+ variant {
+   err: Error;
+   ok: User;
+ };
+type Question__1 = 
+ record {
+   color: text;
+   created: Time__1;
+   creator: principal;
+   id: nat;
+   points: int;
+   question: text;
+ };
+type Question = 
+ record {
+   color: text;
+   created: Time__1;
+   creator: principal;
+   id: nat;
+   points: int;
+   question: text;
+ };
+type MatchingFilter = 
+ record {
+   cohesion: nat8;
+   users: UserFilter;
+ };
+type IsPublic = bool;
+type Gender = 
+ variant {
+   Female;
+   Male;
+   Other;
+   Queer;
+ };
+type Error = 
+ variant {
+   alreadyRegistered;
+   friendAlreadyConnected;
+   friendRequestAlreadySend;
+   insufficientFunds;
+   invalidColor;
+   nameNotAvailable;
+   notEnoughAnswers;
+   notRegistered;
+   tooLong;
+   tooShort;
+   userNotFound;
+   validationError;
+ };
+type AnswerDiff = 
+ record {
+   question: nat;
+   sameAnswer: bool;
+   weight: nat;
+ };
+type Answer = 
+ record {
+   answer: bool;
+   question: nat;
+   weight: nat;
+ };
 service : {
-	answerFriendRequest : (principal, bool) -> (Result);
-	createQuestion : (text, text) -> (Result);
-	createUser : (text) -> (Result);
-	findMatch : (MatchingFilter) -> (Result_4);
-	getAnsweredQuestions : () -> (Result_3) query;
-	getAskableQuestions : (nat) -> (Result_3) query;
-	getFriends : () -> (Result_2) query;
-	getUser : () -> (Result_1) query;
-	sendFriendRequest : (principal) -> (Result);
-	submitAnswer : (Hash, bool, int) -> (Result);
-	submitSkip : (Hash) -> (Result);
-	updateProfile : (User) -> (Result);
-	whoami : () -> (principal) query;
-};
+  answerFriendRequest: (text, bool) -> (Result_3);
+  createQuestion: (text, text) -> (Result_6);
+  createUser: (text) -> (Result);
+  findMatch: (MatchingFilter) -> (Result_5);
+  getAnsweredQuestions: (nat) -> (vec record {
+                                        Question__1;
+                                        Answer;
+                                      }) query;
+  getAskableQuestions: (nat) -> (vec Question__1) query;
+  getFriends: () -> (Result_4) query;
+  getUser: () -> (Result) query;
+  sendFriendRequest: (text) -> (Result_3);
+  submitAnswer: (nat, bool, nat) -> (Result_2);
+  submitSkip: (nat) -> (Result_1);
+  updateProfile: (User) -> (Result);
+  whoami: () -> (principal) query;
+}
