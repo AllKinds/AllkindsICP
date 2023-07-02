@@ -157,12 +157,14 @@ actor {
 
   //find users based on parameters
   public shared ({ caller }) func findMatch(
-    ageRange : (Nat, Nat),
+    minAge : Nat8,
+    maxAge : Nat8,
     gender : ?User.Gender,
-    cohesionRange : (Nat8, Nat8),
+    minCohesion : Nat8,
+    maxCohesion : Nat8,
   ) : async ResultUserMatch {
 
-    let filter = Matching.createFilter(ageRange, gender, cohesionRange);
+    let filter = Matching.createFilter(minAge, maxAge, gender, minCohesion, maxCohesion);
 
     switch (User.checkFunds(users, #findMatch, caller)) {
       case (#ok(_)) { /* user has sufficient funds */ };
@@ -185,7 +187,7 @@ actor {
 
     let scoreFiltered = Iter.filter<UserMatch>(
       withScore,
-      func um = (um.cohesion >= filter.cohesion.0) and (um.cohesion <= filter.cohesion.1),
+      func um = (um.cohesion >= filter.minCohesion) and (um.cohesion <= filter.maxCohesion),
     );
 
     let matches = Iter.toArray(scoreFiltered);

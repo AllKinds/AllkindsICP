@@ -17,12 +17,6 @@ type UserInfo =
    socials: vec Social;
    username: text;
  };
-type UserFilter = 
- record {
-   gender: opt Gender;
-   maxBirth: Time;
-   minBirth: Time;
- };
 type User = 
  record {
    about: record {
@@ -73,40 +67,40 @@ type Skip =
              skip;
            };
  };
-type Result_6 = 
- variant {
-   err: Error;
-   ok: Question__1;
- };
-type Result_5 = 
- variant {
-   err: Error;
-   ok: UserMatch;
- };
-type Result_4 = 
+type ResultUserMatches = 
  variant {
    err: Error;
    ok: vec UserMatch;
  };
-type Result_3 = 
+type ResultUserMatch = 
  variant {
    err: Error;
-   ok;
+   ok: UserMatch;
  };
-type Result_2 = 
+type ResultUser = 
  variant {
    err: Error;
-   ok: Answer;
+   ok: User;
  };
-type Result_1 = 
+type ResultSkip = 
  variant {
    err: Error;
    ok: Skip;
  };
+type ResultQuestion = 
+ variant {
+   err: Error;
+   ok: Question__1;
+ };
+type ResultAnswer = 
+ variant {
+   err: Error;
+   ok: Answer;
+ };
 type Result = 
  variant {
    err: Error;
-   ok: User;
+   ok;
  };
 type Question__1 = 
  record {
@@ -125,11 +119,6 @@ type Question =
    id: nat;
    points: int;
    question: text;
- };
-type MatchingFilter = 
- record {
-   cohesion: nat8;
-   users: UserFilter;
  };
 type IsPublic = bool;
 type Gender = 
@@ -167,20 +156,20 @@ type Answer =
    weight: nat;
  };
 service : {
-  answerFriendRequest: (text, bool) -> (Result_3);
-  createQuestion: (text, text) -> (Result_6);
-  createUser: (text) -> (Result);
-  findMatch: (MatchingFilter) -> (Result_5);
+  answerFriendRequest: (text, bool) -> (Result);
+  createQuestion: (text, text) -> (ResultQuestion);
+  createUser: (text) -> (ResultUser);
+  findMatch: (nat8, nat8, opt Gender, nat8, nat8) -> (ResultUserMatch);
   getAnsweredQuestions: (nat) -> (vec record {
                                         Question__1;
                                         Answer;
                                       }) query;
   getAskableQuestions: (nat) -> (vec Question__1) query;
-  getFriends: () -> (Result_4) query;
-  getUser: () -> (Result) query;
-  sendFriendRequest: (text) -> (Result_3);
-  submitAnswer: (nat, bool, nat) -> (Result_2);
-  submitSkip: (nat) -> (Result_1);
-  updateProfile: (User) -> (Result);
+  getFriends: () -> (ResultUserMatches) query;
+  getUser: () -> (ResultUser) query;
+  sendFriendRequest: (text) -> (Result);
+  submitAnswer: (nat, bool, nat) -> (ResultAnswer);
+  submitSkip: (nat) -> (ResultSkip);
+  updateProfile: (User) -> (ResultUser);
   whoami: () -> (principal) query;
 }

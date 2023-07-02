@@ -12,6 +12,7 @@ import Int "mo:base/Int";
 import Error "Error";
 import Iter "mo:base/Iter";
 import Debug "mo:base/Debug";
+import Nat8 "mo:base/Nat8";
 
 module {
 
@@ -94,14 +95,14 @@ module {
     gender : ?Gender;
   };
 
-  public func createFilter((minAge, maxAge) : (Nat, Nat), gender : ?Gender) : UserFilter {
+  public func createFilter(minAge : Nat8, maxAge : Nat8, gender : ?Gender) : UserFilter {
     if (minAge > maxAge) Debug.trap("Invalid age");
     if (maxAge > 150) Debug.trap("Invalid maxAge");
     // TODO: limit minimal minAge?
 
     // TODO: calculate exact time with consideration of leap years
-    let minBirth = Time.now() - (maxAge * YEAR);
-    let maxBirth = Time.now() - (minAge * YEAR);
+    let minBirth = Time.now() - (Nat8.toNat(maxAge) * YEAR);
+    let maxBirth = Time.now() - (Nat8.toNat(minAge) * YEAR);
 
     { minBirth; maxBirth; gender };
   };

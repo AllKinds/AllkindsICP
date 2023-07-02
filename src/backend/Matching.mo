@@ -28,7 +28,8 @@ module {
 
   public type MatchingFilter = {
     users : UserFilter;
-    cohesion : (Nat8, Nat8);
+    minCohesion : Nat8;
+    maxCohesion : Nat8;
   };
 
   //returnable object of a user that caller requested
@@ -39,12 +40,18 @@ module {
     cohesion : Nat8;
   };
 
-  public func createFilter(ageRange : (Nat, Nat), gender : ?User.Gender, cohesionRange : (Nat8, Nat8)) : MatchingFilter {
-    if (cohesionRange.1 > 100) Debug.trap("Invalid cohesion value");
-    if (cohesionRange.0 < cohesionRange.1) Debug.trap("Invalid cohesion range");
+  public func createFilter(
+    minAge : Nat8,
+    maxAge : Nat8,
+    gender : ?User.Gender,
+    minCohesion : Nat8,
+    maxCohesion : Nat8,
+  ) : MatchingFilter {
+    if (maxCohesion > 100) Debug.trap("Invalid maxCohesion");
+    if (maxCohesion < minCohesion) Debug.trap("Invalid minCohesion");
 
-    let users = User.createFilter((ageRange.0, ageRange.1), gender);
-    return { users; cohesion = cohesionRange };
+    let users = User.createFilter(minAge, maxAge, gender);
+    return { users; minCohesion; maxCohesion };
   };
 
   func score(common : [AnswerDiff]) : Result<Nat8, Error> {

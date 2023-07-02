@@ -28,7 +28,6 @@ export type Gender = { 'Male' : null } |
   { 'Other' : null } |
   { 'Queer' : null };
 export type IsPublic = boolean;
-export interface MatchingFilter { 'cohesion' : number, 'users' : UserFilter }
 export interface Question {
   'id' : bigint,
   'created' : Time__1,
@@ -45,19 +44,19 @@ export interface Question__1 {
   'color' : string,
   'points' : bigint,
 }
-export type Result = { 'ok' : User } |
+export type Result = { 'ok' : null } |
   { 'err' : Error };
-export type Result_1 = { 'ok' : Skip } |
+export type ResultAnswer = { 'ok' : Answer } |
   { 'err' : Error };
-export type Result_2 = { 'ok' : Answer } |
+export type ResultQuestion = { 'ok' : Question__1 } |
   { 'err' : Error };
-export type Result_3 = { 'ok' : null } |
+export type ResultSkip = { 'ok' : Skip } |
   { 'err' : Error };
-export type Result_4 = { 'ok' : Array<UserMatch> } |
+export type ResultUser = { 'ok' : User } |
   { 'err' : Error };
-export type Result_5 = { 'ok' : UserMatch } |
+export type ResultUserMatch = { 'ok' : UserMatch } |
   { 'err' : Error };
-export type Result_6 = { 'ok' : Question__1 } |
+export type ResultUserMatches = { 'ok' : Array<UserMatch> } |
   { 'err' : Error };
 export interface Skip {
   'question' : bigint,
@@ -83,11 +82,6 @@ export interface User {
   'birth' : [[] | [Time], IsPublic],
   'points' : bigint,
 }
-export interface UserFilter {
-  'maxBirth' : Time,
-  'gender' : [] | [Gender],
-  'minBirth' : Time,
-}
 export interface UserInfo {
   'about' : [] | [string],
   'username' : string,
@@ -103,17 +97,20 @@ export interface UserMatch {
   'uncommon' : Array<Question>,
 }
 export interface _SERVICE {
-  'answerFriendRequest' : ActorMethod<[string, boolean], Result_3>,
-  'createQuestion' : ActorMethod<[string, string], Result_6>,
-  'createUser' : ActorMethod<[string], Result>,
-  'findMatch' : ActorMethod<[MatchingFilter], Result_5>,
+  'answerFriendRequest' : ActorMethod<[string, boolean], Result>,
+  'createQuestion' : ActorMethod<[string, string], ResultQuestion>,
+  'createUser' : ActorMethod<[string], ResultUser>,
+  'findMatch' : ActorMethod<
+    [number, number, [] | [Gender], number, number],
+    ResultUserMatch
+  >,
   'getAnsweredQuestions' : ActorMethod<[bigint], Array<[Question__1, Answer]>>,
   'getAskableQuestions' : ActorMethod<[bigint], Array<Question__1>>,
-  'getFriends' : ActorMethod<[], Result_4>,
-  'getUser' : ActorMethod<[], Result>,
-  'sendFriendRequest' : ActorMethod<[string], Result_3>,
-  'submitAnswer' : ActorMethod<[bigint, boolean, bigint], Result_2>,
-  'submitSkip' : ActorMethod<[bigint], Result_1>,
-  'updateProfile' : ActorMethod<[User], Result>,
+  'getFriends' : ActorMethod<[], ResultUserMatches>,
+  'getUser' : ActorMethod<[], ResultUser>,
+  'sendFriendRequest' : ActorMethod<[string], Result>,
+  'submitAnswer' : ActorMethod<[bigint, boolean, bigint], ResultAnswer>,
+  'submitSkip' : ActorMethod<[bigint], ResultSkip>,
+  'updateProfile' : ActorMethod<[User], ResultUser>,
   'whoami' : ActorMethod<[], Principal>,
 }
