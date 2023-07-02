@@ -104,6 +104,6 @@ module {
 
   func getFriend(friends : UserFriends, user : Principal) : ?FriendStatus {
     Map.get(friends, phash, user);
-  }
+  };
 
 };

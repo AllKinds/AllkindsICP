@@ -51,7 +51,15 @@ actor {
   type MatchingFilter = Matching.MatchingFilter;
   type UserMatch = Matching.UserMatch;
 
-  type Result<T, E> = Result.Result<T, E>;
+  type Result<T> = Result.Result<T, Error>;
+
+  // Aliases to get deterministic names for use in frontend code
+  type ResultUser = Result<User>;
+  type ResultQuestion = Result<Question>;
+  type ResultAnswer = Result<Answer>;
+  type ResultSkip = Result<Skip>;
+  type ResultUserMatch = Result<UserMatch>;
+  type ResultUserMatches = Result<[UserMatch]>;
 
   // UTILITY FUNCTIONS
 
@@ -84,20 +92,20 @@ actor {
   };
 
   // Create default new user with only a username
-  public shared ({ caller }) func createUser(username : Text) : async Result<User, Error> {
+  public shared ({ caller }) func createUser(username : Text) : async ResultUser {
     User.add(users, username, caller);
   };
 
-  public shared query ({ caller }) func getUser() : async Result<User, Error> {
+  public shared query ({ caller }) func getUser() : async ResultUser {
     let ?user = User.get(users, caller) else return #err(#notRegistered);
     #ok(user);
   };
 
-  public shared ({ caller }) func updateProfile(user : User) : async Result<User, Error> {
+  public shared ({ caller }) func updateProfile(user : User) : async ResultUser {
     User.update(users, user, caller);
   };
 
-  public shared ({ caller }) func createQuestion(question : Text, color : Text) : async Result<Question, Error> {
+  public shared ({ caller }) func createQuestion(question : Text, color : Text) : async ResultQuestion {
     switch (User.checkFunds(users, #createQuestion, caller)) {
       case (#ok(_)) { /* user has sufficient funds */ };
       case (#err(e)) return #err(e);
@@ -124,7 +132,7 @@ actor {
   };
 
   // Add an answer
-  public shared ({ caller }) func submitAnswer(question : Nat, answer : Bool, weight : Nat) : async Result<Answer, Error> {
+  public shared ({ caller }) func submitAnswer(question : Nat, answer : Bool, weight : Nat) : async ResultAnswer {
     let boost = Nat.max(weight, Configuration.question.maxBoost);
 
     switch (User.checkFunds(users, #createAnswer(boost), caller)) {
@@ -141,14 +149,21 @@ actor {
   };
 
   // Add a skip
-  public shared ({ caller }) func submitSkip(question : Nat) : async Result<Skip, Error> {
+  public shared ({ caller }) func submitSkip(question : Nat) : async ResultSkip {
     let s : Skip = { question; reason = #skip };
     Question.putSkip(skips, s, caller);
     #ok(s);
   };
 
   //find users based on parameters
-  public shared ({ caller }) func findMatch(filter : MatchingFilter) : async Result<UserMatch, Error> {
+  public shared ({ caller }) func findMatch(
+    ageRange : (Nat, Nat),
+    gender : ?User.Gender,
+    cohesionRange : (Nat8, Nat8),
+  ) : async ResultUserMatch {
+
+    let filter = Matching.createFilter(ageRange, gender, cohesionRange);
+
     switch (User.checkFunds(users, #findMatch, caller)) {
       case (#ok(_)) { /* user has sufficient funds */ };
       case (#err(e)) return #err(e);
@@ -156,7 +171,7 @@ actor {
 
     let userFiltered = User.find(users, filter.users);
 
-    //TODO: remove friends and caller
+    // remove caller and friends
     let withoutSelf = Iter.filter<(Principal, User)>(userFiltered, func(p, u) = p != caller);
     let withoutFriends = Iter.filter<(Principal, User)>(withoutSelf, func(p, u) = Friend.has(friends, caller, p));
 
@@ -168,7 +183,10 @@ actor {
       ),
     );
 
-    let scoreFiltered = Iter.filter<UserMatch>(withScore, func um = um.cohesion >= filter.cohesion);
+    let scoreFiltered = Iter.filter<UserMatch>(
+      withScore,
+      func um = (um.cohesion >= filter.cohesion.0) and (um.cohesion <= filter.cohesion.1),
+    );
 
     let matches = Iter.toArray(scoreFiltered);
 
@@ -184,7 +202,7 @@ actor {
   };
 
   //returns both Approved and Unapproved friends
-  public shared query ({ caller }) func getFriends() : async Result<([UserMatch]), Error> {
+  public shared query ({ caller }) func getFriends() : async ResultUserMatches {
     let userFriends = Friend.get(friends, caller);
 
     let filtered = IterTools.mapFilter<(Principal, FriendStatus), UserMatch>(
@@ -199,12 +217,12 @@ actor {
   };
 
   /// Send a friend request to a user
-  public shared ({ caller }) func sendFriendRequest(username : Text) : async Result<(), Error> {
+  public shared ({ caller }) func sendFriendRequest(username : Text) : async Result<()> {
     let ?id = User.getPrincipal(users, username) else return #err(#userNotFound);
     Friend.request(friends, caller, id);
   };
 
-  public shared ({ caller }) func answerFriendRequest(username : Text, accept : Bool) : async Result<(), Error> {
+  public shared ({ caller }) func answerFriendRequest(username : Text, accept : Bool) : async Result<()> {
     let ?id = User.getPrincipal(users, username) else return #err(#userNotFound);
     if (accept) {
       Friend.request(friends, caller, id);

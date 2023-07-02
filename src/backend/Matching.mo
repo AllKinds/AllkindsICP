@@ -10,6 +10,7 @@ import Iter "mo:base/Iter";
 import Map "mo:map/Map";
 import Trie "mo:base/Trie";
 import Option "mo:base/Option";
+import Debug "mo:base/Debug";
 
 module {
 
@@ -27,7 +28,7 @@ module {
 
   public type MatchingFilter = {
     users : UserFilter;
-    cohesion : Nat8;
+    cohesion : (Nat8, Nat8);
   };
 
   //returnable object of a user that caller requested
@@ -36,6 +37,14 @@ module {
     answered : [(Question, AnswerDiff)]; // indicates comparison with caller answer
     uncommon : [Question]; //Questions that user has answered but not caller
     cohesion : Nat8;
+  };
+
+  public func createFilter(ageRange : (Nat, Nat), gender : ?User.Gender, cohesionRange : (Nat8, Nat8)) : MatchingFilter {
+    if (cohesionRange.1 > 100) Debug.trap("Invalid cohesion value");
+    if (cohesionRange.0 < cohesionRange.1) Debug.trap("Invalid cohesion range");
+
+    let users = User.createFilter((ageRange.0, ageRange.1), gender);
+    return { users; cohesion = cohesionRange };
   };
 
   func score(common : [AnswerDiff]) : Result<Nat8, Error> {
