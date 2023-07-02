@@ -30,6 +30,8 @@ import Matching "Matching";
 import Configuration "Configuration";
 import Error "Error";
 import Iter "mo:base/Iter";
+import Prng "mo:prng";
+import Nat64 "mo:base/Nat64";
 
 actor {
 
@@ -64,6 +66,8 @@ actor {
   stable var skips : SkipDB = Question.emptySkipDB();
 
   stable var friends : FriendDB = Friend.emptyDB();
+
+  var random = Prng.SFC64a(); // insecure random numbers
 
   // Upgrade canister
   system func preupgrade() {
@@ -144,31 +148,35 @@ actor {
   };
 
   //find users based on parameters
-  public shared (msg) func findMatch(para : MatchingFilter) : async Result<UserMatch, Error> {
+  public shared ({ caller }) func findMatch(filter : MatchingFilter) : async Result<UserMatch, Error> {
     switch (User.checkFunds(users, #findMatch, caller)) {
       case (#ok(_)) { /* user has sufficient funds */ };
       case (#err(e)) return #err(e);
     };
 
-    let ?match : ?UserWScore = filterUsers(msg.caller, para) else return #err("Couldn't find any match! Try answering more questions.");
-    let ?p = match.0 else return #err("rrreeee");
-    let ?userM : ?User = users.get(p) else return #err("Matched user not found!");
-    let equalQuestions = getEqualQuestions(msg.caller, p);
-    let answered = attachAnswerComparison(msg.caller, p, equalQuestions);
-    let uncommon = getUnequalQuestions(msg.caller, p);
+    let userFiltered = User.find(users, filter.users);
 
-    let result : UserMatch = {
-      principal = p;
-      username = userM.username;
-      about = checkPublic(userM.about);
-      gender = checkPublic(userM.gender);
-      birth = checkPublic(userM.birth);
-      connect = checkPublic(userM.connect);
-      picture = checkPublic(userM.picture);
-      cohesion = match.1;
-      answered;
-      uncommon;
-    };
+    //TODO: remove friends and caller
+    let withoutSelf = Iter.filter<(Principal, User)>(userFiltered, func(p, u) = p != caller);
+    let withoutFriends = Iter.filter<(Principal, User)>(withoutSelf, func(p, u) = Friend.has(friends, caller, p));
+
+    let withScore = IterTools.mapFilter<(Principal, User), UserMatch>(
+      withoutFriends,
+      func(id, user) = Result.toOption(
+        // TODO?: handle errors instead of removing them?
+        Matching.getUserMatch(users, questions, answers, skips, caller, id),
+      ),
+    );
+
+    let scoreFiltered = Iter.filter<UserMatch>(withScore, func um = um.cohesion >= filter.cohesion);
+
+    let matches = Iter.toArray(scoreFiltered);
+
+    if (matches.size() == 0) return #err(#userNotFound);
+
+    let randomIndex = Nat64.toNat(random.next()) % matches.size();
+
+    let result = matches[randomIndex];
 
     let #ok(_) = User.reward(users, #findMatch, caller) else Debug.trap("Bug: Reward failed. checkFunds should have returned an error already");
 
@@ -181,65 +189,28 @@ actor {
 
     let filtered = IterTools.mapFilter<(Principal, FriendStatus), UserMatch>(
       userFriends,
-      func(p, status) = Matching.compare(
-        User.get(users, p)
+      func(p, status) = Result.toOption(
+        // TODO?: handle errors instead of removing them?
+        Matching.getUserMatch(users, questions, answers, skips, caller, p),
       ),
     );
 
     #ok(Iter.toArray(filtered));
   };
 
-  //TODO : extract reusable function from sendFriendRequest and answerFriendRequest
-
+  /// Send a friend request to a user
   public shared ({ caller }) func sendFriendRequest(username : Text) : async Result<(), Error> {
     let ?id = User.getPrincipal(users, username) else return #err(#userNotFound);
     Friend.request(friends, caller, id);
   };
 
-  public shared ({ caller }) func newAnswerFriendRequest(friend : Text, accept : Bool) : async Result<(), Error> {
-    let ?user = User.get(users, caller) else return #err("User not registerd");
-    let ?other = User.getByName(users, friend) else return #err("User not registered");
-    //User.addFriend(user, friend);
-    Debug.trap("not implemented");
-  };
-
-  public shared (msg) func oldAnswerFriendRequest(p : Principal, b : Bool) : async Result<(), Text> {
-    let ?userFriends = friends.get(msg.caller) else return #err("Something went wrong!");
-    let ?targetFriends = friends.get(p) else return #err("Something went wrong!");
-    let buf = Buffer.fromArray<Friend>(userFriends);
-    let targetBuf = Buffer.fromArray<Friend>(targetFriends);
-
-    let ?iT = getIndexFriend(p, msg.caller) else return #err("Strange");
-    let ?i = getIndexFriend(msg.caller, p) else return #err("You have no friend requests from that user!");
-    let friend = buf.get(i) else return #err("Can't check status of your friend");
-
-    switch (friend.status) {
-      case (? #Requested) return #err("You already requested this user to connect!");
-      case (? #Waiting) {
-        ignore buf.remove(i);
-        ignore targetBuf.remove(iT);
-        if (b == false) {
-          //rejected
-          return #ok();
-        };
-        //accepted
-      };
-      case (? #Approved) return #err("You are already friends with this user!");
-      case (null) return #err("Strange null");
+  public shared ({ caller }) func answerFriendRequest(username : Text, accept : Bool) : async Result<(), Error> {
+    let ?id = User.getPrincipal(users, username) else return #err(#userNotFound);
+    if (accept) {
+      Friend.request(friends, caller, id);
+    } else {
+      Friend.reject(friends, caller, id);
     };
-
-    var target : Friend = {
-      account = p;
-      status = ? #Approved;
-    };
-    let user : Friend = {
-      account = msg.caller;
-      status = ? #Approved;
-    };
-
-    updateFriend(msg.caller, target, Buffer.toArray(buf));
-    updateFriend(p, user, Buffer.toArray(targetBuf));
-    #ok();
   };
 
 };

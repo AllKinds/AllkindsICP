@@ -8,6 +8,7 @@ module {
     #userNotFound;
     #friendRequestAlreadySend;
     #friendAlreadyConnected;
+    #notEnoughAnswers;
 
     #insufficientFunds;
     #tooShort;

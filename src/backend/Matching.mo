@@ -22,11 +22,11 @@ module {
   type UserDB = User.UserDB;
   type Result<T, E> = Result.Result<T, E>;
   type Error = Error.Error;
+  type UserFilter = User.UserFilter;
   let { nhash } = Map;
 
   public type MatchingFilter = {
-    ageRange : (Nat, Nat);
-    gender : ?User.Gender;
+    users : UserFilter;
     cohesion : Nat8;
   };
 
@@ -38,8 +38,8 @@ module {
     cohesion : Nat8;
   };
 
-  func score(common : [AnswerDiff]) : ?Nat8 {
-    if (common.size() < Configuration.question.minCommonQuestions) return null;
+  func score(common : [AnswerDiff]) : Result<Nat8, Error> {
+    if (common.size() < Configuration.question.minCommonQuestions) return #err(#notEnoughAnswers);
 
     var weights = 0;
     var scores = 0;
@@ -53,14 +53,17 @@ module {
     let s = (weights * 100 / scores);
     assert (s <= 100);
 
-    return ?(Nat8.fromIntWrap(s));
+    return #ok(Nat8.fromIntWrap(s));
   };
 
   public func getUserMatch(users : UserDB, questions : QuestionDB, answers : AnswerDB, skips : SkipDB, userA : Principal, userB : Principal) : Result<UserMatch, Error> {
     let common = Question.getCommon(answers, userA, userB);
     let answersB = Question.getAnswers(answers, userB);
 
-    let cohesion = score(common);
+    let cohesion = switch (score(common)) {
+      case (#ok(s)) s;
+      case (#err(e)) return #err(e);
+    };
 
     let ?fullUser = User.get(users, userB) else return #err(#userNotFound);
     let user = User.filterUserInfo(fullUser);
@@ -73,7 +76,7 @@ module {
       user;
       answered : [(Question, AnswerDiff)]; // indicates comparison with caller answer
       uncommon = Iter.toArray(uncommon); // Questions that user has answered but not caller
-      cohesion = Option.get<Nat8>(cohesion, 0); // TODO: handle null
+      cohesion = cohesion;
     };
 
     #ok(userMatch);

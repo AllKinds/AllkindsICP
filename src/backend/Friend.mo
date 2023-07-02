@@ -33,9 +33,9 @@ module {
     let recipientFriends = getFriends(friends, sender);
 
     let senderStatus = getFriend(senderFriends, recipient);
-    let receipientStatus = getFriend(recipientFriends, sender);
+    let recipientStatus = getFriend(recipientFriends, sender);
 
-    switch ((senderStatus, receipientStatus)) {
+    switch ((senderStatus, recipientStatus)) {
       case (null, null) {
         // send a new request
         Map.set(senderFriends, phash, recipient, #requestSend);
@@ -58,8 +58,40 @@ module {
     #ok;
   };
 
+  public func reject(friends : FriendDB, sender : Principal, recipient : Principal) : Result<(), Error> {
+    let senderFriends = getFriends(friends, sender);
+    let recipientFriends = getFriends(friends, sender);
+
+    let senderStatus = getFriend(senderFriends, recipient);
+    let recipientStatus = getFriend(recipientFriends, sender);
+
+    switch (recipientStatus) {
+      case (?(#requestIgnored)) {
+        // other user already requested
+        Map.set(senderFriends, phash, recipient, #rejectionSend);
+        Map.set(recipientFriends, phash, sender, #requestIgnored);
+      };
+      case (?(#rejectionSend)) {
+        // other user already requested
+        Map.set(senderFriends, phash, recipient, #rejectionSend);
+        Map.set(recipientFriends, phash, sender, #rejectionSend);
+      };
+      case (_) {
+        // send a new request
+        Map.set(senderFriends, phash, recipient, #rejectionSend);
+        Map.set(recipientFriends, phash, sender, #rejectionReceived);
+      };
+    };
+
+    #ok;
+  };
+
   public func get(friends : FriendDB, user : Principal) : Iter<(Principal, FriendStatus)> {
     Map.entries(getFriends(friends, user));
+  };
+
+  public func has(friends : FriendDB, userA : Principal, userB : Principal) : Bool {
+    Map.has(getFriends(friends, userA), phash, userB);
   };
 
   // Get map of friend status or create an empty map

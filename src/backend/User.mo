@@ -10,14 +10,18 @@ import Text "mo:base/Text";
 import Map "mo:map/Map";
 import Int "mo:base/Int";
 import Error "Error";
+import Iter "mo:base/Iter";
+import Debug "mo:base/Debug";
 
 module {
 
   public type IsPublic = Bool;
+  let YEAR = 31_556_952_000_000_000; // average length of a year: 365.2425 * 24 * 60 * 60* 1000 * 1000 * 1000
 
   type Time = Time.Time;
   type Map<K, V> = Map.Map<K, V>;
   type Result<T, E> = Result.Result<T, E>;
+  type Iter<T> = Iter.Iter<T>;
   let { thash; phash } = Map;
 
   type Error = Error.Error;
@@ -84,6 +88,24 @@ module {
     #phone;
   };
 
+  public type UserFilter = {
+    minBirth : Time;
+    maxBirth : Time;
+    gender : ?Gender;
+  };
+
+  public func createFilter((minAge, maxAge) : (Nat, Nat), gender : ?Gender) : UserFilter {
+    if (minAge > maxAge) Debug.trap("Invalid age");
+    if (maxAge > 150) Debug.trap("Invalid maxAge");
+    // TODO: limit minimal minAge?
+
+    // TODO: calculate exact time with consideration of leap years
+    let minBirth = Time.now() - (maxAge * YEAR);
+    let maxBirth = Time.now() - (minAge * YEAR);
+
+    { minBirth; maxBirth; gender };
+  };
+
   public func add(users : UserDB, username : Text, id : Principal) : Result<User, Error> {
     let null = get(users, id) else return #err(#alreadyRegistered);
     let true = validateName(username) else return #err(#validationError);
@@ -136,6 +158,24 @@ module {
     Map.set(users.info, phash, id, newUser);
 
     #ok newUser;
+  };
+
+  public func find(users : UserDB, filter : UserFilter) : Iter<(Principal, User)> {
+    Iter.filter<(Principal, User)>(Map.entries(users.info), func(_, u) = matches(u, filter));
+  };
+
+  func matches(user : User, filter : UserFilter) : Bool {
+    switch (filter.gender) {
+      case (null) {};
+      case (?gender) {
+        if ((?gender, true) != user.gender) return false;
+      };
+    };
+
+    let (?birth, _) = user.birth else return true;
+    if (birth < filter.minBirth) return false;
+    if (birth > filter.maxBirth) return false;
+    return true;
   };
 
   /// Check how much an action is rewarded or costs
