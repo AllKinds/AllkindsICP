@@ -23,15 +23,16 @@
 </script>
 
 <div class="flex flex-col justify-center items-center">
-	<h2>Choose a username</h2>
+	<h2>Mint your profile</h2>
 	<div class="flex p-2">
 		<div class="flex flex-col rounded-lg">
 			<input
 				type="text"
 				disabled={pending}
 				id="username"
-				class="bg-slate-600 w-56 p-1 rounded-md outline-none"
+				class="bg-slate-200 w-60 p-1 rounded-md outline-none"
 				bind:value={username}
+				placeholder="Your nickname"
 			/>
 		</div>
 	</div>
@@ -41,7 +42,7 @@
 				{#if pending}
 					<Spinner />
 				{:else}
-					Register
+					Continue
 				{/if}
 			</button>
 		</div>

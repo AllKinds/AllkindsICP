@@ -1,7 +1,7 @@
 <script lang="ts">
 </script>
 
-<div class="mx-auto min-h-screen flex flex-col scroll-smooth w-11/12">
+<div class="mx-auto min-h-screen flex flex-col scroll-smooth w-2/3">
 	<!-- header/nav -->
 
 	<div class="mx-auto h-14 flex justify-between w-11/12 fixed z-50">

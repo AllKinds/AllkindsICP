@@ -35,9 +35,8 @@
 </script>
 
 <div class="flex flex-col gap-4">
-	<div class="border-main {$color} w-full mx-auto flex-col p-2 justify-between">
-		<button
-			class="w-full flex justify-between items-center"
+	<div class="w-full mx-auto flex-col p-2 justify-between">
+		<button class="w-full px-3 flex justify-between items-center font-Poppins rounded bg-slate-50 border-slate-600 border"
 			on:click={() => (expandWindow = !expandWindow)}
 		>
 			<span>
@@ -47,30 +46,30 @@
 			</span>
 			{#if !expandWindow}
 				<!-- <ChevronDown class="w-9 cursor-pointerborder-none" /> -->
-				<Add class="w-10 sub-btn" />
+				<Add class="w-10" />
 			{:else if expandWindow}
-				<ChevronUp class="w-10 sub-btn" />
+				<ChevronUp class="w-10" />
 			{/if}
 		</button>
 
 		{#if expandWindow}
-			<div class="mt-8 flex flex-col justify-center items-center {$color}">
+			<div class="rounded-md mt-8 flex flex-col justify-center items-center {$color}">
 				<textarea
 					id="questionInput"
-					class="inputfield w-full min-h-fit py-20 bg-transparent outline-none text-4xl placeholder-current text-center {$color}"
-					placeholder="Ask a Yes/No question..."
+					class="w-full min-h-fit py-20 bg-transparent rounded outline-none text-4xl placeholder-current text-center {$color}"
+					placeholder="Type your Yes/No question here" 
 					disabled={pending}
 					bind:value={newQ}
 				/>
 				<ColorSelect />
 
-				<div class="">
-					<button on:click={submit} class="default-btn {$color} flex my-5">
+				<div>
+					<button on:click={submit} class="default-btn {$color} flex px-20 items-center my-5">
 						{#if pending}
-							<Spinner />
+							<Spinner/>
 						{:else}
 							Submit
-							<span class="flex ml-1 ">+5 <Heart class="w-4 h-4 mt-1" /></span>
+							<span class="flex ml-1 w-full">+5&nbsp;<Heart class="allign-middle w-4 h-4 mt-1 fill-{$color} stroke-{$color}" /></span>
 						{/if}
 					</button>
 				</div>
@@ -84,7 +83,7 @@
 		{/each}
 	{:else}
 		<span class="text-slate-700 mx-auto mt-10"
-			>Oops! There are no questions for you to answer at this moment.</span
+			>That's all questions for now. Come later to check for new ones.</span
 		>
 	{/if}
 </div>
