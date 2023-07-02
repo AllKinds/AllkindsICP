@@ -25,8 +25,9 @@ Alpha v0.2.0
 
 II included for faster local authentication testing
 
-requires atleast DFX v0.13.1 and Motoko v0.8.5 , use [mocv](https://forum.dfinity.org/t/moc-version-management/19011)
+requires at least DFX v0.14.1 and Motoko v0.9.4 , use [mocv](https://forum.dfinity.org/t/moc-version-management/19011)
 
+0. mocv use 0.9.4
 1. dfx start --clean --background
 2. clone repo and navigate into folder
 3. npm install
