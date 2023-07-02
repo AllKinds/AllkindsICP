@@ -1,14 +1,17 @@
 /* Write your global styles here, in PostCSS syntax */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@400;500&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 
 @layer components {
 	.trans-300 {
 		@apply transition-all ease-in-out duration-300;
 	}
 	.default-btn {
-		@apply border-main rounded-full p-2 bg-transparent hover:bg-zinc-300/80 dark:hover:hover:bg-zinc-800/50;
+		@apply border-main border-slate-600 font-Poppins items-center rounded-full p-2 w-60 bg-transparent hover:bg-zinc-300/80 dark:hover:hover:bg-zinc-800/50;
 	}
 	.fancy-btn {
 		@apply trans-300 rounded-full p-2 px-8 bg-main dark:hover:bg-transparent hover:bg-transparent dark:hover:text-zinc-900;
@@ -89,18 +92,19 @@
 
 @layer base {
 	h1 {
-		@apply text-7xl md:text-9xl font-semibold py-2 md:py-6;
+		@apply text-7xl md:text-9xl font-Poppins font-semibold py-2 md:py-6;
 	}
 	h2 {
-		@apply text-3xl md:text-5xl font-semibold py-2 md:py-6;
+		@apply text-center pt-1 lg:text-2xl sm:text-base md:text-2xl font-Poppins font-semibold py-2 pt-1 md:py-2;
 	}
 	h3 {
-		@apply text-xl md:text-3xl font-semibold py-2 md:py-6;
+		@apply text-base font-Poppins py-1 md:py-1;
 	}
 	p {
-		@apply text-xl py-4 max-w-2xl font-semibold;
+		@apply text-xl py-4 max-w-2xl font-Poppins;
 	}
 	a {
 		@apply hover-color;
 	}
+
 }

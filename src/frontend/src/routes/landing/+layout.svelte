@@ -20,7 +20,7 @@
 	<svelte:fragment slot="main">
 		<div class="flex flex-row justify-center mt-5 gap-4">
 			<!-- main content -->
-			<div class="h-fit w-full mt-1 min-h-screen">
+			<div class="h-fit mt-1 min-h-screen">
 				<slot />
 			</div>
 

@@ -3,10 +3,11 @@
 
 	//optionally give text color as second argument for readability
 	let colors = [
+		
+		'bg-zinc-200 text-zinc-800',
 		'bg-black text-zinc-200',
 		'bg-zinc-800 text-zinc-300',
 		'bg-zinc-400 text-zinc-900',
-		'bg-zinc-200 text-zinc-800',
 		'bg-purple-400',
 		'bg-red-400',
 		'bg-green-400',

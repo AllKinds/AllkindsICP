@@ -13,12 +13,14 @@ const config = {
 				accent: 'emerald-500'
 			},
 			fontFamily: {
-				//todo
+				'Poppins': ['Poppins']
 			}
 		}
 	},
 
 	plugins: []
 };
+
+
 
 module.exports = config;

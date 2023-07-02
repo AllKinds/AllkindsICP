@@ -56,13 +56,14 @@
 	}
 </script>
 
-<div class="flex flex-col justify-center items-center">
-	<h2>Setup your profile</h2>
+<div class="flex flex-col items-center py-4">
+	<h2>What do you want people<br> 
+		to know about you?</h2>
 	<span>(You can also do this later)</span>
 
 	<div class="">
 		<Input text="Gender">
-			<select bind:value={userObj.gender} slot="input" disabled={pending}>
+			<select bind:value={userObj.gender} slot="input" disabled={pending} style="width: 250px; background-color: #d1d1d1">
 				{#each genders as gender}
 					<option value={gender}>
 						{gender}
@@ -72,15 +73,16 @@
 			<PublicToggle slot="public" bind:checked={publicGender} />
 		</Input>
 
-		<Input text="Birthday">
+		<Input text="Age">
 			<input
-				type="date"
-				class="inputfield"
+				type="text"
 				slot="input"
 				bind:value={userObj.birth}
 				min="1920-01-01"
 				max="2022-01-01"
 				disabled={pending}
+				style="width: 250px; background-color: #d1d1d1"
+
 			/>
 			<PublicToggle slot="public" bind:checked={publicBirth} />
 		</Input>
@@ -92,12 +94,13 @@
 				slot="input"
 				bind:value={userObj.connect}
 				disabled={pending}
+				style="width: 250px; background-color: #d1d1d1"
 			/>
 			<PublicToggle slot="public" bind:checked={publicConnect} />
 		</Input>
 
-		<Input text="About you">
-			<textarea class="inputfield" slot="input" bind:value={userObj.about} disabled={pending} />
+		<Input text="Short bio?">
+			<textarea class="inputfield" slot="input" bind:value={userObj.about} disabled={pending} style="width: 250px; background-color: #d1d1d1"/>
 			<PublicToggle slot="public" bind:checked={publicAbout} />
 		</Input>
 	</div>
