@@ -23,21 +23,29 @@ export type Error = { 'validationError' : null } |
   { 'friendRequestAlreadySend' : null } |
   { 'notRegistered' : null } |
   { 'invalidColor' : null };
+export type FriendStatus = { 'requestIgnored' : null } |
+  { 'requestReceived' : null } |
+  { 'connected' : null } |
+  { 'rejectionSend' : null } |
+  { 'rejectionReceived' : null } |
+  { 'requestSend' : null };
 export type Gender = { 'Male' : null } |
   { 'Female' : null } |
   { 'Other' : null } |
   { 'Queer' : null };
 export type IsPublic = boolean;
 export interface Question {
-  'id' : bigint,
+  'id' : QuestionID__1,
   'created' : Time__1,
   'creator' : Principal,
   'question' : string,
   'color' : string,
   'points' : bigint,
 }
+export type QuestionID = bigint;
+export type QuestionID__1 = bigint;
 export interface Question__1 {
-  'id' : bigint,
+  'id' : QuestionID__1,
   'created' : Time__1,
   'creator' : Principal,
   'question' : string,
@@ -48,6 +56,8 @@ export type Result = { 'ok' : null } |
   { 'err' : Error };
 export type ResultAnswer = { 'ok' : Answer } |
   { 'err' : Error };
+export type ResultFriends = { 'ok' : Array<[UserMatch, FriendStatus]> } |
+  { 'err' : Error };
 export type ResultQuestion = { 'ok' : Question__1 } |
   { 'err' : Error };
 export type ResultSkip = { 'ok' : Skip } |
@@ -55,8 +65,6 @@ export type ResultSkip = { 'ok' : Skip } |
 export type ResultUser = { 'ok' : User } |
   { 'err' : Error };
 export type ResultUserMatch = { 'ok' : UserMatch } |
-  { 'err' : Error };
-export type ResultUserMatches = { 'ok' : Array<UserMatch> } |
   { 'err' : Error };
 export interface Skip {
   'question' : bigint,
@@ -106,10 +114,10 @@ export interface _SERVICE {
   >,
   'getAnsweredQuestions' : ActorMethod<[bigint], Array<[Question__1, Answer]>>,
   'getAskableQuestions' : ActorMethod<[bigint], Array<Question__1>>,
-  'getFriends' : ActorMethod<[], ResultUserMatches>,
+  'getFriends' : ActorMethod<[], ResultFriends>,
   'getUser' : ActorMethod<[], ResultUser>,
   'sendFriendRequest' : ActorMethod<[string], Result>,
-  'submitAnswer' : ActorMethod<[bigint, boolean, bigint], ResultAnswer>,
+  'submitAnswer' : ActorMethod<[QuestionID, boolean, bigint], ResultAnswer>,
   'submitSkip' : ActorMethod<[bigint], ResultSkip>,
   'updateProfile' : ActorMethod<[User], ResultUser>,
   'whoami' : ActorMethod<[], Principal>,

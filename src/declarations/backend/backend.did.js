@@ -14,9 +14,10 @@ export const idlFactory = ({ IDL }) => {
     'invalidColor' : IDL.Null,
   });
   const Result = IDL.Variant({ 'ok' : IDL.Null, 'err' : Error });
+  const QuestionID__1 = IDL.Nat;
   const Time__1 = IDL.Int;
   const Question__1 = IDL.Record({
-    'id' : IDL.Nat,
+    'id' : QuestionID__1,
     'created' : Time__1,
     'creator' : IDL.Principal,
     'question' : IDL.Text,
@@ -53,7 +54,7 @@ export const idlFactory = ({ IDL }) => {
   });
   const ResultUser = IDL.Variant({ 'ok' : User, 'err' : Error });
   const Question = IDL.Record({
-    'id' : IDL.Nat,
+    'id' : QuestionID__1,
     'created' : Time__1,
     'creator' : IDL.Principal,
     'question' : IDL.Text,
@@ -85,10 +86,19 @@ export const idlFactory = ({ IDL }) => {
     'question' : IDL.Nat,
     'answer' : IDL.Bool,
   });
-  const ResultUserMatches = IDL.Variant({
-    'ok' : IDL.Vec(UserMatch),
+  const FriendStatus = IDL.Variant({
+    'requestIgnored' : IDL.Null,
+    'requestReceived' : IDL.Null,
+    'connected' : IDL.Null,
+    'rejectionSend' : IDL.Null,
+    'rejectionReceived' : IDL.Null,
+    'requestSend' : IDL.Null,
+  });
+  const ResultFriends = IDL.Variant({
+    'ok' : IDL.Vec(IDL.Tuple(UserMatch, FriendStatus)),
     'err' : Error,
   });
+  const QuestionID = IDL.Nat;
   const ResultAnswer = IDL.Variant({ 'ok' : Answer, 'err' : Error });
   const Skip = IDL.Record({
     'question' : IDL.Nat,
@@ -114,10 +124,14 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(Question__1)],
         ['query'],
       ),
-    'getFriends' : IDL.Func([], [ResultUserMatches], ['query']),
+    'getFriends' : IDL.Func([], [ResultFriends], ['query']),
     'getUser' : IDL.Func([], [ResultUser], ['query']),
     'sendFriendRequest' : IDL.Func([IDL.Text], [Result], []),
-    'submitAnswer' : IDL.Func([IDL.Nat, IDL.Bool, IDL.Nat], [ResultAnswer], []),
+    'submitAnswer' : IDL.Func(
+        [QuestionID, IDL.Bool, IDL.Nat],
+        [ResultAnswer],
+        [],
+      ),
     'submitSkip' : IDL.Func([IDL.Nat], [ResultSkip], []),
     'updateProfile' : IDL.Func([User], [ResultUser], []),
     'whoami' : IDL.Func([], [IDL.Principal], ['query']),

@@ -38,6 +38,7 @@ actor {
   //TYPES INDEX
   type User = User.User;
   type Question = Question.Question;
+  type QuestionID = Question.QuestionID;
   type Answer = Question.Answer;
   type Skip = Question.Skip;
   type FriendStatus = Friend.FriendStatus;
@@ -59,7 +60,7 @@ actor {
   type ResultAnswer = Result<Answer>;
   type ResultSkip = Result<Skip>;
   type ResultUserMatch = Result<UserMatch>;
-  type ResultUserMatches = Result<[UserMatch]>;
+  type ResultFriends = Result<[(UserMatch, FriendStatus)]>;
 
   // UTILITY FUNCTIONS
 
@@ -132,7 +133,7 @@ actor {
   };
 
   // Add an answer
-  public shared ({ caller }) func submitAnswer(question : Nat, answer : Bool, weight : Nat) : async ResultAnswer {
+  public shared ({ caller }) func submitAnswer(question : QuestionID, answer : Bool, weight : Nat) : async ResultAnswer {
     let boost = Nat.max(weight, Configuration.question.maxBoost);
 
     switch (User.checkFunds(users, #createAnswer(boost), caller)) {
@@ -204,15 +205,18 @@ actor {
   };
 
   //returns both Approved and Unapproved friends
-  public shared query ({ caller }) func getFriends() : async ResultUserMatches {
+  public shared query ({ caller }) func getFriends() : async ResultFriends {
     let userFriends = Friend.get(friends, caller);
 
-    let filtered = IterTools.mapFilter<(Principal, FriendStatus), UserMatch>(
+    func toUserMatch((p : Principal, status : FriendStatus)) : ?(UserMatch, FriendStatus) {
+      let #ok(userMatch) = Matching.getUserMatch(users, questions, answers, skips, caller, p) else return null;
+      // TODO?: handle errors instead of removing them?
+      ?(userMatch, status);
+    };
+
+    let filtered = IterTools.mapFilter<(Principal, FriendStatus), (UserMatch, FriendStatus)>(
       userFriends,
-      func(p, status) = Result.toOption(
-        // TODO?: handle errors instead of removing them?
-        Matching.getUserMatch(users, questions, answers, skips, caller, p),
-      ),
+      toUserMatch,
     );
 
     #ok(Iter.toArray(filtered));

@@ -67,11 +67,6 @@ type Skip =
              skip;
            };
  };
-type ResultUserMatches = 
- variant {
-   err: Error;
-   ok: vec UserMatch;
- };
 type ResultUserMatch = 
  variant {
    err: Error;
@@ -92,6 +87,14 @@ type ResultQuestion =
    err: Error;
    ok: Question__1;
  };
+type ResultFriends = 
+ variant {
+   err: Error;
+   ok: vec record {
+             UserMatch;
+             FriendStatus;
+           };
+ };
 type ResultAnswer = 
  variant {
    err: Error;
@@ -107,16 +110,18 @@ type Question__1 =
    color: text;
    created: Time__1;
    creator: principal;
-   id: nat;
+   id: QuestionID__1;
    points: int;
    question: text;
  };
+type QuestionID__1 = nat;
+type QuestionID = nat;
 type Question = 
  record {
    color: text;
    created: Time__1;
    creator: principal;
-   id: nat;
+   id: QuestionID__1;
    points: int;
    question: text;
  };
@@ -127,6 +132,15 @@ type Gender =
    Male;
    Other;
    Queer;
+ };
+type FriendStatus = 
+ variant {
+   connected;
+   rejectionReceived;
+   rejectionSend;
+   requestIgnored;
+   requestReceived;
+   requestSend;
  };
 type Error = 
  variant {
@@ -165,10 +179,10 @@ service : {
                                         Answer;
                                       }) query;
   getAskableQuestions: (nat) -> (vec Question__1) query;
-  getFriends: () -> (ResultUserMatches) query;
+  getFriends: () -> (ResultFriends) query;
   getUser: () -> (ResultUser) query;
   sendFriendRequest: (text) -> (Result);
-  submitAnswer: (nat, bool, nat) -> (ResultAnswer);
+  submitAnswer: (QuestionID, bool, nat) -> (ResultAnswer);
   submitSkip: (nat) -> (ResultSkip);
   updateProfile: (User) -> (ResultUser);
   whoami: () -> (principal) query;

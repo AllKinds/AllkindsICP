@@ -22,7 +22,7 @@ module {
   type Iter<T> = Iter.Iter<T>;
   type Map<K, V> = Map.Map<K, V>;
   type Time = Time.Time;
-  type QuestionID = Nat;
+  public type QuestionID = Nat;
   type Buffer<T> = Buffer.StableBuffer<T>;
 
   public type QuestionDB = Buffer<Question>;
@@ -33,7 +33,7 @@ module {
 
   // Color indicates optional background color for the question
   public type Question = {
-    id : Nat; // TODO?: remove because it's implied by the index in QuestionDB?
+    id : QuestionID;
     created : Time;
     creator : Principal;
     question : Text;

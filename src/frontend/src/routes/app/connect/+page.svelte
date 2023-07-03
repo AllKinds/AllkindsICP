@@ -2,9 +2,9 @@
 	import { toNullableGender } from '$lib/utilities';
 	import Spinner from '$lib/components/common/Spinner.svelte';
 	import type {
-		MatchingFilter,
-		FriendlyUserMatch,
-		Result
+		UserMatch,
+		ResultUserMatch
+
 	} from 'src/declarations/backend/backend.did';
 	import UserCard from '$lib/components/app/userCard.svelte';
 	import { getMatchedUser, matchedUser } from '$lib/stores/tasks/getMatchedUser';
@@ -16,11 +16,11 @@
 	let resultWindow: Boolean = false;
 	//age + cohes based on Slider plugin, see for more info
 
-	let cohesionValue = [100, 100];
+	let cohesionValue: [number, number] = [60, 100];
 	let ageValue = [1, 120];
 	let genderValue = 'Everyone';
 	//let matches: Array<[User, BigInt]>;
-	let match: FriendlyUserMatch;
+	let match: UserMatch;
 
 	//this could be moved to some declaration/constant somewhere else
 	let genders = ['Everyone', 'Male', 'Female', 'Other', 'Queer'];
@@ -31,13 +31,13 @@
 		resultWindow = false;
 		pending = true;
 		let filter: MatchingFilter = {
-			cohesion: BigInt(cohesionValue[0]),
+			cohesion: cohesionValue,
 			ageRange: [BigInt(ageValue[0]), BigInt(ageValue[1])],
 			gender: toNullableGender(genderValue == 'Everyone' ? '' : genderValue)
 		};
 		console.log('filter obj ready: ', filter);
 
-		await getMatchedUser(filter).catch((err: Result) => {
+		await getMatchedUser(filter).catch((err: ResultUserMatch) => {
 			console.log('error while getting matchedUsers', err);
 		});
 		match = $matchedUser;
