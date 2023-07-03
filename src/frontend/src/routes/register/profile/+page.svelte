@@ -33,7 +33,7 @@
 		connect: fromNullable($user.connect[0]),
 		about: fromNullable($user.about[0]),
 		username: $user.username,
-		gender: fromNullableGender($user.gender[0]), //biiitch
+		gender: fromNullableGender($user.gender[0]),
 		birth: fromNullableDate($user.birth[0])
 	};
 
@@ -75,11 +75,9 @@
 
 		<Input text="Age">
 			<input
-				type="text"
+				type="number"
 				slot="input"
 				bind:value={userObj.birth}
-				min="1920-01-01"
-				max="2022-01-01"
 				disabled={pending}
 				style="width: 250px; background-color: #d1d1d1"
 
