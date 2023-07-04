@@ -1,13 +1,12 @@
 import { actor } from '$lib/stores';
-import type { Principal } from '@dfinity/principal';
 import { get } from 'svelte/store';
 import { syncAuth } from './auth';
 
-export async function answerFriendRequest(p: Principal, b: boolean) {
+export async function answerFriendRequest(name: string, accept: boolean) {
 	const localActor = get(actor);
-	console.log('answering friendrequest connect to :', p);
+	console.log('answering friend request connect to:', name);
 	await localActor
-		.answerFriendRequest(p, b)
+		.answerFriendRequest(name, accept)
 		.then((res) => console.log('connection request response:', res));
 	//getQs()
 	await syncAuth();

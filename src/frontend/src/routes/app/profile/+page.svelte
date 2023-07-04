@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { user, avatar } from '$lib/stores/index';
-	import { fromNullable, fromNullableDate, fromNullableGender } from '$lib/utilities';
+	import { fromNullableDate, fromNullableGender } from '$lib/utilities';
 	import { onMount } from 'svelte';
 	import { getQsAnswered, answeredQuestions, myQuestions } from '$lib/stores/tasks/getQsAnswered';
 	import Qbanner from '$lib/components/app/Qbanner.svelte';
@@ -18,7 +18,7 @@
 		? fromNullableGender($user.gender[0]) + ', '
 		: '';
 	let userAbout = $user.about[0] ? $user.about[0] : '';
-	let userConnect = $user.connect[0] ? $user.connect[0] : '';
+	let userConnect = $user.socials ? $user.socials : '';
 	let userPicture = $avatar;
 
 	console.log('age', userBirth);

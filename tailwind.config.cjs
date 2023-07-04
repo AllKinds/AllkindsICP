@@ -13,7 +13,7 @@ const config = {
 				accent: 'emerald-500'
 			},
 			fontFamily: {
-				'Poppins': ['Poppins']
+				Poppins: ['Poppins']
 			}
 		}
 	},

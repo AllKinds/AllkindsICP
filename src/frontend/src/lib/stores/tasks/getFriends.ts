@@ -1,40 +1,34 @@
 import { actor } from '$lib/stores';
-import type { FriendlyUserMatch } from 'src/declarations/backend/backend.did';
+import type { FriendStatus, UserMatch } from 'src/declarations/backend/backend.did';
 import { get, writable } from 'svelte/store';
 
 //export const foundFriends = writable<Array<FriendlyUserMatch>>();
-export const friendsApproved = writable<Array<FriendlyUserMatch>>();
-export const friendsWaiting = writable<Array<FriendlyUserMatch>>();
-export const friendsRequested = writable<Array<FriendlyUserMatch>>();
+export const friendsApproved = writable<Array<[UserMatch, FriendStatus]>>([]);
+export const friendsWaiting = writable<Array<[UserMatch, FriendStatus]>>([]);
+export const friendsRequested = writable<Array<[UserMatch, FriendStatus]>>([]);
 //Requested could also be made
 
 export async function getFriends() {
-	friendsApproved.set([]);
-	friendsWaiting.set([]);
-	friendsRequested.set([]);
-	const localActor = get(actor);
+    friendsApproved.set([]);
+    friendsWaiting.set([]);
+    friendsRequested.set([]);
+    const localActor = get(actor);
 
-	await localActor.getFriends().then((res) => {
-		console.log(res);
-		if (res.hasOwnProperty('ok')) {
-			//foundFriends.set(res.ok);
-			let arr = res.ok;
-			const approvedFriends = arr.filter(
-				(f: FriendlyUserMatch) => Object.entries(f.status)[0][0] === 'Approved'
-			);
-			const waitingFriends = arr.filter(
-				(f: FriendlyUserMatch) => Object.entries(f.status)[0][0] === 'Waiting'
-			);
-			const requestedFriends = arr.filter(
-				(f: FriendlyUserMatch) => Object.entries(f.status)[0][0] === 'Requested'
-			);
+    await localActor.getFriends().then((res) => {
+        console.log(res);
+        if ('ok' in res) {
+            //foundFriends.set(res.ok);
+            const arr = res.ok;
+            const approvedFriends = arr.filter((entry) => 'connected' in entry[1]);
+            const waitingFriends = arr.filter((entry) => 'requestReceived' in entry[1]);
+            const requestedFriends = arr.filter((entry) => 'requestSend' in entry[1]);
 
-			friendsApproved.set(approvedFriends);
-			friendsWaiting.set(waitingFriends);
-			friendsRequested.set(requestedFriends);
+            friendsApproved.set(approvedFriends);
+            friendsWaiting.set(waitingFriends);
+            friendsRequested.set(requestedFriends);
 
-			//derive stores
-		}
-	});
-	//await syncAuth();
+            //derive stores
+        }
+    });
+    //await syncAuth();
 }

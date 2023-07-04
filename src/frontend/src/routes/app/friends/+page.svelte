@@ -7,7 +7,6 @@
 		friendsWaiting,
 		friendsRequested
 	} from '$lib/stores/tasks/getFriends';
-	import type { FriendlyUserMatch } from 'src/declarations/backend/backend.did';
 	import { onMount } from 'svelte';
 
 	const handleFindFriends = async () => {
@@ -38,6 +37,6 @@
 
 <CustomTabs {lists}>
 	<svelte:fragment slot="item" let:item>
-		<UserBanner match={item} />
+		<UserBanner match={item[0]} friendStatus={item[1]} />
 	</svelte:fragment>
 </CustomTabs>

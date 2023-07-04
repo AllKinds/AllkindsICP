@@ -1,11 +1,7 @@
 <script lang="ts">
 	import { toNullableGender } from '$lib/utilities';
 	import Spinner from '$lib/components/common/Spinner.svelte';
-	import type {
-		UserMatch,
-		ResultUserMatch
-
-	} from 'src/declarations/backend/backend.did';
+	import type { UserMatch, ResultUserMatch } from 'src/declarations/backend/backend.did';
 	import UserCard from '$lib/components/app/userCard.svelte';
 	import { getMatchedUser, matchedUser } from '$lib/stores/tasks/getMatchedUser';
 	import ArrowLeft from '$lib/assets/icons/arrowLeft.svg?component';
@@ -30,14 +26,16 @@
 	const handleFindMatches = async () => {
 		resultWindow = false;
 		pending = true;
-		let filter: MatchingFilter = {
-			cohesion: cohesionValue,
-			ageRange: [BigInt(ageValue[0]), BigInt(ageValue[1])],
-			gender: toNullableGender(genderValue == 'Everyone' ? '' : genderValue)
-		};
-		console.log('filter obj ready: ', filter);
 
-		await getMatchedUser(filter).catch((err: ResultUserMatch) => {
+		let gender = toNullableGender(genderValue == 'Everyone' ? '' : genderValue);
+
+		await getMatchedUser(
+			ageValue[0],
+			ageValue[1],
+			gender,
+			cohesionValue[0],
+			cohesionValue[1]
+		).catch((err: Error) => {
 			console.log('error while getting matchedUsers', err);
 		});
 		match = $matchedUser;
@@ -98,7 +96,10 @@
 			{#if match}
 				<UserCard {match} />
 			{:else}
-				<span class="text-slate-700 mx-auto">Oops, Something went wrong!</span>
+				<span class="text-slate-700 mx-auto">
+                    Sorry, we couldn't find a match... <br/>
+                    Try answering some more questions!
+                </span>
 			{/if}
 		</div>
 	{/if}

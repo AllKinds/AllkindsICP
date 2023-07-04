@@ -23,14 +23,13 @@
 	let pending: boolean = false;
 	let genders = ['', 'Male', 'Female', 'Other', 'Queer'];
 	let publicAbout: boolean = $user.about[1];
-	let publicConnect: boolean = $user.connect[1];
 	let publicBirth: boolean = $user.birth[1];
 	let publicGender: boolean = $user.gender[1];
 
 	//an user object to temporary store and change OUR values , this has NO User interface
 	let userObj = {
 		created: $user.created,
-		connect: fromNullable($user.connect[0]),
+		socials: $user.socials,
 		about: fromNullable($user.about[0]),
 		username: $user.username,
 		gender: fromNullableGender($user.gender[0]), //biiitch
@@ -41,7 +40,7 @@
 		pending = true;
 		const newUserObj: User = {
 			created: $user.created,
-			connect: [toNullable(userObj.connect), publicConnect],
+			socials: userObj.socials,
 			about: [toNullable(userObj.about), publicAbout],
 			username: userObj.username,
 			gender: [toNullableGender(userObj.gender), publicGender],
@@ -86,18 +85,19 @@
 			/>
 			<PublicToggle slot="public" bind:checked={publicBirth} />
 		</Input>
-
+		<!-- TODO: edit socials
 		<Input text="Email">
 			<input
 				type="email"
 				class="inputfield"
 				slot="input"
-				bind:value={userObj.connect}
+				bind:value={userObj.socials[0][0]}
 				disabled={pending}
 				style="width: 250px; background-color: #d1d1d1"
 			/>
 			<PublicToggle slot="public" bind:checked={publicConnect} />
 		</Input>
+        -->
 
 		<Input text="Short bio?">
 			<textarea class="inputfield" slot="input" bind:value={userObj.about} disabled={pending} style="width: 250px; background-color: #d1d1d1"/>

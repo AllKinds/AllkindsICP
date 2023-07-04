@@ -8,20 +8,17 @@ export const myQuestions = writable<Array<Question>>();
 
 export async function getQsAnswered() {
 	const localActor = get(actor);
-	let p = get(caller);
+	const p = get(caller);
 
-	await localActor.getAnsweredQuestions().then((res) => {
-		console.log('all answer questions: ', res.ok);
-		if (res.ok) {
-			let arr = res.ok;
-			console.log(arr);
+	await localActor.getAnsweredQuestions(BigInt(200)).then((qas) => {
+		console.log('all answer questions: ', qas);
+		if (qas) {
 			//const answered = arr.filter((q: Question) => q.creater.toString() !== p.toString());
-			const my = arr.filter((q: Question) => q.creater.toString() === p.toString());
-			answeredQuestions.set(arr); // same as answered
-			myQuestions.set(my);
+			const my = qas.filter((entry) => entry[0].creator.toString() === p.toString());
+			answeredQuestions.set(qas.map((qa) => qa[0])); // same as answered
+			myQuestions.set(my.map((qa) => qa[0]));
 			console.log(p.toString());
-			console.log(arr[1].creater.toString());
-			console.log('answered: ', arr);
+			console.log('answered: ', qas);
 			console.log('my questions: ', my);
 		}
 	});

@@ -5,13 +5,14 @@ import { get, writable } from 'svelte/store';
 export const questions = writable<Array<Question>>();
 
 export async function getQs() {
-	const localActor = get(actor);
-	let nr: bigint = BigInt(5);
-	await localActor.getAskableQuestions(nr).then((res) => {
-		console.log('questions: ', res.ok);
-		if (res.ok) {
-			questions.set(res.ok);
-		}
-	});
-	//await syncAuth();
+    const localActor = get(actor);
+    if (!localActor) return; // TODO: retry when actor is created
+    const nr = BigInt(5);
+    await localActor.getAskableQuestions(nr).then((qs) => {
+        console.log('questions: ', qs);
+        if (qs) {
+            questions.set(qs);
+        }
+    });
+    //await syncAuth();
 }

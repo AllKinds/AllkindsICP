@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { fromNullable, fromNullableGender } from '$lib/utilities';
-	import type { FriendlyUserMatch } from 'src/declarations/backend/backend.did';
 	import CheckCircle from '$lib/assets/icons/check-circle.svg?component';
 	import PlaceholderPic from '$lib/assets/icons/placeholder-pic.svg?component';
 	import XCircle from '$lib/assets/icons/x-circle.svg?component';
@@ -9,31 +8,32 @@
 	import { getFriends } from '$lib/stores/tasks/getFriends';
 	import ArrowLeft from '$lib/assets/icons/arrowLeft.svg?component';
 	import EllipsisVertical from '$lib/assets/icons/ellipsis-vertical.svg?component';
-	import NavX from '$lib/assets/icons/navX.svg?component';
 	import UserCard from './userCard.svelte';
-	import { syncAuth } from '$lib/stores/tasks';
+	import type { FriendStatus, UserMatch } from 'src/declarations/backend/backend.did';
 
-	export let match: any;
+	export let match: UserMatch;
+	export let friendStatus: FriendStatus | null;
 
 	let userCardWindow: boolean = false;
 
-	let userName = match.username;
+	let user = match.user;
+	let userName = user.username;
 	let userPicture: any;
 	let pending = false;
 	//let userScore = Number(match.cohesion);
-	let userAbout = match.about;
-	let userGender = fromNullableGender(match.gender);
+	let userAbout = user.about;
+	let userGender = fromNullableGender(user.gender);
 	//let userBirth = u.birth;
 	//TODO make age utility function
 
-	let ageMs = Number(new Date()) - Number(match.birth) / 1000000;
+	let ageMs = Number(new Date()) - Number(user.birth) / 1000000;
 	let ageY = Math.floor(ageMs / (1000 * 3600 * 24) / 365);
 	let answered = match.answered;
 	let aQsize = answered.length;
 
 	const handleRequest = async (answer: boolean) => {
 		pending = true;
-		await answerFriendRequest(match.principal, answer).catch((err) => {
+		await answerFriendRequest(user.username, answer).catch((err) => {
 			console.log('error while answering request : ', err);
 		});
 		await getFriends().catch((error) => {
@@ -43,8 +43,8 @@
 		pending = false;
 	};
 
-	let a = fromNullable(match.picture);
-	console.log(match.picture);
+	console.log(user.picture);
+	let a = fromNullable(user.picture);
 	if (a != undefined) {
 		let image = new Uint8Array(a);
 		let blob = new Blob([image], { type: 'image/png' });
@@ -77,7 +77,7 @@
 		<div class="grow text-sm flex flex-col">
 			<span class="text-xl">{userName}</span>
 			<span class="text-sub">
-				{match.birth.length ? ageY : ''}
+				{user.birth.length ? ageY : ''}
 				{userGender ? userGender : ''}
 				<!--TODO :  shorten this about string-->
 			</span>
@@ -89,7 +89,7 @@
 				{'('}{aQsize > 0 ? aQsize : 0}{')'}
 			</div>
 			<!-- show accept & reject control when target user requested to connect -->
-			{#if Object.entries(match.status)[0][0] == 'Waiting'}
+			{#if friendStatus && ('requestSend' in friendStatus || 'requestReceived' in friendStatus)}
 				<div class="h-8 w-fit pt-1 mx-auto">
 					{#if pending}
 						<Spinner />

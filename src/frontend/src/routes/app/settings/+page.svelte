@@ -28,7 +28,7 @@
 
 	let publicMode: boolean = true;
 	let publicAbout: boolean = $user.about[1];
-	let publicConnect: boolean = $user.connect[1];
+	let publicConnect: boolean = true; // TODO!
 	let publicBirth: boolean = $user.birth[1];
 	let publicGender: boolean = $user.gender[1];
 	let publicPicture: boolean = $user.picture[1];
@@ -36,10 +36,10 @@
 	//a user object to temporary store and change OUR values , this has NO User interface
 	let userObj = {
 		created: $user.created,
-		connect: fromNullable($user.connect[0]),
+		socials: $user.socials,
 		about: fromNullable($user.about[0]),
 		username: $user.username,
-		gender: fromNullableGender($user.gender[0]), //biiitch
+		gender: fromNullableGender($user.gender[0]),
 		birth: fromNullableDate($user.birth[0]),
 		picture: fromNullable($user.picture[0])
 	};
@@ -73,7 +73,7 @@
 		//sets the new user object to update
 		const newUser: User = {
 			created: $user.created,
-			connect: [toNullable(userObj.connect), publicConnect],
+			socials: userObj.socials,
 			about: [toNullable(userObj.about), publicAbout],
 			username: userObj.username,
 			gender: [toNullableGender(userObj.gender), publicGender],

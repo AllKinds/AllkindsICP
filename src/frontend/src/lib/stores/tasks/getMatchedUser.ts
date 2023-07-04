@@ -1,25 +1,31 @@
 import { actor } from '$lib/stores';
-import type { UserMatch, MatchingFilter } from 'src/declarations/backend/backend.did';
+import type { Gender, UserMatch } from 'src/declarations/backend/backend.did';
 import { get, writable } from 'svelte/store';
 import { syncAuth } from './auth';
 
-export var matchedUser = writable<UserMatch>();
+export let matchedUser = writable<UserMatch>();
 
-export async function getMatchedUser(filter: MatchingFilter) {
-    const localActor = get(actor);
+export async function getMatchedUser(
+	minAge: number,
+	maxAge: number,
+	gender: [] | [Gender],
+	minCohesion: number,
+	maxCohesion: number
+) {
+	const localActor = get(actor);
 
-    let res = await localActor.findMatch([minAge, maxAge]);
-    if (res.hasOwnProperty('ok')) {
-        matchedUser.set(res.ok);
-        console.log('matched users', res.ok);
-    } else if (res.hasOwnProperty('err')) {
-        matchedUser = writable<UserMatch>();
-        console.log('err : ', res);
-    } else {
-        console.error(res);
-    }
+	const res = await localActor.findMatch(minAge, maxAge, gender, minCohesion, maxCohesion);
+	if ('ok' in res) {
+		matchedUser.set(res.ok);
+		console.log('matched users', res.ok);
+	} else if ('err' in res) {
+		matchedUser = writable<UserMatch>();
+		console.log('err : ', res);
+	} else {
+		console.error(res);
+	}
 
-    await syncAuth();
+	await syncAuth();
 }
 // let result = await localActor.getUser();
 // if (result.hasOwnProperty('ok')) {
