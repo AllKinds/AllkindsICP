@@ -126,6 +126,7 @@ actor {
     Iter.toArray(limited);
   };
 
+  // TODO? remove Answer from return type?
   public shared query ({ caller }) func getAnsweredQuestions(limit : Nat) : async [(Question, Answer)] {
     let iter = Question.answered(questions, answers, caller);
     let limited = IterTools.take(iter, Nat.min(limit, Configuration.api.maxPageSize));
@@ -134,7 +135,7 @@ actor {
 
   // Add an answer
   public shared ({ caller }) func submitAnswer(question : QuestionID, answer : Bool, weight : Nat) : async ResultAnswer {
-    let boost = Nat.max(weight, Configuration.question.maxBoost);
+    let boost = Nat.min(weight, Configuration.question.maxBoost);
 
     switch (User.checkFunds(users, #createAnswer(boost), caller)) {
       case (#ok(_)) { /* user has sufficient funds */ };
@@ -176,7 +177,7 @@ actor {
 
     // remove caller and friends
     let withoutSelf = Iter.filter<(Principal, User)>(userFiltered, func(p, u) = p != caller);
-    let withoutFriends = Iter.filter<(Principal, User)>(withoutSelf, func(p, u) = Friend.has(friends, caller, p));
+    let withoutFriends = Iter.filter<(Principal, User)>(withoutSelf, func(p, u) = not Friend.has(friends, caller, p));
 
     let withScore = IterTools.mapFilter<(Principal, User), UserMatch>(
       withoutFriends,
@@ -235,6 +236,78 @@ actor {
     } else {
       Friend.reject(friends, caller, id);
     };
+  };
+
+  func assertAdmin(caller : Principal) {
+    if (not Principal.isController(caller)) {
+      //TODO!: Debug.trap("Access denied!");
+    };
+  };
+
+  /// Create a backup of users
+  public query ({ caller }) func backupUsers(offset : Nat, limit : Nat) : async [(Principal, User)] {
+    assertAdmin(caller);
+
+    let all = User.backup(users);
+    let withOffset = IterTools.skip(all, offset);
+    let withLimit = IterTools.take(withOffset, limit);
+    Iter.toArray(withLimit);
+  };
+
+  /// Create a backup of friend status
+  public query ({ caller }) func backupConnections(offset : Nat, limit : Nat) : async [(Principal, Principal, FriendStatus)] {
+    assertAdmin(caller);
+
+    let all = Friend.backup(friends);
+    let withOffset = IterTools.skip(all, offset);
+    let withLimit = IterTools.take(withOffset, limit);
+    Iter.toArray(withLimit);
+  };
+
+  /// Create a backup of questions
+  public query ({ caller }) func backupQuestions(offset : Nat, limit : Nat) : async [Question] {
+    assertAdmin(caller);
+
+    let all = Question.backup(questions);
+    let withOffset = IterTools.skip(all, offset);
+    let withLimit = IterTools.take(withOffset, limit);
+    Iter.toArray(withLimit);
+  };
+
+  /// Create a backup of answers
+  public query ({ caller }) func backupAnswers(offset : Nat, limit : Nat) : async [Question] {
+    assertAdmin(caller);
+
+    let all = Question.backup(questions);
+    let withOffset = IterTools.skip(all, offset);
+    let withLimit = IterTools.take(withOffset, limit);
+    Iter.toArray(withLimit);
+  };
+
+  public shared ({ caller }) func airdrop(user : Text, tokens : Int) : async Result<()> {
+    assertAdmin(caller);
+
+    let ?p = User.getPrincipal(users, user) else return #err(#userNotFound);
+
+    switch (User.reward(users, #custom(tokens), p)) {
+      case (#ok(_)) #ok;
+      case (#err(e)) #err(e);
+    };
+  };
+
+  public shared ({ caller }) func selfDestruct(confirm : Text) {
+    assertAdmin(caller);
+    if (confirm == "DELETE CONNECTIONS!") {
+      friends := Friend.emptyDB();
+      return;
+    };
+    if (confirm != "DELETE EVERYTHING!") Debug.trap("canceled");
+
+    users := User.emptyDB();
+    questions := Question.emptyDB();
+    answers := Question.emptyAnswerDB();
+    skips := Question.emptySkipDB();
+    friends := Friend.emptyDB();
   };
 
 };

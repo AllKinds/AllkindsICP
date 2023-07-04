@@ -75,6 +75,22 @@ module {
   public func emptyAnswerDB() : AnswerDB = Map.new<Principal, UserAnswers>(phash);
   public func emptySkipDB() : SkipDB = Map.new<Principal, UserSkips>(phash);
 
+  public func backup(db : QuestionDB) : Iter<Question> {
+    Buffer.vals(db);
+  };
+
+  public func backupAnswers(db : AnswerDB) : Iter<(Principal, QuestionID, Answer)> {
+    let entries = Map.entries(db);
+    let nested = Iter.map<(Principal, UserAnswers), Iter<(Principal, QuestionID, Answer)>>(
+      entries,
+      func(p, qa) = Iter.map<(QuestionID, Answer), (Principal, QuestionID, Answer)>(
+        Trie.iter(qa),
+        func(q, a) = (p, q, a),
+      ),
+    );
+    IterTools.flatten(nested);
+  };
+
   public func add(db : QuestionDB, question : Text, color : Color, creator : Principal) : Result<Question, Error> {
     let id = Buffer.size(db);
     let result = create(id, question, color, creator);
@@ -155,11 +171,11 @@ module {
     let userSkips = getSkips(skips, user);
 
     // filter out answered questions
-    let newAndSkipped = Iter.filter<Question>(all, func q = Trie.get<Nat, Answer>(userAnswers, key(q.id), Nat.equal) != null); // TODO replace func with has()
+    let withoutAnswered = Iter.filter<Question>(all, func q = Trie.get<Nat, Answer>(userAnswers, key(q.id), Nat.equal) == null); // TODO replace func with has()
     // filter out skipped questions
-    let new = Iter.filter<Question>(all, func q = Trie.get<Nat, Skip>(userSkips, key(q.id), Nat.equal) != null);
+    let withoutSkipped = Iter.filter<Question>(withoutAnswered, func q = Trie.get<Nat, Skip>(userSkips, key(q.id), Nat.equal) == null);
 
-    new;
+    withoutSkipped;
   };
 
   func key(id : Nat) : Trie.Key<Nat> {

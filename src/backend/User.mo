@@ -31,6 +31,7 @@ module {
     #createQuestion;
     #createAnswer : Nat; // boost
     #findMatch;
+    #custom : Int;
   };
 
   public type UserDB = {
@@ -41,6 +42,10 @@ module {
   public func emptyDB() : UserDB = {
     info = Map.new<Principal, User>(phash);
     byUsername = Map.new<Text, Principal>(thash);
+  };
+
+  public func backup(users : UserDB) : Iter<(Principal, User)> {
+    Map.entries(users.info);
   };
 
   /// Information about a user.
@@ -108,12 +113,14 @@ module {
   };
 
   public func add(users : UserDB, username : Text, id : Principal) : Result<User, Error> {
+    if (Principal.isAnonymous(id)) return #err(#notLoggedIn);
     let null = get(users, id) else return #err(#alreadyRegistered);
     let true = validateName(username) else return #err(#validationError);
     let null = getByName(users, username) else return #err(#nameNotAvailable);
 
     let user = create(username);
     Map.set(users.info, phash, id, user);
+    Map.set(users.byUsername, thash, username, id);
     #ok(user);
   };
 
@@ -189,6 +196,7 @@ module {
         (boost * Configuration.rewards.boostReward);
       };
       case (#findMatch) { Configuration.rewards.queryReward };
+      case (#custom(n)) { n };
     };
   };
 

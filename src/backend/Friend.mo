@@ -4,6 +4,8 @@ import Result "mo:base/Result";
 import Option "mo:base/Option";
 import Error "Error";
 import Iter "mo:base/Iter";
+import IterTools "mo:itertools/Iter";
+import Debug "mo:base/Debug";
 
 module {
 
@@ -28,9 +30,33 @@ module {
     #rejectionReceived;
   };
 
+  public func backup(friends : FriendDB) : Iter<(Principal, Principal, FriendStatus)> {
+    let usersA = Map.entries(friends);
+    let ?(a, userFriends) = usersA.next() else return IterTools.empty();
+    var userA = a;
+    var userFriendsIter = Map.entries(userFriends);
+
+    func next() : ?(Principal, Principal, FriendStatus) {
+      switch (userFriendsIter.next()) {
+        case (?(userB, status)) {
+          return ?(userA, userB, status);
+        };
+        case (null) {
+          // iterator userFriendsIter is used up -> get iterator for next one
+          let ?(a, userFriends) = usersA.next() else return null;
+          userFriendsIter := Map.entries(userFriends);
+          next();
+        };
+      };
+    };
+
+    return { next };
+  };
+
   public func request(friends : FriendDB, sender : Principal, recipient : Principal) : Result<(), Error> {
     let senderFriends = getFriends(friends, sender);
-    let recipientFriends = getFriends(friends, sender);
+    let recipientFriends = getFriends(friends, recipient);
+    if (sender == recipient) return #err(#friendAlreadyConnected);
 
     let senderStatus = getFriend(senderFriends, recipient);
     let recipientStatus = getFriend(recipientFriends, sender);
@@ -54,11 +80,17 @@ module {
         return #err(#friendRequestAlreadySend);
       };
     };
+    Map.set(friends, phash, sender, senderFriends);
+    Map.set(friends, phash, recipient, recipientFriends);
 
     #ok;
   };
 
   public func reject(friends : FriendDB, sender : Principal, recipient : Principal) : Result<(), Error> {
+    if (Principal.isAnonymous(sender)) { return #err(#notLoggedIn) };
+    if (Principal.isAnonymous(recipient)) { return #err(#userNotFound) };
+    if (sender == recipient) return #err(#friendAlreadyConnected);
+
     let senderFriends = getFriends(friends, sender);
     let recipientFriends = getFriends(friends, sender);
 
@@ -83,6 +115,9 @@ module {
       };
     };
 
+    Map.set(friends, phash, sender, senderFriends);
+    Map.set(friends, phash, recipient, recipientFriends);
+
     #ok;
   };
 
@@ -90,6 +125,7 @@ module {
     Map.entries(getFriends(friends, user));
   };
 
+  /// Check if userA has any friend status set with userB (including rejected and pending requests)
   public func has(friends : FriendDB, userA : Principal, userB : Principal) : Bool {
     Map.has(getFriends(friends, userA), phash, userB);
   };

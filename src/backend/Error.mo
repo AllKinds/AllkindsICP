@@ -4,6 +4,7 @@ module {
     #nameNotAvailable;
     #validationError;
     #notRegistered;
+    #notLoggedIn;
 
     #userNotFound;
     #friendRequestAlreadySend;
@@ -14,5 +15,7 @@ module {
     #tooShort;
     #tooLong;
     #invalidColor;
+
+    #debugValue : Nat;
   };
 };

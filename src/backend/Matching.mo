@@ -57,8 +57,8 @@ module {
   func score(common : [AnswerDiff]) : Result<Nat8, Error> {
     if (common.size() < Configuration.question.minCommonQuestions) return #err(#notEnoughAnswers);
 
-    var weights = 0;
-    var scores = 0;
+    var weights : Nat = 0;
+    var scores : Nat = 0;
     for (diff in common.vals()) {
       weights += diff.weight;
       if (diff.sameAnswer) {
@@ -66,7 +66,7 @@ module {
       };
     };
 
-    let s = (weights * 100 / scores);
+    let s = (scores * 100 / weights);
     assert (s <= 100);
 
     return #ok(Nat8.fromIntWrap(s));
