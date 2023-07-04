@@ -11,7 +11,8 @@ export interface AnswerDiff {
   'question' : bigint,
   'sameAnswer' : boolean,
 }
-export type Error = { 'validationError' : null } |
+export type Error = { 'notLoggedIn' : null } |
+  { 'validationError' : null } |
   { 'userNotFound' : null } |
   { 'tooLong' : null } |
   { 'insufficientFunds' : null } |
@@ -105,7 +106,15 @@ export interface UserMatch {
   'uncommon' : Array<Question>,
 }
 export interface _SERVICE {
+  'airdrop' : ActorMethod<[string, bigint], Result>,
   'answerFriendRequest' : ActorMethod<[string, boolean], Result>,
+  'backupAnswers' : ActorMethod<[bigint, bigint], Array<Question__1>>,
+  'backupConnections' : ActorMethod<
+    [bigint, bigint],
+    Array<[Principal, Principal, FriendStatus]>
+  >,
+  'backupQuestions' : ActorMethod<[bigint, bigint], Array<Question__1>>,
+  'backupUsers' : ActorMethod<[bigint, bigint], Array<[Principal, User]>>,
   'createQuestion' : ActorMethod<[string, string], ResultQuestion>,
   'createUser' : ActorMethod<[string], ResultUser>,
   'findMatch' : ActorMethod<
@@ -116,6 +125,7 @@ export interface _SERVICE {
   'getAskableQuestions' : ActorMethod<[bigint], Array<Question__1>>,
   'getFriends' : ActorMethod<[], ResultFriends>,
   'getUser' : ActorMethod<[], ResultUser>,
+  'selfDestruct' : ActorMethod<[string], undefined>,
   'sendFriendRequest' : ActorMethod<[string], Result>,
   'submitAnswer' : ActorMethod<[QuestionID, boolean, bigint], ResultAnswer>,
   'submitSkip' : ActorMethod<[bigint], ResultSkip>,

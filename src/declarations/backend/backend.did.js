@@ -1,5 +1,6 @@
 export const idlFactory = ({ IDL }) => {
   const Error = IDL.Variant({
+    'notLoggedIn' : IDL.Null,
     'validationError' : IDL.Null,
     'userNotFound' : IDL.Null,
     'tooLong' : IDL.Null,
@@ -24,7 +25,14 @@ export const idlFactory = ({ IDL }) => {
     'color' : IDL.Text,
     'points' : IDL.Int,
   });
-  const ResultQuestion = IDL.Variant({ 'ok' : Question__1, 'err' : Error });
+  const FriendStatus = IDL.Variant({
+    'requestIgnored' : IDL.Null,
+    'requestReceived' : IDL.Null,
+    'connected' : IDL.Null,
+    'rejectionSend' : IDL.Null,
+    'rejectionReceived' : IDL.Null,
+    'requestSend' : IDL.Null,
+  });
   const Time = IDL.Int;
   const IsPublic = IDL.Bool;
   const SocialNetwork = IDL.Variant({
@@ -52,6 +60,7 @@ export const idlFactory = ({ IDL }) => {
     'birth' : IDL.Tuple(IDL.Opt(Time), IsPublic),
     'points' : IDL.Nat,
   });
+  const ResultQuestion = IDL.Variant({ 'ok' : Question__1, 'err' : Error });
   const ResultUser = IDL.Variant({ 'ok' : User, 'err' : Error });
   const Question = IDL.Record({
     'id' : QuestionID__1,
@@ -86,14 +95,6 @@ export const idlFactory = ({ IDL }) => {
     'question' : IDL.Nat,
     'answer' : IDL.Bool,
   });
-  const FriendStatus = IDL.Variant({
-    'requestIgnored' : IDL.Null,
-    'requestReceived' : IDL.Null,
-    'connected' : IDL.Null,
-    'rejectionSend' : IDL.Null,
-    'rejectionReceived' : IDL.Null,
-    'requestSend' : IDL.Null,
-  });
   const ResultFriends = IDL.Variant({
     'ok' : IDL.Vec(IDL.Tuple(UserMatch, FriendStatus)),
     'err' : Error,
@@ -106,7 +107,28 @@ export const idlFactory = ({ IDL }) => {
   });
   const ResultSkip = IDL.Variant({ 'ok' : Skip, 'err' : Error });
   return IDL.Service({
+    'airdrop' : IDL.Func([IDL.Text, IDL.Int], [Result], []),
     'answerFriendRequest' : IDL.Func([IDL.Text, IDL.Bool], [Result], []),
+    'backupAnswers' : IDL.Func(
+        [IDL.Nat, IDL.Nat],
+        [IDL.Vec(Question__1)],
+        ['query'],
+      ),
+    'backupConnections' : IDL.Func(
+        [IDL.Nat, IDL.Nat],
+        [IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Principal, FriendStatus))],
+        ['query'],
+      ),
+    'backupQuestions' : IDL.Func(
+        [IDL.Nat, IDL.Nat],
+        [IDL.Vec(Question__1)],
+        ['query'],
+      ),
+    'backupUsers' : IDL.Func(
+        [IDL.Nat, IDL.Nat],
+        [IDL.Vec(IDL.Tuple(IDL.Principal, User))],
+        ['query'],
+      ),
     'createQuestion' : IDL.Func([IDL.Text, IDL.Text], [ResultQuestion], []),
     'createUser' : IDL.Func([IDL.Text], [ResultUser], []),
     'findMatch' : IDL.Func(
@@ -126,6 +148,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'getFriends' : IDL.Func([], [ResultFriends], ['query']),
     'getUser' : IDL.Func([], [ResultUser], ['query']),
+    'selfDestruct' : IDL.Func([IDL.Text], [], ['oneway']),
     'sendFriendRequest' : IDL.Func([IDL.Text], [Result], []),
     'submitAnswer' : IDL.Func(
         [QuestionID, IDL.Bool, IDL.Nat],

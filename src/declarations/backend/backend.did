@@ -151,6 +151,7 @@ type Error =
    invalidColor;
    nameNotAvailable;
    notEnoughAnswers;
+   notLoggedIn;
    notRegistered;
    tooLong;
    tooShort;
@@ -170,7 +171,20 @@ type Answer =
    weight: nat;
  };
 service : {
+  airdrop: (text, int) -> (Result);
   answerFriendRequest: (text, bool) -> (Result);
+  backupAnswers: (nat, nat) -> (vec Question__1) query;
+  backupConnections: (nat, nat) ->
+   (vec record {
+          principal;
+          principal;
+          FriendStatus;
+        }) query;
+  backupQuestions: (nat, nat) -> (vec Question__1) query;
+  backupUsers: (nat, nat) -> (vec record {
+                                    principal;
+                                    User;
+                                  }) query;
   createQuestion: (text, text) -> (ResultQuestion);
   createUser: (text) -> (ResultUser);
   findMatch: (nat8, nat8, opt Gender, nat8, nat8) -> (ResultUserMatch);
@@ -181,6 +195,7 @@ service : {
   getAskableQuestions: (nat) -> (vec Question__1) query;
   getFriends: () -> (ResultFriends) query;
   getUser: () -> (ResultUser) query;
+  selfDestruct: (text) -> () oneway;
   sendFriendRequest: (text) -> (Result);
   submitAnswer: (QuestionID, bool, nat) -> (ResultAnswer);
   submitSkip: (nat) -> (ResultSkip);

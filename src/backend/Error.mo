@@ -15,7 +15,5 @@ module {
     #tooShort;
     #tooLong;
     #invalidColor;
-
-    #debugValue : Nat;
   };
 };
