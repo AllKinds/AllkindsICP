@@ -38,4 +38,4 @@ Frontend:
 - Order questions by boost and popularity
 - Auto accept friend request above a user defined cohesion score
 - Verify social media accounts (could be a separate product)
-- Age restriction?
+- Add minimum age restriction?

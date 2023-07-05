@@ -103,7 +103,6 @@ module {
   public func createFilter(minAge : Nat8, maxAge : Nat8, gender : ?Gender) : UserFilter {
     if (minAge > maxAge) Debug.trap("Invalid age");
     if (maxAge > 150) Debug.trap("Invalid maxAge");
-    // TODO: limit minimal minAge?
 
     // TODO: calculate exact time with consideration of leap years
     let minBirth = Time.now() - (Nat8.toNat(maxAge) * YEAR);
