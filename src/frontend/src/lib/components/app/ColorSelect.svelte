@@ -27,7 +27,7 @@
 <div class="flex flex-row gap-1 w-full justify-center">
 	{#each colors as c}
 		<button
-			class="w-10 h-14 rounded-full border-main hover:border-4 {c}"
+			class="w-10 h-10 rounded-full border-main hover:border-4 {c}"
 			on:click={() => changeColor(c)}
 		/>
 	{/each}

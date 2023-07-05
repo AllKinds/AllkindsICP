@@ -23,9 +23,9 @@
 			<span class="font-semibold">
 				<a href="/app/profile">{$user.username}</a>
 			</span>
-			<div class="flex ">
+			<div class="flex items-center">
 				<span class="mt-0.5 mr-1">
-					<Heart />
+					<Heart class="h-6"/>
 				</span>
 				{$user.points}
 			</div>

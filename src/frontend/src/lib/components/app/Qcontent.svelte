@@ -49,7 +49,7 @@
 		<p class="text-slate-500 text-sm p-0">By: {question.creater}</p>
 		<span>Color: {question.color[0]}</span>
 		 -->
-	<div class="flex gap-2 my-5 items-center">
+	<div class="flex gap-2 mt-5 items-center">
 		<button class="sub-btn" on:click={() => likeWeight--}>
 			<MinusCircle />
 		</button>
@@ -58,6 +58,7 @@
 			<PlusCircle />
 		</button>
 	</div>
+	<div class="text-xs font-thin mb-5 items-center">Importance</div>
 
 	<div class="w-full flex flex-row justify-center items-center gap-3">
 		<button

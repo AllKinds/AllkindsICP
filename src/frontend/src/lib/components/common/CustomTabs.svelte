@@ -12,7 +12,7 @@
 	//   </CustomTabs>
 </script>
 
-<div class="flex flex-col gap-4">
+<div class="flex flex-col gap-4 items-center">
 	<div class="flex gap-3">
 		{#each lists as { arr, title }, key}
 			<button

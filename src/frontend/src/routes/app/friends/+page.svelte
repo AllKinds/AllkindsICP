@@ -19,7 +19,7 @@
 	let lists: Array<{ arr: Array<any>; title: String }> = [
 		{
 			arr: $friendsApproved,
-			title: 'My Friends'
+			title: 'My Contacts'
 		},
 		{
 			arr: $friendsWaiting,
@@ -27,7 +27,7 @@
 		},
 		{
 			arr: $friendsRequested,
-			title: 'Send'
+			title: 'Requests Sent'
 		}
 	];
 
