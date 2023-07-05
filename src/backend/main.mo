@@ -240,7 +240,7 @@ actor {
 
   func assertAdmin(caller : Principal) {
     if (not Principal.isController(caller)) {
-      //TODO!: Debug.trap("Access denied!");
+      Debug.trap("Access denied!");
     };
   };
 
