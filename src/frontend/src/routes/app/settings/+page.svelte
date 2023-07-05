@@ -91,77 +91,6 @@
 
 <div class="flex flex-col gap-2">
 	<h2 class="p-0 text-center ">Profile settings</h2>
-	<span class="text-zinc-600 flex justify-center">
-		<Eye />
-		: Allow what people can initially see about you.
-	</span>
-
-	<div class="flex flex-col justify-center items-center">
-		<div class="fancy-btn-border">
-			<button on:click={update} class="fancy-btn">
-				{#if pending}
-					<Spinner />
-				{:else}
-					Update
-				{/if}
-			</button>
-		</div>
-	</div>
-
-	<div class=" w-fit rounded-md flex flex-col p-2 md:p-8 mx-auto">
-		<span>Username</span>
-		<label for="username" class="pr-8">
-			<input
-				type="text"
-				id="username"
-				class="inputfield border-main"
-				bind:value={userObj.username}
-			/>
-		</label>
-
-		<span>Gender</span>
-		<label for="gender">
-			<select bind:value={userObj.gender}>
-				{#each genders as gender}
-					<option value={gender}>
-						{gender}
-					</option>
-				{/each}
-			</select>
-			<PublicToggle bind:checked={publicGender} />
-		</label>
-
-		<span>Birthday</span>
-		<label for="birth">
-			<input
-				type="date"
-				id="birth"
-				class="inputfield border-main"
-				bind:value={userObj.birth}
-				min="1920-01-01"
-				max="2022-01-01"
-			/>
-			<PublicToggle bind:checked={publicBirth} />
-		</label>
-
-		<span>Email</span>
-		<label for="connect">
-			<input
-				type="email"
-				id="connect"
-				class="inputfield border-main"
-				bind:value={userObj.connect}
-			/>
-			<PublicToggle bind:checked={publicConnect} />
-		</label>
-
-		<span>About</span>
-		<label for="about">
-			<textarea id="about" class="inputfield h-48 w-60 border-main" bind:value={userObj.about} />
-			<PublicToggle bind:checked={publicAbout} />
-		</label>
-
-		<span>Profile picture</span>
 
 		<!-- <label for="picture">
 				<input type="file" bind:this={file} on:change={handleFileInput} />
@@ -191,7 +120,71 @@
 				disabled={pending}
 			/>
 		</button>
-		<PublicToggle bind:checked={publicPicture} />
+		
+	</div>
+
+	<div class=" w-fit rounded-md flex flex-col p-2 md:p-8 mx-auto">
+		<span>Username</span>
+		<label for="username" class="pr-8">
+			<input
+				type="text"
+				id="username"
+				class="inputfield border-main"
+				bind:value={userObj.username}
+			/>
+		</label>
+
+		<span>Gender</span>
+		<label for="gender">
+			<select bind:value={userObj.gender}>
+				{#each genders as gender}
+					<option value={gender}>
+						{gender}
+					</option>
+				{/each}
+			</select>
+			<PublicToggle bind:checked={publicGender} />
+		</label>
+
+		<span>Age</span>
+		<label for="birth">
+			<input
+				type="number"
+				id="birth"
+				class="inputfield border-main"
+				bind:value={userObj.birth}
+			/>
+			<PublicToggle bind:checked={publicBirth} />
+		</label>
+
+		<span>Email</span>
+		<label for="connect">
+			<input
+				type="email"
+				id="connect"
+				class="inputfield border-main"
+				bind:value={userObj.connect}
+			/>
+			<PublicToggle bind:checked={publicConnect} />
+		</label>
+
+		<span>About</span>
+		<label for="about">
+			<textarea id="about" class="inputfield h-24 w-60 border-main" bind:value={userObj.about} />
+			<PublicToggle bind:checked={publicAbout} />
+		</label>
+
+		
+	<div class="flex flex-col justify-center items-center">
+		<div class="fancy-btn-border">
+			<button on:click={update} class="fancy-btn">
+				{#if pending}
+					<Spinner />
+				{:else}
+					Update
+				{/if}
+			</button>
+		</div>
 	</div>
 </div>
 
