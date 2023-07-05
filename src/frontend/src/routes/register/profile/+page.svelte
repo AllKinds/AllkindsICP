@@ -3,7 +3,7 @@
 	import { RegiState } from '$lib/stores/types';
 
 	import { user } from '$lib/stores/';
-	import type { Gender, User } from 'src/declarations/backend/backend.did';
+	import type { Gender, Social, User } from 'src/declarations/backend/backend.did';
 	import { updateProfile } from '$lib/stores/tasks/updateProfile';
 	import {
 		toNullable,
@@ -25,11 +25,12 @@
 	let publicAbout: boolean = $user.about[1];
 	let publicBirth: boolean = $user.birth[1];
 	let publicGender: boolean = $user.gender[1];
+    let publicEmail: boolean = $user.socials[0] ? $user.socials[0][1] : true;
 
 	//an user object to temporary store and change OUR values , this has NO User interface
 	let userObj = {
 		created: $user.created,
-		socials: $user.socials,
+		email: $user.socials[0] ? $user.socials[0][0].handle : '',
 		about: fromNullable($user.about[0]),
 		username: $user.username,
 		gender: fromNullableGender($user.gender[0]),
@@ -38,9 +39,10 @@
 
 	async function submit() {
 		pending = true;
+        let social : Social = {network: {email: null}, handle: userObj.email}; 
 		const newUserObj: User = {
 			created: $user.created,
-			socials: userObj.socials,
+			socials: [[social, publicEmail]],
 			about: [toNullable(userObj.about), publicAbout],
 			username: userObj.username,
 			gender: [toNullableGender(userObj.gender), publicGender],
@@ -83,19 +85,19 @@
 			/>
 			<PublicToggle slot="public" bind:checked={publicBirth} />
 		</Input>
-		<!-- TODO: edit socials
+		
 		<Input text="Email">
 			<input
 				type="email"
 				class="inputfield"
 				slot="input"
-				bind:value={userObj.socials[0][0]}
+				bind:value={userObj.email}
 				disabled={pending}
 				style="width: 250px; background-color: #d1d1d1"
 			/>
-			<PublicToggle slot="public" bind:checked={publicConnect} />
+			<PublicToggle slot="public" bind:checked={publicEmail} />
 		</Input>
-        -->
+        
 
 		<Input text="Short bio?">
 			<textarea class="inputfield" slot="input" bind:value={userObj.about} disabled={pending} style="width: 250px; background-color: #d1d1d1"/>

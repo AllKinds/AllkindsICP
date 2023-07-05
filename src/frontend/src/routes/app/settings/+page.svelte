@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { avatar, user } from '$lib/stores/index';
-	import type { User } from 'src/declarations/backend/backend.did';
+	import type { Social, User } from 'src/declarations/backend/backend.did';
 	import { updateProfile } from '$lib/stores/tasks/updateProfile';
 	import {
 		toNullable,
@@ -21,14 +21,14 @@
 	//TODO : DECOMPONENTIALISE parts that could be used in future
 
 	let pending: boolean = false;
-	let _avatar = $avatar;
+	let _avatar: any = $avatar;
 	let fileInput: any;
 	//this could be moved to some declaration/constant somewhere else
 	let genders = ['', 'Male', 'Female', 'Other', 'Queer'];
 
 	let publicMode: boolean = true;
 	let publicAbout: boolean = $user.about[1];
-	let publicConnect: boolean = true; // TODO!
+    let publicEmail: boolean = $user.socials[0] ? $user.socials[0][1] : true;
 	let publicBirth: boolean = $user.birth[1];
 	let publicGender: boolean = $user.gender[1];
 	let publicPicture: boolean = $user.picture[1];
@@ -36,7 +36,7 @@
 	//a user object to temporary store and change OUR values , this has NO User interface
 	let userObj = {
 		created: $user.created,
-		socials: $user.socials,
+		email: $user.socials[0] ? $user.socials[0][0].handle : '',
 		about: fromNullable($user.about[0]),
 		username: $user.username,
 		gender: fromNullableGender($user.gender[0]),
@@ -71,9 +71,10 @@
 	const update = async () => {
 		pending = true;
 		//sets the new user object to update
+        let social : Social = {network: {email: null}, handle: userObj.email}; 
 		const newUser: User = {
 			created: $user.created,
-			socials: userObj.socials,
+			socials: [[social, publicEmail]],
 			about: [toNullable(userObj.about), publicAbout],
 			username: userObj.username,
 			gender: [toNullableGender(userObj.gender), publicGender],
@@ -163,9 +164,9 @@
 				type="email"
 				id="connect"
 				class="inputfield border-main"
-				bind:value={userObj.connect}
+				bind:value={userObj.email}
 			/>
-			<PublicToggle bind:checked={publicConnect} />
+			<PublicToggle bind:checked={publicEmail} />
 		</label>
 
 		<span>About</span>
