@@ -1,0 +1,7 @@
+[dependencies]
+#base = "0.9.3"
+base = "https://github.com/dfinity/motoko-base#moc-0.9.4"
+itertools = "0.1.1"
+StableBuffer = "https://github.com/f0i/StableBuffer#main"
+map = "8.1.0"
+prng = "0.0.3"

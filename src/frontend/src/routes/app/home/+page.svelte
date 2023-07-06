@@ -36,7 +36,8 @@
 
 <div class="flex flex-col gap-4">
 	<div class="w-full mx-auto flex-col p-2 justify-between">
-		<button class="w-full px-3 flex justify-between items-center font-Poppins rounded bg-slate-50 border-slate-600 border"
+		<button
+			class="w-full px-3 flex justify-between items-center font-Poppins rounded bg-slate-50 border-slate-600 border"
 			on:click={() => (expandWindow = !expandWindow)}
 		>
 			<span>
@@ -57,7 +58,7 @@
 				<textarea
 					id="questionInput"
 					class="w-full min-h-fit py-20 bg-transparent rounded outline-none text-4xl placeholder-current text-center {$color}"
-					placeholder="Type your Yes/No question here" 
+					placeholder="Type your Yes/No question here"
 					disabled={pending}
 					bind:value={newQ}
 				/>
@@ -66,10 +67,14 @@
 				<div>
 					<button on:click={submit} class="default-btn {$color} flex px-20 items-center my-5">
 						{#if pending}
-							<Spinner/>
+							<Spinner />
 						{:else}
 							Submit
-							<span class="flex ml-1 w-full">+5&nbsp;<Heart class="allign-middle w-4 h-4 mt-1 fill-{$color} stroke-{$color}" /></span>
+							<span class="flex ml-1 w-full"
+								>+5&nbsp;<Heart
+									class="allign-middle w-4 h-4 mt-1 fill-{$color} stroke-{$color}"
+								/></span
+							>
 						{/if}
 					</button>
 				</div>

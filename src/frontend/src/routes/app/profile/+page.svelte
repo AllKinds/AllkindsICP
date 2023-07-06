@@ -1,13 +1,14 @@
 <script lang="ts">
 	import { user, avatar } from '$lib/stores/index';
-	import { fromNullable, fromNullableDate, fromNullableGender } from '$lib/utilities';
+	import { fromNullableDate, fromNullableGender } from '$lib/utilities';
 	import { onMount } from 'svelte';
 	import { getQsAnswered, answeredQuestions, myQuestions } from '$lib/stores/tasks/getQsAnswered';
 	import Qbanner from '$lib/components/app/Qbanner.svelte';
 	import PlaceholderPic from '$lib/assets/icons/placeholder-pic.svg?component';
 	import CustomTabs from '$lib/components/common/CustomTabs.svelte';
+	import type { Social } from 'src/declarations/backend/backend.did';
 
-	//TODO make age/birth into ultility function
+	//TODO make age/birth into utility function
 
 	let userBirth = fromNullableDate($user.birth[0]);
 	let ageMs = Number(new Date()) - Number($user.birth[0]) / 1000000;
@@ -18,8 +19,8 @@
 		? fromNullableGender($user.gender[0]) + ', '
 		: '';
 	let userAbout = $user.about[0] ? $user.about[0] : '';
-	let userConnect = $user.connect[0] ? $user.connect[0] : '';
-	let userPicture = $avatar;
+	let userEmail  = $user.socials[0] ? $user.socials[0][0].handle : '';
+	let userPicture : any = $avatar;
 
 	console.log('age', userBirth);
 	console.log($user.about[0]);
@@ -58,7 +59,7 @@
 
 	<span class="p-0 text-xl mx-auto text-zinc-600">
 		{userAge}{userGender}
-		<span class="p-0 text-base mx-auto text-zinc-600">{userConnect}</span>
+		<span class="p-0 text-base mx-auto text-zinc-600">{userEmail}</span>
 	</span>
 
 	<span class="mx-auto">{userAbout}</span>

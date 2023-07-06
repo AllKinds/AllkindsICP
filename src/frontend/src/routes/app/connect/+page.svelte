@@ -1,12 +1,8 @@
 <script lang="ts">
 	import { toNullableGender } from '$lib/utilities';
 	import Spinner from '$lib/components/common/Spinner.svelte';
-	import type {
-		MatchingFilter,
-		FriendlyUserMatch,
-		Result
-	} from 'src/declarations/backend/backend.did';
-	import UserCard from '$lib/components/app/UserCard.svelte';
+	import type { UserMatch, ResultUserMatch } from 'src/declarations/backend/backend.did';
+	import UserCard from '$lib/components/app/userCard.svelte';
 	import { getMatchedUser, matchedUser } from '$lib/stores/tasks/getMatchedUser';
 	import ArrowLeft from '$lib/assets/icons/arrowLeft.svg?component';
 	import Heart from '$lib/assets/icons/heart.svg?component';
@@ -16,11 +12,11 @@
 	let resultWindow: Boolean = false;
 	//age + cohes based on Slider plugin, see for more info
 
-	let cohesionValue = [100, 100];
+	let cohesionValue: [number, number] = [60, 100];
 	let ageValue = [1, 120];
 	let genderValue = 'Everyone';
 	//let matches: Array<[User, BigInt]>;
-	let match: FriendlyUserMatch;
+	let match: UserMatch;
 
 	//this could be moved to some declaration/constant somewhere else
 	let genders = ['Everyone', 'Male', 'Female', 'Other', 'Queer'];
@@ -30,14 +26,16 @@
 	const handleFindMatches = async () => {
 		resultWindow = false;
 		pending = true;
-		let filter: MatchingFilter = {
-			cohesion: BigInt(cohesionValue[0]),
-			ageRange: [BigInt(ageValue[0]), BigInt(ageValue[1])],
-			gender: toNullableGender(genderValue == 'Everyone' ? '' : genderValue)
-		};
-		console.log('filter obj ready: ', filter);
 
-		await getMatchedUser(filter).catch((err: Result) => {
+		let gender = toNullableGender(genderValue == 'Everyone' ? '' : genderValue);
+
+		await getMatchedUser(
+			ageValue[0],
+			ageValue[1],
+			gender,
+			cohesionValue[0],
+			cohesionValue[1]
+		).catch((err: Error) => {
 			console.log('error while getting matchedUsers', err);
 		});
 		match = $matchedUser;
@@ -98,7 +96,10 @@
 			{#if match}
 				<UserCard {match} />
 			{:else}
-				<span class="text-slate-700 mx-auto">Oops, Something went wrong!</span>
+				<span class="text-slate-700 mx-auto">
+                    Sorry, we couldn't find a match... <br/>
+                    Try answering some more questions!
+                </span>
 			{/if}
 		</div>
 	{/if}

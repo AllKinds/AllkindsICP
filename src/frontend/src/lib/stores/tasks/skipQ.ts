@@ -1,11 +1,11 @@
 import { actor } from '$lib/stores';
-import type { Hash } from 'src/declarations/backend/backend.did';
+import type { QuestionID } from 'src/declarations/backend/backend.did';
 import { get } from 'svelte/store';
 import { syncAuth } from './auth';
 
-export async function skipQ(hash: Hash) {
+export async function skipQ(id: QuestionID) {
 	const localActor = get(actor);
-	console.log(hash, '= gonna be skipped');
-	await localActor.submitSkip(hash).then((res) => console.log('Res after Q skipped :', res));
+	console.log(id, '= gonna be skipped');
+	await localActor.submitSkip(id).then((res) => console.log('Res after Q skipped :', res));
 	await syncAuth();
 }

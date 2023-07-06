@@ -1,19 +1,25 @@
 import { actor } from '$lib/stores';
-import type { FriendlyUserMatch, MatchingFilter } from 'src/declarations/backend/backend.did';
+import type { Gender, UserMatch } from 'src/declarations/backend/backend.did';
 import { get, writable } from 'svelte/store';
 import { syncAuth } from './auth';
 
-export var matchedUser = writable<FriendlyUserMatch>();
+export let matchedUser = writable<UserMatch>();
 
-export async function getMatchedUser(filter: MatchingFilter) {
+export async function getMatchedUser(
+	minAge: number,
+	maxAge: number,
+	gender: [] | [Gender],
+	minCohesion: number,
+	maxCohesion: number
+) {
 	const localActor = get(actor);
 
-	let res = await localActor.findMatch(filter);
-	if (res.hasOwnProperty('ok')) {
+	const res = await localActor.findMatch(minAge, maxAge, gender, minCohesion, maxCohesion);
+	if ('ok' in res) {
 		matchedUser.set(res.ok);
 		console.log('matched users', res.ok);
-	} else if (res.hasOwnProperty('err')) {
-		matchedUser = writable<FriendlyUserMatch>();
+	} else if ('err' in res) {
+		matchedUser = writable<UserMatch>();
 		console.log('err : ', res);
 	} else {
 		console.error(res);

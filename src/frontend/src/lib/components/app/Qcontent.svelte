@@ -17,7 +17,7 @@
 		answerPending = bool;
 		let answer: boolean = bool;
 		let weight = BigInt(likeWeight);
-		await answerQ(question.hash, answer, weight)
+		await answerQ(question.id, answer, weight)
 			.catch((error) => {
 				console.log('errorcatch', error);
 			})
@@ -31,7 +31,7 @@
 
 	const skipQuestion = async () => {
 		skipPending = true;
-		await skipQ(question.hash).catch((error) => {
+		await skipQ(question.id).catch((error) => {
 			console.log('errorcatch', error);
 		});
 		skipPending = false;

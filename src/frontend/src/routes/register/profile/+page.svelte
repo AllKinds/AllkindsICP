@@ -3,7 +3,7 @@
 	import { RegiState } from '$lib/stores/types';
 
 	import { user } from '$lib/stores/';
-	import type { Gender, User } from 'src/declarations/backend/backend.did';
+	import type { Gender, Social, User } from 'src/declarations/backend/backend.did';
 	import { updateProfile } from '$lib/stores/tasks/updateProfile';
 	import {
 		toNullable,
@@ -23,25 +23,26 @@
 	let pending: boolean = false;
 	let genders = ['', 'Male', 'Female', 'Other', 'Queer'];
 	let publicAbout: boolean = $user.about[1];
-	let publicConnect: boolean = $user.connect[1];
 	let publicBirth: boolean = $user.birth[1];
 	let publicGender: boolean = $user.gender[1];
+    let publicEmail: boolean = $user.socials[0] ? $user.socials[0][1] : true;
 
 	//an user object to temporary store and change OUR values , this has NO User interface
 	let userObj = {
 		created: $user.created,
-		connect: fromNullable($user.connect[0]),
+		email: $user.socials[0] ? $user.socials[0][0].handle : '',
 		about: fromNullable($user.about[0]),
 		username: $user.username,
-		gender: fromNullableGender($user.gender[0]), //biiitch
+		gender: fromNullableGender($user.gender[0]),
 		birth: fromNullableDate($user.birth[0])
 	};
 
 	async function submit() {
 		pending = true;
+        let social : Social = {network: {email: null}, handle: userObj.email}; 
 		const newUserObj: User = {
 			created: $user.created,
-			connect: [toNullable(userObj.connect), publicConnect],
+			socials: [[social, publicEmail]],
 			about: [toNullable(userObj.about), publicAbout],
 			username: userObj.username,
 			gender: [toNullableGender(userObj.gender), publicGender],
@@ -75,29 +76,28 @@
 
 		<Input text="Age">
 			<input
-				type="text"
+				type="number"
 				slot="input"
 				bind:value={userObj.birth}
-				min="1920-01-01"
-				max="2022-01-01"
 				disabled={pending}
 				style="width: 250px; background-color: #d1d1d1"
 
 			/>
 			<PublicToggle slot="public" bind:checked={publicBirth} />
 		</Input>
-
+		
 		<Input text="Email">
 			<input
 				type="email"
 				class="inputfield"
 				slot="input"
-				bind:value={userObj.connect}
+				bind:value={userObj.email}
 				disabled={pending}
 				style="width: 250px; background-color: #d1d1d1"
 			/>
-			<PublicToggle slot="public" bind:checked={publicConnect} />
+			<PublicToggle slot="public" bind:checked={publicEmail} />
 		</Input>
+        
 
 		<Input text="Short bio?">
 			<textarea class="inputfield" slot="input" bind:value={userObj.about} disabled={pending} style="width: 250px; background-color: #d1d1d1"/>

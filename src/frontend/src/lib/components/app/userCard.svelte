@@ -2,7 +2,7 @@
 	import { sendFriendRequest } from '$lib/stores/tasks/sendFriendRequest';
 	import { fromNullable, fromNullableGender } from '$lib/utilities';
 	import type { Principal } from '@dfinity/principal';
-	import type { FriendlyUserMatch } from 'src/declarations/backend/backend.did';
+	import type { UserMatch } from 'src/declarations/backend/backend.did';
 	import PlaceholderPic from '$lib/assets/icons/placeholder-pic.svg?component';
 	import Spinner from '../common/Spinner.svelte';
 	import Qbanner from './Qbanner.svelte';
@@ -10,21 +10,21 @@
 	import CustomTabs from '../common/CustomTabs.svelte';
 	import { onMount } from 'svelte';
 
-	export let match: FriendlyUserMatch;
+	export let match: UserMatch;
+	let user = match.user;
 
 	let pending: boolean = false;
 	let succes: boolean = false;
 	let current = 0;
 
 	let userPicture: any;
-	let userPrincipal: Principal = match.principal;
-	let userName = match.username;
+	let userName = user.username;
 	let userScore = match.cohesion;
-	let userAbout = match.about;
-	let userGender = fromNullableGender(match.gender);
-	let userBirth = match.birth;
+	let userAbout = user.about;
+	let userGender = fromNullableGender(user.gender);
+	let userBirth = user.birth;
 	//TODO make age utility function
-	let ageMs = Number(new Date()) - Number(match.birth) / 1000000;
+	let ageMs = Number(new Date()) - Number(user.birth) / 1000000;
 	let ageY = Math.floor(ageMs / (1000 * 3600 * 24) / 365);
 	//TODO : return all questions (+weight) with indication which had common answer (matched)
 	let answered = match.answered;
@@ -35,7 +35,7 @@
 	const handleConnectionRequest = async () => {
 		pending = true;
 		succes = false;
-		await sendFriendRequest(userPrincipal).catch((err) => {
+		await sendFriendRequest(userName).catch((err) => {
 			console.log('error while sending connection request', err);
 		});
 		succes = true;
@@ -43,8 +43,8 @@
 	};
 	//console.log("PIC TEST", match)
 
-	let a = fromNullable(match.picture);
-	console.log(match.picture);
+	let a = fromNullable(user.picture);
+	console.log(user.picture);
 	if (a != undefined) {
 		let image = new Uint8Array(a);
 		let blob = new Blob([image], { type: 'image/png' });
