@@ -128,14 +128,14 @@ export async function syncAuth() {
 }
 
 export async function login() {
-	await authClient.login({
-		identityProvider:
-			import.meta.env.VITE_DFX_NETWORK === 'ic' 
-			? "https://nfid.one" + AUTH_PATH
-      : "http://r7inp-6aaaa-aaaaa-aaabq-cai.localhost:8080/",
-		//local dev II has changed, broken for now
-		onSuccess: async () => await checkRegistration()
-	});
+    await authClient.login({
+        identityProvider:
+            import.meta.env.VITE_DFX_NETWORK === 'ic'
+                ? NFID_AUTH_URL
+                : "http://" + import.meta.env.VITE_INTERNET_IDENTITY_CANISTER_ID +
+                "." + import.meta.env.VITE_HOST.replace(/^https?:../, ''),
+        onSuccess: async () => await checkRegistration()
+    });
 }
 
 export async function logout() {
