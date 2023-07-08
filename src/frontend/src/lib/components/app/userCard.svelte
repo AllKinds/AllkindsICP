@@ -22,10 +22,7 @@
 	let userScore = match.cohesion;
 	let userAbout = user.about;
 	let userGender = fromNullableGender(user.gender);
-	let userBirth = user.birth;
-	//TODO make age utility function
-	let ageMs = Number(new Date()) - Number(user.birth) / 1000000;
-	let ageY = Math.floor(ageMs / (1000 * 3600 * 24) / 365);
+	let userAge = user.age;
 	//TODO : return all questions (+weight) with indication which had common answer (matched)
 	let answered = match.answered;
 	let uncommon = match.uncommon;
@@ -92,7 +89,7 @@
 			</span>
 		</div>
 		<span class="p-1 text-slate-600"
-			>{userBirth ? ageY + ', ' : ''}{userGender ? userGender : ''}</span
+			>{userAge ? userAge + ', ' : ''}{userGender ? userGender : ''}</span
 		>
 		<span class="p-1 ">{userAbout ? userAbout : ''}</span>
 

@@ -25,7 +25,7 @@ Alpha v0.2.0
 
 II included for faster local authentication testing
 
-requires at least DFX v0.14.1 and Motoko v0.9.4 , use [mocv](https://forum.dfinity.org/t/moc-version-management/19011)
+requires at least DFX v0.14.1, Motoko v0.9.4 (use [mocv](https://forum.dfinity.org/t/moc-version-management/19011)) and the [mops](https://mops.one/docs/install) packet manager.
 
 0. mocv use 0.9.4
 1. dfx start --clean --background

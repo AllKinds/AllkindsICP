@@ -23,7 +23,7 @@
 	let pending: boolean = false;
 	let genders = ['', 'Male', 'Female', 'Other', 'Queer'];
 	let publicAbout: boolean = $user.about[1];
-	let publicBirth: boolean = $user.birth[1];
+	let publicAge: boolean = $user.age[1];
 	let publicGender: boolean = $user.gender[1];
     let publicEmail: boolean = $user.socials[0] ? $user.socials[0][1] : true;
 
@@ -34,7 +34,7 @@
 		about: fromNullable($user.about[0]),
 		username: $user.username,
 		gender: fromNullableGender($user.gender[0]),
-		birth: fromNullableDate($user.birth[0])
+		age: fromNullable($user.age[0])
 	};
 
 	async function submit() {
@@ -46,7 +46,7 @@
 			about: [toNullable(userObj.about), publicAbout],
 			username: userObj.username,
 			gender: [toNullableGender(userObj.gender), publicGender],
-			birth: [toNullableDate(userObj.birth), publicBirth],
+			age: [toNullable(userObj.age), publicAge],
 			points: $user.points,
 			picture: $user.picture
 			//HUGE vulnerability, points shouldn't be part user obj, not a high priority for demo, but NEED to be fixed before any public deployment
@@ -78,12 +78,11 @@
 			<input
 				type="number"
 				slot="input"
-				bind:value={userObj.birth}
+				bind:value={userObj.age}
 				disabled={pending}
 				style="width: 250px; background-color: #d1d1d1"
-
 			/>
-			<PublicToggle slot="public" bind:checked={publicBirth} />
+			<PublicToggle slot="public" bind:checked={publicAge} />
 		</Input>
 		
 		<Input text="Email">
@@ -97,7 +96,6 @@
 			/>
 			<PublicToggle slot="public" bind:checked={publicEmail} />
 		</Input>
-        
 
 		<Input text="Short bio?">
 			<textarea class="inputfield" slot="input" bind:value={userObj.about} disabled={pending} style="width: 250px; background-color: #d1d1d1"/>

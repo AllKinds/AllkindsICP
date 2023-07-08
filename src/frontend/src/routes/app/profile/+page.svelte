@@ -8,13 +8,8 @@
 	import CustomTabs from '$lib/components/common/CustomTabs.svelte';
 	import type { Social } from 'src/declarations/backend/backend.did';
 
-	//TODO make age/birth into utility function
 
-	let userBirth = fromNullableDate($user.birth[0]);
-	let ageMs = Number(new Date()) - Number($user.birth[0]) / 1000000;
-	let ageY = Math.floor(ageMs / (1000 * 3600 * 24) / 365);
-
-	let userAge = userBirth ? ageY + ', ' : '';
+	let userAge = $user.age ? $user.age + ', ' : '';
 	let userGender = fromNullableGender($user.gender[0])
 		? fromNullableGender($user.gender[0]) + ', '
 		: '';
@@ -22,7 +17,7 @@
 	let userEmail  = $user.socials[0] ? $user.socials[0][0].handle : '';
 	let userPicture : any = $avatar;
 
-	console.log('age', userBirth);
+	console.log('age', userAge);
 	console.log($user.about[0]);
 
 	let lists: Array<{ arr: Array<any>; title: String }> = [

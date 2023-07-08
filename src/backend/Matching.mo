@@ -81,8 +81,7 @@ module {
       case (#err(e)) return #err(e);
     };
 
-    let ?fullUser = User.get(users, userB) else return #err(#userNotFound);
-    let user = User.filterUserInfo(fullUser);
+    let ?user = User.getInfo(users, userB, false) else return #err(#userNotFound);
 
     let answered = Array.tabulate<(Question, AnswerDiff)>(common.size(), func i = (Question.get(questions, common[i].question), common[i]));
     let unanswered : Iter.Iter<Question> = Question.unanswered(questions, answers, skips, userA);

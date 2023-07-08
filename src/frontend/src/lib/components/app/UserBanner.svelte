@@ -23,11 +23,8 @@
 	//let userScore = Number(match.cohesion);
 	let userAbout = user.about;
 	let userGender = fromNullableGender(user.gender);
-	//let userBirth = u.birth;
-	//TODO make age utility function
+    let userAge = user.age;
 
-	let ageMs = Number(new Date()) - Number(user.birth) / 1000000;
-	let ageY = Math.floor(ageMs / (1000 * 3600 * 24) / 365);
 	let answered = match.answered;
 	let aQsize = answered.length;
 
@@ -77,10 +74,10 @@
 		<div class="grow text-sm flex flex-col">
 			<span class="text-xl">{userName}</span>
 			<span class="text-sub">
-				{user.birth.length ? ageY : ''}
+				{userAge ? userAge : ''}
 				{userGender ? userGender : ''}
-				<!--TODO :  shorten this about string-->
 			</span>
+			<!--TODO :  shorten this about string-->
 			<span class="overflow-clip text-sub">{userAbout}</span>
 		</div>
 		<div class="shrink-0">
