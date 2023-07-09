@@ -210,7 +210,8 @@ actor {
     let userFriends = Friend.get(friends, caller);
 
     func toUserMatch((p : Principal, status : FriendStatus)) : ?(UserMatch, FriendStatus) {
-      let #ok(userMatch) = Matching.getUserMatch(users, questions, answers, skips, caller, p) else return null;
+      let showNonPublic = (status == #connected or status == #requestReceived);
+      let #ok(userMatch) = Matching.getUserMatch(users, questions, answers, skips, caller, p, showNonPublic) else return null;
       // TODO?: handle errors instead of removing them?
       ?(userMatch, status);
     };

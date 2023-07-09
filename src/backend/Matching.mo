@@ -72,7 +72,7 @@ module {
     return #ok(Nat8.fromIntWrap(s));
   };
 
-  public func getUserMatch(users : UserDB, questions : QuestionDB, answers : AnswerDB, skips : SkipDB, userA : Principal, userB : Principal) : Result<UserMatch, Error> {
+  public func getUserMatch(users : UserDB, questions : QuestionDB, answers : AnswerDB, skips : SkipDB, userA : Principal, userB : Principal, showNonPublic: Bool) : Result<UserMatch, Error> {
     let common = Question.getCommon(answers, userA, userB);
     let answersB = Question.getAnswers(answers, userB);
 
@@ -81,7 +81,7 @@ module {
       case (#err(e)) return #err(e);
     };
 
-    let ?user = User.getInfo(users, userB, false) else return #err(#userNotFound);
+    let ?user = User.getInfo(users, userB, showNonPublic) else return #err(#userNotFound);
 
     let answered = Array.tabulate<(Question, AnswerDiff)>(common.size(), func i = (Question.get(questions, common[i].question), common[i]));
     let unanswered : Iter.Iter<Question> = Question.unanswered(questions, answers, skips, userA);
