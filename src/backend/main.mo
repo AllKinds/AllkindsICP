@@ -183,7 +183,7 @@ actor {
       withoutFriends,
       func(id, user) = Result.toOption(
         // TODO?: handle errors instead of removing them?
-        Matching.getUserMatch(users, questions, answers, skips, caller, id),
+        Matching.getUserMatch(users, questions, answers, skips, caller, id, false),
       ),
     );
 
