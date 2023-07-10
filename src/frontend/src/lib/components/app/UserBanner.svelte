@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { fromNullable, fromNullableGender } from '$lib/utilities';
+	import { capitalize, fromNullable, fromNullableGender } from '$lib/utilities';
 	import CheckCircle from '$lib/assets/icons/check-circle.svg?component';
 	import PlaceholderPic from '$lib/assets/icons/placeholder-pic.svg?component';
 	import XCircle from '$lib/assets/icons/x-circle.svg?component';
@@ -75,7 +75,7 @@
 			<span class="text-xl">{userName}</span>
 			<span class="text-sub">
 				{userAge ? userAge : ''}
-				{userGender ? userGender : ''}
+				{userGender ? capitalize(userGender) : ''}
 			</span>
 			<!--TODO :  shorten this about string-->
 			<span class="overflow-clip text-sub">{userAbout}</span>

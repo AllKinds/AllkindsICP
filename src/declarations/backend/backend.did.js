@@ -45,10 +45,10 @@ export const idlFactory = ({ IDL }) => {
   });
   const Social = IDL.Record({ 'network' : SocialNetwork, 'handle' : IDL.Text });
   const Gender = IDL.Variant({
-    'Male' : IDL.Null,
-    'Female' : IDL.Null,
-    'Other' : IDL.Null,
-    'Queer' : IDL.Null,
+    'other' : IDL.Null,
+    'female' : IDL.Null,
+    'male' : IDL.Null,
+    'queer' : IDL.Null,
   });
   const User = IDL.Record({
     'age' : IDL.Tuple(IDL.Opt(IDL.Nat8), IsPublic),

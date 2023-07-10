@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { sendFriendRequest } from '$lib/stores/tasks/sendFriendRequest';
-	import { fromNullable, fromNullableGender } from '$lib/utilities';
+	import { capitalize, fromNullable, fromNullableGender } from '$lib/utilities';
 	import type { Principal } from '@dfinity/principal';
 	import type { UserMatch } from 'src/declarations/backend/backend.did';
 	import PlaceholderPic from '$lib/assets/icons/placeholder-pic.svg?component';
@@ -89,7 +89,7 @@
 			</span>
 		</div>
 		<span class="p-1 text-slate-600"
-			>{userAge ? userAge + ', ' : ''}{userGender ? userGender : ''}</span
+			>{userAge ? userAge + ', ' : ''}{userGender ? capitalize(userGender) : ''}</span
 		>
 		<span class="p-1 ">{userAbout ? userAbout : ''}</span>
 

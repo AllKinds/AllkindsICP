@@ -8,7 +8,10 @@
 		toNullableDate,
 		fromNullableDate,
 		toNullableGender,
-		fromNullableGender
+		fromNullableGender,
+
+		capitalize
+
 		//convertImageToUInt8Array
 	} from '$lib/utilities';
 	import PublicToggle from '$lib/components/common/PublicToggle.svelte';
@@ -24,7 +27,7 @@
 	let _avatar: any = $avatar;
 	let fileInput: any;
 	//this could be moved to some declaration/constant somewhere else
-	let genders = ['', 'Male', 'Female', 'Other', 'Queer'];
+	let genders = ['', 'male', 'female', 'other', 'queer'];
 
 	let publicMode: boolean = true;
 	let publicAbout: boolean = $user.about[1];
@@ -140,7 +143,7 @@
 			<select bind:value={userObj.gender}>
 				{#each genders as gender}
 					<option value={gender}>
-						{gender}
+						{capitalize(gender)}
 					</option>
 				{/each}
 			</select>

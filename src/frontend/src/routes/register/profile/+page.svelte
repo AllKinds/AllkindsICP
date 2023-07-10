@@ -11,7 +11,10 @@
 		toNullableDate,
 		fromNullableDate,
 		toNullableGender,
-		fromNullableGender
+		fromNullableGender,
+
+		capitalize
+
 	} from '$lib/utilities';
 	import Input from '$lib/components/common/Input.svelte';
 	import PublicToggle from '$lib/components/common/PublicToggle.svelte';
@@ -21,7 +24,7 @@
 	//TODO : DECOMPONENTIALISE parts that could be used in future
 
 	let pending: boolean = false;
-	let genders = ['', 'Male', 'Female', 'Other', 'Queer'];
+	let genders = ['', 'male', 'female', 'other', 'queer'];
 	let publicAbout: boolean = $user.about[1];
 	let publicAge: boolean = $user.age[1];
 	let publicGender: boolean = $user.gender[1];
@@ -67,7 +70,7 @@
 			<select bind:value={userObj.gender} slot="input" disabled={pending} style="width: 250px; background-color: #d1d1d1">
 				{#each genders as gender}
 					<option value={gender}>
-						{gender}
+						{capitalize(gender)}
 					</option>
 				{/each}
 			</select>

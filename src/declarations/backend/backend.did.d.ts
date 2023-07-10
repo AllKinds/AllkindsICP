@@ -30,10 +30,10 @@ export type FriendStatus = { 'requestIgnored' : null } |
   { 'rejectionSend' : null } |
   { 'rejectionReceived' : null } |
   { 'requestSend' : null };
-export type Gender = { 'Male' : null } |
-  { 'Female' : null } |
-  { 'Other' : null } |
-  { 'Queer' : null };
+export type Gender = { 'other' : null } |
+  { 'female' : null } |
+  { 'male' : null } |
+  { 'queer' : null };
 export type IsPublic = boolean;
 export interface Question {
   'id' : QuestionID__1,

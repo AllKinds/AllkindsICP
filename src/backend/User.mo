@@ -92,10 +92,10 @@ module {
   };
 
   public type Gender = {
-    #Male;
-    #Female;
-    #Queer;
-    #Other;
+    #male;
+    #female;
+    #queer;
+    #other;
   };
 
   public type Social = {

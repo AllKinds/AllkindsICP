@@ -5,27 +5,27 @@ import type { _SERVICE } from 'src/declarations/backend/backend.did';
 
 //Backend based
 export enum AuthState {
-	LoggedOut,
-	LoggedIn,
-	Registered
+    LoggedOut,
+    LoggedIn,
+    Registered
 }
 export type BackendActor = ActorSubclass<_SERVICE>;
 //Frontend based
 export enum RegiState {
-	Username,
-	Profile,
-	Finished
+    Username,
+    Profile,
+    Finished
 }
 export enum RootState {
-	Landing,
-	Register,
-	App
+    Landing,
+    Register,
+    App
 }
 export enum AppState {
-	Home,
-	People,
-	User,
-	Profile
+    Home,
+    People,
+    User,
+    Profile
 }
 
 //Others
@@ -36,7 +36,7 @@ export enum AppState {
 
 // })
 
-// let gender: Gender = { Male: null };
+// let gender: Gender = { male: null };
 // let user: User = {
 // 	created: BigInt(0),
 // 	connect: [['email@mail.com'], true],

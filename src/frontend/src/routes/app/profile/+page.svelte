@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { user, avatar } from '$lib/stores/index';
-	import { fromNullableDate, fromNullableGender } from '$lib/utilities';
+	import { capitalize, fromNullableDate, fromNullableGender } from '$lib/utilities';
 	import { onMount } from 'svelte';
 	import { getQsAnswered, answeredQuestions, myQuestions } from '$lib/stores/tasks/getQsAnswered';
 	import Qbanner from '$lib/components/app/Qbanner.svelte';
@@ -53,7 +53,7 @@
 	</span>
 
 	<span class="p-0 text-xl mx-auto text-zinc-600">
-		{userAge}{userGender}
+		{userAge}, {capitalize(userGender)}
 		<span class="p-0 text-base mx-auto text-zinc-600">{userEmail}</span>
 	</span>
 
