@@ -20,9 +20,9 @@
 	let userPicture: any;
 	let userName = user.username;
 	let userScore = match.cohesion;
-	let userAbout = user.about;
+	let userAbout = fromNullable(user.about);
 	let userGender = fromNullableGender(user.gender);
-	let userAge = user.age;
+	let userAge = fromNullable(user.age);
 	//TODO : return all questions (+weight) with indication which had common answer (matched)
 	let answered = match.answered;
 	let uncommon = match.uncommon;
@@ -84,13 +84,13 @@
 		<div class="flex p-1 text-2xl font-bold justify-between">
 			<span>{userName}</span>
 			<span>
-				{userScore}
-				{'(' + aQsize + ')'}
+				{userScore}%
+                {'(' + aQsize + ')'}
 			</span>
 		</div>
-		<span class="p-1 text-slate-600"
-			>{userAge ? userAge + ', ' : ''}{userGender ? capitalize(userGender) : ''}</span
-		>
+		<span class="p-1 text-slate-600">
+            {userAge ? userAge + ', ' : ''}{userGender ? capitalize(userGender) : ''}
+        </span>
 		<span class="p-1 ">{userAbout ? userAbout : ''}</span>
 
 		{#if succes}

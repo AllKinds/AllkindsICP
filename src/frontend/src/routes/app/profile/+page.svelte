@@ -9,7 +9,7 @@
 	import type { Social } from 'src/declarations/backend/backend.did';
 
 
-	let userAge = $user.age ? $user.age + ', ' : '';
+	let userAge = $user.age ? $user.age[0] + ', ' : '';
 	let userGender = fromNullableGender($user.gender[0])
 		? fromNullableGender($user.gender[0]) + ', '
 		: '';
@@ -53,7 +53,7 @@
 	</span>
 
 	<span class="p-0 text-xl mx-auto text-zinc-600">
-		{userAge}, {capitalize(userGender)}
+		{userAge} {capitalize(userGender)}
 		<span class="p-0 text-base mx-auto text-zinc-600">{userEmail}</span>
 	</span>
 

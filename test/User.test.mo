@@ -13,4 +13,3 @@ let fooId = gen.principal(0);
 let #ok(userA) = User.add(users, "foo", fooId) else { assert false; fail() };
 
 assert User.getPrincipal(users, "foo") == ?fooId;
-

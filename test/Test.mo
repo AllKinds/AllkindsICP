@@ -8,5 +8,5 @@ module Test {
   public func section(title : Text) = Debug.print("\n##" # " " # title # "\n");
 
   public func test(name : Text) = Debug.print("- " # name);
-  public func fail(): None = Debug.trap("");
+  public func fail() : None = Debug.trap("");
 };

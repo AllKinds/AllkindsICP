@@ -23,7 +23,7 @@
 	//let userScore = Number(match.cohesion);
 	let userAbout = user.about;
 	let userGender = fromNullableGender(user.gender);
-    let userAge = user.age;
+    let userAge = fromNullable(user.age);
 
 	let answered = match.answered;
 	let aQsize = answered.length;
