@@ -23,6 +23,7 @@
 	let userAbout = user.about;
 	let userGender = fromNullableGender(user.gender);
 	let userBirth = user.birth;
+	//let userEmail = user.socials;
 	//TODO make age utility function
 	let ageMs = Number(new Date()) - Number(user.birth) / 1000000;
 	let ageY = Math.floor(ageMs / (1000 * 3600 * 24) / 365);
@@ -87,8 +88,8 @@
 		<div class="flex p-1 text-2xl font-bold justify-between">
 			<span>{userName}</span>
 			<span>
-				{userScore}
-				{'(' + aQsize + ')'}
+				{userScore}%
+				{'(' + aQsize + ' questions)'}
 			</span>
 		</div>
 		<span class="p-1 text-slate-600"
@@ -97,7 +98,7 @@
 		<span class="p-1 ">{userAbout ? userAbout : ''}</span>
 
 		{#if succes}
-			<span class="mx-auto text-slate-600 py-8">Connection request send!</span>
+			<span class="mx-auto text-slate-600 py-8">Connection request sent!</span>
 		{:else}
 			<div class="mx-auto fancy-btn-border">
 				<button on:click={handleConnectionRequest} class="fancy-btn bg-main90">
