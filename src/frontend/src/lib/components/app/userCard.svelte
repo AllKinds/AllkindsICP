@@ -85,11 +85,7 @@
 			<span>{userName}</span>
 			<span>
 				{userScore}%
-<<<<<<< HEAD
-				{'(' + aQsize + ' questions)'}
-=======
                 {'(' + aQsize + ')'}
->>>>>>> 5cf144fc368dcab769d91abc963e7ea01adf5af8
 			</span>
 		</div>
 		<span class="p-1 text-slate-600">
