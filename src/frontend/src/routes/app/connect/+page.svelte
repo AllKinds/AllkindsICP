@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { toNullableGender } from '$lib/utilities';
+	import { capitalize, toNullableGender } from '$lib/utilities';
 	import Spinner from '$lib/components/common/Spinner.svelte';
 	import type { UserMatch, ResultUserMatch } from 'src/declarations/backend/backend.did';
 	import UserCard from '$lib/components/app/userCard.svelte';
@@ -14,12 +14,12 @@
 
 	let cohesionValue: [number, number] = [60, 100];
 	let ageValue = [1, 120];
-	let genderValue = 'Everyone';
+	let genderValue = 'everyone';
 	//let matches: Array<[User, BigInt]>;
 	let match: UserMatch;
 
 	//this could be moved to some declaration/constant somewhere else
-	let genders = ['Everyone', 'Male', 'Female', 'Other', 'Queer'];
+	let genders = ['everyone', 'male', 'female', 'other', 'queer'];
 
 	//TODO : DE-COMPONENT-IALIZE (only what cant be fixed with css classes), and extract the re-occuring CSS
 
@@ -27,7 +27,7 @@
 		resultWindow = false;
 		pending = true;
 
-		let gender = toNullableGender(genderValue == 'Everyone' ? '' : genderValue);
+		let gender = toNullableGender(genderValue == 'everyone' ? '' : genderValue);
 
 		await getMatchedUser(
 			ageValue[0],
@@ -70,7 +70,7 @@
 							class:active={genderValue === gender}
 							on:click={() => (genderValue = gender)}
 						>
-							{gender}
+							{capitalize(gender)}
 						</button>
 					{/each}
 				</div>

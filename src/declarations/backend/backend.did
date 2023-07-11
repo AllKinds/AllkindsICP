@@ -11,7 +11,7 @@ type UserMatch =
 type UserInfo = 
  record {
    about: opt text;
-   birth: opt Time;
+   age: opt nat8;
    gender: opt Gender;
    picture: opt blob;
    socials: vec Social;
@@ -23,10 +23,10 @@ type User =
             opt text;
             IsPublic;
           };
-   birth: record {
-            opt Time;
-            IsPublic;
-          };
+   age: record {
+          opt nat8;
+          IsPublic;
+        };
    created: Time;
    gender: record {
              opt Gender;
@@ -128,10 +128,10 @@ type Question =
 type IsPublic = bool;
 type Gender = 
  variant {
-   Female;
-   Male;
-   Other;
-   Queer;
+   female;
+   male;
+   other;
+   queer;
  };
 type FriendStatus = 
  variant {

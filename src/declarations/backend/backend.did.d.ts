@@ -30,10 +30,10 @@ export type FriendStatus = { 'requestIgnored' : null } |
   { 'rejectionSend' : null } |
   { 'rejectionReceived' : null } |
   { 'requestSend' : null };
-export type Gender = { 'Male' : null } |
-  { 'Female' : null } |
-  { 'Other' : null } |
-  { 'Queer' : null };
+export type Gender = { 'other' : null } |
+  { 'female' : null } |
+  { 'male' : null } |
+  { 'queer' : null };
 export type IsPublic = boolean;
 export interface Question {
   'id' : QuestionID__1,
@@ -82,22 +82,22 @@ export type SocialNetwork = { 'mastodon' : null } |
 export type Time = bigint;
 export type Time__1 = bigint;
 export interface User {
+  'age' : [[] | [number], IsPublic],
   'created' : Time,
   'about' : [[] | [string], IsPublic],
   'username' : string,
   'socials' : Array<[Social, IsPublic]>,
   'picture' : [[] | [Uint8Array | number[]], IsPublic],
   'gender' : [[] | [Gender], IsPublic],
-  'birth' : [[] | [Time], IsPublic],
   'points' : bigint,
 }
 export interface UserInfo {
+  'age' : [] | [number],
   'about' : [] | [string],
   'username' : string,
   'socials' : Array<Social>,
   'picture' : [] | [Uint8Array | number[]],
   'gender' : [] | [Gender],
-  'birth' : [] | [Time],
 }
 export interface UserMatch {
   'cohesion' : number,

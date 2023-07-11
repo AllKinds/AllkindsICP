@@ -13,6 +13,10 @@ import Error "Error";
 import Iter "mo:base/Iter";
 import Debug "mo:base/Debug";
 import Nat8 "mo:base/Nat8";
+import TextHelper "helper/TextHelper";
+import Option "mo:base/Option";
+import TupleHelper "helper/TupleHelper";
+import StableBuffer "mo:StableBuffer/StableBuffer";
 
 module {
 
@@ -35,23 +39,38 @@ module {
   };
 
   public type UserDB = {
-    info : Map<Principal, User>;
+    info : Map<Principal, StableUser>;
     byUsername : Map<Text, Principal>;
   };
 
   public func emptyDB() : UserDB = {
-    info = Map.new<Principal, User>(phash);
+    info = Map.new<Principal, StableUser>(phash);
     byUsername = Map.new<Text, Principal>(thash);
   };
 
   public func backup(users : UserDB) : Iter<(Principal, User)> {
-    Map.entries(users.info);
+    let all : Iter<(Principal, StableUser)> = Map.entries(users.info);
+    Iter.map<(Principal, StableUser), (Principal, User)>(
+      all,
+      func entry = TupleHelper.mapSecond(entry, stableToUser),
+    );
   };
 
   /// Information about a user.
   /// This contains private data and should not be returned to other users directly
   /// see UserInfo for non sensitive information
   public type User = {
+    username : Text;
+    created : Time;
+    about : (?Text, IsPublic);
+    gender : (?Gender, IsPublic);
+    age : (?Nat8, IsPublic);
+    socials : [(Social, IsPublic)]; // contains email or social media links
+    points : Nat;
+    picture : (?Blob, IsPublic);
+  };
+
+  type StableUser = {
     username : Text;
     created : Time;
     about : (?Text, IsPublic);
@@ -67,16 +86,16 @@ module {
     username : Text;
     about : ?Text;
     gender : ?Gender;
-    birth : ?Time;
+    age : ?Nat8;
     socials : [Social];
     picture : ?Blob;
   };
 
   public type Gender = {
-    #Male;
-    #Female;
-    #Queer;
-    #Other;
+    #male;
+    #female;
+    #queer;
+    #other;
   };
 
   public type Social = {
@@ -100,13 +119,28 @@ module {
     gender : ?Gender;
   };
 
+  func stableToUser(user : StableUser) : User {
+    {
+      username = user.username;
+      created = user.created;
+      about = user.about;
+      gender = user.gender;
+      age = TupleHelper.mapFirst<?Time, IsPublic, ?Nat8>(
+        user.birth,
+        func x = Option.chain(x, toAge),
+      );
+      socials = user.socials;
+      picture = user.picture;
+      points = user.points;
+    };
+  };
+
   public func createFilter(minAge : Nat8, maxAge : Nat8, gender : ?Gender) : UserFilter {
     if (minAge > maxAge) Debug.trap("Invalid age");
     if (maxAge > 150) Debug.trap("Invalid maxAge");
 
-    // TODO: calculate exact time with consideration of leap years
-    let minBirth = Time.now() - (Nat8.toNat(maxAge) * YEAR);
-    let maxBirth = Time.now() - (Nat8.toNat(minAge) * YEAR);
+    let minBirth = toBirth(maxAge) - YEAR;
+    let maxBirth = toBirth(minAge);
 
     { minBirth; maxBirth; gender };
   };
@@ -118,22 +152,33 @@ module {
     let null = getByName(users, username) else return #err(#nameNotAvailable);
 
     let user = create(username);
+    let lookupKey = TextHelper.toLower(username);
     Map.set(users.info, phash, id, user);
-    Map.set(users.byUsername, thash, username, id);
-    #ok(user);
+    Map.set(users.byUsername, thash, lookupKey, id);
+    #ok(stableToUser(user));
   };
 
-  public func get(users : UserDB, id : Principal) : ?User {
+  func getStable(users : UserDB, id : Principal) : ?StableUser {
     Map.get(users.info, phash, id);
   };
 
-  public func getPrincipal(users : UserDB, name : Text) : ?Principal {
-    Map.get(users.byUsername, thash, name);
+  public func get(users : UserDB, id : Principal) : ?User {
+    Option.map(getStable(users, id), stableToUser);
   };
 
-  public func getByName(users : UserDB, name : Text) : ?User {
+  public func getPrincipal(users : UserDB, username : Text) : ?Principal {
+    let lookupKey = TextHelper.toLower(username);
+    Map.get(users.byUsername, thash, lookupKey);
+  };
+
+  func getByName(users : UserDB, name : Text) : ?StableUser {
     let ?id = getPrincipal(users, name) else return null;
-    get(users, id);
+    getStable(users, id);
+  };
+
+  public func getInfo(users : UserDB, id : Principal, showNonPublic : Bool) : ?UserInfo {
+    let ?u = getStable(users, id) else return null;
+    ?filterUserInfo(u, showNonPublic);
   };
 
   func validateName(username : Text) : Bool {
@@ -151,12 +196,12 @@ module {
 
   public func update(users : UserDB, user : User, id : Principal) : Result<User, Error> {
     let ?u = get(users, id) else return #err(#notRegistered);
-    let newUser : User = {
+    let newUser : StableUser = {
       username = u.username; // can't be changed by user
       created = u.created; // can't be changed by user
       about = user.about;
       gender = user.gender;
-      birth = user.birth;
+      birth = TupleHelper.mapFirst<?Nat8, IsPublic, ?Time>(user.age, func x = Option.map(x, toBirth));
       socials = user.socials;
       points = u.points; // can't be changed by user
       picture = user.picture;
@@ -164,14 +209,15 @@ module {
 
     Map.set(users.info, phash, id, newUser);
 
-    #ok newUser;
+    #ok(stableToUser(newUser));
   };
 
   public func find(users : UserDB, filter : UserFilter) : Iter<(Principal, User)> {
-    Iter.filter<(Principal, User)>(Map.entries(users.info), func(_, u) = matches(u, filter));
+    let filtered = Iter.filter<(Principal, StableUser)>(Map.entries(users.info), func(_, u) = matches(u, filter));
+    Iter.map<(Principal, StableUser), (Principal, User)>(filtered, func x = TupleHelper.mapSecond(x, stableToUser));
   };
 
-  func matches(user : User, filter : UserFilter) : Bool {
+  func matches(user : StableUser, filter : UserFilter) : Bool {
     switch (filter.gender) {
       case (null) {};
       case (?gender) {
@@ -213,7 +259,7 @@ module {
   };
 
   public func reward(users : UserDB, action : RewardableAction, id : Principal) : Result<User, Error> {
-    let ?u = get(users, id) else return #err(#notRegistered);
+    let ?u = getStable(users, id) else return #err(#notRegistered);
 
     let amount : Int = rewardSize(action);
 
@@ -222,7 +268,7 @@ module {
     // check if the user can pay
     if (points < 0) return #err(#insufficientFunds);
 
-    let newUser : User = {
+    let newUser : StableUser = {
       username = u.username;
       created = u.created;
       about = u.about;
@@ -235,10 +281,10 @@ module {
 
     Map.set(users.info, phash, id, newUser);
 
-    #ok newUser;
+    #ok(stableToUser(newUser));
   };
 
-  func create(username : Text) : User {
+  func create(username : Text) : StableUser {
     {
       username;
       created = Time.now();
@@ -251,31 +297,55 @@ module {
     };
   };
 
-  public func filterUserInfo(user : User) : UserInfo {
+  public func filterUserInfo(user : StableUser, showNonPublic : Bool) : UserInfo {
     let info : UserInfo = {
       username = user.username;
-      about = checkPublic(user.about);
-      gender = checkPublic(user.gender);
-      birth = checkPublic(user.birth);
-      socials = filterPublic(user.socials);
-      picture = checkPublic(user.picture);
+      about = checkPublic(user.about, showNonPublic);
+      gender = checkPublic(user.gender, showNonPublic);
+      age = Option.chain<Time, Nat8>(checkPublic(user.birth, showNonPublic), toAge);
+      socials = filterPublic(user.socials, showNonPublic);
+      picture = checkPublic(user.picture, showNonPublic);
     };
   };
 
   //returns user info opt property if not undefined and public viewable
-  func checkPublic<T>(prop : (?T, IsPublic)) : (?T) {
-    switch (prop) {
-      case (null, _) { null };
-      case (?_, false) { null };
-      case (?x, true) { ?x };
-    };
+  func checkPublic<T>((t : ?T, pub : IsPublic), showNonPublic : Bool) : (?T) {
+    if (pub or showNonPublic) { t } else { null };
   };
 
-  func filterPublic<T>(props : [(T, IsPublic)]) : [T] {
+  func filterPublic<T>(props : [(T, IsPublic)], showNonPublic : Bool) : [T] {
     Array.mapFilter<(T, IsPublic), T>(
       props,
-      func(t, pub) = if pub { ?t } else { null },
+      func(t, pub) = if (pub or showNonPublic) { ?t } else { null },
     );
+  };
+
+  func toAge(birth : Time) : ?Nat8 {
+    let diff = Time.now() - birth;
+    if (diff < 0) return null;
+    // TODO: calculate exact time with consideration of leap years
+    ?Nat8.fromIntWrap(diff / YEAR);
+  };
+
+  func toBirth(age : Nat8) : Time {
+    // TODO: calculate exact time with consideration of leap years
+    Time.now() - (Nat8.toNat(age) * YEAR);
+  };
+
+  func setAge((ageOrBirth, isPublic) : (?Int, Bool)) : (?Time, Bool) {
+    switch (ageOrBirth) {
+      case (null)(null, isPublic);
+      case (?number) {
+        if (number <= 200 and number >= 0) {
+          // This is overlapping with the possible time stamps
+          // chance of collision is very small: 200 nanoseconds per year,
+          // so no real risk, but it's ugly
+          (?toBirth(Nat8.fromIntWrap(number)), isPublic);
+        } else if (number < Time.now() and number > toBirth(200)) {
+          (?number, isPublic);
+        } else { (null, isPublic) };
+      };
+    };
   };
 
 };

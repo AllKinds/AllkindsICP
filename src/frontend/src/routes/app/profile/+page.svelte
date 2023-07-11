@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { user, avatar } from '$lib/stores/index';
-	import { fromNullableDate, fromNullableGender } from '$lib/utilities';
+	import { capitalize, fromNullableDate, fromNullableGender } from '$lib/utilities';
 	import { onMount } from 'svelte';
 	import { getQsAnswered, answeredQuestions, myQuestions } from '$lib/stores/tasks/getQsAnswered';
 	import Qbanner from '$lib/components/app/Qbanner.svelte';
@@ -8,13 +8,8 @@
 	import CustomTabs from '$lib/components/common/CustomTabs.svelte';
 	import type { Social } from 'src/declarations/backend/backend.did';
 
-	//TODO make age/birth into utility function
 
-	let userBirth = fromNullableDate($user.birth[0]);
-	let ageMs = Number(new Date()) - Number($user.birth[0]) / 1000000;
-	let ageY = Math.floor(ageMs / (1000 * 3600 * 24) / 365);
-
-	let userAge = userBirth ? ageY + ', ' : '';
+	let userAge = $user.age ? $user.age[0] + ', ' : '';
 	let userGender = fromNullableGender($user.gender[0])
 		? fromNullableGender($user.gender[0]) + ', '
 		: '';
@@ -22,7 +17,7 @@
 	let userEmail  = $user.socials[0] ? $user.socials[0][0].handle : '';
 	let userPicture : any = $avatar;
 
-	console.log('age', userBirth);
+	console.log('age', userAge);
 	console.log($user.about[0]);
 
 	let lists: Array<{ arr: Array<any>; title: String }> = [
@@ -58,7 +53,7 @@
 	</span>
 
 	<span class="p-0 text-xl mx-auto text-zinc-600">
-		{userAge}{userGender}
+		{userAge} {capitalize(userGender)}
 		<span class="p-0 text-base mx-auto text-zinc-600">{userEmail}</span>
 	</span>
 

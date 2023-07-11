@@ -8,7 +8,10 @@
 		toNullableDate,
 		fromNullableDate,
 		toNullableGender,
-		fromNullableGender
+		fromNullableGender,
+
+		capitalize
+
 		//convertImageToUInt8Array
 	} from '$lib/utilities';
 	import PublicToggle from '$lib/components/common/PublicToggle.svelte';
@@ -24,12 +27,12 @@
 	let _avatar: any = $avatar;
 	let fileInput: any;
 	//this could be moved to some declaration/constant somewhere else
-	let genders = ['', 'Male', 'Female', 'Other', 'Queer'];
+	let genders = ['', 'male', 'female', 'other', 'queer'];
 
 	let publicMode: boolean = true;
 	let publicAbout: boolean = $user.about[1];
     let publicEmail: boolean = $user.socials[0] ? $user.socials[0][1] : true;
-	let publicBirth: boolean = $user.birth[1];
+	let publicAge: boolean = $user.age[1];
 	let publicGender: boolean = $user.gender[1];
 	let publicPicture: boolean = $user.picture[1];
 
@@ -40,7 +43,7 @@
 		about: fromNullable($user.about[0]),
 		username: $user.username,
 		gender: fromNullableGender($user.gender[0]),
-		birth: fromNullableDate($user.birth[0]),
+		age: fromNullable($user.age[0]),
 		picture: fromNullable($user.picture[0])
 	};
 
@@ -78,7 +81,7 @@
 			about: [toNullable(userObj.about), publicAbout],
 			username: userObj.username,
 			gender: [toNullableGender(userObj.gender), publicGender],
-			birth: [toNullableDate(userObj.birth), publicBirth],
+			age: [toNullable(userObj.age), publicAge],
 			points: $user.points,
 			picture: [toNullable(userObj.picture), publicPicture]
 			//TODO : fix vulnerability with points being in userObj
@@ -140,7 +143,7 @@
 			<select bind:value={userObj.gender}>
 				{#each genders as gender}
 					<option value={gender}>
-						{gender}
+						{capitalize(gender)}
 					</option>
 				{/each}
 			</select>
@@ -153,9 +156,9 @@
 				type="number"
 				id="birth"
 				class="inputfield border-main"
-				bind:value={userObj.birth}
+				bind:value={userObj.age}
 			/>
-			<PublicToggle bind:checked={publicBirth} />
+			<PublicToggle bind:checked={publicAge} />
 		</label>
 
 		<span>Email</span>

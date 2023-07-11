@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { sendFriendRequest } from '$lib/stores/tasks/sendFriendRequest';
-	import { fromNullable, fromNullableGender } from '$lib/utilities';
+	import { capitalize, fromNullable, fromNullableGender } from '$lib/utilities';
 	import type { Principal } from '@dfinity/principal';
 	import type { UserMatch } from 'src/declarations/backend/backend.did';
 	import PlaceholderPic from '$lib/assets/icons/placeholder-pic.svg?component';
@@ -20,13 +20,9 @@
 	let userPicture: any;
 	let userName = user.username;
 	let userScore = match.cohesion;
-	let userAbout = user.about;
+	let userAbout = fromNullable(user.about);
 	let userGender = fromNullableGender(user.gender);
-	let userBirth = user.birth;
-	//let userEmail = user.socials;
-	//TODO make age utility function
-	let ageMs = Number(new Date()) - Number(user.birth) / 1000000;
-	let ageY = Math.floor(ageMs / (1000 * 3600 * 24) / 365);
+	let userAge = fromNullable(user.age);
 	//TODO : return all questions (+weight) with indication which had common answer (matched)
 	let answered = match.answered;
 	let uncommon = match.uncommon;
@@ -89,12 +85,16 @@
 			<span>{userName}</span>
 			<span>
 				{userScore}%
+<<<<<<< HEAD
 				{'(' + aQsize + ' questions)'}
+=======
+                {'(' + aQsize + ')'}
+>>>>>>> 5cf144fc368dcab769d91abc963e7ea01adf5af8
 			</span>
 		</div>
-		<span class="p-1 text-slate-600"
-			>{userBirth ? ageY + ', ' : ''}{userGender ? userGender : ''}</span
-		>
+		<span class="p-1 text-slate-600">
+            {userAge ? userAge + ', ' : ''}{userGender ? capitalize(userGender) : ''}
+        </span>
 		<span class="p-1 ">{userAbout ? userAbout : ''}</span>
 
 		{#if succes}
