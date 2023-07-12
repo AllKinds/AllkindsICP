@@ -12,7 +12,7 @@ export const load: LayoutLoad = () => {
 			{ slug: 'connect', title: 'Search', icon: GlobeAlt },
 			{ slug: 'friends', title: 'Contacts', icon: Users },
 			{ slug: 'profile', title: 'My answers', icon: User },
-			{ slug: 'settings', title: 'Settings', icon: Cogwheel }
+			{ slug: 'settings', title: 'My profile', icon: Cogwheel }
 		]
 	};
 };
