@@ -9,9 +9,9 @@ export const load: LayoutLoad = () => {
 	return {
 		sections: [
 			{ slug: 'home', title: 'Home', icon: Home },
-			{ slug: 'connect', title: 'Connect', icon: GlobeAlt },
-			{ slug: 'friends', title: 'Friends', icon: Users },
-			{ slug: 'profile', title: 'Me', icon: User },
+			{ slug: 'connect', title: 'Search', icon: GlobeAlt },
+			{ slug: 'friends', title: 'Contacts', icon: Users },
+			{ slug: 'profile', title: 'My answers', icon: User },
 			{ slug: 'settings', title: 'Settings', icon: Cogwheel }
 		]
 	};
