@@ -26,6 +26,7 @@ export async function getFriends() {
             friendsApproved.set(approvedFriends);
             friendsWaiting.set(waitingFriends);
             friendsRequested.set(requestedFriends);
+            console.log("getFriends done", arr)
 
             //derive stores
         }

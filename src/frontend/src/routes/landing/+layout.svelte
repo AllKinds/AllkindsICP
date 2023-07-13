@@ -1,13 +1,6 @@
 <script lang="ts">
 	import Layout from '$lib/components/common/Layout.svelte';
-	import type { LayoutData } from './$types';
-	import DropdownNav from '$lib/components/nav/DropdownNav.svelte';
 	import { goto } from '$app/navigation';
-	import Nav from '$lib/components/nav/Nav.svelte';
-
-	//export let data: LayoutData;
-
-	// layout is actually not needed because landing is a single page, but still using it for possible future additions
 </script>
 
 <Layout>

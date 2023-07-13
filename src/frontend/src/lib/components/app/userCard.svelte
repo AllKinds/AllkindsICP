@@ -8,7 +8,6 @@
 	import Qbanner from './Qbanner.svelte';
 	import QbannerNoColor from './QbannerNoColor.svelte';
 	import CustomTabs from '../common/CustomTabs.svelte';
-	import { onMount } from 'svelte';
 
 	export let match: UserMatch;
 	let user = match.user;

@@ -22,6 +22,7 @@ module {
   public let user = {
     minNameSize = 2;
     maxNameSize = 20;
+    maxAge : Nat8 = 120;
   };
 
   public let matching = {
