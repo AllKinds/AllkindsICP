@@ -20,7 +20,7 @@
 	console.log('age', userAge);
 	console.log($user.about[0]);
 
-	let lists: Array<{ arr: Array<any>; title: String }> = [
+	$: lists = [
 		{
 			arr: $myQuestions,
 			title: 'My Questions'
