@@ -16,7 +16,7 @@
 	let ageValue = [1, 120];
 	let genderValue = 'everyone';
 	//let matches: Array<[User, BigInt]>;
-	let match: UserMatch;
+	let match: UserMatch | undefined;
 
 	//this could be moved to some declaration/constant somewhere else
 	let genders = ['everyone', 'male', 'female', 'other', 'queer'];

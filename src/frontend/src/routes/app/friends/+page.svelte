@@ -15,7 +15,7 @@
 		});
 	};
 
-	let lists: Array<{ arr: Array<any>; title: String }> = [
+	$: lists = [
 		{
 			arr: $friendsApproved,
 			title: 'My Friends'

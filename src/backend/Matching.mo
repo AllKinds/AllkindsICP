@@ -72,7 +72,7 @@ module {
     return #ok(Nat8.fromIntWrap(s));
   };
 
-  public func getUserMatch(users : UserDB, questions : QuestionDB, answers : AnswerDB, skips : SkipDB, userA : Principal, userB : Principal, showNonPublic: Bool) : Result<UserMatch, Error> {
+  public func getUserMatch(users : UserDB, questions : QuestionDB, answers : AnswerDB, skips : SkipDB, userA : Principal, userB : Principal, showNonPublic : Bool) : Result<UserMatch, Error> {
     let common = Question.getCommon(answers, userA, userB);
     let answersB = Question.getAnswers(answers, userB);
 

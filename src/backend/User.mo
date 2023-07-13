@@ -323,8 +323,11 @@ module {
   func toAge(birth : Time) : ?Nat8 {
     let diff = Time.now() - birth;
     if (diff < 0) return null;
+    let age = diff / YEAR;
+    if (age > Nat8.toNat(Configuration.user.maxAge)) return ?Configuration.user.maxAge;
+
     // TODO: calculate exact time with consideration of leap years
-    ?Nat8.fromIntWrap(diff / YEAR);
+    ?Nat8.fromIntWrap(age);
   };
 
   func toBirth(age : Nat8) : Time {
