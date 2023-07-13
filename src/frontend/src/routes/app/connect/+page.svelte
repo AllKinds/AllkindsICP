@@ -12,7 +12,7 @@
 	let resultWindow: Boolean = false;
 	//age + cohes based on Slider plugin, see for more info
 
-	let cohesionValue: [number, number] = [60, 100];
+	let cohesionValue: [number, number] = [100, 100];
 	let ageValue = [1, 120];
 	let genderValue = 'everyone';
 	//let matches: Array<[User, BigInt]>;
