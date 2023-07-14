@@ -52,7 +52,7 @@ module {
   };
 
   func score(common : [AnswerDiff]) : Result<Nat8, Error> {
-    if (common.size() < Configuration.question.minCommonQuestions) return #err(#notEnoughAnswers);
+    if (common.size() < Configuration.matching.minCommonQuestions) return #err(#notEnoughAnswers);
 
     var weights : Nat = 0;
     var scores : Nat = 0;
@@ -70,6 +70,10 @@ module {
   };
 
   public func getUserMatch(users : UserDB, questions : QuestionDB, answers : AnswerDB, skips : SkipDB, userA : Principal, userB : Principal, showNonPublic : Bool) : Result<UserMatch, Error> {
+    if (Question.countAnswers(answers, userB) < Configuration.matching.minAnswers) {
+      return #err(#notEnoughAnswers);
+    };
+
     let common = Question.getCommon(answers, userA, userB);
     let answersB = Question.getAnswers(answers, userB);
 

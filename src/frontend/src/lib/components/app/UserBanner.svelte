@@ -40,7 +40,7 @@
 		pending = false;
 	};
 
-	console.log(user.picture);
+	console.log("user picture", user.picture, "friend status", friendStatus);
 	let a = fromNullable(user.picture);
 	if (a != undefined) {
 		let image = new Uint8Array(a);
@@ -118,7 +118,7 @@
 			</button>
 
 			{#if match}
-				<UserCard {match} />
+				<UserCard {match} {friendStatus} />
 			{:else}
 				<span class="text-slate-700 mx-auto">Oops, Something went wrong!</span>
 			{/if}

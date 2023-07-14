@@ -2,7 +2,7 @@
 	import { sendFriendRequest } from '$lib/stores/tasks/sendFriendRequest';
 	import { capitalize, fromNullable, fromNullableGender } from '$lib/utilities';
 	import type { Principal } from '@dfinity/principal';
-	import type { UserMatch } from 'src/declarations/backend/backend.did';
+	import type { FriendStatus, UserMatch } from 'src/declarations/backend/backend.did';
 	import PlaceholderPic from '$lib/assets/icons/placeholder-pic.svg?component';
 	import Spinner from '../common/Spinner.svelte';
 	import Qbanner from './Qbanner.svelte';
@@ -10,10 +10,11 @@
 	import CustomTabs from '../common/CustomTabs.svelte';
 
 	export let match: UserMatch;
+	export let friendStatus: FriendStatus | null;
 	let user = match.user;
 
 	let pending: boolean = false;
-	let succes: boolean = false;
+	let succes: boolean = ('requestSend' in (friendStatus || []));
 	let current = 0;
 
 	let userPicture: any;
@@ -22,11 +23,14 @@
 	let userAbout = fromNullable(user.about);
 	let userGender = fromNullableGender(user.gender);
 	let userAge = fromNullable(user.age);
+	let userEmail = user.socials[0] ? user.socials[0].handle : '';
+
 	//TODO : return all questions (+weight) with indication which had common answer (matched)
 	let answered = match.answered;
 	let uncommon = match.uncommon;
 	let aQsize = answered.length;
 	let uQsize = uncommon.length;
+    let connected = ('connected' in (friendStatus || []));
 
 	const handleConnectionRequest = async () => {
 		pending = true;
@@ -92,7 +96,13 @@
         </span>
 		<span class="p-1 ">{userAbout ? userAbout : ''}</span>
 
-		{#if succes}
+        {#if connected}
+            <div class="mx-auto fancy-btn-border">
+                <a href={"mailto:" + userEmail} target="_blank">
+                <div class="fancy-btn bg-main90">{userEmail}</div>
+                </a>
+            </div>
+		{:else if succes}
 			<span class="mx-auto text-slate-600 py-8">Connection request sent!</span>
 		{:else}
 			<div class="mx-auto fancy-btn-border">

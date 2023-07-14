@@ -189,6 +189,10 @@ module {
     Option.get(Map.get(answers, phash, user), Trie.empty<Nat, Answer>());
   };
 
+  public func countAnswers(answers : AnswerDB, user : Principal) : Nat {
+    Trie.size(getAnswers(answers, user));
+  };
+
   func putAnswers(answers : AnswerDB, user : Principal, userAnswers : UserAnswers) {
     Map.set(answers, phash, user, userAnswers);
   };

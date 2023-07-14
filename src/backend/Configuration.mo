@@ -15,7 +15,6 @@ module {
   public let question = {
     minSize : Nat = 5;
     maxSize : Nat = 200;
-    minCommonQuestions : Nat = 5;
     maxBoost : Nat = 10;
   };
 
@@ -26,11 +25,12 @@ module {
   };
 
   public let matching = {
-    minAnswers = 10; // Users have to answer at least this many questions to start matching or get matched
+    minAnswers : Nat = 10; // Users have to answer at least this many questions to start matching or get matched
+    minCommonQuestions : Nat = 5; // number of common questions to consider two users for matching
   };
 
   public let api = {
-    maxPageSize = 500; // number of elements that can be returned in one request
+    maxPageSize : Nat = 500; // number of elements that can be returned in one request
   };
 
 };
