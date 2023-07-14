@@ -6,7 +6,7 @@ export const questions = writable<Array<Question>>();
 
 export async function getQs() {
     const localActor = get(actor);
-    if (!localActor) return; // TODO: retry when actor is created
+    if (!localActor) { setTimeout(getQs, 100); return; } // TODO: retry when actor is created
     const nr = BigInt(5);
     await localActor.getAskableQuestions(nr).then((qs) => {
         console.log('questions: ', qs);
