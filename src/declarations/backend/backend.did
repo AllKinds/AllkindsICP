@@ -187,7 +187,7 @@ service : {
                                   }) query;
   createQuestion: (text, text) -> (ResultQuestion);
   createUser: (text) -> (ResultUser);
-  findMatch: (nat8, nat8, opt Gender, nat8, nat8) -> (ResultUserMatch);
+  findMatch: (nat8, nat8, opt Gender, nat8) -> (ResultUserMatch);
   getAnsweredQuestions: (nat) -> (vec record {
                                         Question__1;
                                         Answer;

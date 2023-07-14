@@ -118,7 +118,7 @@ export interface _SERVICE {
   'createQuestion' : ActorMethod<[string, string], ResultQuestion>,
   'createUser' : ActorMethod<[string], ResultUser>,
   'findMatch' : ActorMethod<
-    [number, number, [] | [Gender], number, number],
+    [number, number, [] | [Gender], number],
     ResultUserMatch
   >,
   'getAnsweredQuestions' : ActorMethod<[bigint], Array<[Question__1, Answer]>>,

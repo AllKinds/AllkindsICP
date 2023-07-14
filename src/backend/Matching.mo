@@ -28,8 +28,7 @@ module {
 
   public type MatchingFilter = {
     users : UserFilter;
-    minCohesion : Nat8;
-    maxCohesion : Nat8;
+    cohesion : Nat8;
   };
 
   //returnable object of a user that caller requested
@@ -44,14 +43,12 @@ module {
     minAge : Nat8,
     maxAge : Nat8,
     gender : ?User.Gender,
-    minCohesion : Nat8,
-    maxCohesion : Nat8,
+    cohesion : Nat8,
   ) : MatchingFilter {
-    if (maxCohesion > 100) Debug.trap("Invalid maxCohesion");
-    if (maxCohesion < minCohesion) Debug.trap("Invalid minCohesion");
+    if (cohesion > 100) Debug.trap("Invalid cohesion");
 
     let users = User.createFilter(minAge, maxAge, gender);
-    return { users; minCohesion; maxCohesion };
+    return { users; cohesion };
   };
 
   func score(common : [AnswerDiff]) : Result<Nat8, Error> {
@@ -89,9 +86,9 @@ module {
 
     let userMatch : UserMatch = {
       user;
-      answered : [(Question, AnswerDiff)]; // indicates comparison with caller answer
+      answered; // indicates comparison with caller answer
       uncommon = Iter.toArray(uncommon); // Questions that user has answered but not caller
-      cohesion = cohesion;
+      cohesion;
     };
 
     #ok(userMatch);

@@ -162,11 +162,10 @@ actor {
     minAge : Nat8,
     maxAge : Nat8,
     gender : ?User.Gender,
-    minCohesion : Nat8,
-    maxCohesion : Nat8,
+    cohesion : Nat8,
   ) : async ResultUserMatch {
 
-    let filter = Matching.createFilter(minAge, maxAge, gender, minCohesion, maxCohesion);
+    let filter = Matching.createFilter(minAge, maxAge, gender, cohesion);
 
     switch (User.checkFunds(users, #findMatch, caller)) {
       case (#ok(_)) { /* user has sufficient funds */ };
@@ -187,18 +186,18 @@ actor {
       ),
     );
 
-    let scoreFiltered = Iter.filter<UserMatch>(
-      withScore,
-      func um = (um.cohesion >= filter.minCohesion) and (um.cohesion <= filter.maxCohesion),
-    );
+    var bestMatch : ?UserMatch = null;
+    var bestDiff = 100;
+    let ref : Int = Nat8.toNat(filter.cohesion);
 
-    let matches = Iter.toArray(scoreFiltered);
+    for (match in withScore) {
+      let diff = Int.abs(ref - Nat8.toNat(match.cohesion));
+      if (bestMatch == null or bestDiff > diff) {
+        bestMatch := ?match;
+      };
+    };
 
-    if (matches.size() == 0) return #err(#userNotFound);
-
-    let randomIndex = Nat64.toNat(random.next()) % matches.size();
-
-    let result = matches[randomIndex];
+    let ?result = bestMatch else return #err(#userNotFound);
 
     let #ok(_) = User.reward(users, #findMatch, caller) else Debug.trap("Bug: Reward failed. checkFunds should have returned an error already");
 

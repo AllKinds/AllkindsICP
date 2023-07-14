@@ -34,7 +34,6 @@
 			ageValue[1],
 			gender,
 			cohesionValue[0],
-			cohesionValue[1]
 		).catch((err: Error) => {
 			console.log('error while getting matchedUsers', err);
 		});

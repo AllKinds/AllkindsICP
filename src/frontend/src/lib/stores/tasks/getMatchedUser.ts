@@ -9,12 +9,11 @@ export async function getMatchedUser(
     minAge: number,
     maxAge: number,
     gender: [] | [Gender],
-    minCohesion: number,
-    maxCohesion: number
+    cohesion: number,
 ) {
     const localActor = get(actor);
 
-    const res = await localActor.findMatch(minAge, maxAge, gender, minCohesion, maxCohesion);
+    const res = await localActor.findMatch(minAge, maxAge, gender, cohesion);
     if ('ok' in res) {
         matchedUser.set(res.ok);
         console.log('matched users', res.ok);
