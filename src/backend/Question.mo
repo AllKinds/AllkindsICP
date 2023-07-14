@@ -15,6 +15,7 @@ import Map "mo:map/Map";
 import Result "mo:base/Result";
 import Configuration "Configuration";
 import Error "Error";
+import BufferHelper "helper/BufferHelper";
 
 /// Types and functionst related to questions and answers
 module {
@@ -25,7 +26,7 @@ module {
   public type QuestionID = Nat;
   type Buffer<T> = Buffer.StableBuffer<T>;
 
-  public type QuestionDB = Buffer<Question>;
+  public type QuestionDB = Buffer<Question>; // TODO: consider other data structure as buffer can have bad worst case performance due to resizing
   public type UserAnswers = Trie.Trie<QuestionID, Answer>;
   public type UserSkips = Trie.Trie<QuestionID, Skip>;
   public type AnswerDB = Map<Principal, UserAnswers>;
@@ -166,7 +167,7 @@ module {
   };
 
   public func unanswered(questions : QuestionDB, answers : AnswerDB, skips : SkipDB, user : Principal) : Iter<Question> {
-    let all = Buffer.vals(questions);
+    let all = BufferHelper.valsReverse(questions);
     let userAnswers = getAnswers(answers, user);
     let userSkips = getSkips(skips, user);
 
