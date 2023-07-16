@@ -1,12 +1,12 @@
 <script lang="ts">
-	import { capitalize, toNullableGender } from '$lib/utilities';
 	import Spinner from '$lib/components/common/Spinner.svelte';
-	import type { UserMatch, ResultUserMatch } from 'src/declarations/backend/backend.did';
-	import UserCard from '$lib/components/app/userCard.svelte';
 	import { getMatchedUser, matchedUser } from '$lib/stores/tasks/getMatchedUser';
-	import ArrowLeft from '$lib/assets/icons/arrowLeft.svg?component';
-	import Heart from '$lib/assets/icons/heart.svg?component';
-	import Slider from '@bulatdashiev/svelte-slider';
+    import Slider from '@bulatdashiev/svelte-slider';
+	import { capitalize, toNullableGender } from '$lib/utilities';
+	import type { UserMatch } from 'src/declarations/backend/backend.did';
+    import ArrowLeft from '$lib/assets/icons/arrowLeft.svg?component'
+    import Heart from '$lib/assets/icons/heart.svg?component'
+	import UserCard from '$lib/components/app/userCard.svelte';
 
 	let pending: boolean = false;
 	let resultWindow: Boolean = false;
@@ -17,6 +17,8 @@
 	let genderValue = 'everyone';
 	//let matches: Array<[User, BigInt]>;
 	let match: UserMatch | undefined;
+	const friendStatus = null;
+	matchedUser.update;
 
 	//this could be moved to some declaration/constant somewhere else
 	let genders = ['everyone', 'male', 'female', 'other', 'queer'];
@@ -29,16 +31,11 @@
 
 		let gender = toNullableGender(genderValue == 'everyone' ? '' : genderValue);
 
-		await getMatchedUser(
-			ageValue[0],
-			ageValue[1],
-			gender,
-			cohesionValue[0],
-		).catch((err: Error) => {
+		await getMatchedUser(ageValue[0], ageValue[1], gender, cohesionValue[0]).catch((err: Error) => {
 			console.log('error while getting matchedUsers', err);
 		});
 		match = $matchedUser;
-		console.log($matchedUser, match);
+		console.log('matched user:', match);
 		pending = false;
 		resultWindow = true;
 	};
@@ -93,12 +90,12 @@
 			</button>
 
 			{#if match}
-				<UserCard {match} />
+				<UserCard {match} {friendStatus} />
 			{:else}
 				<span class="text-slate-700 mx-auto">
-                    Sorry, we couldn't find a match... <br/>
-                    Try answering some more questions!
-                </span>
+					Sorry, we couldn't find a match... <br />
+					Try answering some more questions!
+				</span>
 			{/if}
 		</div>
 	{/if}
