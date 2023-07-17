@@ -58,7 +58,7 @@
 		userPicture = undefined;
 	}
 
-	let lists: Array<{ arr: Array<any>; title: String }> = [
+	$: lists = [
 		{
 			arr: answered,
 			title: 'All Questions'
@@ -119,7 +119,7 @@
 		<CustomTabs {lists}>
 			<svelte:fragment slot="item" let:item>
 				{#if item[1]}
-					<QbannerNoColor q={item[0]} b={item[1]} />
+					<QbannerNoColor q={item[0]} d={item[1]} />
 				{:else}
 					<Qbanner q={item} />
 				{/if}

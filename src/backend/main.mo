@@ -165,7 +165,12 @@ actor {
     cohesion : Nat8,
   ) : async ResultUserMatch {
 
+    if (Question.countAnswers(answers, caller) < Configuration.matching.minAnswers) {
+      return #err(#notEnoughAnswers);
+    };
+
     let filter = Matching.createFilter(minAge, maxAge, gender, cohesion);
+
 
     switch (User.checkFunds(users, #findMatch, caller)) {
       case (#ok(_)) { /* user has sufficient funds */ };

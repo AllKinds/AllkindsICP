@@ -70,9 +70,6 @@ module {
   };
 
   public func getUserMatch(users : UserDB, questions : QuestionDB, answers : AnswerDB, skips : SkipDB, userA : Principal, userB : Principal, showNonPublic : Bool) : Result<UserMatch, Error> {
-    if (Question.countAnswers(answers, userB) < Configuration.matching.minAnswers) {
-      return #err(#notEnoughAnswers);
-    };
 
     let common = Question.getCommon(answers, userA, userB);
     let answersB = Question.getAnswers(answers, userB);

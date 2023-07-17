@@ -96,8 +96,8 @@
 				<UserCard {match} />
 			{:else}
 				<span class="text-slate-700 mx-auto">
-                    Sorry, we couldn't find a match... <br/>
-                    Try answering some more questions!
+                    We couldn't find anyone... <br/>
+                    Try answering more questions (you need to answer at least 10 questions) or ask yours.
                 </span>
 			{/if}
 		</div>
