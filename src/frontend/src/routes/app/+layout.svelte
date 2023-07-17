@@ -9,8 +9,10 @@
 	import GlobeAlt from '$lib/assets/icons/globe-alt.svg?component';
 	import { goto } from '$app/navigation';
 	import DropdownNav from '$lib/components/nav/DropdownNav.svelte';
+	import Notifications from '$lib/components/common/Notifications.svelte';
 
 	export let data: LayoutData;
+
 </script>
 
 <Layout>
@@ -24,6 +26,8 @@
 	</svelte:fragment>
 
 	<svelte:fragment slot="main">
+            <Notifications />
+
 		<div class="flex flex-row justify-center mt-8 gap-4">
 			<!-- left sided col, possible for menu icon shortcuts  -->
 			<!-- <div

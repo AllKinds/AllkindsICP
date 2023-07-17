@@ -1,5 +1,3 @@
-<script lang="ts">
-</script>
 
 <div class="mx-auto min-h-screen flex flex-col scroll-smooth w-2/3">
 	<!-- header/nav -->

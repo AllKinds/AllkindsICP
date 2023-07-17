@@ -2,6 +2,7 @@ import { actor } from '$lib/stores';
 import type { Gender, UserMatch } from 'src/declarations/backend/backend.did';
 import { get, writable } from 'svelte/store';
 import { syncAuth } from './auth';
+import { addError, addNotification } from '$lib/utilities/notifications';
 
 export const matchedUser = writable<UserMatch | undefined>();
 
@@ -19,7 +20,8 @@ export async function getMatchedUser(
         console.log('matched users', res.ok);
     } else if ('err' in res) {
         matchedUser.set(undefined);
-        console.log('err : ', res);
+        console.log('error in findMatch:', res);
+        addError(res.err)
     } else {
         matchedUser.set(undefined);
         console.error(res);

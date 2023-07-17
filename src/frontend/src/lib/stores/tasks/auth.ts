@@ -6,6 +6,7 @@ import type { ResultUser, User } from 'src/declarations/backend/backend.did';
 import { get, writable } from 'svelte/store';
 import { idlFactory } from '../../../../../declarations/backend';
 import { AuthState, type BackendActor } from '../types';
+import { addError } from '$lib/utilities/notifications';
 
 export const authStore = writable<AuthState>();
 export const actor = writable<BackendActor>();

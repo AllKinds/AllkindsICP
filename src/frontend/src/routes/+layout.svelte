@@ -27,7 +27,7 @@
 </script>
 
 {#if browser}
-	<slot />
+    <slot />
 {:else}
 	{console.error('Not in a browser!')}
 {/if}
