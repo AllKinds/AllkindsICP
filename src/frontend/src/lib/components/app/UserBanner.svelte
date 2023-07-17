@@ -82,8 +82,8 @@
 		</div>
 		<div class="shrink-0">
 			<div class="border-main h-8 w-full p-1 px-2 rounded-full border-slate-200 text-center">
-				{match.cohesion}
-				{'('}{aQsize > 0 ? aQsize : 0}{')'}
+				{match.cohesion}%
+				{'('}{aQsize > 0 ? aQsize : 0}{' Qs)'}
 			</div>
 			<!-- show accept & reject control when target user requested to connect -->
 			{#if friendStatus && ('requestSend' in friendStatus || 'requestReceived' in friendStatus)}
