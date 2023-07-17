@@ -93,15 +93,9 @@
 				<UserCard {match} {friendStatus} />
 			{:else}
 				<span class="text-slate-700 mx-auto">
-<<<<<<< HEAD
                     We couldn't find anyone... <br/>
                     Try answering more questions (you need to answer at least 10 questions) or ask yours.
                 </span>
-=======
-					Sorry, we couldn't find a match... <br />
-					Try answering some more questions!
-				</span>
->>>>>>> cd95c18b130ebe5b324e31a7589a16b6e6f53eae
 			{/if}
 		</div>
 	{/if}
