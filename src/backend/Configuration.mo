@@ -3,10 +3,10 @@
 
 module {
   public let rewards = {
-    initialPoints : Nat = 1000;
+    initialPoints : Nat = 100;
 
-    answerReward : Int = 2;
-    creatorReward : Int = 5;
+    answerReward : Int = 10;
+    creatorReward : Int = 50;
     boostReward : Int = -2; // cost per boost point
 
     queryReward : Int = -10; // ask to find a match
