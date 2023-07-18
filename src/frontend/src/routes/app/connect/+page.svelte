@@ -92,8 +92,8 @@
 			{#if match}
 				<UserCard {match} {friendStatus} />
 			{:else}
-				<span class="text-slate-700 mx-auto">
-                    We couldn't find anyone... <br/>
+				<span class="text-slate-700 mx-auto text-center">
+                    We couldn't find anyone at the moment.<br/>
                     Try answering more questions (you need to answer at least 10 questions) or ask yours.
                 </span>
 			{/if}
