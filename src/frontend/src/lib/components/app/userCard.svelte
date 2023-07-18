@@ -61,7 +61,7 @@
 	$: lists = [
 		{
 			arr: answered,
-			title: 'All Questions'
+			title: 'Common questions'
 		},
 		{
 			arr: uncommon,
@@ -115,7 +115,7 @@
 				</button>
 			</div>
 		{/if}
-
+		<span class="font-light font-xs text-center mb-2"><span class="text-green-600 font-medium">Green</span> means questions were responded the same (both yes, or both no).</span>
 		<CustomTabs {lists}>
 			<svelte:fragment slot="item" let:item>
 				{#if item[1]}
