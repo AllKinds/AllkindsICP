@@ -1,27 +1,16 @@
 # Allkinds
+Allkinds allows individuals to find like-minded people or organizations in a very precise and private manner. This happens in a very natural way - by asking questions about what people consider important and answering questions from other people. Allkinds then calculates the cohesion score by the number of the same questions weighted on the importance of every question for each user.
 
-[Mainnet deployed Dapp](https://tp4bo-yaaaa-aaaap-aa5la-cai.icp0.io/)
-Have fun testing ^^ , Don't overconsume cycles pls
+You can try our MVP here: https://xroyo-niaaa-aaaal-act6a-cai.icp0.io/
 
-## Releases
+## Introduction
+### Problem
+Despite the presence of numerous solutions in the market, the issue of loneliness is worsening. Having a Facebook 'friend' does not equate to having a genuine friend, and Tinder-like matches often fail to lead to sustainable relationships.
+People spend too much time on social media and dating services, yet they only establish shallow connections. As a result, approximately 60% of the global population considers themselves either lonely, left out, or lacking meaningful relationships.
+### Solution
+Allkinds is a web3 protocol that empowers individuals and organizations to create comprehensive meta profiles encompassing their values, traits, interests, and more. By comparing these meta profiles with others, Allkinds enables users to discover precisely aligned like-minded individuals or organizations.
 
-Alpha v0.2.1 (1/05/23) (BREAKING CHANGE: ONLY questions have been reset)
-
-- Reverted UI colors back and removed custom accent slider
-- Added color selection instead of slider for questions
-- Removed footer from /app sections
-- Extracted some reuasble components , finetuned & optimized code
-- Added userCard toggle on userbanners at friendlist
-- Fixed slider issues at matchingFilter
-- Fixed age bug when birth was not set
-- Several smaller bug fixes/UI tweaks
-- fixed app not working on safari, esbuild bug (2/05/23)
-
-Alpha v0.2.0
-
-- first live deploy
-
-## Testing out locally
+## Installation for testing out locally
 
 II included for faster local authentication testing
 
@@ -33,3 +22,5 @@ requires at least DFX v0.14.1, Motoko v0.9.4 (use [mocv](https://forum.dfinity.o
 3. npm install
 4. dfx deploy
 5. npm run dev
+
+
