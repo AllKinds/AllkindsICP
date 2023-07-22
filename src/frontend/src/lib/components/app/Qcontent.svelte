@@ -51,11 +51,11 @@
 		 -->
 		 
 	<div class="flex gap-2 mt-2 items-center">
-		<button class="sub-btn" on:click={() => likeWeight--}>
+		<button class="sub-btn" on:click={() => {if(likeWeight > 0) likeWeight--}}>
 			<MinusCircle />
 		</button>
 		<span>{likeWeight}</span>
-		<button class="sub-btn" on:click={() => likeWeight++}>
+		<button class="sub-btn" on:click={() => {if(likeWeight < 10) likeWeight++}}>
 			<PlusCircle />
 		</button>
 	</div>
