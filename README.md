@@ -23,4 +23,10 @@ requires at least DFX v0.14.1, Motoko v0.9.4 (use [mocv](https://forum.dfinity.o
 4. dfx deploy
 5. npm run dev
 
+# License
+Allkinds project is licensed under the MIT license.
+
+# References
+- [Internet Computer ](https://internetcomputer.org)
+
 
