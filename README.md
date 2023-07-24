@@ -29,7 +29,7 @@ Allkinds project is licensed under the MIT license.
 # References
 - [Internet Computer ](https://internetcomputer.org)
 - [Allkinds landing page ](https://allkinds.xyz)
-- [Allkinds Lite paper] (https://allkinds.xyz/Allkinds_litepaper.pdf)
+- [Allkinds Lite paper ](https://allkinds.xyz/Allkinds_litepaper.pdf)
 
 # Roadmap
 - [x] Landing page
