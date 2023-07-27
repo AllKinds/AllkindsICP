@@ -2,42 +2,47 @@
 import type { Error } from 'src/declarations/backend/backend.did';
 import { writable } from 'svelte/store';
 
-const empty: string[] = [];
+const empty: [string, boolean][] = [];
 
 export const notifications = writable(empty);
 
 export function clearNotifications() {
-    notifications.set(empty);
+    notifications.set([]);
 };
 
-export function addNotification(msg: string) {
+export function addNotification(msg: string, isError: boolean) {
     console.log('Notification add:', msg);
-    notifications.update((current) => { current.push(msg); return current });
+    notifications.update((current) => { current.push([msg, isError]); return current });
     setTimeout(() => {
         notifications.update((current) => { current.pop(); return current });
         console.log('Notification removed:', msg);
     }, 2500);
 }
 
-export function addError(err: Error) {
+export function showError(err: Error) {
 
     switch (Object.keys(err)[0]) {
-        case 'notLoggedIn': addNotification("Not logged in"); break;
-        case 'validationError': addNotification("Validation error"); break;
-        case 'userNotFound': addNotification("User not found"); break;
-        case 'tooLong': addNotification("Too long"); break;
-        case 'insufficientFunds': addNotification("Insufficient funds"); break;
-        case 'notEnoughAnswers': addNotification("Not enough answers"); break;
-        case 'tooShort': addNotification("Too short"); break;
-        case 'friendAlreadyConnected': addNotification("Friend already connected"); break;
-        case 'nameNotAvailable': addNotification("Name not available"); break;
-        case 'alreadyRegistered': addNotification("Already registered"); break;
-        case 'friendRequestAlreadySend': addNotification("Friend request already send"); break;
-        case 'notRegistered': addNotification("Not registered"); break;
-        case 'invalidColor': addNotification("Invalid color"); break;
+        case 'notLoggedIn': addNotification("Not logged in", true); break;
+        case 'validationError': addNotification("Validation error", true); break;
+        case 'userNotFound': addNotification("User not found", true); break;
+        case 'tooLong': addNotification("Too long", true); break;
+        case 'insufficientFunds': addNotification("Insufficient funds", true); break;
+        case 'notEnoughAnswers': addNotification("Not enough answers", true); break;
+        case 'tooShort': addNotification("Too short", true); break;
+        case 'friendAlreadyConnected': addNotification("Friend already connected", true); break;
+        case 'nameNotAvailable': addNotification("Name not available", true); break;
+        case 'alreadyRegistered': addNotification("Already registered", true); break;
+        case 'friendRequestAlreadySend': addNotification("Friend request already send", true); break;
+        case 'notRegistered': addNotification("Not registered", true); break;
+        case 'invalidColor': addNotification("Invalid color", true); break;
         default:
             console.error("Unhandled error:", err);
-            addNotification(Object.keys(err)[0]);
+            addNotification(Object.keys(err)[0], true);
             break;
     }
+}
+
+export function showResult(res: { err: Error } | { ok: any }, success: string) {
+    if ('err' in res) { showError(res.err) }
+    else { addNotification(success, false) }
 }

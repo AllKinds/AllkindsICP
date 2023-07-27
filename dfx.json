@@ -28,6 +28,14 @@
             "frontend": {}
         }
     },
+    "networks": {
+        "staging": {
+            "providers": [
+                "https://icp0.io"
+            ],
+            "type": "persistent"
+        }
+    },
     "defaults": {
         "build": {
             "packtool": "mops sources"

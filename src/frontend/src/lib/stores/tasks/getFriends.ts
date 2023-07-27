@@ -1,5 +1,5 @@
 import { actor } from '$lib/stores';
-import { addError } from '$lib/utilities/notifications';
+import { showError } from '$lib/utilities/notifications';
 import type { FriendStatus, UserMatch } from 'src/declarations/backend/backend.did';
 import { get, writable } from 'svelte/store';
 
@@ -32,7 +32,7 @@ export async function getFriends() {
             //derive stores
         }
 
-        if ('err' in res) addError(res.err);
+        if ('err' in res) showError(res.err);
     });
     //await syncAuth();
 }

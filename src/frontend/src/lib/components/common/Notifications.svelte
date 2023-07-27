@@ -6,15 +6,19 @@
 	} from '$lib/utilities/notifications';
 </script>
 
-<ul class="mx-auto w-72 opacity-80">
+<ul class="mx-auto w-72 mt-4 opacity-80 toasts w-fit absolute">
 	{#each $notifications as notification}
 		<li
-			class="border-2 bg-red-200 px-5 py-4 rounded-lg cursor-pointer"
+			class="border-2 {notification[1] ? 'bg-red-200' : 'bg-green-300'} px-5 py-4 rounded-lg cursor-pointer"
 			on:click={() => clearNotifications()}
 			on:keypress={() => null}
 		>
-			<b class="text-xl">⚠</b>
-			{notification}
+            {#if notification[1]}
+                <span class="text-xl">⚠</span>
+            {:else}
+                <span class="text-l">🛈</span>
+            {/if}
+			{notification[0]}
 			<span class="float-right font-thin">&times;</span>
 		</li>
 	{/each}

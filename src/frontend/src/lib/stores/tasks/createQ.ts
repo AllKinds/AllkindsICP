@@ -1,7 +1,7 @@
 import { actor } from '$lib/stores';
 import { get } from 'svelte/store';
 import { syncAuth } from './auth';
-import { addError } from '$lib/utilities/notifications';
+import { showError } from '$lib/utilities/notifications';
 
 export async function createQ(text: string, color: string) {
     const localActor = get(actor);
@@ -10,7 +10,7 @@ export async function createQ(text: string, color: string) {
         .createQuestion(text, color)
         .then((res) => {
             console.log('Res after Q creation :', res);
-            if ('err' in res) addError(res.err);
+            if ('err' in res) showError(res.err);
         });
     await syncAuth();
 }

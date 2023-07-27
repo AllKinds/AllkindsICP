@@ -6,7 +6,7 @@ import type { ResultUser, User } from 'src/declarations/backend/backend.did';
 import { get, writable } from 'svelte/store';
 import { idlFactory } from '../../../../../declarations/backend';
 import { AuthState, type BackendActor } from '../types';
-import { addError } from '$lib/utilities/notifications';
+import { showError } from '$lib/utilities/notifications';
 
 export const authStore = writable<AuthState>();
 export const actor = writable<BackendActor>();
@@ -42,6 +42,7 @@ const AUTH_PATH =
 // Replace https://identity.ic0.app with NFID_AUTH_URL
 // as the identityProvider for authClient.login({})
 const NFID_AUTH_URL = 'https://nfid.one' + AUTH_PATH;
+const II_AUTH_URL = 'https://identity.ic0.app';
 
 // let authClient: AuthClient = await AuthClient.create();
 
@@ -74,7 +75,8 @@ async function createActor() {
     });
 
     // Fetch root key for certificate validation during development
-    if (import.meta.env.VITE_DFX_NETWORK !== 'ic') {
+    const network = import.meta.env.VITE_DFX_NETWORK;
+    if (network !== 'ic' && network !== 'staging') {
         agent.fetchRootKey().catch((err) => {
             console.warn('Unable to fetch root key. Check to ensure that your local replica is running');
             console.error(err);
@@ -128,15 +130,28 @@ export async function syncAuth() {
     isAuthenticated ? await checkRegistration() : authStore.set(AuthState.LoggedOut);
 }
 
-export async function login() {
+export async function login(provider: "II" | "NFID") {
     await authClient.login({
-        identityProvider:
-            import.meta.env.VITE_DFX_NETWORK === 'ic'
-                ? NFID_AUTH_URL
-                : "http://" + import.meta.env.VITE_INTERNET_IDENTITY_CANISTER_ID +
-                "." + import.meta.env.VITE_HOST.replace(/^https?:../, ''),
+        identityProvider: getAuthURL(provider),
         onSuccess: async () => await checkRegistration()
     });
+}
+
+function getAuthURL(provider: "II" | "NFID"): string {
+    const network = import.meta.env.VITE_DFX_NETWORK;
+    const isProduction = (network === 'ic' || network == 'staging');
+
+    if (isProduction) {
+        switch (provider) {
+            case "II":
+                return II_AUTH_URL;
+            case "NFID":
+                return NFID_AUTH_URL;
+        }
+    } else {
+        return "http://" + import.meta.env.VITE_INTERNET_IDENTITY_CANISTER_ID +
+            "." + import.meta.env.VITE_HOST.replace(/^https?:../, '')
+    }
 }
 
 export async function logout() {

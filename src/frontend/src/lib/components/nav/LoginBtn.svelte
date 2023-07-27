@@ -3,6 +3,7 @@
 	import { authStore } from '$lib/stores/';
 	import { AuthState } from '$lib/stores/types';
 	import Logout from '$lib/assets/icons/logout.svg?component';
+
 </script>
 
 <a
@@ -10,7 +11,7 @@
 	href={null}
 	on:click={$authStore === AuthState.LoggedIn || $authStore === AuthState.Registered
 		? logout
-		: login}
+		: () => login('NFID')}
 >
 	<Logout class="w-6 mr-1 mt-1 -ml-1" />
 	{#if $authStore === AuthState.LoggedIn || $authStore === AuthState.Registered}

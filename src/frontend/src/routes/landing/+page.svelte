@@ -47,6 +47,8 @@
 	// 		text: 'Want to see who is your real friend on Facebook? Attach meta profile to LinkedIn?'
 	// 	}
 	// ];
+
+    var showLoginOptions = false;
 </script>
 
 <div><h2>Find the <span class="text-cyan-600">right</span> people</h2></div>
@@ -54,9 +56,26 @@
 <br><br>Try our new approach! Express yourself through questions that matter. See what other people are interested in. It's completely private, so you can be sincere.
 </div>
 
-<div class="fancy-btn-border mx-auto mt-20">
-	<button on:click={login} class="fancy-btn">Connect with Internet-Identity</button>
+<div class="fancy-btn-border mx-auto mt-20 w-96">
+	<button on:click={() => login('NFID')} class="fancy-btn w-full">Log in with Google</button>
 </div>
+
+{#if !showLoginOptions}
+    <div class="mx-auto mt-2 w-fit">
+        <button on:click={() => showLoginOptions = true} class="btn hover:underline underline-offset-1">Other sign in options</button>
+    </div>
+{:else}
+    <div class="fancy-btn-border mx-auto mt-2 w-96">
+         <button on:click={() => login('II')} class="fancy-btn w-full">Log in with Internet&nbsp;Identity</button>
+    </div>
+    <div class="fancy-btn-border mx-auto mt-2 w-96">
+        <button on:click={() => login('NFID')} class="fancy-btn w-full">Log in with Metamask</button>
+    </div>
+    <div class="fancy-btn-border mx-auto mt-2 w-96">
+        <button on:click={() => login('NFID')} class="fancy-btn w-full">Other NFID options</button>
+    </div>
+{/if}
+
 
 <!-- 
 <Segment>
