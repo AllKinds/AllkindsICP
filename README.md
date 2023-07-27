@@ -23,4 +23,29 @@ requires at least DFX v0.14.1, Motoko v0.9.4 (use [mocv](https://forum.dfinity.o
 4. dfx deploy
 5. npm run dev
 
+# License
+Allkinds project is licensed under the MIT license.
+
+# References
+- [Internet Computer ](https://internetcomputer.org)
+- [Allkinds landing page ](https://allkinds.xyz)
+- [Allkinds Lite paper ](https://allkinds.xyz/Allkinds_litepaper.pdf)
+
+# Roadmap
+- [x] Landing page
+- [x] Fully working MVP (II&NFID auth, question/asnwers, basic cohesion algorithm) built on the ICP
+- [ ] Redesign
+- [ ] Share my profile/invite features
+- [ ] NLP/AI functionality (recomendation system for question, cohesion oncategories, etc.)
+- [ ] Geo-location services
+- [ ] Organisation accounts
+- [ ] Built-in/integrated messenger
+- [ ] DAO&Protocol functionality
+
+# Acknowledgements
+- Martin (https://github.com/f0i)
+- Denny (https://github.com/dennyweiss)
+- Wannes (https://github.com/wannesds)
+- Samer https://github.com/Web3NL
+
 
