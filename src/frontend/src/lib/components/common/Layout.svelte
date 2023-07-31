@@ -1,3 +1,8 @@
+<script>
+
+	import Tracking from "./Tracking.svelte";
+
+</script>
 
 <div class="mx-auto min-h-screen flex flex-col scroll-smooth w-2/3">
 	<!-- header/nav -->
@@ -12,4 +17,7 @@
 	<div class="mx-auto pb-16 pt-8 w-full">
 		<slot name="main" />
 	</div>
+
 </div>
+
+<Tracking />
