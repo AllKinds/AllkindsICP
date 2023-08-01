@@ -56,7 +56,7 @@
 <br><br>Try our new approach! Express yourself through questions that matter. See what other people are interested in. It's completely private, so you can be sincere.
 </div>
 
-<div class="fancy-btn-border mx-auto mt-20 w-96">
+<div class="fancy-btn-border mx-auto mt-20 w-80">
 	<button on:click={() => login('NFID')} class="fancy-btn w-full">Log in with Google</button>
 </div>
 
@@ -65,13 +65,13 @@
         <button on:click={() => showLoginOptions = true} class="btn hover:underline underline-offset-1">Other sign in options</button>
     </div>
 {:else}
-    <div class="fancy-btn-border mx-auto mt-2 w-96">
+    <div class="fancy-btn-border mx-auto mt-2 w-80">
          <button on:click={() => login('II')} class="fancy-btn w-full">Log in with Internet&nbsp;Identity</button>
     </div>
-    <div class="fancy-btn-border mx-auto mt-2 w-96">
+    <div class="fancy-btn-border mx-auto mt-2 w-80">
         <button on:click={() => login('NFID')} class="fancy-btn w-full">Log in with Metamask</button>
     </div>
-    <div class="fancy-btn-border mx-auto mt-2 w-96">
+    <div class="fancy-btn-border mx-auto mt-2 w-80">
         <button on:click={() => login('NFID')} class="fancy-btn w-full">Other NFID options</button>
     </div>
 {/if}
