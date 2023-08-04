@@ -49,11 +49,11 @@
 
 <!-- menu shortcuts sticky to bottom , left sided col replacement for mobile view -->
 <!-- TEMP FIX ,, TODO : generate from LayoutData and make into own Navshortcuts component-->
-<div class="flex w-full bg-footer py-1 fixed bottom-0 lg:hidden rounded-t-lg justify-evenly text-xs">
-	<div class="flex flex-col items-center"><a href="/app/home"><Home class="w-8 sub-btn" /></a>Home</div>
-	<div class="flex flex-col items-center"><a href="/app/connect"><GlobeAlt class="w-8 sub-btn" /></a>Search</div>
-	<div class="flex flex-col items-center"><a href="/app/friends"><Users class="w-8 sub-btn" /></a>Contacts</div>
-	<div class="flex flex-col items-center"><a href="/app/profile"><User class="w-8 sub-btn" /></a>Answers</div>
-	<div class="flex flex-col items-center"><a href="/app/settings"><Cogwheel class="w-8 sub-btn" /></a>Profile</div>
+<div class="flex w-full bg-footer py-3 fixed bottom-0 lg:hidden rounded-t-lg justify-evenly text-xs">
+	<div class="flex flex-col items-center px-2"><a href="/app/home"><Home class="w-8 sub-btn" /></a>Home</div>
+	<div class="flex flex-col items-center px-2"><a href="/app/connect"><GlobeAlt class="w-8 sub-btn" /></a>Search</div>
+	<div class="flex flex-col items-center px-2"><a href="/app/friends"><Users class="w-8 sub-btn" /></a>Contacts</div>
+	<div class="flex flex-col items-center px-2"><a href="/app/profile"><User class="w-8 sub-btn" /></a>Answers</div>
+	<div class="flex flex-col items-center px-2"><a href="/app/settings"><Cogwheel class="w-8 sub-btn" /></a>Profile</div>
 </div>
 

@@ -57,7 +57,7 @@
 			<div class="rounded-md mt-8 flex flex-col justify-center items-center {$color}">
 				<textarea
 					id="questionInput"
-					class="w-full min-h-fit py-20 bg-transparent rounded outline-none text-4xl placeholder-current text-center {$color}"
+					class="w-full min-h-fit py-20 bg-transparent rounded outline-none text-4xl placeholder-current text-center {$color} placeholder:opacity-60"
 					placeholder="Type your Yes/No question here"
 					disabled={pending}
 					bind:value={newQ}
