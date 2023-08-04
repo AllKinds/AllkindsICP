@@ -88,7 +88,7 @@
 		{/each}
 	{:else}
 		<span class="text-slate-700 mx-auto mt-10"
-			>That's all questions for now. Come later to check for new ones.</span
+			>That's all questions for now. Come back later to check for new ones.</span
 		>
 	{/if}
 </div>

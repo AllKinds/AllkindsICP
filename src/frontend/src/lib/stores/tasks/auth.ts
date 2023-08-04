@@ -94,6 +94,7 @@ async function createActor() {
 async function checkRegistration(): Promise<void> {
     await createActor();
     const localActor = get(actor);
+    authStore.set(AuthState.Registered); // default: assume user is registered
     const p = await localActor.whoami();
     const result: ResultUser = await localActor.getUser();
     if ('ok' in result) {
