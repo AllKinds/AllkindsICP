@@ -53,7 +53,7 @@
 			class="flex gap-1 text-sm p-1 hover:bg-sub rounded-md"
 		>
 			<GithubLogo class="w-6 text-zinc-200 rounded-full" />
-			<span class="m-auto">Allkinds v0.2.1</span>
+			<span class="m-auto">Allkinds v0.3.0</span>
 		</a>
 	</div>
 </div>

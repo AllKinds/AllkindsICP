@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Layout from '$lib/components/common/Layout.svelte';
-	import DropdownNav from '$lib/components/nav/DropdownNav.svelte';
 	import { goto } from '$app/navigation';
 	import { regiStore } from '$lib/stores/index';
 	import { RegiState } from '$lib/stores/types';
@@ -21,9 +20,6 @@
 	
 	<svelte:fragment slot="logo">
 		<button class="logo">Allkinds</button>
-	</svelte:fragment>
-	<svelte:fragment slot="nav">
-		<DropdownNav data={undefined} />
 	</svelte:fragment>
 
 	<svelte:fragment slot="main">

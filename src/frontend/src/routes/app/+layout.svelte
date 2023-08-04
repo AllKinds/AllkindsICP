@@ -8,7 +8,6 @@
 	import User from '$lib/assets/icons/user.svg?component';
 	import GlobeAlt from '$lib/assets/icons/globe-alt.svg?component';
 	import { goto } from '$app/navigation';
-	import DropdownNav from '$lib/components/nav/DropdownNav.svelte';
 	import Notifications from '$lib/components/common/Notifications.svelte';
 
 	export let data: LayoutData;
@@ -21,9 +20,6 @@
 		<button class="logo" on:click={() => goto('/app/home')}>Allkinds</button>
 	</svelte:fragment>
 
-	<svelte:fragment slot="nav">
-		<DropdownNav {data} />
-	</svelte:fragment>
 
 	<svelte:fragment slot="main">
             <Notifications />
@@ -53,7 +49,7 @@
 
 <!-- menu shortcuts sticky to bottom , left sided col replacement for mobile view -->
 <!-- TEMP FIX ,, TODO : generate from LayoutData and make into own Navshortcuts component-->
-<div class="flex w-full bg-main90 py-1 fixed bottom-0 sm:hidden rounded-t-lg justify-evenly text-xs">
+<div class="flex w-full bg-footer py-1 fixed bottom-0 lg:hidden rounded-t-lg justify-evenly text-xs">
 	<div class="flex flex-col items-center"><a href="/app/home"><Home class="w-8 sub-btn" /></a>Home</div>
 	<div class="flex flex-col items-center"><a href="/app/connect"><GlobeAlt class="w-8 sub-btn" /></a>Search</div>
 	<div class="flex flex-col items-center"><a href="/app/friends"><Users class="w-8 sub-btn" /></a>Contacts</div>
