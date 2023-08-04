@@ -1,7 +1,6 @@
 
 <!-- Ybug code start (https://ybug.io) -->
 <script type='text/javascript'>
-console.error("asdfasdfasdf");
 (function() {
     window.ybug_settings = {"id":"8d648tg0mktxfmp1va7v"};
     var ybug = document.createElement('script'); ybug.type = 'text/javascript'; ybug.async = true;

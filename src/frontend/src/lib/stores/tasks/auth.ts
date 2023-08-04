@@ -132,6 +132,7 @@ export async function syncAuth() {
 
 export async function login(provider: "II" | "NFID") {
     await authClient.login({
+        maxTimeToLive: BigInt(7 * 24 * 60 * 60 * 1000 * 1000 * 1000), // 7 days
         identityProvider: getAuthURL(provider),
         onSuccess: async () => await checkRegistration()
     });
