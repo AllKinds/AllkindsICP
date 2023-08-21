@@ -59,15 +59,16 @@
 <div class="fancy-btn-border mx-auto mt-20 w-80">
 	<button on:click={() => login('NFID')} class="fancy-btn w-full">Log in with Google</button>
 </div>
+<div class="fancy-btn-border mx-auto mt-2 w-80">
+        <button on:click={() => login('II')} class="fancy-btn w-full">Log in with Internet&nbsp;Identity</button>
+</div>
 
+<!--
 {#if !showLoginOptions}
     <div class="mx-auto mt-2 w-fit">
         <button on:click={() => showLoginOptions = true} class="btn hover:underline underline-offset-1">Other sign in options</button>
     </div>
 {:else}
-    <div class="fancy-btn-border mx-auto mt-2 w-80">
-         <button on:click={() => login('II')} class="fancy-btn w-full">Log in with Internet&nbsp;Identity</button>
-    </div>
     <div class="fancy-btn-border mx-auto mt-2 w-80">
         <button on:click={() => login('NFID')} class="fancy-btn w-full">Log in with Metamask</button>
     </div>
@@ -75,6 +76,7 @@
         <button on:click={() => login('NFID')} class="fancy-btn w-full">Other NFID options</button>
     </div>
 {/if}
+-->
 
 
 <!-- 
