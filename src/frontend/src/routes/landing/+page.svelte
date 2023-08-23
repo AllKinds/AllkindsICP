@@ -52,7 +52,7 @@
 </script>
 
 <div><h2>Find the <span class="text-cyan-600">right</span> people</h2></div>
-<div><span>There are a lot of people around. But how ca we find those who share our interests and values?</span>
+<div><span>There are a lot of people around. But how can we find those who share our interests and values?</span>
 <br><br>Try our new approach! Express yourself through questions that matter. See what other people are interested in. It's completely private, so you can be sincere.
 </div>
 
