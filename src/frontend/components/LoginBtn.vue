@@ -1,3 +1,6 @@
 <template>
-  <div class="btn">Login <Icon name="material-symbols:login" /></div>
+  <NuxtLink to="/login" class="btn">
+    Login
+    <Icon name="material-symbols:login" />
+  </NuxtLink>
 </template>
