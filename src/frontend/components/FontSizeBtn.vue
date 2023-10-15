@@ -1,5 +1,10 @@
+<script lang="ts" setup>
+const largeFont = useState("largeFont", () => false);
+</script>
+
 <template>
-  <div class="btn items-baseline">
-    <span class="text-xl underline">a</span><span class="text-4xl font-normal">a</span>
-  </div>
+  <button class="btn items-baseline" @click="largeFont = !largeFont">
+    <span class="text-xl" :class="{ underline: !largeFont }">a</span
+    ><span class="text-4xl font-normal" :class="{ underline: largeFont }">a</span>
+  </button>
 </template>

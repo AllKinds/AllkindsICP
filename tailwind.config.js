@@ -16,6 +16,7 @@ module.exports = {
                     "error": "#ff0000",
                     "--btn-text-case": "none",
                 }
-            }],
+            }
+        ],
     },
 }

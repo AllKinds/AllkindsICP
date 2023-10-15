@@ -9,10 +9,10 @@
                 "backend"
             ],
             "frontend": {
-                "entrypoint": "build/index.html"
+                "entrypoint": ".output/public/index.html"
             },
             "source": [
-                "build/"
+                ".output/public"
             ],
             "type": "assets"
         },
@@ -41,6 +41,6 @@
             "packtool": "mops sources"
         }
     },
-    "dfx": "0.14.3",
+    "dfx": "0.15.1",
     "version": 1
 }
