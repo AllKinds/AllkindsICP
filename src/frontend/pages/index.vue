@@ -1,3 +1,7 @@
+<!--
+Landing page
+-->
+
 <template>
   <header class="text-4xl p-4 text-center">
     <div class="font-bold flex justify-center">
@@ -12,18 +16,19 @@
   <NuxtPage />
 
   <div class="grow flex flex-col items-center">
-    <a href="#" class="btn btn-outline w-60 m-3 rounded-full">Just Cause</a>
-    <a href="#" class="btn btn-outline w-60 m-3 rounded-full">Project design</a>
-    <a href="#" class="btn btn-outline w-60 m-3 rounded-full">Main mechanics</a>
-    <a href="#" class="btn btn-outline w-60 m-3 rounded-full">Season#0</a>
-    <a href="#" class="btn btn-outline btn-disabled w-60 m-3 rounded-full"
-      >Ask for invite</a
-    >
+    <Btn to="/just-cause" class="w-60"> Just Cause </Btn>
+    <Btn to="/project-design" class="w-60"> Project design </Btn>
+    <Btn to="/main-mechanics" class="w-60"> Main mechanics </Btn>
+    <Btn to="/season-0" class="w-60"> Season#0 </Btn>
+    <Btn to="/ask-for-invite" class="btn-disabled w-60"> Ask for invite </Btn>
   </div>
 
-  <footer class="text-center w-full">
+  <footer class="text-center w-full m-2">
     <span class="text-xs">
-      Powered by InternetComputer <img src="/icp.png" class="h-5 inline" />
+      Powered by
+      <a href="https://internetcomputer.org/">
+        InternetComputer <img src="/icp.png" class="h-5 inline" />
+      </a>
     </span>
   </footer>
 </template>

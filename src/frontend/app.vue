@@ -6,7 +6,9 @@
         <FontSizeBtn />
       </nav>
 
-      <NuxtPage />
+      <div class="grow flex flex-col items-center pb-3">
+        <NuxtPage />
+      </div>
     </div>
   </div>
 </template>
