@@ -1,3 +1,7 @@
+<script lang="ts" setup>
+definePageMeta({ title: "Project design" });
+</script>
+
 <template>
   <TextBlock>
     <h3>Seasons.</h3>

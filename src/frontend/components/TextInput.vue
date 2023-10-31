@@ -1,0 +1,19 @@
+<script lang="ts" setup>
+defineProps(["modelValue", "placeholder"]);
+defineEmits(["update:modelValue"]);
+
+const el = ref();
+
+const largeFont = useState("largeFont", () => false);
+</script>
+
+<template>
+  <input
+    ref="el"
+    class="textarea textarea-bordered textarea-md w-full"
+    :class="largeFont ? 'textarea-lg' : 'textarea-md'"
+    :value="modelValue"
+    @input="$emit('update:modelValue', ($event.target as any).value);"
+    :placeholder="placeholder"
+  />
+</template>

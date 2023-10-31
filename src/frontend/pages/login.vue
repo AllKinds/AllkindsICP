@@ -3,14 +3,27 @@ Page to select login provider and initiate login process
 -->
 
 <script lang="ts" setup>
+import { Effect } from "effect";
+
 definePageMeta({ middleware: ["auth"], title: "Log in" });
 
 const largeFont = useState("largeFont", () => false);
 
 async function login(provider: Provider) {
-  if (await checkAuth(provider)) {
+  if (await Effect.runPromise(checkAuth(provider))) {
+    console.log("already logged in");
     navigateTo("/welcome");
   }
+}
+
+if (
+  await Effect.runPromise(checkAuth(null)).catch((e) => {
+    console.error("checkAuth error", e);
+    return false;
+  })
+) {
+  console.warn("navigated to /login, but already logged in");
+  navigateTo("/welcome");
 }
 </script>
 
@@ -18,8 +31,8 @@ async function login(provider: Provider) {
   <div class="grow flex flex-col items-center">
     <TextBlock class="max-w-sm text-center" align="text-center">
       <p>
-        Allkinds is powered by the Internet Computer. It’s fully decentralised and
-        secured. <br />
+        Allkinds is powered by the Internet Computer.<br />
+        It’s fully decentralised and secured. <br />
         <img src="/icp.png" class="w-20 inline" />
       </p>
     </TextBlock>
@@ -28,6 +41,6 @@ async function login(provider: Provider) {
       Log in with Internet&nbsp;Identity
     </Btn>
     <Btn class="w-72" @click="login('NFID')"> Log in with email </Btn>
-    <Link to="/" class="m-3 link outline-none"> cancel </Link>
+    <Btn to="/" outline="link outline-none"> cancel </Btn>
   </div>
 </template>

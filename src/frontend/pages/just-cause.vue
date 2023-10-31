@@ -1,3 +1,7 @@
+<script lang="ts" setup>
+definePageMeta({ title: "Just cause" });
+</script>
+
 <template>
   <TextBlock>
     <i>Denny:</i>

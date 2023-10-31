@@ -5,7 +5,7 @@ defineProps({ align: String });
 
 <template>
   <div
-    class="max-w-xl prose"
+    class="max-w-xl prose p-8"
     :class="[{ 'text-xl': largeFont }, align || 'text-justify']"
   >
     <slot />

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { backend } from "~~/src/declarations/backend";
 
-const actor = await useActor();
+const actor = useState<typeof backend | null>("actor", () => null);
 const largeFont = await useState("largeFont", () => false);
 </script>
 
@@ -10,7 +10,7 @@ const largeFont = await useState("largeFont", () => false);
     Login
     <Icon name="material-symbols:login" />
   </NuxtLink>
-  <button class="btn" :class="{ 'text-xl': largeFont }" v-else @click="logoutActor()">
+  <button class="btn" :class="{ 'text-xl': largeFont }" v-else @click="logoutActor">
     Logout
     <Icon name="material-symbols:logout" />
   </button>

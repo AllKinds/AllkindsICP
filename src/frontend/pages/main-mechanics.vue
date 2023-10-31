@@ -1,3 +1,6 @@
+<script lang="ts" setup>
+definePageMeta({ title: "Main mechanics" });
+</script>
 <template>
   <TextBlock>
     <h3>How to find like-minded</h3>

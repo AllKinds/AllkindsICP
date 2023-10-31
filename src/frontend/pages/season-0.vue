@@ -1,3 +1,6 @@
+<script lang="ts" setup>
+definePageMeta({ title: "Season#0" });
+</script>
 <template>
   <TextBlock>
     <h3>Time frame</h3>

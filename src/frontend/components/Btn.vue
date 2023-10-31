@@ -1,13 +1,19 @@
 <script lang="ts" setup>
-defineProps({
+const props = defineProps({
   to: String,
-  class: String,
+  width: String,
+  outline: String,
 });
+
 const largeFont = useState("largeFont", () => false);
 </script>
 
 <template>
-  <NuxtLink :to="to" class="m-3 btn btn-outline rounded-full w-48" :class="class">
+  <NuxtLink
+    :to="to"
+    class="m-3 btn rounded-full"
+    :class="props.width || 'w-48' + ' ' + (props.outline || 'btn-outline')"
+  >
     <span :class="{ 'text-xl': largeFont }"> <slot /> </span>
   </NuxtLink>
 </template>

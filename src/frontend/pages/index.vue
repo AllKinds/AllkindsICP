@@ -4,11 +4,7 @@ Landing page
 
 <template>
   <header class="text-4xl p-4 text-center">
-    <div class="font-bold flex justify-center">
-      <img src="/logo.svg" class="w-10 h-10" />
-
-      Allkinds
-    </div>
+    <AllkindsTitle>Allkinds</AllkindsTitle>
 
     <div class="max-w-60 my-10">Where people<br />make people<br />happy</div>
   </header>

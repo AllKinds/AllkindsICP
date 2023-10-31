@@ -6,12 +6,18 @@ import { dfx_env } from "./env_loader";
 export default defineNuxtConfig({
     srcDir: './src/frontend',
     devtools: { enabled: true },
-    ssr: false,
+    //ssr: false,
     modules: [
         '@nuxtjs/tailwindcss',
         'nuxt-icon',
     ],
     runtimeConfig: {
         public: dfx_env()
-    }
+    },
+    app:
+    {
+        head: {
+            titleTemplate: (t) => { return t ? `${t} - Allkinds` : 'Allkinds' },
+        },
+    },
 })

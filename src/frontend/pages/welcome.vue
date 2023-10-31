@@ -4,5 +4,5 @@ definePageMeta({ middleware: ["auth"] });
 
 <template>
   <h1>Welcome</h1>
-  <NuxtLink to="/" class="m-3 link">back</NuxtLink>
+  <Btn to="/register">continue</Btn>
 </template>
