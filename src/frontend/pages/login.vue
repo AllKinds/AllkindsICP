@@ -16,12 +16,7 @@ async function login(provider: Provider) {
   }
 }
 
-if (
-  await Effect.runPromise(checkAuth(null)).catch((e) => {
-    console.error("checkAuth error", e);
-    return false;
-  })
-) {
+if (await Effect.runPromise(checkAuth(null)).catch((e) => false)) {
   console.warn("navigated to /login, but already logged in");
   navigateTo("/welcome");
 }

@@ -1,10 +1,11 @@
-import { backend } from "../../declarations/backend";
-import { createActor } from "~~/src/declarations/backend";
+import { backend, createActor } from "../../declarations/backend";
 import { AuthClient } from "@dfinity/auth-client";
 import { HttpAgent, Agent } from "@dfinity/agent";
 import { Effect, pipe } from "effect";
 import { EffectPrototype } from "effect/dist/declarations/src/Effectable";
 import { isUint8Array } from "effect/dist/declarations/src/Predicate";
+import { BackendActor, BackendError } from "~/helper/backend";
+import { FrontendError } from "~/helper/errors";
 
 export type Provider = "II" | "NFID";
 
@@ -44,11 +45,13 @@ export function checkAuth(
         });
 
     function login(a: AuthClient, provider: Provider): Effect.Effect<never, Error, void> {
+
         return Effect.async((resume) => {
             a.login({
                 identityProvider: loginUrl(provider),
                 onSuccess: (() => resume(Effect.succeed(null))),
                 onError: ((e) => resume(Effect.fail(new Error("Could not log in: " + e)))),
+                maxTimeToLive: BigInt(3_600_000_000_000) * BigInt(24) * BigInt(7), // 7 days
             });
         });
     }
@@ -67,15 +70,16 @@ export function checkAuth(
         // return if login failed
         if (!(yield* _(isAuthenticated(client)))) return false;
 
-        const identity = client.getIdentity();
-        // Using the identity obtained from the auth client, we can create an agent to interact with the IC.
-        const agent = new HttpAgent({ identity });
+        if (!actor.value) {
+            const identity = client.getIdentity();
+            // Using the identity obtained from the auth client, we can create an agent to interact with the IC.
+            const agent = new HttpAgent({ identity: identity, host: config.host });
 
-        console.log("set auth client", actor.value, "to", agent);
-        // Using the interface description of our webapp, we create an actor that we use to call the service methods.
-        actor.value = createActor(config.canisterIds.backend, {
-            agent,
-        });
+            // Using the interface description of our webapp, we create an actor that we use to call the service methods.
+            actor.value = createActor(config.canisterIds.backend, {
+                agent,
+            });
+        }
 
         return true;
     });
@@ -83,27 +87,30 @@ export function checkAuth(
     return prog;
 }
 
-export const logoutActor = async () => {
+export const logoutActor = (): Effect.Effect<never, never, void> => {
     console.log("Logging out actor");
-    try {
-        if (typeof window === "undefined") {
-            return Promise.resolve();
-        }
-    } catch (error) {
-        console.error(error);
+    if (typeof window === "undefined") {
+        return Effect.succeed(null);
     }
-    let authClient = await AuthClient.create();
-    console.log("Logging out actor: auth client created");
 
-    const ret = await authClient.logout();
-    console.log("Logging out actor: logout called:", ret);
-
-    (await useActor()).value = null;
-    console.log("Logging out actor: actor set to null:", await useActor());
+    return Effect.gen(function* (_) {
+        const authClient = yield* _(Effect.promise(() => AuthClient.create()));
+        yield* _(Effect.promise(() => authClient.logout()));
+        useActor().value = null;
+        return;
+    });
 };
 
 export const useActor = () => {
     return useState<typeof backend | null>("actor", () => null);
+};
+
+export const useActorOrLogin = (): Effect.Effect<never, FrontendError, BackendActor> => {
+    const actor = useActor();
+    if (actor.value) return Effect.succeed(actor.value);
+    console.log("actor.value is null, redirecting to /login")
+    navigateTo("/login");
+    return Effect.fail({ tag: "notLoggedIn" });
 };
 
 export const isLoggedIn = () => {
