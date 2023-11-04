@@ -7,7 +7,6 @@ function resize(e: any) {
   t.style.height = "1px";
   const height = t.scrollHeight;
   const total = height + 2;
-  console.log(height, total);
   t.style.setProperty("height", total + "px");
 }
 
@@ -26,7 +25,8 @@ onMounted(() => {
 
 onUpdated(() => resize(el.value));
 
-const largeFont = useState("largeFont", () => false);
+const largeFont = useLargeFont();
+watch(largeFont, () => resize(el.value));
 </script>
 
 <template>
@@ -34,7 +34,6 @@ const largeFont = useState("largeFont", () => false);
     ref="el"
     class="textarea textarea-bordered textarea-md w-full"
     :class="largeFont ? 'textarea-lg' : 'textarea-md'"
-    :value="largeFont ? modelValue : modelValue"
     @input="$emit('update:modelValue', ($event.target as any).value);"
     :placeholder="placeholder"
     >{{ modelValue }}</textarea

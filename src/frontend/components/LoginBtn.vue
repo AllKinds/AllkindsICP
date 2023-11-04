@@ -1,9 +1,8 @@
 <script lang="ts" setup>
-import { backend } from "~~/src/declarations/backend";
 import { Effect } from "effect";
 
-const actor = useState<typeof backend | null>("actor", () => null);
-const largeFont = useState("largeFont", () => false);
+const actor = useActor();
+const largeFont = useLargeFont();
 
 const logout = () => {
   Effect.runPromise(logoutActor()).then(() => {

@@ -7,7 +7,7 @@ import { Effect } from "effect";
 
 definePageMeta({ middleware: ["auth"], title: "Log in" });
 
-const largeFont = useState("largeFont", () => false);
+const largeFont = useLargeFont();
 
 async function login(provider: Provider) {
   if (await Effect.runPromise(checkAuth(provider))) {

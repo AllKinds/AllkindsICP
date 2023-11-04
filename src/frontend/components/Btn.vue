@@ -5,7 +5,7 @@ const props = defineProps({
   outline: String,
 });
 
-const largeFont = useState("largeFont", () => false);
+const largeFont = useLargeFont();
 </script>
 
 <template>

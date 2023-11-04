@@ -1,30 +1,22 @@
 <script lang="ts" setup>
-import { formatError } from "../helper/backend";
-import { ResultUser } from "~~/src/declarations/backend/backend.did";
-
-const dummyResult: ResultUser = { err: { notLoggedIn: null } };
+import { useAppState } from "~/composables/appState";
+import { formatError } from "../helper/errors";
+import { ResultUser, User } from "~~/src/declarations/backend/backend.did";
 
 definePageMeta({ middleware: ["auth"] });
-const info = useState<ResultUser>("userInfo", () => dummyResult);
+const app = useAppState();
 const backend = useActor();
 
 if (backend.value)
   backend.value
     .getUser()
-    .then((u) => (info.value = u))
-    .then(() => console.log("info set to", info.value));
+    .then((u) => (app.value.user = u.ok))
+    .then(() => console.log("appState set to", app.value));
 
-function showInfo(i: ResultUser) {
-  if (!i) {
-    console.log("i is", i);
-    return "never";
-  }
-  if ("err" in i) {
-    return formatError(i.err);
-  } else {
-    const user = i.ok;
-    return user.username + ": " + user.points + " points";
-  }
+function showInfo(i: AppState) {
+  console.log("i is", i);
+  const user = i.user;
+  return user?.username + ": " + user?.points + " points";
 }
 </script>
 
@@ -34,7 +26,7 @@ function showInfo(i: ResultUser) {
     <p></p>
   </TextBlock>
 
-  {{ showInfo(info) }}
+  {{ showInfo(app) }}
 
-  <Btn to="/register">continue</Btn>
+  <Btn to="/home">continue</Btn>
 </template>

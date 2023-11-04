@@ -1,11 +1,9 @@
 import { backend, createActor } from "../../declarations/backend";
 import { AuthClient } from "@dfinity/auth-client";
-import { HttpAgent, Agent } from "@dfinity/agent";
-import { Effect, pipe } from "effect";
-import { EffectPrototype } from "effect/dist/declarations/src/Effectable";
-import { isUint8Array } from "effect/dist/declarations/src/Predicate";
-import { BackendActor, BackendError } from "~/helper/backend";
-import { FrontendError } from "~/helper/errors";
+import { HttpAgent } from "@dfinity/agent";
+import { Effect } from "effect";
+import { BackendActor } from "~/helper/backend";
+import { FrontendError, notLoggedIn, toBackendError, toNetworkError } from "~/helper/errors";
 
 export type Provider = "II" | "NFID";
 
@@ -19,11 +17,12 @@ function loginUrl(provider: Provider) {
 
 export function checkAuth(
     loginWith: Provider | null
-): Effect.Effect<never, Error, boolean> {
+): Effect.Effect<never, FrontendError, boolean> {
     // compatibility to webpack
     try {
         if (typeof window === "undefined") {
-            return Effect.fail(new Error("Not in browser"));
+            const err: FrontendError = { tag: "env", err: "not in browser" };
+            return Effect.fail(err);
         }
         window.global ||= window;
     } catch (error) {
@@ -38,10 +37,10 @@ export function checkAuth(
     //let authClient = await AuthClient.create();
     const config = useRuntimeConfig().public;
 
-    const isAuthenticated = (a: AuthClient) =>
+    const isAuthenticated = (a: AuthClient): Effect.Effect<never, FrontendError, boolean> =>
         Effect.tryPromise({
             try: () => a.isAuthenticated(),
-            catch: (e) => new Error("Failed to check authclient.isAuthenticated(): + " + e),
+            catch: toNetworkError,
         });
 
     function login(a: AuthClient, provider: Provider): Effect.Effect<never, Error, void> {
@@ -101,16 +100,19 @@ export const logoutActor = (): Effect.Effect<never, never, void> => {
     });
 };
 
-export const useActor = () => {
+export const useActor = (): Ref<typeof backend | null> => {
     return useState<typeof backend | null>("actor", () => null);
 };
 
 export const useActorOrLogin = (): Effect.Effect<never, FrontendError, BackendActor> => {
-    const actor = useActor();
-    if (actor.value) return Effect.succeed(actor.value);
-    console.log("actor.value is null, redirecting to /login")
-    navigateTo("/login");
-    return Effect.fail({ tag: "notLoggedIn" });
+    return Effect.gen(function* (_) {
+        yield* _(checkAuth(null));
+        const actor = useActor();
+        if (actor.value) return yield* _(Effect.succeed(actor.value));
+        console.log("actor.value is null, redirecting to /login")
+        navigateTo("/login");
+        return yield* _(Effect.fail(toBackendError(notLoggedIn)));
+    })
 };
 
 export const isLoggedIn = () => {
