@@ -31,7 +31,7 @@ export function checkAuth(
 
     const authClient = Effect.tryPromise({
         try: () => AuthClient.create(),
-        catch: (e) => new Error("Failed to create AuthClient: " + e),
+        catch: (e) => toNetworkError("Failed to create AuthClient: " + e),
     });
 
     //let authClient = await AuthClient.create();
@@ -43,14 +43,14 @@ export function checkAuth(
             catch: toNetworkError,
         });
 
-    function login(a: AuthClient, provider: Provider): Effect.Effect<never, Error, void> {
+    function login(a: AuthClient, provider: Provider): Effect.Effect<never, FrontendError, void> {
 
         return Effect.async((resume) => {
             a.login({
                 identityProvider: loginUrl(provider),
                 onSuccess: (() => resume(Effect.succeed(null))),
-                onError: ((e) => resume(Effect.fail(new Error("Could not log in: " + e)))),
-                maxTimeToLive: BigInt(3_600_000_000_000) * BigInt(24) * BigInt(7), // 7 days
+                onError: ((e) => resume(Effect.fail(toNetworkError("Could not log in: " + e)))),
+                maxTimeToLive: (BigInt(7 * 24 * 60 * 60 * 1000 * 1000 * 1000)), // 7 days
             });
         });
     }

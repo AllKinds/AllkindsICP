@@ -1,3 +1,4 @@
+import { Effect } from "effect";
 import type { Error as BackendError } from "~~/src/declarations/backend/backend.did";
 export type { Error as BackendError } from "~~/src/declarations/backend/backend.did";
 
@@ -17,7 +18,7 @@ export type ErrorKey =
     | "notRegistered"
     | "invalidColor";
 
-export function formatError(err: Error): string {
+export function formatBackendError(err: BackendError): string {
     const key = Object.keys(err)[0] as ErrorKey;
 
     switch (key) {
@@ -32,11 +33,21 @@ export function formatError(err: Error): string {
             return "Error " + key;
     }
 }
+export function formatError(err: FrontendError): string {
+    if (err.tag === "backend") {
+        return formatBackendError(err.err)
+    } else if (err.tag === "notLoggedIn") {
+        return "Not logged in"
+    } else {
+        return err.err;
+    }
+}
 
 export type ErrorTags = "backend" | "network"
 export type FrontendError = { tag: "backend", err: BackendError }
     | { tag: "network", err: string }
     | { tag: "env", err: string }
+    | { tag: "deps", err: string }
     | { tag: "notLoggedIn" }
 
 export const toNetworkError = (e: any): FrontendError => {
@@ -48,3 +59,17 @@ export const toBackendError = (e: BackendError): FrontendError => {
 }
 
 export const notLoggedIn: BackendError = { notLoggedIn: null }
+
+export const depsErr = (err: string): FrontendError => {
+    return {
+        tag: "deps",
+        err
+    }
+}
+
+export const orNotify = <R, A>(effect: Effect.Effect<R, FrontendError, A>): Effect.Effect<R, FrontendError, A> => {
+    return Effect.mapError(effect, (e) => {
+        addNotification("error", formatError(e));
+        return e;
+    })
+}

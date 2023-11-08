@@ -24,6 +24,7 @@
     },
     "dependencies": {
         "effect": "^2.0.0-next.52",
-        "theme-change": "^2.5.0"
+        "theme-change": "^2.5.0",
+        "vue3-toastify": "^0.1.14"
     }
 }
