@@ -1,7 +1,9 @@
 
 <script lang="ts" setup>
-import { Question, answerQuestion } from '~/helper/backend';
+import { Question, answerQuestion, skipQuestion } from '~/helper/backend';
+import { notifyWithMsg } from '~/helper/errors';
 import { Effect } from "effect"
+const emit = defineEmits(["answered"]);
 
 const props = defineProps<{
     question: Question,
@@ -12,8 +14,20 @@ const q = props.question;
 const selected = props.selected;
 console.log("question is", q)
 
-const answer = (q: number, a: boolean, boost: number) => {
-    Effect.runPromise(answerQuestion(q, a, boost)).finally(() => { });
+const answer = (q: BigInt, a: boolean, boost: number) => {
+    Effect.runPromise(
+        answerQuestion(q.valueOf(), a, boost).pipe(notifyWithMsg("Answer saved"))
+    ).then(
+        () => { emit('answered', a); }
+    );
+}
+
+const skip = (q: BigInt) => {
+    Effect.runPromise(
+        skipQuestion(q.valueOf()).pipe(notifyWithMsg("Question skipped"))
+    ).then(
+        () => { emit('answered', props.question); }
+    );
 }
 
 </script>
@@ -34,8 +48,8 @@ const answer = (q: number, a: boolean, boost: number) => {
 
                 <div class="pt-2">
                     <Btn width="w-32" @click="answer(q.id, false, 0)">No</Btn>
-                    <Btn width="w-0 " outline="outline-none">skip</Btn>
-                    <Btn width="w-32">Yes</Btn>
+                    <Lnk width="w-0 " @click="skip(q.id)">skip</Lnk>
+                    <Btn width="w-32" @click="answer(q.id, false, 0)">Yes</Btn>
                 </div>
             </div>
         </div>

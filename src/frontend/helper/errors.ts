@@ -1,5 +1,6 @@
 import { Effect } from "effect";
 import type { Error as BackendError } from "~~/src/declarations/backend/backend.did";
+import { FrontendEffect } from "./backend";
 export type { Error as BackendError } from "~~/src/declarations/backend/backend.did";
 
 // TODO: this should be auto generated:
@@ -67,9 +68,24 @@ export const depsErr = (err: string): FrontendError => {
     }
 }
 
-export const orNotify = <R, A>(effect: Effect.Effect<R, FrontendError, A>): Effect.Effect<R, FrontendError, A> => {
-    return Effect.mapError(effect, (e) => {
-        addNotification("error", formatError(e));
-        return e;
+const notifyWith = <R, A>(effect: Effect.Effect<R, FrontendError, A>, msg?: (a: A) => string): Effect.Effect<R, FrontendError, A> => {
+    return Effect.mapBoth(effect, {
+        onFailure: (e) => { addNotification("error", formatError(e)); return e; },
+        onSuccess: (a) => { if (msg) addNotification("ok", msg(a)); return a; },
     })
+}
+
+const notifyMsg = <R, A>(effect: Effect.Effect<R, FrontendError, A>, msg?: string): Effect.Effect<R, FrontendError, A> => {
+    return Effect.mapBoth(effect, {
+        onFailure: (e) => { addNotification("error", formatError(e)); return e; },
+        onSuccess: (a) => { if (msg) addNotification("ok", msg); return a; },
+    })
+}
+
+export const notifyWithMsg = <A>(msg?: string): (effect: FrontendEffect<A>) => FrontendEffect<A> => {
+    return (effect) => notifyMsg(effect, msg);
+}
+
+export const notifyWithFormatter = <A>(msg: (a: A) => string): (effect: FrontendEffect<A>) => FrontendEffect<A> => {
+    return (effect) => notifyWith(effect, msg);
 }

@@ -2,11 +2,13 @@ import { backend } from "~~/src/declarations/backend";
 export type * from "~~/src/declarations/backend/backend.did";
 export type BackendActor = typeof backend;
 import { Effect } from "effect";
-import { BackendError, FrontendError, toNetworkError } from "~/helper/errors";
+import { BackendError, FrontendError, toBackendError, toNetworkError } from "~/helper/errors";
 import { Question } from "./backend";
+import { Answer } from "./backend";
+import { Skip } from "./backend";
 
 type BackendEffect<T> = Effect.Effect<never, BackendError, T>
-type FrontendEffect<T> = Effect.Effect<never, FrontendError, T>
+export type FrontendEffect<T> = Effect.Effect<never, FrontendError, T>
 
 export const resultToEffect = <T>(result: { err: BackendError } | { ok: T }): BackendEffect<T> => {
     if ("err" in result) {
@@ -27,15 +29,26 @@ const effectify = <T>(fn: (actor: BackendActor) => Promise<T>): FrontendEffect<T
     });
 }
 
+const effectifyResult = <T>(fn: (actor: BackendActor) => Promise<{ ok: T } | { err: BackendError }>): FrontendEffect<T> => {
+    return Effect.gen(function* (_) {
+        const res = yield* _(effectify(fn));
+        return yield* _(resultToEffect(res).pipe(Effect.mapError(toBackendError)));
+    })
+}
+
 export const loadQuestions = (): FrontendEffect<Question[]> => {
     const limit = BigInt(10);
     return effectify((actor) => actor.getAskableQuestions(limit))
 }
 
 export const createQuestion = (q: string): FrontendEffect<void> => {
-    return effectify((actor) => actor.createQuestion(q, ""))
+    return effectifyResult((actor) => actor.createQuestion(q, ""))
 }
 
-export const answerQuestion = (q: number, a: boolean, boost: number): FrontendEffect<void> => {
-    return effectify((actor) => actor.submitAnswer(BigInt(q), a, BigInt(boost)));
+export const answerQuestion = (q: BigInt, a: boolean, boost: number): FrontendEffect<Answer> => {
+    return effectifyResult((actor) => actor.submitAnswer(q.valueOf(), a, BigInt(boost)));
+}
+
+export const skipQuestion = (q: BigInt): FrontendEffect<Skip> => {
+    return effectifyResult((actor) => actor.submitSkip(q.valueOf()));
 }

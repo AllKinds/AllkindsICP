@@ -1,7 +1,7 @@
 <script type="ts" setup>
 import { Effect } from "effect";
 import { loadQuestions, createQuestion } from "~/helper/backend"
-import { orNotify } from "~/helper/errors";
+import { notifyWithMsg } from "~/helper/errors";
 
 const question = useState('new-question', () => "")
 const app = useAppState();
@@ -11,7 +11,7 @@ function loadQs() {
     app.value.openQuestions = undefined;
     console.log("loading questions")
     Effect.runPromise(
-        orNotify(loadQuestions())
+        loadQuestions().pipe(notifyWithMsg())
     ).then((qs) => app.value.openQuestions = qs);
 }
 
@@ -44,7 +44,7 @@ loadQs();
     </div>
 
     <div class="w-full">
-        <Question v-for="(q, i) in app.openQuestions" :question="q" :selected="i === 0">
+        <Question v-for="(q, i) in app.openQuestions" :question="q" :selected="i === 0" @answered="loadQs">
         </Question>
         <div v-if="app.openQuestions?.length === 0">No unanswered questions available</div>
         <div v-if="app.openQuestions === undefined">Loading questions...</div>
