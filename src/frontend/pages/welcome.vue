@@ -10,7 +10,7 @@ const backend = useActor();
 if (backend.value)
     backend.value
         .getUser()
-        .then((u) => { app.value.user = u.ok })
+        .then((u) => { app.value.user.data = u.ok })
         .then(() => console.log("appState set to", app.value));
 
 const load = () => {
@@ -30,7 +30,7 @@ const load = () => {
 
 function showInfo(i: AppState) {
     console.log("i is", i);
-    const user = i.user;
+    const user = i.user.data;
     return user?.username + ": " + user?.points + " points";
 }
 </script>

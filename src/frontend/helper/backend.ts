@@ -32,6 +32,7 @@ const effectify = <T>(fn: (actor: BackendActor) => Promise<T>): FrontendEffect<T
 const effectifyResult = <T>(fn: (actor: BackendActor) => Promise<{ ok: T } | { err: BackendError }>): FrontendEffect<T> => {
     return Effect.gen(function* (_) {
         const res = yield* _(effectify(fn));
+        console.log("asdf", res);
         return yield* _(resultToEffect(res).pipe(Effect.mapError(toBackendError)));
     })
 }

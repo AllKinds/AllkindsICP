@@ -10,11 +10,13 @@ const props = defineProps<{
     selected?: boolean,
 }>();
 
+console.log("question is", props.question);
+
 const q = props.question;
 const selected = props.selected;
-console.log("question is", q)
 
 const answer = (q: BigInt, a: boolean, boost: number) => {
+    console.log("answering question ", q, a, boost)
     Effect.runPromise(
         answerQuestion(q.valueOf(), a, boost).pipe(notifyWithMsg("Answer saved"))
     ).then(
@@ -43,7 +45,7 @@ const skip = (q: BigInt) => {
 
             <div class="collapse-content">
                 <div class="badge badge-primary">
-                    Boost
+                    Boost {{ q.id }}
                 </div>
 
                 <div class="pt-2">

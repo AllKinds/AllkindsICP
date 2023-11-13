@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     modules: [
         '@nuxtjs/tailwindcss',
         'nuxt-icon',
+        '@pinia/nuxt',
     ],
     runtimeConfig: {
         public: dfx_env()
