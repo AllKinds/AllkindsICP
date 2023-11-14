@@ -1,7 +1,6 @@
 <script type="ts" setup>
 import { Effect } from "effect";
 import { loadQuestions, createQuestion } from "~/helper/backend"
-import { notifyWithMsg } from "~/helper/errors";
 
 const question = useState('new-question', () => "")
 const app = useAppState();
@@ -9,20 +8,19 @@ const loading = useState("loading", () => false);
 
 async function loadQs() {
     console.log("loading questions")
-    await Effect.runPromise(
-        storeToData(loadQuestions().pipe(notifyWithMsg()), app.setOpenQuestions));
+    runStoreNotify(loadQuestions(), app.setOpenQuestions)
 }
 
-function create() {
+async function create() {
     loading.value = true;
     const q = question.value;
-    Effect.runPromise(
-        createQuestion(q).pipe(notifyWithMsg("Question created successfully."))).then(
-            () => {
-                question.value = "";
-                loadQs();
-            }
-        )
+
+    await runNotify(createQuestion(q), "Question created successfully.").then(
+        () => {
+            question.value = "";
+            return loadQs();
+        }
+    );
 }
 
 loadQs();
@@ -30,9 +28,9 @@ loadQs();
 async function test() {
     const delay = ms => new Promise(res => setTimeout(res, ms));
     app.setOpenQuestions({ status: "requested" })
-    await delay(2000)
+    await delay(1000)
     app.setOpenQuestions({ status: "ok", data: [] })
-    await delay(2000)
+    await delay(1000)
     app.setOpenQuestions({ status: "error" })
 }
 
@@ -50,9 +48,11 @@ async function test() {
     {{ app.openQuestions.status }}
 
     <div class="w-full">
-        <Question v-for="(q, i) in app.openQuestions.data" :question="q" :selected="i === 0" @answered="loadQs">
-            {{ i }}: {{ q }}
-        </Question>
+        <NetworkDataContainer :networkdata="app.openQuestions">
+            <Question v-for="(q, i) in app.openQuestions.data" :question="q" :selected="i === 0" @answered="loadQs">
+                {{ i }}: {{ q.color }}
+            </Question>
+        </NetworkDataContainer>
         <div v-if="app.openQuestions.data?.length === 0">No unanswered questions available</div>
         <div v-if="app.openQuestions.status === 'requested'">Loading questions...</div>
         <Btn class="btn-secondary" @click="loadQs">Reload questions</Btn>

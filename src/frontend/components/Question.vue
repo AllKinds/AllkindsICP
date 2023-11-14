@@ -45,7 +45,8 @@ const skip = (q: BigInt) => {
 
             <div class="collapse-content">
                 <div class="badge badge-primary">
-                    Boost {{ q.id }}
+                    Boost
+                    <slot />
                 </div>
 
                 <div class="pt-2">

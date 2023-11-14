@@ -1,6 +1,6 @@
 import { Effect, pipe } from "effect";
 import { FrontendEffect, Question, User } from "~/helper/backend";
-import { FrontendError } from "~/helper/errors";
+import { FrontendError, notifyWithMsg } from "~/helper/errors";
 import { defineStore } from 'pinia'
 
 export type AppState = {
@@ -11,7 +11,7 @@ export type AppState = {
 type NotificationLevel = "ok" | "warning" | "error";
 
 type DataStatus = "init" | "requested" | "error" | "ok";
-type NetworkData<T> = {
+export type NetworkData<T> = {
     status: DataStatus;
     data?: T;
     lastOK?: Date;
@@ -55,15 +55,19 @@ const setErr = <A>(err: FrontendError): NetworkData<A> => {
 
 export const storeToData = <A>(effect: FrontendEffect<A>, store: (a: NetworkData<A>) => void): FrontendEffect<A> => {
     const before = Effect.sync<void>(() => {
-        store(setRequested())
+        console.log("requesting")
+        store(setOk(undefined as A));
+        setTimeout(() => store(setRequested()));
     })
     const after = Effect.mapBoth<FrontendError, A, FrontendError, A>({
         onSuccess: (a) => {
+            console.log("request ok")
             store(setOk(undefined as A));
             setTimeout(() => store(setOk(a)));
             return a;
         },
         onFailure: (e) => {
+            console.log("request error")
             store(setErr(e))
             return e;
         },
@@ -73,6 +77,20 @@ export const storeToData = <A>(effect: FrontendEffect<A>, store: (a: NetworkData
         () => effect,
         after
     )
+}
+
+
+export const runStoreNotify = <A>(effect: FrontendEffect<A>, store: (a: NetworkData<A>) => void, msg?: string): Promise<A> => {
+    return Effect.runPromise(
+        storeToData(
+            effect.pipe(notifyWithMsg(msg)),
+            store,
+        )
+    );
+}
+
+export const runNotify = <A>(effect: FrontendEffect<A>, msg?: string): Promise<A> => {
+    return runStoreNotify(effect, (_) => { }, msg);
 }
 
 const combineNetworkData = <A>(old: NetworkData<A>, newer: NetworkData<A>): NetworkData<A> => {
@@ -95,6 +113,9 @@ export const useAppState = defineStore('app', {
     actions: {
         setOpenQuestions(qs: NetworkData<Question[]>) {
             this.openQuestions = combineNetworkData(this.openQuestions, qs);
+        },
+        setUser(user: NetworkData<User>) {
+            this.user = combineNetworkData(this.user, user)
         }
     }
 });
