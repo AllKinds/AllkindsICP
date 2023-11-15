@@ -10,7 +10,7 @@ export type AppState = {
 
 type NotificationLevel = "ok" | "warning" | "error";
 
-type DataStatus = "init" | "requested" | "error" | "ok";
+export type DataStatus = "init" | "requested" | "error" | "ok";
 export type NetworkData<T> = {
     status: DataStatus;
     data?: T;
@@ -54,6 +54,7 @@ const setErr = <A>(err: FrontendError): NetworkData<A> => {
 }
 
 export const storeToData = <A>(effect: FrontendEffect<A>, store: (a: NetworkData<A>) => void): FrontendEffect<A> => {
+    store(setRequested());
     const before = Effect.sync<void>(() => {
         console.log("requesting")
         store(setOk(undefined as A));
@@ -108,17 +109,36 @@ const defaultAppState: AppState = {
     openQuestions: dataInit,
 };
 
-export const useAppState = defineStore('app', {
+export const useAppState = defineStore({
+    id: 'app',
     state: () => defaultAppState,
     actions: {
         setOpenQuestions(qs: NetworkData<Question[]>) {
-            this.openQuestions = combineNetworkData(this.openQuestions, qs);
+            const { openQuestions } = storeToRefs(this)
+            openQuestions.value = combineNetworkData(this.openQuestions, qs);
+        },
+        removeQuestion(q: Question) {
+            const data = this.openQuestions as NetworkData<Question[]>
+            if (data.data) {
+                const i = data.data.findIndex((x) => x.id === q.id);
+                if (1 >= 0) {
+                    console.log("index of", q, "is", i, "in", this.openQuestions.data)
+                    data.data.splice(i, 1);
+                }
+            }
+            this.setOpenQuestions({ status: "ok" });
+            setTimeout(() => this.setOpenQuestions(data));
         },
         setUser(user: NetworkData<User>) {
             this.user = combineNetworkData(this.user, user)
         }
-    }
+    },
 });
+
+export const storeQuestions = (qs: NetworkData<Question[]>) => {
+    const app = useAppState();
+
+}
 
 export const addNotification = (level: NotificationLevel, msg: string): void => {
     if (!process.client) {

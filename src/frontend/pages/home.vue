@@ -18,6 +18,7 @@ async function create() {
     await runNotify(createQuestion(q), "Question created successfully.").then(
         () => {
             question.value = "";
+            loading.value = false;
             return loadQs();
         }
     );
@@ -34,22 +35,31 @@ async function test() {
     app.setOpenQuestions({ status: "error" })
 }
 
+function remove(q) {
+    app.removeQuestion(q);
+}
+
 </script>
 
 <template>
     <Btn @click="console.log(app); test()">asdf</Btn>
     <div class="p-5 w-full max-w-xl">
+        <div v-if="loading" class="text-center w-full">
+            <Icon name="line-md:loading-alt-loop" size="5em" class="absolute mt-8" />
+        </div>
         <TextArea style="min-height: 1em !important" @ctrl-enter="create" v-model="question"
-            placeholder="Ask a Yes/No question…"></TextArea>
-        <Btn v-if="question.length > 0" @click="create" :class="{ 'btn-disabled': question.length <= 10 }">Create</Btn>
-        <Btn v-if="question.length > 0" @click="question = ''">cancel</Btn>
+            placeholder="Ask a Yes/No question…" :class="{ 'input-disabled': loading }"></TextArea>
+        <Btn v-if="question.length > 0" @click="create" :class="{ 'btn-disabled': (question.length <= 10 || loading) }">
+            Create</Btn>
+        <Btn v-if="question.length > 0" @click="question = ''" :class="{ 'btn-disabled': (loading) }">cancel</Btn>
     </div>
 
     {{ app.openQuestions.status }}
 
     <div class="w-full">
         <NetworkDataContainer :networkdata="app.openQuestions">
-            <Question v-for="(q, i) in app.openQuestions.data" :question="q" :selected="i === 0" @answered="loadQs">
+            <Question v-for="(q, i) in app.openQuestions.data" :question="q" :selected="i === 0" @answered="loadQs"
+                @answering="remove(q)">
                 {{ i }}: {{ q.color }}
             </Question>
         </NetworkDataContainer>

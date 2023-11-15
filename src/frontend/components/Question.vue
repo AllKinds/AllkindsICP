@@ -3,7 +3,7 @@
 import { Question, answerQuestion, skipQuestion } from '~/helper/backend';
 import { notifyWithMsg } from '~/helper/errors';
 import { Effect } from "effect"
-const emit = defineEmits(["answered"]);
+const emit = defineEmits(["answered", "answering"]);
 
 const props = defineProps<{
     question: Question,
@@ -17,6 +17,7 @@ const selected = props.selected;
 
 const answer = (q: BigInt, a: boolean, boost: number) => {
     console.log("answering question ", q, a, boost)
+    emit('answering', props.question)
     Effect.runPromise(
         answerQuestion(q.valueOf(), a, boost).pipe(notifyWithMsg("Answer saved"))
     ).then(
@@ -25,6 +26,7 @@ const answer = (q: BigInt, a: boolean, boost: number) => {
 }
 
 const skip = (q: BigInt) => {
+    emit('answering', props.question)
     Effect.runPromise(
         skipQuestion(q.valueOf()).pipe(notifyWithMsg("Question skipped"))
     ).then(
