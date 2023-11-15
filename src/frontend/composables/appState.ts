@@ -57,8 +57,6 @@ export const storeToData = <A>(effect: FrontendEffect<A>, store: (a: NetworkData
     store(setRequested());
     const before = Effect.sync<void>(() => {
         console.log("requesting")
-        store(setOk(undefined as A));
-        setTimeout(() => store(setRequested()));
     })
     const after = Effect.mapBoth<FrontendError, A, FrontendError, A>({
         onSuccess: (a) => {
@@ -134,11 +132,6 @@ export const useAppState = defineStore({
         }
     },
 });
-
-export const storeQuestions = (qs: NetworkData<Question[]>) => {
-    const app = useAppState();
-
-}
 
 export const addNotification = (level: NotificationLevel, msg: string): void => {
     if (!process.client) {
