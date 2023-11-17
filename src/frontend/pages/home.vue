@@ -26,19 +26,6 @@ async function create() {
 
 loadQs();
 
-async function test() {
-    const delay = ms => new Promise(res => setTimeout(res, ms));
-    app.setOpenQuestions({ status: "requested" })
-    await delay(1000)
-    app.setOpenQuestions({ status: "ok", data: [] })
-    await delay(1000)
-    app.setOpenQuestions({ status: "error" })
-}
-
-function remove(q) {
-    app.removeQuestion(q);
-}
-
 </script>
 
 <template>
@@ -59,7 +46,7 @@ function remove(q) {
     <div class="w-full">
         <NetworkDataContainer :networkdata="app.openQuestions">
             <Question v-for="(q, i) in app.openQuestions.data" :question="q" :selected="i === 0" @answered="loadQs"
-                @answering="remove(q)">
+                @answering="app.removeQuestion(q)">
                 {{ i }}: {{ q.color }}
             </Question>
         </NetworkDataContainer>
