@@ -11,6 +11,7 @@ export default defineNuxtConfig({
         '@nuxtjs/tailwindcss',
         'nuxt-icon',
         '@pinia/nuxt',
+        '@nuxtjs/google-fonts',
     ],
     runtimeConfig: {
         public: dfx_env()
@@ -20,5 +21,11 @@ export default defineNuxtConfig({
         head: {
             titleTemplate: (t) => { return t ? `${t} - Allkinds` : 'Allkinds' },
         },
+    },
+    googleFonts: {
+        download: true,
+        families: {
+            'Open+Sans': [300, 400, 500, 600, 700, 800],
+        }
     },
 })

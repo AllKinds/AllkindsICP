@@ -2,12 +2,13 @@
 import { Effect } from "effect";
 import { toNetworkError } from "~/helper/errors";
 
-definePageMeta({ middleware: ["auth"] });
+definePageMeta({ title: "Welcome" });
 const app = useAppState();
 
 </script>
 
 <template>
+    <AllkindsTitle>Welcome</AllkindsTitle>
     <TextBlock>
         <h1>Welcome</h1>
         <p></p>

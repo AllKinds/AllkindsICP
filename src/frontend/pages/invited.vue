@@ -35,7 +35,7 @@ async function login(provider: Provider) {
 
     <div class="grow flex flex-col items-center">
         <Btn class="w-72 mt-32" @click="login('II')">
-            Log in with Internet&nbsp;Identity
+            Join with Internet&nbsp;Identity
         </Btn>
     </div>
 

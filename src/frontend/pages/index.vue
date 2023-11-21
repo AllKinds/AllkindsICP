@@ -4,7 +4,7 @@ Landing page
 <script lang="ts" setup>
 import { Effect } from "effect";
 
-definePageMeta({ title: "Log in", logo: "allkinds" });
+definePageMeta({ title: "Log in", logo: "mdi:hexagon-outline" });
 
 const largeFont = useLargeFont();
 
@@ -17,29 +17,25 @@ async function login(provider: Provider) {
 </script>
 
 <template>
-    <header class="text-xl p-4 text-center">
+    <div class="text-xl mt-8 w-full">
         <AllkindsTitle>Allkinds.Teams</AllkindsTitle>
-
-        <div class="max-w-60 my-10">Find friends among your colleagues</div>
-    </header>
-
-    <NuxtPage />
-
-    <div class="grow flex flex-col items-center">
-        <Btn to="/about" class="btn-disabled w-72"> Ask for invite </Btn>
-
-
-        <Btn class="w-72 mt-32" @click="login('II')">
-            Log in with Internet&nbsp;Identity
-        </Btn>
     </div>
 
-    <footer class="text-center w-full m-2">
-        <span class="text-xs">
-            Powered by
-            <a href="https://internetcomputer.org/">
-                InternetComputer <img src="/icp.png" class="h-5 inline" />
-            </a>
-        </span>
-    </footer>
+    <div class="text-2xl p-4 text-center">
+        <div class="max-w-60 my-24 font-bold">
+            Make your team stronger <br> and your employees <br> happier.
+        </div>
+    </div>
+
+
+    <div class="grow flex flex-col items-center">
+    </div>
+
+    <Btn to="/about" class="w-80"> Learn more </Btn>
+
+    <Btn class="w-80 mt-2" @click="login('II')">
+        Join with Internet&nbsp;Identity
+    </Btn>
+
+    <ICFooter />
 </template>

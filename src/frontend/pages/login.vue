@@ -5,7 +5,7 @@ Page to select login provider and initiate login process
 <script lang="ts" setup>
 import { Effect } from "effect";
 
-definePageMeta({ middleware: ["auth"], title: "Log in" });
+definePageMeta({ title: "Log in" });
 
 const largeFont = useLargeFont();
 

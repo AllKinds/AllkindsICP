@@ -29,7 +29,6 @@ loadQs();
 </script>
 
 <template>
-    <Btn @click="console.log(app); test()">asdf</Btn>
     <div class="p-5 w-full max-w-xl">
         <div v-if="loading" class="text-center w-full">
             <Icon name="line-md:loading-alt-loop" size="5em" class="absolute mt-8" />

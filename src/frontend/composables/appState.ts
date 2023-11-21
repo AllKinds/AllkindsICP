@@ -149,3 +149,10 @@ export const addNotification = (level: NotificationLevel, msg: string): void => 
         case "error": toast.error(msg); break;
     }
 }
+
+export const inBrowser = (fn?: () => unknown): boolean => {
+    if (fn !== undefined) {
+        if (process.client) fn();
+    }
+    return !!process.client
+}

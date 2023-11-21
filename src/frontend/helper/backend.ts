@@ -10,6 +10,7 @@ import { Skip } from "./backend";
 type BackendEffect<T> = Effect.Effect<never, BackendError, T>
 export type FrontendEffect<T> = Effect.Effect<never, FrontendError, T>
 
+
 export const resultToEffect = <T>(result: { err: BackendError } | { ok: T }): BackendEffect<T> => {
     if ("err" in result) {
         return Effect.fail(result.err);
