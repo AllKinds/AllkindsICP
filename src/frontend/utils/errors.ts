@@ -30,6 +30,8 @@ export function formatBackendError(err: BackendError): string {
         case "tooLong":
             return "Too long";
 
+        // TODO: format other errors
+
         default:
             return "Error " + key;
     }
@@ -50,6 +52,7 @@ export type FrontendError = { tag: "backend", err: BackendError }
     | { tag: "env", err: string }
     | { tag: "deps", err: string }
     | { tag: "notLoggedIn" }
+    | { tag: "form", err: BackendError }
 
 export const toNetworkError = (e: any): FrontendError => {
     return { tag: "network", err: "" + e };
@@ -66,6 +69,12 @@ export const depsErr = (err: string): FrontendError => {
         tag: "deps",
         err
     }
+}
+
+export const formErr = (key: ErrorKey): FrontendError => {
+    let err: any = {};
+    err[key] = null;
+    return { tag: "form", err: err as BackendError }
 }
 
 const notifyWith = <R, A>(effect: Effect.Effect<R, FrontendError, A>, msg?: (a: A) => string): Effect.Effect<R, FrontendError, A> => {
@@ -89,3 +98,4 @@ export const notifyWithMsg = <A>(msg?: string): (effect: FrontendEffect<A>) => F
 export const notifyWithFormatter = <A>(msg: (a: A) => string): (effect: FrontendEffect<A>) => FrontendEffect<A> => {
     return (effect) => notifyWith(effect, msg);
 }
+

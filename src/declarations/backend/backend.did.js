@@ -130,7 +130,7 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'createQuestion' : IDL.Func([IDL.Text, IDL.Text], [ResultQuestion], []),
-    'createUser' : IDL.Func([IDL.Text], [ResultUser], []),
+    'createUser' : IDL.Func([IDL.Text, IDL.Text], [ResultUser], []),
     'findMatch' : IDL.Func(
         [IDL.Nat8, IDL.Nat8, IDL.Opt(Gender), IDL.Nat8],
         [ResultUserMatch],

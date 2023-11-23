@@ -1,7 +1,7 @@
 
 <script lang="ts" setup>
-import { Question, answerQuestion, skipQuestion } from '~/helper/backend';
-import { notifyWithMsg } from '~/helper/errors';
+import { Question, answerQuestion, skipQuestion } from '~/utils/backend';
+import { notifyWithMsg } from '~/utils/errors';
 import { Effect } from "effect"
 const emit = defineEmits(["answered", "answering"]);
 

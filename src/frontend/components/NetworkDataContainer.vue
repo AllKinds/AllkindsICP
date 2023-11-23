@@ -7,21 +7,23 @@ const props = defineProps<{
     networkdata: NetworkData<unknown>,
 }>();
 
+const status = () => props.networkdata.status;
+
 </script>
 
 <template>
     <div class="">
-        <div v-if="props.networkdata.status === 'ok'" class="">
+        <div v-if="status() === 'ok'" class="">
             <slot />
         </div>
-        <div v-else-if="props.networkdata.status === 'requested'" class="text-center">
+        <div v-else-if="status() === 'requested'" class="text-center">
             <Icon name="line-md:loading-alt-loop" size="5em" class="absolute mt-8" />
             <div class="opacity-20">
                 <slot />
             </div>
         </div>
         <div v-else class="bg-error">
-            {{ props.networkdata.status }}
+            {{ status() }}
             <slot />
         </div>
     </div>

@@ -1,6 +1,6 @@
 <script type="ts" setup>
 import { Effect } from "effect";
-import { loadQuestions, createQuestion } from "~/helper/backend"
+import { loadQuestions, createQuestion } from "~/utils/ackend"
 
 const question = useState('new-question', () => "")
 const app = useAppState();

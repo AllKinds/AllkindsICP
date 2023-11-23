@@ -1,6 +1,6 @@
 import { Effect, pipe } from "effect";
-import { FrontendEffect, Question, User } from "~/helper/backend";
-import { FrontendError, notifyWithMsg } from "~/helper/errors";
+import { FrontendEffect, Question, User } from "~/utils/backend";
+import { FrontendError, notifyWithMsg } from "~/utils/errors";
 import { defineStore } from 'pinia'
 
 export type AppState = {
@@ -134,12 +134,12 @@ export const useAppState = defineStore({
 });
 
 export const addNotification = (level: NotificationLevel, msg: string): void => {
+    switch (level) {
+        case "ok": console.log("notification (" + level + "): " + msg); break;
+        case "warning": console.warn("notification (" + level + "): " + msg); break;
+        case "error": console.error("notification (" + level + "): " + msg); break;
+    }
     if (!process.client) {
-        switch (level) {
-            case "ok": console.log("notification (" + level + "): " + msg); break;
-            case "warning": console.warn("notification (" + level + "): " + msg); break;
-            case "error": console.error("notification (" + level + "): " + msg); break;
-        }
         return;
     }
     const toast = useNuxtApp().$toast;

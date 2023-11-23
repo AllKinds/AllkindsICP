@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { Effect } from "effect";
-import { toNetworkError } from "~/helper/errors";
+import { toNetworkError } from "~/utils/errors";
 
 definePageMeta({ title: "Welcome" });
 const app = useAppState();

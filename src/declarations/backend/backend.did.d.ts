@@ -116,7 +116,7 @@ export interface _SERVICE {
   'backupQuestions' : ActorMethod<[bigint, bigint], Array<Question__1>>,
   'backupUsers' : ActorMethod<[bigint, bigint], Array<[Principal, User]>>,
   'createQuestion' : ActorMethod<[string, string], ResultQuestion>,
-  'createUser' : ActorMethod<[string], ResultUser>,
+  'createUser' : ActorMethod<[string, string], ResultUser>,
   'findMatch' : ActorMethod<
     [number, number, [] | [Gender], number],
     ResultUserMatch

@@ -2,7 +2,7 @@ import { backend } from "~~/src/declarations/backend";
 export type * from "~~/src/declarations/backend/backend.did";
 export type BackendActor = typeof backend;
 import { Effect } from "effect";
-import { BackendError, FrontendError, toBackendError, toNetworkError } from "~/helper/errors";
+import { BackendError, FrontendError, toBackendError, toNetworkError } from "~/utils/errors";
 import { Question } from "./backend";
 import { Answer } from "./backend";
 import { Skip } from "./backend";
@@ -45,6 +45,10 @@ export const loadQuestions = (): FrontendEffect<Question[]> => {
 
 export const createQuestion = (q: string): FrontendEffect<void> => {
     return effectifyResult((actor) => actor.createQuestion(q, ""))
+}
+
+export const createUser = (name: string, contact: string): FrontendEffect<void> => {
+    return effectifyResult((actor) => actor.createUser(name, contact))
 }
 
 export const answerQuestion = (q: BigInt, a: boolean, boost: number): FrontendEffect<Answer> => {

@@ -32,7 +32,7 @@ if (await Effect.runPromise(checkAuth(null)).catch((e) => false)) {
             </p>
         </TextBlock>
 
-        <Btn class="w-72" :class="{ 'h-16': largeFont }" @click="login('II')">
+        <Btn class="w-72" @click="login('II')">
             Log in with Internet&nbsp;Identity
         </Btn>
         <Btn class="w-72" @click="login('NFID')"> Log in with email </Btn>

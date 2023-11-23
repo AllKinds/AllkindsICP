@@ -2,8 +2,8 @@ import { backend, createActor } from "../../declarations/backend";
 import { AuthClient } from "@dfinity/auth-client";
 import { HttpAgent } from "@dfinity/agent";
 import { Effect } from "effect";
-import { BackendActor } from "~/helper/backend";
-import { FrontendError, notLoggedIn, toBackendError, toNetworkError } from "~/helper/errors";
+import { BackendActor } from "~/utils/backend";
+import { FrontendError, notLoggedIn, toBackendError, toNetworkError } from "~/utils/errors";
 
 export type Provider = "II" | "NFID";
 

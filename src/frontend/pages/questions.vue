@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 definePageMeta({ title: "Project design" });
 
-import { loadQuestions, createQuestion } from "~/helper/backend"
+import { loadQuestions, createQuestion } from "~/utils/backend"
+import { getColor } from "~/utils/color"
 
 const question = useState('new-question', () => "")
 const app = useAppState();
@@ -25,7 +26,11 @@ async function create() {
     );
 }
 
-if (inBrowser()) loadQs();
+if (inBrowser()) {
+    loadQs();
+} else {
+    //app.openQuestions.status = "init";
+}
 </script>
 
 
@@ -37,10 +42,15 @@ if (inBrowser()) loadQs();
         <Icon name="prime:users" size="2em" />
     </AllkindsTitle>
 
-    <NetworkDataContainer :networkdata="app.openQuestions" class="grow">
-        <Question v-for="(q, i) in    app.openQuestions.data   " :question="q" :selected="i === 0" @answered="loadQs"
-            @answering="app.removeQuestion(q as Question)">
-            {{ i }}: {{ q.color }}
-        </Question>
+    <NuxtLink to="/ask-question" class="w-full rounded bg-slate-100 text-gray-500 text-xl p-5">
+        Ask your yes/no question
+    </NuxtLink>
+
+    <NetworkDataContainer :networkdata="app.openQuestions" class="grow mt-4 w-full">
+        <NuxtLink v-for="(q, i) in app.openQuestions.data" :question="q" :selected="i === 0"
+            :to="'/answer-question/' + q.id" :class="getColor(q.color).color"
+            class="border p-4 w-full my-2 rounded-lg block">
+            {{ q.question }}
+        </NuxtLink>
     </NetworkDataContainer>
 </template>

@@ -7,13 +7,14 @@ const props = defineProps({
 });
 
 const largeFont = useLargeFont();
-const outline = (props.outline || 'btn-outline');
+const outline = (props.outline || '');
 const width = (props.width || 'w-48');
 const disabled = (props.disabled?.startsWith('t') ? 'btn-disabled' : '')
 </script>
 
 <template>
-    <NuxtLink :to="to" class="m-3 btn rounded-full" :class="width + ' ' + outline + ' ' + disabled">
+    <NuxtLink :to="to" :class="width + ' ' + outline + ' ' + disabled"
+        class="m-3 p-4 border rounded-full text-center cursor-pointer active:scale-95 transition-all hover:bg-white hover:text-black">
         <span :class="{ 'text-xl': largeFont }">
             <slot />
         </span>

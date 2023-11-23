@@ -6,7 +6,7 @@ definePageMeta({ title: "Privacy" });
 <template>
     <AllkindsTitle>Hello</AllkindsTitle>
 
-    <TextBlock align="justify-left" class="w-96">
+    <TextBlock align="text-left" class="w-96">
         <p>
             Allkinds.Team is build fully on blockchain, the Internet Computer.
         </p>

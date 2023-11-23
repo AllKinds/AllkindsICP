@@ -33,7 +33,6 @@ export const createActor = (canisterId, options = {}) => {
     }
 
     // Creates an actor with using the candid interface and the HttpAgent
-    console.log("createActor", canisterId, options.actorOptions);
     return Actor.createActor(idlFactory, {
         agent,
         canisterId,

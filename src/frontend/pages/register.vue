@@ -1,48 +1,29 @@
 <script lang="ts" setup>
-import { Effect } from "effect";
-import { EffectScope } from "vue";
-import { BackendError, ErrorKey } from "~/helper/errors";
+import { Effect, pipe } from "effect";
+import { FrontendError, ErrorKey, formErr } from "~/utils/errors";
+import * as backend from "~/utils/backend";
 
 definePageMeta({ title: "Personal handle" });
 const username = useState("username", () => "");
 const contact = useState("contact", () => "");
 const loading = useState("loading", () => false);
 
-const validateUsername = (u: string): Effect.Effect<never, BackendError, void> => {
-    if (u.length < 2) return Effect.fail({ tooShort: null });
-    if (u.length > 20) return Effect.fail({ tooLong: null });
-    if (!/^[a-zA-Z][a-zA-Z0-9]*$/.test(u)) return Effect.fail({ validationError: null });
+const validateUsername = (u: string): Effect.Effect<never, FrontendError, void> => {
+    if (u.length < 2) return Effect.fail(formErr("tooShort"));
+    if (u.length > 20) return Effect.fail(formErr("tooLong"));
+    if (!/^[a-zA-Z][a-zA-Z0-9]*$/.test(u)) return Effect.fail(formErr("validationError"));
 
     return Effect.succeed(null);
 };
 
 // TODO: move to backend.ts
-function createUser() {
-    const prog = Effect.gen(function* (_) {
-        yield* _(Effect.log("start creating " + username.value));
-        yield* _(validateUsername(username.value));
-        yield* _(Effect.log("local validation passed"));
-        const backend = yield* _(useActorOrLogin());
-        yield* _(Effect.log("getting actor passed"));
-        const res = yield* _(
-            Effect.tryPromise({
-                try: () => backend.createUser(username.value),
-                catch: (err) => {
-                    return Effect.fail(new Error("" + err));
-                },
-            })
-        );
-        return Effect.succeed(null);
-    });
-
-    // TODO: 
-    Effect.runPromise(prog).then(
-        () => {
-            navigateTo("/welcome");
-        },
-        (err) => {
-        }
+async function createUser() {
+    const prog = pipe(
+        validateUsername(username.value),
+        () => backend.createUser(username.value, contact.value)
     );
+
+    await runNotify(prog, "").catch(console.warn);
 }
 </script>
 <template>

@@ -93,8 +93,8 @@ actor {
   };
 
   // Create default new user with only a username
-  public shared ({ caller }) func createUser(username : Text) : async ResultUser {
-    User.add(users, username, caller);
+  public shared ({ caller }) func createUser(username : Text, contact : Text) : async ResultUser {
+    User.add(users, username, contact, caller);
   };
 
   public shared query ({ caller }) func getUser() : async ResultUser {
@@ -170,7 +170,6 @@ actor {
     };
 
     let filter = Matching.createFilter(minAge, maxAge, gender, cohesion);
-
 
     switch (User.checkFunds(users, #findMatch, caller)) {
       case (#ok(_)) { /* user has sufficient funds */ };

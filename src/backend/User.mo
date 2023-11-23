@@ -145,13 +145,13 @@ module {
     { minBirth; maxBirth; gender };
   };
 
-  public func add(users : UserDB, username : Text, id : Principal) : Result<User, Error> {
+  public func add(users : UserDB, username : Text, contact : Text, id : Principal) : Result<User, Error> {
     if (Principal.isAnonymous(id)) return #err(#notLoggedIn);
     let null = get(users, id) else return #err(#alreadyRegistered);
     let true = validateName(username) else return #err(#validationError);
     let null = getByName(users, username) else return #err(#nameNotAvailable);
 
-    let user = create(username);
+    let user = create(username, contact);
     let lookupKey = TextHelper.toLower(username);
     Map.set(users.info, phash, id, user);
     Map.set(users.byUsername, thash, lookupKey, id);
@@ -284,14 +284,14 @@ module {
     #ok(stableToUser(newUser));
   };
 
-  func create(username : Text) : StableUser {
+  func create(username : Text, contact : Text) : StableUser {
     {
       username;
       created = Time.now();
       about = (null, true);
       gender = (null, true);
       birth = (null, true);
-      socials = [];
+      socials = [({ network = #email; handle = contact }, false)];
       points = 100;
       picture = (null, true);
     };
