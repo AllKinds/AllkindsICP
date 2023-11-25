@@ -15,5 +15,5 @@ const app = useAppState();
     </TextBlock>
 
 
-    <Btn to="/home">continue</Btn>
+    <Btn to="/questions">continue</Btn>
 </template>

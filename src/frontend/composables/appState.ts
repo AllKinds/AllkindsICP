@@ -1,5 +1,6 @@
 import { Effect, pipe } from "effect";
 import { FrontendEffect, Question, User } from "~/utils/backend";
+import * as backend from "~/utils/backend";
 import { FrontendError, notifyWithMsg } from "~/utils/errors";
 import { defineStore } from 'pinia'
 
@@ -78,11 +79,20 @@ export const storeToData = <A>(effect: FrontendEffect<A>, store: (a: NetworkData
     )
 }
 
-
 export const runStoreNotify = <A>(effect: FrontendEffect<A>, store: (a: NetworkData<A>) => void, msg?: string): Promise<A> => {
     return Effect.runPromise(
         storeToData(
             effect.pipe(notifyWithMsg(msg)),
+            store,
+        )
+    );
+}
+
+
+export const runStore = <A>(effect: FrontendEffect<A>, store: (a: NetworkData<A>) => void, msg?: string): Promise<A> => {
+    return Effect.runPromise(
+        storeToData(
+            effect,
             store,
         )
     );
@@ -129,6 +139,9 @@ export const useAppState = defineStore({
         },
         setUser(user: NetworkData<User>) {
             this.user = combineNetworkData(this.user, user)
+        },
+        loadQuestions() {
+            runStoreNotify(backend.loadQuestions(), app.setOpenQuestions)
         }
     },
 });

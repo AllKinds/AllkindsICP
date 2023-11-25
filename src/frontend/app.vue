@@ -33,19 +33,25 @@ if (!process.server) {
         show = !show;
         if (!e.ctrlKey) show = false;
         const el = document.getElementById("asdf")!;
+        if (!el) return;
         el.style.background = !show ? "black" : "";
         el.style.opacity = show ? "0.6" : "1";
     }
     document.onmousedown = toggle
     //document.onmouseup = toggle
     toggle({ ctrlKey: false });
+
+    if (isLoggedIn()) {
+        console.log("load user data")
+        runStoreNotify(loadUser(), app.setUser)
+    }
 }
 
 </script>
 
 <template>
     <div class="w-full h-full transition-all" :style="style()">
-        <div id="asdf" class="m-auto max-w-sm h-full flex flex-col items-center p-3" style="backdrop-filter: blur(1px);">
+        <div id="asdf" class="m-auto max-w-lg h-full flex flex-col items-center p-3" style="backdrop-filter: blur(1px);">
             <NuxtPage />
         </div>
     </div>

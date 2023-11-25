@@ -3,9 +3,7 @@ export type * from "~~/src/declarations/backend/backend.did";
 export type BackendActor = typeof backend;
 import { Effect } from "effect";
 import { BackendError, FrontendError, toBackendError, toNetworkError } from "~/utils/errors";
-import { Question } from "./backend";
-import { Answer } from "./backend";
-import { Skip } from "./backend";
+import { Question, Answer, Skip, User } from "./backend";
 
 type BackendEffect<T> = Effect.Effect<never, BackendError, T>
 export type FrontendEffect<T> = Effect.Effect<never, FrontendError, T>
@@ -43,8 +41,12 @@ export const loadQuestions = (): FrontendEffect<Question[]> => {
     return effectify((actor) => actor.getAskableQuestions(limit))
 }
 
-export const createQuestion = (q: string): FrontendEffect<void> => {
-    return effectifyResult((actor) => actor.createQuestion(q, ""))
+export const loadUser = (): FrontendEffect<User> => {
+    return effectifyResult((actor) => actor.getUser())
+}
+
+export const createQuestion = (q: string, c: ColorName): FrontendEffect<void> => {
+    return effectifyResult((actor) => actor.createQuestion(q, c))
 }
 
 export const createUser = (name: string, contact: string): FrontendEffect<void> => {
