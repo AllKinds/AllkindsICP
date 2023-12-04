@@ -10,7 +10,7 @@ const loading = useState("loading", () => false);
 
 async function loadQs() {
     console.log("loading questions")
-    runStoreNotify(loadQuestions(), app.setOpenQuestions)
+    app.loadQuestions();
 }
 
 async function create() {
@@ -28,6 +28,7 @@ async function create() {
 
 if (inBrowser()) {
     loadQs();
+    app.loadUser()
 } else {
     //app.openQuestions.status = "init";
 }
@@ -36,7 +37,10 @@ if (inBrowser()) {
 
 <template>
     <AllkindsTitle>
-        <div class="m-auto">Adam, 214 <Icon name="gg:shape-hexagon"></Icon>
+        <div class="m-auto">
+            {{ app.getUser().username }},
+            {{ app.getUser().points }}
+            <Icon name="gg:shape-hexagon" class="mb-2" />
         </div>
 
         <Icon name="prime:users" size="2em" />

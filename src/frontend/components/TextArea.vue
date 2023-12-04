@@ -27,11 +27,12 @@ onUpdated(() => resize(el.value));
 
 const largeFont = useLargeFont();
 watch(largeFont, () => resize(el.value));
+
 </script>
 
 <template>
     <textarea ref="el" class="textarea textarea-bordered textarea-md w-full bg-transparent"
         :class="largeFont ? 'textarea-lg' : 'textarea-md'"
         @input="$emit('update:modelValue', ($event.target as any).value); false" :value="modelValue"
-        @keyup.crtl.enter="$emit('ctrl-enter', modelValue)" :placeholder="placeholder">{{ modelValue }}</textarea>
+        @keyup.ctrl.enter="$emit('ctrl-enter', modelValue)" :placeholder="placeholder">{{ modelValue }}</textarea>
 </template>

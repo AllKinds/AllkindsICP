@@ -39,14 +39,17 @@ async function loadQs() {
 
 let loaded = false;
 
-function findQuestion(id) {
+function findQuestion(id, findOther = false) {
     const data = app.openQuestions.data;
     let q = null;
     if (!data) {
         if (!loaded) {
             loaded = true;
             loadQs()
-                .catch(() => navigateTo("/questions"));
+                .catch(() => {
+                    console.log("could not load question " + id + ", redirect to /questions")
+                    navigateTo("/questions")
+                });
         }
     } else if (data.length === 0) {
         navigateTo("/questions");
@@ -62,7 +65,7 @@ function findQuestion(id) {
 
 let q = () => findQuestion(route.params.id) || {};
 
-runStoreNotify(loadUser(), app.setUser);
+app.loadUser();
 
 const twColor = () => getColor(q().color).color;
 
@@ -70,7 +73,7 @@ const twColor = () => getColor(q().color).color;
 
 <template>
     <AllkindsTitle class="w-full" logo="ph:x-circle" linkTo="/questions">
-        <div class="m-auto">{{ app.user.data?.username || '-' }}, 214 <Icon name="gg:shape-hexagon"></Icon>
+        <div class="m-auto">{{ app.getUser().username }}, 214 <Icon name="gg:shape-hexagon" class="mb-4"></Icon>
         </div>
 
         <Icon name="prime:users" size="2em" />

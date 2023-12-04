@@ -81,7 +81,7 @@ module {
 
     let ?user = User.getInfo(users, userB, showNonPublic) else return #err(#userNotFound);
 
-    let answered = Array.tabulate<(Question, AnswerDiff)>(common.size(), func i = (Question.get(questions, common[i].question), common[i]));
+    let answered = Array.tabulate<(Question, AnswerDiff)>(common.size(), func i = (Question.getQuestion(questions, common[i].question), common[i]));
     let unanswered : Iter.Iter<Question> = Question.unanswered(questions, answers, skips, userA);
     let uncommon = Iter.filter<Question>(unanswered, func q = Question.has(answersB, q.id));
 

@@ -17,7 +17,7 @@ import Configuration "Configuration";
 import Error "Error";
 import BufferHelper "helper/BufferHelper";
 
-/// Types and functionst related to questions and answers
+/// Types and functions related to questions and answers
 module {
 
   type Iter<T> = Iter.Iter<T>;
@@ -26,14 +26,14 @@ module {
   public type QuestionID = Nat;
   type Buffer<T> = Buffer.StableBuffer<T>;
 
-  public type QuestionDB = Buffer<Question>; // TODO: consider other data structure as buffer can have bad worst case performance due to resizing
+  public type QuestionDB = Buffer<StableQuestion>; // TODO: consider other data structure as buffer can have bad worst case performance due to resizing
   public type UserAnswers = Trie.Trie<QuestionID, Answer>;
   public type UserSkips = Trie.Trie<QuestionID, Skip>;
   public type AnswerDB = Map<Principal, UserAnswers>;
   public type SkipDB = Map<Principal, UserSkips>;
 
   // Color indicates optional background color for the question
-  public type Question = {
+  public type StableQuestion = {
     id : QuestionID;
     created : Time;
     creator : Principal;
@@ -42,7 +42,18 @@ module {
     points : Int; // type Int because question points should be able to go negative
   };
 
+  // Question that can be returned to the frontend
+  public type Question = {
+    id : QuestionID;
+    created : Time;
+    creator : ?Text;
+    question : Text;
+    color : Text;
+    points : Int; // type Int because question points should be able to go negative
+  };
+
   public type Answer = {
+    created : Time;
     question : Nat; // Question ID // TODO? remove because it can be implied by the key in UserAnswers?
     answer : Bool;
     weight : Nat;
@@ -69,14 +80,14 @@ module {
   type Color = Color.Color;
   type Result<T, E> = Result.Result<T, E>;
 
-  public func emptyDB() : QuestionDB = Buffer.init<Question>();
+  public func emptyDB() : QuestionDB = Buffer.init<StableQuestion>();
 
   let { phash } = Map;
 
   public func emptyAnswerDB() : AnswerDB = Map.new<Principal, UserAnswers>(phash);
   public func emptySkipDB() : SkipDB = Map.new<Principal, UserSkips>(phash);
 
-  public func backup(db : QuestionDB) : Iter<Question> {
+  public func backup(db : QuestionDB) : Iter<StableQuestion> {
     Buffer.vals(db);
   };
 
@@ -95,10 +106,13 @@ module {
   public func add(db : QuestionDB, question : Text, color : Color, creator : Principal) : Result<Question, Error> {
     let id = Buffer.size(db);
     let result = create(id, question, color, creator);
-    let #ok(q) = result else return result;
+    let q = switch (result) {
+      case (#ok(value)) { value };
+      case (#err(error)) { return #err error };
+    };
 
     Buffer.add(db, q);
-    result;
+    #ok(toQuestion(q));
   };
 
   public func putAnswer(answers : AnswerDB, answer : Answer, user : Principal) : () {
@@ -117,22 +131,30 @@ module {
     Map.set(skips, phash, user, withSkip);
   };
 
-  func create(id : Nat, question : Text, color : Color, creator : Principal) : Result<Question, Error> {
-    if (question.size() < Configuration.question.minSize) return #err(#tooShort);
-    if (question.size() > Configuration.question.maxSize) return #err(#tooLong);
-
-    #ok {
-      id;
-      created = Time.now();
-      creator;
-      question;
-      color;
-      points = 0;
+  func toQuestion(q : StableQuestion) : Question {
+    {
+      id = q.id;
+      created = q.created;
+      creator = null;
+      question = q.question;
+      color = q.color;
+      points = q.points;
     };
   };
 
-  public func get(questions : QuestionDB, id : QuestionID) : Question {
+  func create(id : Nat, question : Text, color : Color, creator : Principal) : Result<StableQuestion, Error> {
+    if (question.size() < Configuration.question.minSize) return #err(#tooShort);
+    if (question.size() > Configuration.question.maxSize) return #err(#tooLong);
+
+    #ok { id; created = Time.now(); creator; question; color; points = 0 };
+  };
+
+  public func get(questions : QuestionDB, id : QuestionID) : StableQuestion {
     Buffer.get(questions, id);
+  };
+
+  public func getQuestion(questions : QuestionDB, id : QuestionID) : Question {
+    toQuestion(Buffer.get(questions, id));
   };
 
   func compare(answerA : Answer, answerB : Answer) : AnswerDiff {
@@ -162,7 +184,7 @@ module {
     // map answers to questions
     Iter.map<(QuestionID, Answer), (Question, Answer)>(
       userAnswers,
-      func(q, a) = (Buffer.get(questions, q), a),
+      func(q, a) = (toQuestion(Buffer.get(questions, q)), a),
     );
   };
 
@@ -172,11 +194,13 @@ module {
     let userSkips = getSkips(skips, user);
 
     // filter out answered questions
-    let withoutAnswered = Iter.filter<Question>(all, func q = Trie.get<Nat, Answer>(userAnswers, key(q.id), Nat.equal) == null); // TODO replace func with has()
+    let withoutAnswered = Iter.filter<StableQuestion>(all, func q = Trie.get<Nat, Answer>(userAnswers, key(q.id), Nat.equal) == null); // TODO replace func with has()
     // filter out skipped questions
-    let withoutSkipped = Iter.filter<Question>(withoutAnswered, func q = Trie.get<Nat, Skip>(userSkips, key(q.id), Nat.equal) == null);
+    let withoutSkipped = Iter.filter<StableQuestion>(withoutAnswered, func q = Trie.get<Nat, Skip>(userSkips, key(q.id), Nat.equal) == null);
 
-    withoutSkipped;
+    let asQuestions = Iter.map<StableQuestion, Question>(withoutSkipped, func q = toQuestion(q));
+
+    asQuestions;
   };
 
   func key(id : Nat) : Trie.Key<Nat> {

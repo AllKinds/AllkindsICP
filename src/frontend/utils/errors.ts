@@ -39,6 +39,8 @@ export function formatBackendError(err: BackendError): string {
 export function formatError(err: FrontendError): string {
     if (err.tag === "backend") {
         return formatBackendError(err.err)
+    } else if (err.tag === "form") {
+        return formatBackendError(err.err)
     } else if (err.tag === "notLoggedIn") {
         return "Not logged in"
     } else {

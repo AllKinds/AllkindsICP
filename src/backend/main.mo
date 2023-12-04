@@ -38,6 +38,7 @@ actor {
   //TYPES INDEX
   type User = User.User;
   type Question = Question.Question;
+  type StableQuestion = Question.StableQuestion;
   type QuestionID = Question.QuestionID;
   type Answer = Question.Answer;
   type Skip = Question.Skip;
@@ -142,7 +143,12 @@ actor {
       case (#err(e)) return #err(e);
     };
 
-    let a : Answer = { question; answer; weight = 1 + boost };
+    let a : Answer = {
+      question;
+      answer;
+      weight = 1 + boost;
+      created = Time.now();
+    };
     Question.putAnswer(answers, a, caller);
 
     let #ok(_) = User.reward(users, #createAnswer(boost), caller) else Debug.trap("Bug: Reward failed. checkFunds should have returned an error already");
@@ -269,7 +275,7 @@ actor {
   };
 
   /// Create a backup of questions
-  public query ({ caller }) func backupQuestions(offset : Nat, limit : Nat) : async [Question] {
+  public query ({ caller }) func backupQuestions(offset : Nat, limit : Nat) : async [StableQuestion] {
     assertAdmin(caller);
 
     let all = Question.backup(questions);
@@ -279,7 +285,7 @@ actor {
   };
 
   /// Create a backup of answers
-  public query ({ caller }) func backupAnswers(offset : Nat, limit : Nat) : async [Question] {
+  public query ({ caller }) func backupAnswers(offset : Nat, limit : Nat) : async [StableQuestion] {
     assertAdmin(caller);
 
     let all = Question.backup(questions);
