@@ -16,9 +16,9 @@ const answer = (question, a, boost) => {
     app.removeQuestion(question)
     navigateTo("/questions") // TODO: goto next question
     runNotify(answerQuestion(question.id.valueOf(), a, boost), "Answer saved").then(
-        () => { loadQs() }
+        () => { app.loadQuestions() }
     ).catch(
-        () => { loadQs() }
+        () => { app.loadQuestions() }
     );
 }
 
@@ -30,16 +30,12 @@ const skip = (question) => {
     Effect.runPromise(
         skipQuestion(question.id.valueOf()).pipe(notifyWithMsg("Question skipped"))
     ).then(
-        () => { loadQs() },
+        () => { app.loadQuestions() },
     ).catch(
-        () => { loadQs() }
+        () => { app.loadQuestions() }
     );
 }
 
-async function loadQs() {
-    console.log("loading questions")
-    runStoreNotify(loadQuestions(), app.setOpenQuestions)
-}
 
 let loaded = false;
 
@@ -50,11 +46,7 @@ function findQuestion(id, findOther = false) {
     if (!data) {
         if (!loaded) {
             loaded = true;
-            loadQs()
-                .catch(() => {
-                    console.log("could not load question " + id + ", redirect to /questions")
-                    navigateTo("/questions")
-                });
+            app.loadQuestions();
         }
     } else if (data.length === 0) {
         navigateTo("/questions");

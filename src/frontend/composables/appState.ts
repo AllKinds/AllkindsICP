@@ -154,7 +154,7 @@ export const useAppState = defineStore({
                     data.data.splice(i, 1);
                 }
             }
-            this.setOpenQuestions({ status: "ok", errCount: 0 });
+            this.setOpenQuestions({ status: "requested", errCount: 0 });
             setTimeout(() => this.setOpenQuestions(data));
         },
         loadQuestions(maxAgeS?: number, msg?: string) {
