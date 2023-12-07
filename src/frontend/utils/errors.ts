@@ -19,8 +19,14 @@ export type ErrorKey =
     | "notRegistered"
     | "invalidColor";
 
-export function formatBackendError(err: BackendError): string {
+
+export function getErrorKey(err: BackendError): ErrorKey {
     const key = Object.keys(err)[0] as ErrorKey;
+    return key;
+}
+
+export function formatBackendError(err: BackendError): string {
+    const key = getErrorKey(err);
 
     switch (key) {
         case "validationError":
@@ -48,7 +54,7 @@ export function formatError(err: FrontendError): string {
     }
 }
 
-export type ErrorTags = "backend" | "network"
+export type ErrorTags = "backend" | "network" | "env" | "deps" | "notLoggedIn" | "form";
 export type FrontendError = { tag: "backend", err: BackendError }
     | { tag: "network", err: string }
     | { tag: "env", err: string }
@@ -101,3 +107,18 @@ export const notifyWithFormatter = <A>(msg: (a: A) => string): (effect: Frontend
     return (effect) => notifyWith(effect, msg);
 }
 
+export const is = (err: FrontendError, tag: ErrorTags, key?: ErrorKey): boolean => {
+    if (err.tag !== tag) return false;
+    if (!key) return true;
+    switch (err.tag) {
+        case "backend": return getErrorKey(err.err) === key;
+        case "form": return getErrorKey(err.err) === key;
+        case "network": return true;
+        case "deps": return true;
+        case "env": return true;
+        case "notLoggedIn": return true;
+    }
+
+    console.error("unhandled error tag " + tag)
+    return false;
+}

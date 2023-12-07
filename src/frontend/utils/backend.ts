@@ -3,7 +3,8 @@ export type * from "~~/src/declarations/backend/backend.did";
 export type BackendActor = typeof backend;
 import { Effect } from "effect";
 import { BackendError, FrontendError, toBackendError, toNetworkError } from "~/utils/errors";
-import { Question, Answer, Skip, User } from "./backend";
+import { Question, Answer, Skip, User, Friend } from "./backend";
+import { FriendStatus } from "./backend";
 
 type BackendEffect<T> = Effect.Effect<never, BackendError, T>
 export type FrontendEffect<T> = Effect.Effect<never, FrontendError, T>
@@ -37,8 +38,18 @@ const effectifyResult = <T>(fn: (actor: BackendActor) => Promise<{ ok: T } | { e
 }
 
 export const loadQuestions = (): FrontendEffect<Question[]> => {
-    const limit = BigInt(10);
-    return effectify((actor) => actor.getAskableQuestions(limit))
+    const limit = BigInt(20);
+    return effectify((actor) => actor.getUnansweredQuestions(limit))
+}
+
+export const getAnsweredQuestions = (): FrontendEffect<[Question, Answer][]> => {
+    const limit = BigInt(200);
+    return effectify((actor) => actor.getAnsweredQuestions(limit))
+}
+
+export const getOwnQuestions = (): FrontendEffect<Question[]> => {
+    const limit = BigInt(200);
+    return effectify((actor) => actor.getOwnQuestions(limit))
 }
 
 export const loadUser = (): FrontendEffect<User> => {
@@ -59,4 +70,33 @@ export const answerQuestion = (q: BigInt, a: boolean, boost: number): FrontendEf
 
 export const skipQuestion = (q: BigInt): FrontendEffect<Skip> => {
     return effectifyResult((actor) => actor.submitSkip(q.valueOf()));
+}
+
+export const loadFriends = (): FrontendEffect<Friend[]> => {
+    return effectifyResult((actor) => actor.getFriends())
+}
+
+
+export type FriendStatusKey = "requestSend"
+    | "requestReceived"
+    | "connected"
+    | "requestIgnored"
+    | "rejectionSend"
+    | "rejectionReceived";
+
+export const friendStatusToKey = (status: FriendStatus): FriendStatusKey => {
+    return Object.keys(status)[0] as FriendStatusKey;
+}
+
+export const formatFriendStatus = (status: FriendStatus): string => {
+    switch (friendStatusToKey(status)) {
+        case "connected": return "connected"
+        case "rejectionReceived": return "rejected";
+        case "rejectionSend": return "reject";
+        case "requestIgnored": return "ignored";
+        case "requestReceived": return "request";
+        case "requestSend": return "requested";
+    }
+    console.error("Unexpected friend status")
+    return "unknown"
 }

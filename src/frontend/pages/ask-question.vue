@@ -10,8 +10,7 @@ const color = useState('color', () => "green")
 const weight = useState('weight', () => 1)
 
 async function loadQs() {
-    console.log("loading questions")
-    runStoreNotify(loadQuestions(), app.setOpenQuestions)
+    app.loadQuestions()
 }
 
 async function create() {
@@ -30,12 +29,18 @@ function canCreate() {
     return question.value.length >= 10 && !loading.value
 }
 
+if (inBrowser()) {
+    app.loadUser();
+}
+
 </script>
 
 <template>
     <AllkindsTitle class="w-full" logo="ph:x-circle" link-to="/questions">
-        <div class="m-auto">Adam, 214 <Icon name="gg:shape-hexagon"></Icon>
-        </div>
+        <NuxtLink to="/my-profile" class="m-auto">
+            {{ app.getUser().username }}, {{ app.getUser().points }}
+            <Icon name="gg:shape-hexagon" class="mb-2" />
+        </NuxtLink>
 
         <Icon name="prime:users" size="2em" />
     </AllkindsTitle>

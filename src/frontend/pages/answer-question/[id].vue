@@ -17,6 +17,8 @@ const answer = (question, a, boost) => {
     navigateTo("/questions") // TODO: goto next question
     runNotify(answerQuestion(question.id.valueOf(), a, boost), "Answer saved").then(
         () => { loadQs() }
+    ).catch(
+        () => { loadQs() }
     );
 }
 
@@ -28,6 +30,8 @@ const skip = (question) => {
     Effect.runPromise(
         skipQuestion(question.id.valueOf()).pipe(notifyWithMsg("Question skipped"))
     ).then(
+        () => { loadQs() },
+    ).catch(
         () => { loadQs() }
     );
 }
@@ -41,6 +45,7 @@ let loaded = false;
 
 function findQuestion(id, findOther = false) {
     const data = app.openQuestions.data;
+    const data2 = app.answeredQuestions.data;
     let q = null;
     if (!data) {
         if (!loaded) {
@@ -56,6 +61,10 @@ function findQuestion(id, findOther = false) {
     } else {
         q = data.find((x) => x.id == id);
         if (!q) {
+            q = data2.find((x) => x[0].id == id);
+            if (q) q = q[0];
+        }
+        if (!q) {
             navigateTo("/answer-question/" + data[0].id);
         }
     }
@@ -65,7 +74,9 @@ function findQuestion(id, findOther = false) {
 
 let q = () => findQuestion(route.params.id) || {};
 
-app.loadUser();
+if (inBrowser()) {
+    app.loadUser();
+}
 
 const twColor = () => getColor(q().color).color;
 
@@ -73,8 +84,10 @@ const twColor = () => getColor(q().color).color;
 
 <template>
     <AllkindsTitle class="w-full" logo="ph:x-circle" linkTo="/questions">
-        <div class="m-auto">{{ app.getUser().username }}, 214 <Icon name="gg:shape-hexagon" class="mb-4"></Icon>
-        </div>
+        <NuxtLink to="/my-profile" class="m-auto">
+            {{ app.getUser().username }}, {{ app.getUser().points }}
+            <Icon name="gg:shape-hexagon" class="mb-2" />
+        </NuxtLink>
 
         <Icon name="prime:users" size="2em" />
     </AllkindsTitle>

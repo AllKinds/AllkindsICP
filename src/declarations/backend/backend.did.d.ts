@@ -3,6 +3,7 @@ import type { ActorMethod } from '@dfinity/agent';
 
 export interface Answer {
   'weight' : bigint,
+  'created' : Time__1,
   'question' : bigint,
   'answer' : boolean,
 }
@@ -24,6 +25,7 @@ export type Error = { 'notLoggedIn' : null } |
   { 'friendRequestAlreadySend' : null } |
   { 'notRegistered' : null } |
   { 'invalidColor' : null };
+export type Friend = [UserMatch, FriendStatus];
 export type FriendStatus = { 'requestIgnored' : null } |
   { 'requestReceived' : null } |
   { 'connected' : null } |
@@ -38,7 +40,7 @@ export type IsPublic = boolean;
 export interface Question {
   'id' : QuestionID__1,
   'created' : Time__1,
-  'creator' : Principal,
+  'creator' : [] | [string],
   'question' : string,
   'color' : string,
   'points' : bigint,
@@ -48,7 +50,7 @@ export type QuestionID__1 = bigint;
 export interface Question__1 {
   'id' : QuestionID__1,
   'created' : Time__1,
-  'creator' : Principal,
+  'creator' : [] | [string],
   'question' : string,
   'color' : string,
   'points' : bigint,
@@ -57,9 +59,9 @@ export type Result = { 'ok' : null } |
   { 'err' : Error };
 export type ResultAnswer = { 'ok' : Answer } |
   { 'err' : Error };
-export type ResultFriends = { 'ok' : Array<[UserMatch, FriendStatus]> } |
+export type ResultFriends = { 'ok' : Array<Friend> } |
   { 'err' : Error };
-export type ResultQuestion = { 'ok' : Question__1 } |
+export type ResultQuestion = { 'ok' : Question } |
   { 'err' : Error };
 export type ResultSkip = { 'ok' : Skip } |
   { 'err' : Error };
@@ -79,6 +81,14 @@ export type SocialNetwork = { 'mastodon' : null } |
   { 'distrikt' : null } |
   { 'phone' : null } |
   { 'dscvr' : null };
+export interface StableQuestion {
+  'id' : QuestionID__1,
+  'created' : Time__1,
+  'creator' : Principal,
+  'question' : string,
+  'color' : string,
+  'points' : bigint,
+}
 export type Time = bigint;
 export type Time__1 = bigint;
 export interface User {
@@ -101,19 +111,19 @@ export interface UserInfo {
 }
 export interface UserMatch {
   'cohesion' : number,
-  'answered' : Array<[Question, AnswerDiff]>,
+  'answered' : Array<[Question__1, AnswerDiff]>,
   'user' : UserInfo,
-  'uncommon' : Array<Question>,
+  'uncommon' : Array<Question__1>,
 }
 export interface _SERVICE {
   'airdrop' : ActorMethod<[string, bigint], Result>,
   'answerFriendRequest' : ActorMethod<[string, boolean], Result>,
-  'backupAnswers' : ActorMethod<[bigint, bigint], Array<Question__1>>,
+  'backupAnswers' : ActorMethod<[bigint, bigint], Array<StableQuestion>>,
   'backupConnections' : ActorMethod<
     [bigint, bigint],
     Array<[Principal, Principal, FriendStatus]>
   >,
-  'backupQuestions' : ActorMethod<[bigint, bigint], Array<Question__1>>,
+  'backupQuestions' : ActorMethod<[bigint, bigint], Array<StableQuestion>>,
   'backupUsers' : ActorMethod<[bigint, bigint], Array<[Principal, User]>>,
   'createQuestion' : ActorMethod<[string, string], ResultQuestion>,
   'createUser' : ActorMethod<[string, string], ResultUser>,
@@ -121,9 +131,10 @@ export interface _SERVICE {
     [number, number, [] | [Gender], number],
     ResultUserMatch
   >,
-  'getAnsweredQuestions' : ActorMethod<[bigint], Array<[Question__1, Answer]>>,
-  'getAskableQuestions' : ActorMethod<[bigint], Array<Question__1>>,
+  'getAnsweredQuestions' : ActorMethod<[bigint], Array<[Question, Answer]>>,
   'getFriends' : ActorMethod<[], ResultFriends>,
+  'getOwnQuestions' : ActorMethod<[bigint], Array<Question>>,
+  'getUnansweredQuestions' : ActorMethod<[bigint], Array<Question>>,
   'getUser' : ActorMethod<[], ResultUser>,
   'selfDestruct' : ActorMethod<[string], undefined>,
   'sendFriendRequest' : ActorMethod<[string], Result>,

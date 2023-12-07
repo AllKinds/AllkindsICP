@@ -1,12 +1,16 @@
 import { Effect, pipe } from "effect";
-import { FrontendEffect, Question, User } from "~/utils/backend";
+import { FrontendEffect, Question, Answer, User, Friend } from "~/utils/backend";
 import * as backend from "~/utils/backend";
 import { FrontendError, notifyWithMsg } from "~/utils/errors";
 import { defineStore } from 'pinia'
+import * as errors from "~/utils/errors";
 
 export type AppState = {
     user: NetworkData<User>,
     openQuestions: NetworkData<Question[]>,
+    answeredQuestions: NetworkData<Friend[]>,
+    ownQuestions: NetworkData<Question[]>,
+    friends: NetworkData<Friend[]>,
 };
 
 type NotificationLevel = "ok" | "warning" | "error";
@@ -68,6 +72,7 @@ export const storeToData = <A>(old: NetworkData<A>, effect: FrontendEffect<A>, s
         onSuccess: (a) => {
             console.log("request ok")
             store(setOk(undefined as A));
+            store(setRequested(old));
             setTimeout(() => store(setOk(a)));
             return a;
         },
@@ -124,6 +129,9 @@ const combineNetworkData = <A>(old: NetworkData<A>, newer: NetworkData<A>): Netw
 const defaultAppState: AppState = {
     user: dataInit,
     openQuestions: dataInit,
+    answeredQuestions: dataInit,
+    ownQuestions: dataInit,
+    friends: dataInit,
 };
 
 export const useAppState = defineStore({
@@ -149,22 +157,70 @@ export const useAppState = defineStore({
             this.setOpenQuestions({ status: "ok", errCount: 0 });
             setTimeout(() => this.setOpenQuestions(data));
         },
-        loadQuestions(maxAgeS?: number): void {
+        loadQuestions(maxAgeS?: number, msg?: string) {
             if (shouldUpdate(this.openQuestions, maxAgeS)) {
                 const old = this.getOpenQuestions();
-                runStoreNotify(old, backend.loadQuestions(), this.setOpenQuestions)
+                runStoreNotify(old, backend.loadQuestions(), this.setOpenQuestions, msg)
             }
+        },
+        getAnsweredQuestions(): NetworkData<[Question, Answer][]> {
+            return this.answeredQuestions as NetworkData<[Question, Answer][]>; // TODO remove `as ...`
+        },
+        setAnsweredQuestions(qs: NetworkData<[Question, Answer][]>): void {
+            const { answeredQuestions } = storeToRefs(this)
+            let old = this.answeredQuestions as NetworkData<[Question, Answer][]>;
+            answeredQuestions.value = combineNetworkData(old, qs);
+        },
+        loadAnsweredQuestions(maxAgeS?: number): void {
+            if (shouldUpdate(this.answeredQuestions, maxAgeS)) {
+                const old = this.getAnsweredQuestions();
+                runStoreNotify(old, backend.getAnsweredQuestions(), this.setAnsweredQuestions)
+            }
+        },
+        getOwnQuestions(): NetworkData<Question[]> {
+            return this.ownQuestions as NetworkData<Question[]>; // TODO remove `as ...`
+        },
+        setOwnQuestions(qs: NetworkData<Question[]>): void {
+            const { ownQuestions } = storeToRefs(this)
+            ownQuestions.value = combineNetworkData(this.ownQuestions, qs);
+        },
+        loadOwnQuestions(maxAgeS?: number): void {
+            if (shouldUpdate(this.ownQuestions, maxAgeS)) {
+                const old = this.getOwnQuestions();
+                runStoreNotify(old, backend.getOwnQuestions(), this.setOwnQuestions)
+            }
+        },
+        getUser() {
+            return withDefault(this.user, {} as User);
         },
         setUser(user: NetworkData<User>): void {
             this.user = combineNetworkData(this.user, user)
         },
-        loadUser() {
+        loadUser(orRedirect: boolean = true) {
             if (shouldUpdate(this.user)) {
-                runStore(this.user, backend.loadUser(), this.setUser)
+                runStore(this.user, backend.loadUser().pipe(Effect.mapError(
+                    (err) => {
+                        if (!orRedirect) return err;
+                        if (errors.is(err, "backend", "notRegistered")) navigateTo("/register");
+                        if (errors.is(err, "backend", "notLoggedIn")) navigateTo("/login");
+                        return err;
+                    }
+                )), this.setUser)
+                    .catch((e) => console.warn("couldn't loadUser " + e));
             }
         },
-        getUser() {
-            return withDefault(this.user, { username: "-" } as User);
+        getFriends() {
+            return this.friends as NetworkData<Friend[]>; // TODO remove `as ...`
+        },
+        setFriends(friends: NetworkData<Friend[]>): void {
+            const old = this.friends as NetworkData<Friend[]>
+            this.friends = combineNetworkData(old, friends)
+        },
+        loadFriends() {
+            if (shouldUpdate(this.friends)) {
+                runStore(this.friends, backend.loadFriends(), this.setFriends)
+                    .catch(console.error);
+            }
         },
     },
 });

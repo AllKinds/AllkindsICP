@@ -24,7 +24,9 @@ async function create() {
     );
 }
 
-loadQs();
+if (inBrowser()) {
+    loadQs();
+}
 
 </script>
 

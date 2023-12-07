@@ -43,7 +43,7 @@ if (!process.server) {
 
     if (isLoggedIn()) {
         console.log("load user data")
-        runStoreNotify(loadUser(), app.setUser)
+        app.loadUser(false);
     }
 }
 

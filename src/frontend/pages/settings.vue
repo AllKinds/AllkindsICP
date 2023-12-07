@@ -1,0 +1,38 @@
+<script lang="ts" setup>
+import { Effect } from 'effect';
+
+definePageMeta({ title: "My profile" });
+
+const app = useAppState();
+
+const logout = () => {
+    Effect.runPromise(logoutActor()).then(() => {
+        app.$reset();
+        navigateTo("/");
+    });
+};
+
+if (inBrowser()) {
+    app.loadUser();
+    app.loadAnsweredQuestions();
+    app.loadOwnQuestions();
+}
+</script>
+
+
+<template>
+    <AllkindsTitle logo="ph:x-circle" logoSize="2em" linkTo="/questions">
+
+    </AllkindsTitle>
+
+    <div class="flex flex-col">
+        <!-- TODO: link to something -->
+        <Btn to="/about" class="w-96">More about Allkinds.Teams</Btn>
+        <Btn class="w-96 mt-10">We want to hear from you</Btn>
+        <Btn @click="logout()" class="w-96">Sign out</Btn>
+
+
+        <Btn class="w-96 mt-20 bg-red-600">Delete all my answers</Btn>
+        <Btn class="w-96 bg-red-600">Delete my account and all data</Btn>
+    </div>
+</template>

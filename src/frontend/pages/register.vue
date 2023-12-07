@@ -7,6 +7,7 @@ definePageMeta({ title: "Personal handle" });
 const username = useState("username", () => "");
 const contact = useState("contact", () => "");
 const loading = useState("loading", () => false);
+const app = useAppState();
 
 const validateUsername = (u: string): Effect.Effect<never, FrontendError, void> => {
     if (u.length < 2) return Effect.fail(formErr("tooShort"));
@@ -20,13 +21,34 @@ const validateUsername = (u: string): Effect.Effect<never, FrontendError, void> 
 async function createUser() {
     const prog = pipe(
         validateUsername(username.value),
-        () => backend.createUser(username.value, contact.value)
+        () => backend.createUser(username.value, contact.value),
+        Effect.match({
+            onSuccess: () => { },
+            onFailure: (err) => {
+                if (err.tag === "backend" && getErrorKey(err.err) === "alreadyRegistered") {
+                    navigateTo("/questions")
+                }
+            }
+        }),
     );
 
-    await runNotify(prog, "").catch(console.warn);
+    await runNotify(prog, "").then(() => { navigateTo("/questions") }).catch(console.warn);
 }
+
+const checkUser = () => {
+    if (app.getUser().username?.length > 1) {
+        navigateTo("/questions")
+    }
+}
+
+if (inBrowser()) {
+    app.loadUser(false)
+}
+
+
 </script>
 <template>
+    {{ checkUser() }}
     <AllkindsTitle>Register</AllkindsTitle>
 
     <TextBlock align="text-left">
@@ -43,7 +65,7 @@ async function createUser() {
     </TextBlock>
 
     <TextInput name="handle" v-model.trim="contact" placeholder="Contact" required class="w-full m-2"
-        :class="{ 'input-disabled': loading }" />
+        :class="{ 'input-disabled': loading }" @keyup.enter="createUser()" />
 
     <div class="grow" />
 

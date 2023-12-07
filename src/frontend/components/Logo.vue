@@ -2,6 +2,7 @@
 
 const props = defineProps<{
     logo: string,
+    size?: string,
 }>();
 
 let allkinds = !props.logo || props.logo === "allkinds";
@@ -27,7 +28,7 @@ if (allkinds) {
             margin-bottom: 0.3em;
         ">⬤⬤</span>
 
-        <Icon v-if="icon" :name="icon" size="1.4em" style="margin-top: -6px;" />
+        <Icon v-if="icon" :name="icon" :size="props.size || '1.4em'" style="margin-top: -6px;" />
 
         <img v-if="url" :src="url" alt="logo" />
     </div>

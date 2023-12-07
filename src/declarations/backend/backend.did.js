@@ -17,7 +17,7 @@ export const idlFactory = ({ IDL }) => {
   const Result = IDL.Variant({ 'ok' : IDL.Null, 'err' : Error });
   const QuestionID__1 = IDL.Nat;
   const Time__1 = IDL.Int;
-  const Question__1 = IDL.Record({
+  const StableQuestion = IDL.Record({
     'id' : QuestionID__1,
     'created' : Time__1,
     'creator' : IDL.Principal,
@@ -60,12 +60,20 @@ export const idlFactory = ({ IDL }) => {
     'gender' : IDL.Tuple(IDL.Opt(Gender), IsPublic),
     'points' : IDL.Nat,
   });
-  const ResultQuestion = IDL.Variant({ 'ok' : Question__1, 'err' : Error });
-  const ResultUser = IDL.Variant({ 'ok' : User, 'err' : Error });
   const Question = IDL.Record({
     'id' : QuestionID__1,
     'created' : Time__1,
-    'creator' : IDL.Principal,
+    'creator' : IDL.Opt(IDL.Text),
+    'question' : IDL.Text,
+    'color' : IDL.Text,
+    'points' : IDL.Int,
+  });
+  const ResultQuestion = IDL.Variant({ 'ok' : Question, 'err' : Error });
+  const ResultUser = IDL.Variant({ 'ok' : User, 'err' : Error });
+  const Question__1 = IDL.Record({
+    'id' : QuestionID__1,
+    'created' : Time__1,
+    'creator' : IDL.Opt(IDL.Text),
     'question' : IDL.Text,
     'color' : IDL.Text,
     'points' : IDL.Int,
@@ -85,20 +93,19 @@ export const idlFactory = ({ IDL }) => {
   });
   const UserMatch = IDL.Record({
     'cohesion' : IDL.Nat8,
-    'answered' : IDL.Vec(IDL.Tuple(Question, AnswerDiff)),
+    'answered' : IDL.Vec(IDL.Tuple(Question__1, AnswerDiff)),
     'user' : UserInfo,
-    'uncommon' : IDL.Vec(Question),
+    'uncommon' : IDL.Vec(Question__1),
   });
   const ResultUserMatch = IDL.Variant({ 'ok' : UserMatch, 'err' : Error });
   const Answer = IDL.Record({
     'weight' : IDL.Nat,
+    'created' : Time__1,
     'question' : IDL.Nat,
     'answer' : IDL.Bool,
   });
-  const ResultFriends = IDL.Variant({
-    'ok' : IDL.Vec(IDL.Tuple(UserMatch, FriendStatus)),
-    'err' : Error,
-  });
+  const Friend = IDL.Tuple(UserMatch, FriendStatus);
+  const ResultFriends = IDL.Variant({ 'ok' : IDL.Vec(Friend), 'err' : Error });
   const QuestionID = IDL.Nat;
   const ResultAnswer = IDL.Variant({ 'ok' : Answer, 'err' : Error });
   const Skip = IDL.Record({
@@ -111,7 +118,7 @@ export const idlFactory = ({ IDL }) => {
     'answerFriendRequest' : IDL.Func([IDL.Text, IDL.Bool], [Result], []),
     'backupAnswers' : IDL.Func(
         [IDL.Nat, IDL.Nat],
-        [IDL.Vec(Question__1)],
+        [IDL.Vec(StableQuestion)],
         ['query'],
       ),
     'backupConnections' : IDL.Func(
@@ -121,7 +128,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'backupQuestions' : IDL.Func(
         [IDL.Nat, IDL.Nat],
-        [IDL.Vec(Question__1)],
+        [IDL.Vec(StableQuestion)],
         ['query'],
       ),
     'backupUsers' : IDL.Func(
@@ -138,15 +145,16 @@ export const idlFactory = ({ IDL }) => {
       ),
     'getAnsweredQuestions' : IDL.Func(
         [IDL.Nat],
-        [IDL.Vec(IDL.Tuple(Question__1, Answer))],
-        ['query'],
-      ),
-    'getAskableQuestions' : IDL.Func(
-        [IDL.Nat],
-        [IDL.Vec(Question__1)],
+        [IDL.Vec(IDL.Tuple(Question, Answer))],
         ['query'],
       ),
     'getFriends' : IDL.Func([], [ResultFriends], ['query']),
+    'getOwnQuestions' : IDL.Func([IDL.Nat], [IDL.Vec(Question)], ['query']),
+    'getUnansweredQuestions' : IDL.Func(
+        [IDL.Nat],
+        [IDL.Vec(Question)],
+        ['query'],
+      ),
     'getUser' : IDL.Func([], [ResultUser], ['query']),
     'selfDestruct' : IDL.Func([IDL.Text], [], ['oneway']),
     'sendFriendRequest' : IDL.Func([IDL.Text], [Result], []),

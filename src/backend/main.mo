@@ -61,21 +61,31 @@ actor {
   type ResultAnswer = Result<Answer>;
   type ResultSkip = Result<Skip>;
   type ResultUserMatch = Result<UserMatch>;
-  type ResultFriends = Result<[(UserMatch, FriendStatus)]>;
+  type Friend = (UserMatch, FriendStatus);
+  type ResultFriends = Result<[Friend]>;
 
   // UTILITY FUNCTIONS
 
   // DATA STORAGE
 
-  stable var users : UserDB = User.emptyDB();
+  type DBv1 = {
+    users : UserDB;
+    questions : QuestionDB;
+    answers : AnswerDB;
+    skips : SkipDB;
+    friends : FriendDB;
+  };
 
-  stable var questions : QuestionDB = Question.emptyDB();
+  stable var db_v1 : DBv1 = {
+    users = User.emptyDB();
+    questions = Question.emptyDB();
+    answers = Question.emptyAnswerDB();
+    skips = Question.emptySkipDB();
+    friends = Friend.emptyDB();
+  };
 
-  stable var answers : AnswerDB = Question.emptyAnswerDB();
-
-  stable var skips : SkipDB = Question.emptySkipDB();
-
-  stable var friends : FriendDB = Friend.emptyDB();
+  // alias for current db version
+  var db = db_v1;
 
   var random = Prng.SFC64a(); // insecure random numbers
 
@@ -85,7 +95,9 @@ actor {
   };
 
   system func postupgrade() {
-    // Cleanup temporary stable data
+    // transfer data from old db version
+    //migrate_DBv1_v2()
+    // Cleanup old stable data
   };
 
   // PUBLIC API
@@ -95,41 +107,47 @@ actor {
 
   // Create default new user with only a username
   public shared ({ caller }) func createUser(username : Text, contact : Text) : async ResultUser {
-    User.add(users, username, contact, caller);
+    User.add(db.users, username, contact, caller);
   };
 
   public shared query ({ caller }) func getUser() : async ResultUser {
-    let ?user = User.get(users, caller) else return #err(#notRegistered);
+    let ?user = User.get(db.users, caller) else return #err(#notRegistered);
     #ok(user);
   };
 
   public shared ({ caller }) func updateProfile(user : User) : async ResultUser {
-    User.update(users, user, caller);
+    User.update(db.users, user, caller);
   };
 
   public shared ({ caller }) func createQuestion(question : Text, color : Text) : async ResultQuestion {
-    switch (User.checkFunds(users, #createQuestion, caller)) {
+    switch (User.checkFunds(db.users, #createQuestion, caller)) {
       case (#ok(_)) { /* user has sufficient funds */ };
       case (#err(e)) return #err(e);
     };
 
-    let result = Question.add(questions, question, color, caller);
+    let result = Question.add(db.questions, question, color, caller);
     let #ok(q) = result else return result;
 
-    let #ok(_) = User.reward(users, #createQuestion, caller) else Debug.trap("Bug: Reward failed. checkFunds should have returned an error already");
+    let #ok(_) = User.reward(db.users, #createQuestion, caller) else Debug.trap("Bug: Reward failed. checkFunds should have returned an error already");
 
     #ok(q);
   };
 
-  public shared query ({ caller }) func getAskableQuestions(limit : Nat) : async [Question] {
-    let iter = Question.unanswered(questions, answers, skips, caller);
+  public shared query ({ caller }) func getUnansweredQuestions(limit : Nat) : async [Question] {
+    let iter = Question.unanswered(db.questions, db.answers, db.skips, caller);
     let limited = IterTools.take(iter, Nat.min(limit, Configuration.api.maxPageSize));
     Iter.toArray(limited);
   };
 
   // TODO? remove Answer from return type?
   public shared query ({ caller }) func getAnsweredQuestions(limit : Nat) : async [(Question, Answer)] {
-    let iter = Question.answered(questions, answers, caller);
+    let iter = Question.answered(db.questions, db.answers, caller);
+    let limited = IterTools.take(iter, Nat.min(limit, Configuration.api.maxPageSize));
+    Iter.toArray(limited);
+  };
+
+  public shared query ({ caller }) func getOwnQuestions(limit : Nat) : async [Question] {
+    let iter = Question.getByCreator(db.questions, caller);
     let limited = IterTools.take(iter, Nat.min(limit, Configuration.api.maxPageSize));
     Iter.toArray(limited);
   };
@@ -138,7 +156,7 @@ actor {
   public shared ({ caller }) func submitAnswer(question : QuestionID, answer : Bool, weight : Nat) : async ResultAnswer {
     let boost = Nat.min(weight, Configuration.question.maxBoost);
 
-    switch (User.checkFunds(users, #createAnswer(boost), caller)) {
+    switch (User.checkFunds(db.users, #createAnswer(boost), caller)) {
       case (#ok(_)) { /* user has sufficient funds */ };
       case (#err(e)) return #err(e);
     };
@@ -149,9 +167,9 @@ actor {
       weight = 1 + boost;
       created = Time.now();
     };
-    Question.putAnswer(answers, a, caller);
+    Question.putAnswer(db.answers, a, caller);
 
-    let #ok(_) = User.reward(users, #createAnswer(boost), caller) else Debug.trap("Bug: Reward failed. checkFunds should have returned an error already");
+    let #ok(_) = User.reward(db.users, #createAnswer(boost), caller) else Debug.trap("Bug: Reward failed. checkFunds should have returned an error already");
 
     #ok(a);
   };
@@ -159,7 +177,7 @@ actor {
   // Add a skip
   public shared ({ caller }) func submitSkip(question : Nat) : async ResultSkip {
     let s : Skip = { question; reason = #skip };
-    Question.putSkip(skips, s, caller);
+    Question.putSkip(db.skips, s, caller);
     #ok(s);
   };
 
@@ -171,28 +189,28 @@ actor {
     cohesion : Nat8,
   ) : async ResultUserMatch {
 
-    if (Question.countAnswers(answers, caller) < Configuration.matching.minAnswers) {
+    if (Question.countAnswers(db.answers, caller) < Configuration.matching.minAnswers) {
       return #err(#notEnoughAnswers);
     };
 
     let filter = Matching.createFilter(minAge, maxAge, gender, cohesion);
 
-    switch (User.checkFunds(users, #findMatch, caller)) {
+    switch (User.checkFunds(db.users, #findMatch, caller)) {
       case (#ok(_)) { /* user has sufficient funds */ };
       case (#err(e)) return #err(e);
     };
 
-    let userFiltered = User.find(users, filter.users);
+    let userFiltered = User.find(db.users, filter.users);
 
     // remove caller and friends
     let withoutSelf = Iter.filter<(Principal, User)>(userFiltered, func(p, u) = p != caller);
-    let withoutFriends = Iter.filter<(Principal, User)>(withoutSelf, func(p, u) = not Friend.has(friends, caller, p));
+    let withoutFriends = Iter.filter<(Principal, User)>(withoutSelf, func(p, u) = not Friend.has(db.friends, caller, p));
 
     let withScore = IterTools.mapFilter<(Principal, User), UserMatch>(
       withoutFriends,
       func(id, user) = Result.toOption(
         // TODO?: handle errors instead of removing them?
-        Matching.getUserMatch(users, questions, answers, skips, caller, id, false),
+        Matching.getUserMatch(db.users, db.questions, db.answers, db.skips, caller, id, false),
       ),
     );
 
@@ -209,18 +227,18 @@ actor {
 
     let ?result = bestMatch else return #err(#userNotFound);
 
-    let #ok(_) = User.reward(users, #findMatch, caller) else Debug.trap("Bug: Reward failed. checkFunds should have returned an error already");
+    let #ok(_) = User.reward(db.users, #findMatch, caller) else Debug.trap("Bug: Reward failed. checkFunds should have returned an error already");
 
     return #ok(result);
   };
 
   //returns both Approved and Unapproved friends
   public shared query ({ caller }) func getFriends() : async ResultFriends {
-    let userFriends = Friend.get(friends, caller);
+    let userFriends = Friend.get(db.friends, caller);
 
     func toUserMatch((p : Principal, status : FriendStatus)) : ?(UserMatch, FriendStatus) {
       let showNonPublic = (status == #connected or status == #requestReceived);
-      let #ok(userMatch) = Matching.getUserMatch(users, questions, answers, skips, caller, p, showNonPublic) else return null;
+      let #ok(userMatch) = Matching.getUserMatch(db.users, db.questions, db.answers, db.skips, caller, p, showNonPublic) else return null;
       // TODO?: handle errors instead of removing them?
       ?(userMatch, status);
     };
@@ -235,16 +253,16 @@ actor {
 
   /// Send a friend request to a user
   public shared ({ caller }) func sendFriendRequest(username : Text) : async Result<()> {
-    let ?id = User.getPrincipal(users, username) else return #err(#userNotFound);
-    Friend.request(friends, caller, id);
+    let ?id = User.getPrincipal(db.users, username) else return #err(#userNotFound);
+    Friend.request(db.friends, caller, id);
   };
 
   public shared ({ caller }) func answerFriendRequest(username : Text, accept : Bool) : async Result<()> {
-    let ?id = User.getPrincipal(users, username) else return #err(#userNotFound);
+    let ?id = User.getPrincipal(db.users, username) else return #err(#userNotFound);
     if (accept) {
-      Friend.request(friends, caller, id);
+      Friend.request(db.friends, caller, id);
     } else {
-      Friend.reject(friends, caller, id);
+      Friend.reject(db.friends, caller, id);
     };
   };
 
@@ -258,7 +276,7 @@ actor {
   public query ({ caller }) func backupUsers(offset : Nat, limit : Nat) : async [(Principal, User)] {
     assertAdmin(caller);
 
-    let all = User.backup(users);
+    let all = User.backup(db.users);
     let withOffset = IterTools.skip(all, offset);
     let withLimit = IterTools.take(withOffset, limit);
     Iter.toArray(withLimit);
@@ -268,7 +286,7 @@ actor {
   public query ({ caller }) func backupConnections(offset : Nat, limit : Nat) : async [(Principal, Principal, FriendStatus)] {
     assertAdmin(caller);
 
-    let all = Friend.backup(friends);
+    let all = Friend.backup(db.friends);
     let withOffset = IterTools.skip(all, offset);
     let withLimit = IterTools.take(withOffset, limit);
     Iter.toArray(withLimit);
@@ -278,7 +296,7 @@ actor {
   public query ({ caller }) func backupQuestions(offset : Nat, limit : Nat) : async [StableQuestion] {
     assertAdmin(caller);
 
-    let all = Question.backup(questions);
+    let all = Question.backup(db.questions);
     let withOffset = IterTools.skip(all, offset);
     let withLimit = IterTools.take(withOffset, limit);
     Iter.toArray(withLimit);
@@ -288,7 +306,7 @@ actor {
   public query ({ caller }) func backupAnswers(offset : Nat, limit : Nat) : async [StableQuestion] {
     assertAdmin(caller);
 
-    let all = Question.backup(questions);
+    let all = Question.backup(db.questions);
     let withOffset = IterTools.skip(all, offset);
     let withLimit = IterTools.take(withOffset, limit);
     Iter.toArray(withLimit);
@@ -297,9 +315,9 @@ actor {
   public shared ({ caller }) func airdrop(user : Text, tokens : Int) : async Result<()> {
     assertAdmin(caller);
 
-    let ?p = User.getPrincipal(users, user) else return #err(#userNotFound);
+    let ?p = User.getPrincipal(db.users, user) else return #err(#userNotFound);
 
-    switch (User.reward(users, #custom(tokens), p)) {
+    switch (User.reward(db.users, #custom(tokens), p)) {
       case (#ok(_)) #ok;
       case (#err(e)) #err(e);
     };
@@ -307,17 +325,16 @@ actor {
 
   public shared ({ caller }) func selfDestruct(confirm : Text) {
     assertAdmin(caller);
-    if (confirm == "DELETE CONNECTIONS!") {
-      friends := Friend.emptyDB();
-      return;
-    };
+
     if (confirm != "DELETE EVERYTHING!") Debug.trap("canceled");
 
-    users := User.emptyDB();
-    questions := Question.emptyDB();
-    answers := Question.emptyAnswerDB();
-    skips := Question.emptySkipDB();
-    friends := Friend.emptyDB();
+    db_v1 := {
+      users = User.emptyDB();
+      questions = Question.emptyDB();
+      answers = Question.emptyAnswerDB();
+      skips = Question.emptySkipDB();
+      friends = Friend.emptyDB();
+    };
   };
 
 };

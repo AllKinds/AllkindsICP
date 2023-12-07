@@ -15,7 +15,7 @@ const width = () => (props.width || 'w-48');
 
 <template>
     <NuxtLink :to="to" :class="[width(), outline(), props.disabled ? 'pointer-events-none opacity-50' : '']"
-        class="m-3 p-4 border rounded-full text-center cursor-pointer active:scale-95 transition-all hover:bg-white hover:text-black">
+        class="m-3 p-4 border rounded-full text-center cursor-pointer active:scale-95 transition-all hover:bg-white hover:text-black inline-block">
         <span :class="{ 'text-xl': largeFont }">
             <slot />
         </span>

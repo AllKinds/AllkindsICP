@@ -188,6 +188,19 @@ module {
     );
   };
 
+  public func getByCreator(questions : QuestionDB, user : Principal) : Iter<Question> {
+
+    let all = BufferHelper.valsReverse(questions);
+
+    let qs = Iter.filter<StableQuestion>(all, func q = q.creator == user);
+
+    // map answers to questions
+    Iter.map<StableQuestion, Question>(
+      qs,
+      func q = toQuestion(q),
+    );
+  };
+
   public func unanswered(questions : QuestionDB, answers : AnswerDB, skips : SkipDB, user : Principal) : Iter<Question> {
     let all = BufferHelper.valsReverse(questions);
     let userAnswers = getAnswers(answers, user);
