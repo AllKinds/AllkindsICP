@@ -3,7 +3,7 @@ export type * from "~~/src/declarations/backend/backend.did";
 export type BackendActor = typeof backend;
 import { Effect } from "effect";
 import { BackendError, FrontendError, toBackendError, toNetworkError } from "~/utils/errors";
-import { Question, Answer, Skip, User, Friend } from "./backend";
+import { Question, Answer, Skip, User, Friend, UserMatch } from "./backend";
 import { FriendStatus } from "./backend";
 
 type BackendEffect<T> = Effect.Effect<never, BackendError, T>
@@ -76,6 +76,9 @@ export const loadFriends = (): FrontendEffect<Friend[]> => {
     return effectifyResult((actor) => actor.getFriends())
 }
 
+export const loadMatches = (): FrontendEffect<UserMatch[]> => {
+    return effectifyResult((actor) => actor.getMatches())
+}
 
 export type FriendStatusKey = "requestSend"
     | "requestReceived"

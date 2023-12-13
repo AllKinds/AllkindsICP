@@ -33,32 +33,21 @@ export const idlFactory = ({ IDL }) => {
     'rejectionReceived' : IDL.Null,
     'requestSend' : IDL.Null,
   });
-  const IsPublic = IDL.Bool;
   const Time = IDL.Int;
-  const SocialNetwork = IDL.Variant({
-    'mastodon' : IDL.Null,
-    'twitter' : IDL.Null,
-    'email' : IDL.Null,
-    'distrikt' : IDL.Null,
-    'phone' : IDL.Null,
-    'dscvr' : IDL.Null,
-  });
-  const Social = IDL.Record({ 'network' : SocialNetwork, 'handle' : IDL.Text });
-  const Gender = IDL.Variant({
-    'other' : IDL.Null,
-    'female' : IDL.Null,
-    'male' : IDL.Null,
-    'queer' : IDL.Null,
+  const UserStats = IDL.Record({
+    'asked' : IDL.Nat,
+    'answered' : IDL.Nat,
+    'boosts' : IDL.Nat,
+    'points' : IDL.Nat,
   });
   const User = IDL.Record({
-    'age' : IDL.Tuple(IDL.Opt(IDL.Nat8), IsPublic),
     'created' : Time,
-    'about' : IDL.Tuple(IDL.Opt(IDL.Text), IsPublic),
+    'contact' : IDL.Text,
+    'about' : IDL.Text,
     'username' : IDL.Text,
-    'socials' : IDL.Vec(IDL.Tuple(Social, IsPublic)),
-    'picture' : IDL.Tuple(IDL.Opt(IDL.Vec(IDL.Nat8)), IsPublic),
-    'gender' : IDL.Tuple(IDL.Opt(Gender), IsPublic),
-    'points' : IDL.Nat,
+    'displayName' : IDL.Text,
+    'picture' : IDL.Opt(IDL.Vec(IDL.Nat8)),
+    'stats' : UserStats,
   });
   const Question = IDL.Record({
     'id' : QuestionID__1,
@@ -84,12 +73,11 @@ export const idlFactory = ({ IDL }) => {
     'sameAnswer' : IDL.Bool,
   });
   const UserInfo = IDL.Record({
-    'age' : IDL.Opt(IDL.Nat8),
-    'about' : IDL.Opt(IDL.Text),
+    'contact' : IDL.Text,
+    'about' : IDL.Text,
     'username' : IDL.Text,
-    'socials' : IDL.Vec(Social),
+    'displayName' : IDL.Text,
     'picture' : IDL.Opt(IDL.Vec(IDL.Nat8)),
-    'gender' : IDL.Opt(Gender),
   });
   const UserMatch = IDL.Record({
     'cohesion' : IDL.Nat8,
@@ -106,6 +94,10 @@ export const idlFactory = ({ IDL }) => {
   });
   const Friend = IDL.Tuple(UserMatch, FriendStatus);
   const ResultFriends = IDL.Variant({ 'ok' : IDL.Vec(Friend), 'err' : Error });
+  const ResultUserMatches = IDL.Variant({
+    'ok' : IDL.Vec(UserMatch),
+    'err' : Error,
+  });
   const QuestionID = IDL.Nat;
   const ResultAnswer = IDL.Variant({ 'ok' : Answer, 'err' : Error });
   const Skip = IDL.Record({
@@ -137,18 +129,16 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'createQuestion' : IDL.Func([IDL.Text, IDL.Text], [ResultQuestion], []),
+    'createTestData' : IDL.Func([IDL.Nat, IDL.Nat], [], []),
     'createUser' : IDL.Func([IDL.Text, IDL.Text], [ResultUser], []),
-    'findMatch' : IDL.Func(
-        [IDL.Nat8, IDL.Nat8, IDL.Opt(Gender), IDL.Nat8],
-        [ResultUserMatch],
-        [],
-      ),
+    'findMatch' : IDL.Func([IDL.Nat8], [ResultUserMatch], []),
     'getAnsweredQuestions' : IDL.Func(
         [IDL.Nat],
         [IDL.Vec(IDL.Tuple(Question, Answer))],
         ['query'],
       ),
     'getFriends' : IDL.Func([], [ResultFriends], ['query']),
+    'getMatches' : IDL.Func([], [ResultUserMatches], ['query']),
     'getOwnQuestions' : IDL.Func([IDL.Nat], [IDL.Vec(Question)], ['query']),
     'getUnansweredQuestions' : IDL.Func(
         [IDL.Nat],

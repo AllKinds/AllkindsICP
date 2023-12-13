@@ -10,7 +10,7 @@ const color = useState('color', () => "green")
 const weight = useState('weight', () => 1)
 
 async function loadQs() {
-    app.loadQuestions()
+    app.loadQuestions(0)
 }
 
 async function create() {
@@ -38,7 +38,7 @@ if (inBrowser()) {
 <template>
     <AllkindsTitle class="w-full" logo="ph:x-circle" link-to="/questions">
         <NuxtLink to="/my-profile" class="m-auto">
-            {{ app.getUser().username }}, {{ app.getUser().points }}
+            {{ app.getUser().displayName }}, {{ app.getUser().stats.points }}
             <Icon name="gg:shape-hexagon" class="mb-2" />
         </NuxtLink>
 

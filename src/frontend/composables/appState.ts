@@ -1,5 +1,5 @@
 import { Effect, pipe } from "effect";
-import { FrontendEffect, Question, Answer, User, Friend } from "~/utils/backend";
+import { FrontendEffect, Question, Answer, User, Friend, UserMatch } from "~/utils/backend";
 import * as backend from "~/utils/backend";
 import { FrontendError, notifyWithMsg } from "~/utils/errors";
 import { defineStore } from 'pinia'
@@ -11,6 +11,7 @@ export type AppState = {
     answeredQuestions: NetworkData<Friend[]>,
     ownQuestions: NetworkData<Question[]>,
     friends: NetworkData<Friend[]>,
+    matches: NetworkData<UserMatch[]>
 };
 
 type NotificationLevel = "ok" | "warning" | "error";
@@ -132,6 +133,7 @@ const defaultAppState: AppState = {
     answeredQuestions: dataInit,
     ownQuestions: dataInit,
     friends: dataInit,
+    matches: dataInit,
 };
 
 export const useAppState = defineStore({
@@ -191,7 +193,7 @@ export const useAppState = defineStore({
             }
         },
         getUser() {
-            return withDefault(this.user, {} as User);
+            return withDefault(this.user, { stats: {} } as User);
         },
         setUser(user: NetworkData<User>): void {
             this.user = combineNetworkData(this.user, user)
@@ -219,6 +221,19 @@ export const useAppState = defineStore({
         loadFriends() {
             if (shouldUpdate(this.friends)) {
                 runStore(this.friends, backend.loadFriends(), this.setFriends)
+                    .catch(console.error);
+            }
+        },
+        getMatches() {
+            return this.matches as NetworkData<UserMatch[]>; // TODO remove `as ...`
+        },
+        setMatches(matches: NetworkData<UserMatch[]>): void {
+            const old = this.matches as NetworkData<UserMatch[]>
+            this.matches = combineNetworkData(old, matches)
+        },
+        loadMatches() {
+            if (shouldUpdate(this.matches)) {
+                runStore(this.matches, backend.loadMatches(), this.setMatches)
                     .catch(console.error);
             }
         },
@@ -254,7 +269,7 @@ export const addNotification = (level: NotificationLevel, msg: string): void => 
     switch (level) {
         case "ok": console.log("notification (" + level + "): " + msg); break;
         case "warning": console.warn("notification (" + level + "): " + msg); break;
-        case "error": console.error("notification (" + level + "): " + msg); break;
+        case "error": console.warn("notification (" + level + "): " + msg); break;
     }
     if (!process.client) {
         return;

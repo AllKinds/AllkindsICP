@@ -32,11 +32,6 @@ export type FriendStatus = { 'requestIgnored' : null } |
   { 'rejectionSend' : null } |
   { 'rejectionReceived' : null } |
   { 'requestSend' : null };
-export type Gender = { 'other' : null } |
-  { 'female' : null } |
-  { 'male' : null } |
-  { 'queer' : null };
-export type IsPublic = boolean;
 export interface Question {
   'id' : QuestionID__1,
   'created' : Time__1,
@@ -69,18 +64,13 @@ export type ResultUser = { 'ok' : User } |
   { 'err' : Error };
 export type ResultUserMatch = { 'ok' : UserMatch } |
   { 'err' : Error };
+export type ResultUserMatches = { 'ok' : Array<UserMatch> } |
+  { 'err' : Error };
 export interface Skip {
   'question' : bigint,
   'reason' : { 'flag' : null } |
     { 'skip' : null },
 }
-export interface Social { 'network' : SocialNetwork, 'handle' : string }
-export type SocialNetwork = { 'mastodon' : null } |
-  { 'twitter' : null } |
-  { 'email' : null } |
-  { 'distrikt' : null } |
-  { 'phone' : null } |
-  { 'dscvr' : null };
 export interface StableQuestion {
   'id' : QuestionID__1,
   'created' : Time__1,
@@ -92,28 +82,32 @@ export interface StableQuestion {
 export type Time = bigint;
 export type Time__1 = bigint;
 export interface User {
-  'age' : [[] | [number], IsPublic],
   'created' : Time,
-  'about' : [[] | [string], IsPublic],
+  'contact' : string,
+  'about' : string,
   'username' : string,
-  'socials' : Array<[Social, IsPublic]>,
-  'picture' : [[] | [Uint8Array | number[]], IsPublic],
-  'gender' : [[] | [Gender], IsPublic],
-  'points' : bigint,
+  'displayName' : string,
+  'picture' : [] | [Uint8Array | number[]],
+  'stats' : UserStats,
 }
 export interface UserInfo {
-  'age' : [] | [number],
-  'about' : [] | [string],
+  'contact' : string,
+  'about' : string,
   'username' : string,
-  'socials' : Array<Social>,
+  'displayName' : string,
   'picture' : [] | [Uint8Array | number[]],
-  'gender' : [] | [Gender],
 }
 export interface UserMatch {
   'cohesion' : number,
   'answered' : Array<[Question__1, AnswerDiff]>,
   'user' : UserInfo,
   'uncommon' : Array<Question__1>,
+}
+export interface UserStats {
+  'asked' : bigint,
+  'answered' : bigint,
+  'boosts' : bigint,
+  'points' : bigint,
 }
 export interface _SERVICE {
   'airdrop' : ActorMethod<[string, bigint], Result>,
@@ -126,13 +120,12 @@ export interface _SERVICE {
   'backupQuestions' : ActorMethod<[bigint, bigint], Array<StableQuestion>>,
   'backupUsers' : ActorMethod<[bigint, bigint], Array<[Principal, User]>>,
   'createQuestion' : ActorMethod<[string, string], ResultQuestion>,
+  'createTestData' : ActorMethod<[bigint, bigint], undefined>,
   'createUser' : ActorMethod<[string, string], ResultUser>,
-  'findMatch' : ActorMethod<
-    [number, number, [] | [Gender], number],
-    ResultUserMatch
-  >,
+  'findMatch' : ActorMethod<[number], ResultUserMatch>,
   'getAnsweredQuestions' : ActorMethod<[bigint], Array<[Question, Answer]>>,
   'getFriends' : ActorMethod<[], ResultFriends>,
+  'getMatches' : ActorMethod<[], ResultUserMatches>,
   'getOwnQuestions' : ActorMethod<[bigint], Array<Question>>,
   'getUnansweredQuestions' : ActorMethod<[bigint], Array<Question>>,
   'getUser' : ActorMethod<[], ResultUser>,

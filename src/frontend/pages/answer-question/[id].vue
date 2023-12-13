@@ -52,7 +52,7 @@ function findQuestion(id, findOther = false) {
         navigateTo("/questions");
     } else {
         q = data.find((x) => x.id == id);
-        if (!q) {
+        if (!q && data2) {
             q = data2.find((x) => x[0].id == id);
             if (q) q = q[0];
         }
@@ -77,7 +77,7 @@ const twColor = () => getColor(q().color).color;
 <template>
     <AllkindsTitle class="w-full" logo="ph:x-circle" linkTo="/questions">
         <NuxtLink to="/my-profile" class="m-auto">
-            {{ app.getUser().username }}, {{ app.getUser().points }}
+            {{ app.getUser().displayName }}, {{ app.getUser().stats.points }}
             <Icon name="gg:shape-hexagon" class="mb-2" />
         </NuxtLink>
 

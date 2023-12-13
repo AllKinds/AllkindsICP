@@ -32,6 +32,8 @@ import Error "Error";
 import Iter "mo:base/Iter";
 import Prng "mo:prng";
 import Nat64 "mo:base/Nat64";
+import TextHelper "helper/TextHelper";
+import Nat8Extra "helper/Nat8Extra";
 
 actor {
 
@@ -61,6 +63,7 @@ actor {
   type ResultAnswer = Result<Answer>;
   type ResultSkip = Result<Skip>;
   type ResultUserMatch = Result<UserMatch>;
+  type ResultUserMatches = Result<[UserMatch]>;
   type Friend = (UserMatch, FriendStatus);
   type ResultFriends = Result<[Friend]>;
 
@@ -106,8 +109,8 @@ actor {
   };
 
   // Create default new user with only a username
-  public shared ({ caller }) func createUser(username : Text, contact : Text) : async ResultUser {
-    User.add(db.users, username, contact, caller);
+  public shared ({ caller }) func createUser(displayName : Text, contact : Text) : async ResultUser {
+    User.add(db.users, displayName, contact, caller);
   };
 
   public shared query ({ caller }) func getUser() : async ResultUser {
@@ -181,26 +184,12 @@ actor {
     #ok(s);
   };
 
-  //find users based on parameters
-  public shared ({ caller }) func findMatch(
-    minAge : Nat8,
-    maxAge : Nat8,
-    gender : ?User.Gender,
-    cohesion : Nat8,
-  ) : async ResultUserMatch {
-
+  public shared query ({ caller }) func getMatches() : async ResultUserMatches {
     if (Question.countAnswers(db.answers, caller) < Configuration.matching.minAnswers) {
       return #err(#notEnoughAnswers);
     };
 
-    let filter = Matching.createFilter(minAge, maxAge, gender, cohesion);
-
-    switch (User.checkFunds(db.users, #findMatch, caller)) {
-      case (#ok(_)) { /* user has sufficient funds */ };
-      case (#err(e)) return #err(e);
-    };
-
-    let userFiltered = User.find(db.users, filter.users);
+    let userFiltered = User.find(db.users);
 
     // remove caller and friends
     let withoutSelf = Iter.filter<(Principal, User)>(userFiltered, func(p, u) = p != caller);
@@ -208,28 +197,20 @@ actor {
 
     let withScore = IterTools.mapFilter<(Principal, User), UserMatch>(
       withoutFriends,
-      func(id, user) = Result.toOption(
-        // TODO?: handle errors instead of removing them?
-        Matching.getUserMatch(db.users, db.questions, db.answers, db.skips, caller, id, false),
-      ),
+      func(id, user) {
+        let res = Matching.getUserMatch(db.users, db.questions, db.answers, db.skips, caller, id, false);
+        if (user.username != "admin") {
+          let #ok(_) = res else Debug.trap("error in getMatches " # debug_show (res) # " with user " # user.username);
+        };
+        Result.toOption(res); // TODO?: handle errors instead of removing them?
+      },
     );
 
-    var bestMatch : ?UserMatch = null;
-    var bestDiff = 100;
-    let ref : Int = Nat8.toNat(filter.cohesion);
+    let all = Iter.toArrayMut<UserMatch>(withScore);
 
-    for (match in withScore) {
-      let diff = Int.abs(ref - Nat8.toNat(match.cohesion));
-      if (bestMatch == null or bestDiff > diff) {
-        bestMatch := ?match;
-      };
-    };
+    Array.sortInPlace<UserMatch>(all, func(a, b) = Nat8Extra.compareDesc(a.cohesion, b.cohesion));
 
-    let ?result = bestMatch else return #err(#userNotFound);
-
-    let #ok(_) = User.reward(db.users, #findMatch, caller) else Debug.trap("Bug: Reward failed. checkFunds should have returned an error already");
-
-    return #ok(result);
+    #ok(Array.freeze(all));
   };
 
   //returns both Approved and Unapproved friends
@@ -335,6 +316,54 @@ actor {
       skips = Question.emptySkipDB();
       friends = Friend.emptyDB();
     };
+    db := db_v1;
+  };
+
+  public shared ({ caller }) func createTestData(questions : Nat, users : Nat) : async Nat {
+    assertAdmin(caller);
+
+    let res = User.add(db.users, "admin", "admin@allkinds", caller);
+
+    for (i in Iter.range(1, questions)) {
+      let text = "Question " # Nat.toText(i) # "?";
+
+      let res = Question.add(db.questions, text, ["red", "green", "orange", "black", "purple"][i % 5], caller);
+      switch (res) {
+        case (#ok(_)) {};
+        case (#err(error)) {
+          Debug.trap(debug_show (error) # " when creating question " # text);
+        };
+      };
+    };
+
+    let rand = [0, 1, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 0, 1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1];
+    var randI = 1;
+    for (i in Iter.range(1, users)) {
+      let name = "User." # Nat.toText(i);
+
+      let principal = Principal.fromBlob(Blob.fromArray([Nat8.fromNat(i % 256), Nat8.fromNat((i / 256) % 256), 0x03]));
+      let res = User.add(db.users, name, name # "@allkinds", principal);
+      switch (res) {
+        case (#ok(_)) {};
+        case (#err(error)) {
+          Debug.trap(debug_show (error) # " when creating user " # name);
+        };
+      };
+      let qs = Question.unanswered(db.questions, db.answers, db.skips, principal);
+      for (q in qs) {
+        randI += 1;
+        let a : Answer = {
+          question = q.id;
+          answer = rand[randI % 256] == 0;
+          weight = 1;
+          created = Time.now();
+        };
+        Question.putAnswer(db.answers, a, principal);
+      };
+    };
+
+    return randI;
+
   };
 
 };

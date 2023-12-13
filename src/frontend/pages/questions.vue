@@ -34,7 +34,7 @@ if (inBrowser()) {
 <template>
     <AllkindsTitle>
         <NuxtLink to="/my-profile" class="m-auto">
-            {{ app.getUser().username }}, {{ app.getUser().points }}
+            {{ app.getUser().displayName }}, {{ app.getUser().stats.points }}
             <Icon name="gg:shape-hexagon" class="mb-2" />
         </NuxtLink>
 

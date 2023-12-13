@@ -39,21 +39,17 @@ module {
   };
 
   public type UserDB = {
-    info : Map<Principal, StableUser>;
+    info : Map<Principal, User>;
     byUsername : Map<Text, Principal>;
   };
 
   public func emptyDB() : UserDB = {
-    info = Map.new<Principal, StableUser>(phash);
+    info = Map.new<Principal, User>(phash);
     byUsername = Map.new<Text, Principal>(thash);
   };
 
   public func backup(users : UserDB) : Iter<(Principal, User)> {
-    let all : Iter<(Principal, StableUser)> = Map.entries(users.info);
-    Iter.map<(Principal, StableUser), (Principal, User)>(
-      all,
-      func entry = TupleHelper.mapSecond(entry, stableToUser),
-    );
+    Map.entries(users.info);
   };
 
   /// Information about a user.
@@ -61,109 +57,48 @@ module {
   /// see UserInfo for non sensitive information
   public type User = {
     username : Text;
+    displayName : Text;
     created : Time;
-    about : (?Text, IsPublic);
-    gender : (?Gender, IsPublic);
-    age : (?Nat8, IsPublic);
-    socials : [(Social, IsPublic)]; // contains email or social media links
-    points : Nat;
-    picture : (?Blob, IsPublic);
+    about : Text;
+    contact : Text; // contains email or social media links
+    picture : ?Blob;
+    stats : UserStats;
   };
 
-  type StableUser = {
-    username : Text;
-    created : Time;
-    about : (?Text, IsPublic);
-    gender : (?Gender, IsPublic);
-    birth : (?Time, IsPublic);
-    socials : [(Social, IsPublic)]; // contains email or social media links
+  public type UserStats = {
     points : Nat;
-    picture : (?Blob, IsPublic);
+    asked : Nat;
+    answered : Nat;
+    boosts : Nat;
   };
 
   /// Public info about a user
   public type UserInfo = {
     username : Text;
-    about : ?Text;
-    gender : ?Gender;
-    age : ?Nat8;
-    socials : [Social];
+    displayName : Text;
+    about : Text;
+    contact : Text;
     picture : ?Blob;
   };
 
-  public type Gender = {
-    #male;
-    #female;
-    #queer;
-    #other;
-  };
+  public type UserFilter = {};
 
-  public type Social = {
-    network : SocialNetwork;
-    handle : Text;
-    //verification: {link: Text, status: {#pending; #verified; #failed})
-  };
-
-  public type SocialNetwork = {
-    #distrikt;
-    #dscvr;
-    #twitter;
-    #mastodon;
-    #email;
-    #phone;
-  };
-
-  public type UserFilter = {
-    minBirth : Time;
-    maxBirth : Time;
-    gender : ?Gender;
-  };
-
-  func stableToUser(user : StableUser) : User {
-    {
-      username = user.username;
-      created = user.created;
-      about = user.about;
-      gender = user.gender;
-      age = TupleHelper.mapFirst<?Time, IsPublic, ?Nat8>(
-        user.birth,
-        func x = Option.chain(x, toAge),
-      );
-      socials = user.socials;
-      picture = user.picture;
-      points = user.points;
-    };
-  };
-
-  public func createFilter(minAge : Nat8, maxAge : Nat8, gender : ?Gender) : UserFilter {
-    if (minAge > maxAge) Debug.trap("Invalid age");
-    if (maxAge > 150) Debug.trap("Invalid maxAge");
-
-    let minBirth = toBirth(maxAge) - YEAR;
-    let maxBirth = toBirth(minAge);
-
-    { minBirth; maxBirth; gender };
-  };
-
-  public func add(users : UserDB, username : Text, contact : Text, id : Principal) : Result<User, Error> {
+  public func add(users : UserDB, displayName : Text, contact : Text, id : Principal) : Result<User, Error> {
     if (Principal.isAnonymous(id)) return #err(#notLoggedIn);
     let null = get(users, id) else return #err(#alreadyRegistered);
-    let true = validateName(username) else return #err(#validationError);
-    let null = getByName(users, username) else return #err(#nameNotAvailable);
 
-    let user = create(username, contact);
-    let lookupKey = TextHelper.toLower(username);
+    let user = create(displayName, contact);
+
+    let true = validateName(user.username) else return #err(#validationError);
+    let null = getByName(users, user.username) else return #err(#nameNotAvailable);
+
     Map.set(users.info, phash, id, user);
-    Map.set(users.byUsername, thash, lookupKey, id);
-    #ok(stableToUser(user));
-  };
-
-  func getStable(users : UserDB, id : Principal) : ?StableUser {
-    Map.get(users.info, phash, id);
+    Map.set(users.byUsername, thash, user.username, id);
+    #ok(user);
   };
 
   public func get(users : UserDB, id : Principal) : ?User {
-    Option.map(getStable(users, id), stableToUser);
+    Map.get(users.info, phash, id);
   };
 
   public func getPrincipal(users : UserDB, username : Text) : ?Principal {
@@ -171,14 +106,14 @@ module {
     Map.get(users.byUsername, thash, lookupKey);
   };
 
-  func getByName(users : UserDB, name : Text) : ?StableUser {
+  func getByName(users : UserDB, name : Text) : ?User {
     let ?id = getPrincipal(users, name) else return null;
-    getStable(users, id);
+    get(users, id);
   };
 
   public func getInfo(users : UserDB, id : Principal, showNonPublic : Bool) : ?UserInfo {
-    let ?u = getStable(users, id) else return null;
-    ?filterUserInfo(u, showNonPublic);
+    let ?u = get(users, id) else return null;
+    ?filterUserInfo(u);
   };
 
   func validateName(username : Text) : Bool {
@@ -196,39 +131,23 @@ module {
 
   public func update(users : UserDB, user : User, id : Principal) : Result<User, Error> {
     let ?u = get(users, id) else return #err(#notRegistered);
-    let newUser : StableUser = {
+    let newUser : User = {
       username = u.username; // can't be changed by user
+      displayName = user.displayName;
       created = u.created; // can't be changed by user
       about = user.about;
-      gender = user.gender;
-      birth = TupleHelper.mapFirst<?Nat8, IsPublic, ?Time>(user.age, func x = Option.map(x, toBirth));
-      socials = user.socials;
-      points = u.points; // can't be changed by user
+      contact = user.contact;
       picture = user.picture;
+      stats = u.stats; // can't be changed by user
     };
 
     Map.set(users.info, phash, id, newUser);
 
-    #ok(stableToUser(newUser));
+    #ok(newUser);
   };
 
-  public func find(users : UserDB, filter : UserFilter) : Iter<(Principal, User)> {
-    let filtered = Iter.filter<(Principal, StableUser)>(Map.entries(users.info), func(_, u) = matches(u, filter));
-    Iter.map<(Principal, StableUser), (Principal, User)>(filtered, func x = TupleHelper.mapSecond(x, stableToUser));
-  };
-
-  func matches(user : StableUser, filter : UserFilter) : Bool {
-    switch (filter.gender) {
-      case (null) {};
-      case (?gender) {
-        if ((?gender, true) != user.gender) return false;
-      };
-    };
-
-    let (?birth, _) = user.birth else return true;
-    if (birth < filter.minBirth) return false;
-    if (birth > filter.maxBirth) return false;
-    return true;
+  public func find(users : UserDB) : Iter<(Principal, User)> {
+    Map.entries(users.info);
   };
 
   /// Check how much an action is rewarded or costs
@@ -250,7 +169,7 @@ module {
 
     let amount : Int = rewardSize(action);
 
-    let points = u.points : Int + amount;
+    let points = u.stats.points : Int + amount;
 
     // check if the user can pay
     if (points < 0) return #err(#insufficientFunds);
@@ -259,52 +178,93 @@ module {
   };
 
   public func reward(users : UserDB, action : RewardableAction, id : Principal) : Result<User, Error> {
-    let ?u = getStable(users, id) else return #err(#notRegistered);
+    let ?u = get(users, id) else return #err(#notRegistered);
 
     let amount : Int = rewardSize(action);
 
-    let points = u.points : Int + amount;
+    let points = u.stats.points : Int + amount;
 
     // check if the user can pay
     if (points < 0) return #err(#insufficientFunds);
 
-    let newUser : StableUser = {
-      username = u.username;
-      created = u.created;
-      about = u.about;
-      gender = u.gender;
-      birth = u.birth;
-      socials = u.socials;
-      points = Int.abs(points); // only this changes here
-      picture = u.picture;
-    };
+    let newStats = setPoints(u.stats, Int.abs(points));
+
+    let newUser = setStats(u, newStats);
 
     Map.set(users.info, phash, id, newUser);
 
-    #ok(stableToUser(newUser));
+    #ok(newUser);
   };
 
-  func create(username : Text, contact : Text) : StableUser {
-    {
-      username;
-      created = Time.now();
-      about = (null, true);
-      gender = (null, true);
-      birth = (null, true);
-      socials = [({ network = #email; handle = contact }, false)];
-      points = 100;
-      picture = (null, true);
+  let initStats : UserStats = {
+    points = 100;
+    asked = 0;
+    answered = 0;
+    boosts = 0;
+  };
+
+  func setStats(u : User, stats : UserStats) : User {
+    return {
+      username = u.username;
+      displayName = u.displayName;
+      created = u.created;
+      about = u.about;
+      contact = u.contact;
+      picture = u.picture;
+      stats; // only this is updated
     };
   };
 
-  public func filterUserInfo(user : StableUser, showNonPublic : Bool) : UserInfo {
+  func setPoints(s : UserStats, points : Nat) : UserStats {
+    return {
+      points;
+      answered = s.answered;
+      asked = s.asked;
+      boosts = s.boosts;
+    };
+  };
+
+  func create(displayName : Text, contact : Text) : User {
+    return {
+      username = toUsername(displayName);
+      displayName;
+      created = Time.now();
+      about = "";
+      contact;
+      picture = null;
+      stats = initStats;
+    };
+  };
+
+  func toUsername(displayName : Text) : Text {
+    var first = true;
+    Text.translate(
+      displayName,
+      func(c) {
+        if (Char.isAlphabetic(c)) {
+          first := false;
+          TextHelper.charToLower(c);
+        } else if (Char.isDigit(c)) {
+          if (first) {
+            first := false;
+            "";
+          } else {
+            Text.fromChar(c);
+          };
+        } else {
+          "";
+        };
+      },
+    );
+  };
+
+  public func filterUserInfo(user : User) : UserInfo {
     let info : UserInfo = {
       username = user.username;
-      about = checkPublic(user.about, showNonPublic);
-      gender = checkPublic(user.gender, showNonPublic);
-      age = Option.chain<Time, Nat8>(checkPublic(user.birth, showNonPublic), toAge);
-      socials = filterPublic(user.socials, showNonPublic);
-      picture = checkPublic(user.picture, showNonPublic);
+      displayName = user.displayName;
+      about = user.about;
+      contact = user.contact;
+      picture = user.picture;
     };
   };
 

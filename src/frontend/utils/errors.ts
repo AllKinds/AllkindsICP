@@ -35,6 +35,8 @@ export function formatBackendError(err: BackendError): string {
             return "User not found";
         case "tooLong":
             return "Too long";
+        case "notEnoughAnswers":
+            return "Not enough answers"
 
         // TODO: format other errors
 

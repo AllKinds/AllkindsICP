@@ -8,7 +8,7 @@ const app = useAppState();
 
 if (inBrowser()) {
     app.loadUser();
-    app.loadFriends();
+    app.loadMatches();
 }
 </script>
 
@@ -20,18 +20,17 @@ if (inBrowser()) {
             <Icon name="gg:shape-hexagon" class="mb-2" />
         </NuxtLink>
 
-        <NuxtLink to="/discover">
-            <Icon name="prime:user-plus" size="2em" />
-        </NuxtLink>
     </AllkindsTitle>
 
-    <NetworkDataContainer :networkdata="app.getFriends()">
-        <div v-if="app.getFriends().data?.length === 0">
-            You have no connections yet. <!-- TODO: add instructions to find friends -->
+    <NetworkDataContainer :networkdata="app.getMatches()">
+        <div v-if="app.getMatches().data?.length === 0">
+            No matches found.
+            <br>
+            You need at least 5 questions in common to see each others coherence score.
         </div>
 
-        <div v-for="[match, status] in app.getFriends().data">
-            {{ match.user.username }}: {{ match.cohesion }} ({{ formatFriendStatus(status) }})
+        <div v-for="match in app.getMatches().data">
+            {{ match.user.username }}: {{ match.cohesion }} ({{ match.answered.length }})
         </div>
     </NetworkDataContainer>
 </template>

@@ -11,6 +11,7 @@ import Map "mo:map/Map";
 import Trie "mo:base/Trie";
 import Option "mo:base/Option";
 import Debug "mo:base/Debug";
+import Nat "mo:base/Nat";
 
 module {
 
@@ -39,18 +40,6 @@ module {
     cohesion : Nat8;
   };
 
-  public func createFilter(
-    minAge : Nat8,
-    maxAge : Nat8,
-    gender : ?User.Gender,
-    cohesion : Nat8,
-  ) : MatchingFilter {
-    if (cohesion > 100) Debug.trap("Invalid cohesion");
-
-    let users = User.createFilter(minAge, maxAge, gender);
-    return { users; cohesion };
-  };
-
   func score(common : [AnswerDiff]) : Result<Nat8, Error> {
     if (common.size() < Configuration.matching.minCommonQuestions) return #err(#notEnoughAnswers);
 
@@ -73,6 +62,10 @@ module {
 
     let common = Question.getCommon(answers, userA, userB);
     let answersB = Question.getAnswers(answers, userB);
+
+    if (common.size() == 0) {
+      Debug.print("notEnoughAnswers " # Nat.toText(common.size()) # " " # debug_show (answersB));
+    };
 
     let cohesion = switch (score(common)) {
       case (#ok(s)) s;

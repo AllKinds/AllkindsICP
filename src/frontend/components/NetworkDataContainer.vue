@@ -12,19 +12,20 @@ const status = () => props.networkdata.status;
 </script>
 
 <template>
-    <div class="">
-        <div v-if="status() === 'ok'" class="">
+    <div v-if="status() === 'ok'" class="">
+        <slot />
+    </div>
+    <div v-else-if="status() === 'requested'" class="text-center">
+        <Icon name="line-md:loading-alt-loop" size="5em" class="absolute mt-8" />
+        <div class="opacity-20">
             <slot />
         </div>
-        <div v-else-if="status() === 'requested'" class="text-center">
-            <Icon name="line-md:loading-alt-loop" size="5em" class="absolute mt-8" />
-            <div class="opacity-20">
-                <slot />
-            </div>
-        </div>
-        <div v-else class="bg-error">
-            {{ status() }}
-            <slot />
-        </div>
+    </div>
+    <div v-else-if="status() === 'init'" class="text-center">
+        loading...
+    </div>
+    <div v-else class="w-full border border-red-700 p-4 rounded-lg">
+        {{ formatError(props.networkdata.err!) }}
+        <slot />
     </div>
 </template>

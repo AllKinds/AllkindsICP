@@ -23,19 +23,19 @@ if (inBrowser()) {
 
     <div class="w-full">
         <div class="text-3xl font-bold">
-            {{ app.getUser().username }}, {{ app.getUser().points }}
+            {{ app.getUser().displayName }}, {{ app.getUser().stats.points }}
             <Icon name="gg:shape-hexagon" class="mb-2" />
         </div>
         <div>
-            <span class="font-bold">{{ /* app.getUser().stats.asked */ 8 }}</span>
+            <span class="font-bold">{{ app.getUser().stats.asked }}</span>
             questions asked
         </div>
         <div>
-            <span class="font-bold">{{ /* app.getUser().stats.answered */ 77 }}</span>
+            <span class="font-bold">{{ app.getUser().stats.answered }}</span>
             questions answered
         </div>
         <div>
-            <span class="font-bold">{{ /* app.getUser().stats.boosts */ 6 }}</span>
+            <span class="font-bold">{{ app.getUser().stats.boosts }}</span>
             people boosted your question
         </div>
     </div>
