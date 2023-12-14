@@ -8,7 +8,7 @@ const app = useAppState();
 
 if (inBrowser()) {
     app.loadUser();
-    app.loadFriends();
+    app.loadFriends(0);
 }
 </script>
 
@@ -23,15 +23,26 @@ if (inBrowser()) {
         <NuxtLink to="/discover">
             <Icon name="prime:user-plus" size="2em" />
         </NuxtLink>
+
     </AllkindsTitle>
 
-    <NetworkDataContainer :networkdata="app.getFriends()">
+    <NetworkDataContainer :networkdata="app.getFriends()" class="w-full">
         <div v-if="app.getFriends().data?.length === 0">
             You have no connections yet. <!-- TODO: add instructions to find friends -->
         </div>
 
-        <div v-for="[match, status] in app.getFriends().data">
-            {{ match.user.username }}: {{ match.cohesion }} ({{ formatFriendStatus(status) }})
-        </div>
+        <NuxtLink v-for="[match, status] in app.getFriends().data" :to="'/contacts/' + match.user.username"
+            class="flex flex-row w-full">
+            <div class="flex-grow m-2">
+                {{ match.user.username }}:
+            </div>
+            <div class="m-2">
+                {{ match.cohesion }} %
+                ({{ match.answered.length }})
+            </div>
+            <div class="m-2">
+                ({{ formatFriendStatus(status) }})
+            </div>
+        </NuxtLink>
     </NetworkDataContainer>
 </template>

@@ -1,4 +1,4 @@
-<script type="ts" setup>
+<script lang="ts" setup>
 import { Effect } from "effect";
 import { loadQuestions, createQuestion } from "~/utils/backend"
 import { getColor } from "~/utils/color";
@@ -6,7 +6,7 @@ import { getColor } from "~/utils/color";
 const question = useState('new-question', () => "")
 const app = useAppState();
 const loading = useState("loading", () => false);
-const color = useState('color', () => "green")
+const color = useState<ColorName>('color', () => "green")
 const weight = useState('weight', () => 1)
 
 async function loadQs() {
@@ -16,7 +16,7 @@ async function loadQs() {
 async function create() {
     loading.value = true;
 
-    await runNotify(createQuestion(question.value, color.value), "Question created successfully.").then(
+    await runNotify(createQuestion(question.value, color.value as ColorName), "Question created successfully.").then(
         () => {
             question.value = "";
             loading.value = false;

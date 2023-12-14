@@ -1,7 +1,7 @@
-<script type="ts" setup>
+<script lang="ts" setup>
 import { Effect } from "effect";
-import { loadQuestions } from "~/utils/backend"
-import { getColor } from "~/utils/color";
+import { Question } from "~/utils/backend";
+import { ColorName, getColor } from "~/utils/color";
 
 const route = useRoute();
 const question = useState('new-question', () => "")
@@ -10,11 +10,12 @@ const loading = useState("loading", () => false);
 const color = useState('color', () => "green")
 const weight = useState('weight', () => 1)
 weight.value = 1;
+let gotoNextQuestion = false;
 
-const answer = (question, a, boost) => {
+const answer = (question: Question, a: boolean, boost: number) => {
     console.log("answering question ", question, a, boost)
     app.removeQuestion(question)
-    navigateTo("/questions") // TODO: goto next question
+    gotoNextQuestion = true;
     runNotify(answerQuestion(question.id.valueOf(), a, boost), "Answer saved").then(
         () => { app.loadQuestions() }
     ).catch(
@@ -22,13 +23,12 @@ const answer = (question, a, boost) => {
     );
 }
 
-const skip = (question) => {
+const skip = (question: Question) => {
     console.log('skipping', question)
     app.removeQuestion(question)
-    navigateTo("/questions") // TODO: goto next question
-    runNotify()
-    Effect.runPromise(
-        skipQuestion(question.id.valueOf()).pipe(notifyWithMsg("Question skipped"))
+    gotoNextQuestion = true;
+    runNotify(
+        skipQuestion(question.id), "Question skipped"
     ).then(
         () => { app.loadQuestions() },
     ).catch(
@@ -39,7 +39,7 @@ const skip = (question) => {
 
 let loaded = false;
 
-function findQuestion(id, findOther = false) {
+function findQuestion(id: bigint, findOther = false) {
     const data = app.openQuestions.data;
     const data2 = app.answeredQuestions.data;
     let q = null;
@@ -50,13 +50,15 @@ function findQuestion(id, findOther = false) {
         }
     } else if (data.length === 0) {
         navigateTo("/questions");
+    } else if (gotoNextQuestion) {
+        navigateTo("/answer-question/" + data[0].id);
     } else {
-        q = data.find((x) => x.id == id);
+        q = data.find((x) => x.id === id);
         if (!q && data2) {
-            q = data2.find((x) => x[0].id == id);
-            if (q) q = q[0];
+            q = data2.find((x) => x.id === id);
         }
         if (!q) {
+            // goto next question
             navigateTo("/answer-question/" + data[0].id);
         }
     }
@@ -64,13 +66,13 @@ function findQuestion(id, findOther = false) {
     return q;
 }
 
-let q = () => findQuestion(route.params.id) || {};
+let q = () => findQuestion(BigInt(route.params.id as string)) || {} as Question;
 
 if (inBrowser()) {
     app.loadUser();
 }
 
-const twColor = () => getColor(q().color).color;
+const twColor = () => getColor(q().color as ColorName).color;
 
 </script>
 

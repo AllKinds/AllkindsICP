@@ -8,7 +8,7 @@ import * as errors from "~/utils/errors";
 export type AppState = {
     user: NetworkData<User>,
     openQuestions: NetworkData<Question[]>,
-    answeredQuestions: NetworkData<Friend[]>,
+    answeredQuestions: NetworkData<Question[]>,
     ownQuestions: NetworkData<Question[]>,
     friends: NetworkData<Friend[]>,
     matches: NetworkData<UserMatch[]>
@@ -216,10 +216,11 @@ export const useAppState = defineStore({
         },
         setFriends(friends: NetworkData<Friend[]>): void {
             const old = this.friends as NetworkData<Friend[]>
-            this.friends = combineNetworkData(old, friends)
+            this.friends = { status: "requested", errCount: 0, data: [] };
+            setTimeout(() => this.friends = combineNetworkData(old, friends));
         },
-        loadFriends() {
-            if (shouldUpdate(this.friends)) {
+        loadFriends(maxAgeS?: number) {
+            if (shouldUpdate(this.friends, maxAgeS)) {
                 runStore(this.friends, backend.loadFriends(), this.setFriends)
                     .catch(console.error);
             }
@@ -236,6 +237,12 @@ export const useAppState = defineStore({
                 runStore(this.matches, backend.loadMatches(), this.setMatches)
                     .catch(console.error);
             }
+        },
+        sendFriendRequest(username: string): Promise<void> {
+            return runNotify(backend.sendFriendRequest(username), "Friend request send")
+        },
+        answerFriendRequest(username: string, accept: boolean): Promise<void> {
+            return runNotify(backend.answerFriendRequest(username, accept), accept ? "Friend request accepted" : "Friend request rejected")
         },
     },
 });
@@ -257,6 +264,7 @@ const shouldUpdate = <T>(data: NetworkData<T>, maxAgeS?: number): boolean => {
             return true;
 
         case "ok":
+            if (maxAgeS === 0) return true;
             const limit = Date.now().valueOf() - ((maxAgeS || 30) * 1000);
             if (data.lastOK!.valueOf() < limit) {
                 return true;

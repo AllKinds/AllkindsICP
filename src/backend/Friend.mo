@@ -25,7 +25,6 @@ module {
     #requestSend;
     #requestReceived;
     #connected;
-    #requestIgnored;
     #rejectionSend;
     #rejectionReceived;
   };
@@ -68,7 +67,7 @@ module {
         Map.set(recipientFriends, phash, sender, #requestReceived);
       };
       case (?(#requestReceived), ?(#requestSend)) {
-        // other user already requested
+        // other user already requested -> connect
         Map.set(senderFriends, phash, recipient, #connected);
         Map.set(recipientFriends, phash, sender, #connected);
       };
@@ -76,10 +75,20 @@ module {
         // already connected
         return #ok;
       };
+      case (?(#rejectionSend), ?(#rejectionReceived)) {
+        Map.set(senderFriends, phash, recipient, #requestSend);
+        Map.set(recipientFriends, phash, sender, #requestReceived);
+      };
+      case (?(_), ?(#rejectionSend)) {
+        // other user already requested -> connect
+        Map.set(senderFriends, phash, recipient, #rejectionReceived);
+        // recipientFriends unchanged
+      };
       case (_, _) {
         return #err(#friendRequestAlreadySend);
       };
     };
+    // save to modified friend lists in FriendsDB
     Map.set(friends, phash, sender, senderFriends);
     Map.set(friends, phash, recipient, recipientFriends);
 
@@ -98,13 +107,8 @@ module {
     let recipientStatus = getFriend(recipientFriends, sender);
 
     switch (recipientStatus) {
-      case (?(#requestIgnored)) {
-        // other user already requested
-        Map.set(senderFriends, phash, recipient, #rejectionSend);
-        Map.set(recipientFriends, phash, sender, #requestIgnored);
-      };
       case (?(#rejectionSend)) {
-        // other user already requested
+        // other user already rejected
         Map.set(senderFriends, phash, recipient, #rejectionSend);
         Map.set(recipientFriends, phash, sender, #rejectionSend);
       };

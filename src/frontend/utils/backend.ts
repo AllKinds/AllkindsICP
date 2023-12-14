@@ -32,7 +32,6 @@ const effectify = <T>(fn: (actor: BackendActor) => Promise<T>): FrontendEffect<T
 const effectifyResult = <T>(fn: (actor: BackendActor) => Promise<{ ok: T } | { err: BackendError }>): FrontendEffect<T> => {
     return Effect.gen(function* (_) {
         const res = yield* _(effectify(fn));
-        console.log("asdf", res);
         return yield* _(resultToEffect(res).pipe(Effect.mapError(toBackendError)));
     })
 }
@@ -73,6 +72,7 @@ export const skipQuestion = (q: BigInt): FrontendEffect<Skip> => {
 }
 
 export const loadFriends = (): FrontendEffect<Friend[]> => {
+    console.log("loadFriends requested");
     return effectifyResult((actor) => actor.getFriends())
 }
 
@@ -98,8 +98,40 @@ export const formatFriendStatus = (status: FriendStatus): string => {
         case "rejectionSend": return "reject";
         case "requestIgnored": return "ignored";
         case "requestReceived": return "request";
-        case "requestSend": return "requested";
+        case "requestSend": return "request pending";
     }
-    console.error("Unexpected friend status")
-    return "unknown"
+    console.error("Unexpected friend status", status);
+    return "unknown";
+}
+
+export const canSendFriendRequest = (status: FriendStatus): boolean => {
+    switch (friendStatusToKey(status)) {
+        case "connected": return false;
+        case "rejectionReceived": return false;
+        case "rejectionSend": return true;
+        case "requestIgnored": return true;
+        case "requestReceived": return true;
+        case "requestSend": return false;
+    }
+}
+
+export const canSendRemoveFriendRequest = (status: FriendStatus): boolean => {
+    switch (friendStatusToKey(status)) {
+        case "connected": return true;
+        case "rejectionReceived": return false;
+        case "rejectionSend": return false;
+        case "requestIgnored": return false;
+        case "requestReceived": return true;
+        case "requestSend": return true;
+    }
+}
+
+
+
+export const sendFriendRequest = (username: string): FrontendEffect<void> => {
+    return effectifyResult((actor) => actor.sendFriendRequest(username))
+}
+
+export const answerFriendRequest = (username: string, accept: boolean): FrontendEffect<void> => {
+    return effectifyResult((actor) => actor.answerFriendRequest(username, accept))
 }
