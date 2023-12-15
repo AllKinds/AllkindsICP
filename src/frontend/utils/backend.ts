@@ -83,7 +83,6 @@ export const loadMatches = (): FrontendEffect<UserMatch[]> => {
 export type FriendStatusKey = "requestSend"
     | "requestReceived"
     | "connected"
-    | "requestIgnored"
     | "rejectionSend"
     | "rejectionReceived";
 
@@ -96,7 +95,6 @@ export const formatFriendStatus = (status: FriendStatus): string => {
         case "connected": return "connected"
         case "rejectionReceived": return "rejected";
         case "rejectionSend": return "reject";
-        case "requestIgnored": return "ignored";
         case "requestReceived": return "request";
         case "requestSend": return "request pending";
     }
@@ -104,12 +102,23 @@ export const formatFriendStatus = (status: FriendStatus): string => {
     return "unknown";
 }
 
+export const friendStatusIcon = (status: FriendStatus): { icon: string, color: string } => {
+    switch (friendStatusToKey(status)) {
+        case "connected": return { icon: "tabler:user-check", color: "text-green-500" };
+        case "rejectionReceived": return { icon: "tabler:user-x", color: "text-red-500" };
+        case "rejectionSend": return { icon: "tabler:user-cancel", color: "text-red-600" };
+        case "requestReceived": return { icon: "tabler:user-question", color: "text-orange-500" };
+        case "requestSend": return { icon: "tabler:user-exclamation", color: "text-gray-500" };
+    }
+    console.error("Unexpected friend status", status);
+    return { icon: "?", color: "" };
+}
+
 export const canSendFriendRequest = (status: FriendStatus): boolean => {
     switch (friendStatusToKey(status)) {
         case "connected": return false;
         case "rejectionReceived": return false;
         case "rejectionSend": return true;
-        case "requestIgnored": return true;
         case "requestReceived": return true;
         case "requestSend": return false;
     }
@@ -120,7 +129,6 @@ export const canSendRemoveFriendRequest = (status: FriendStatus): boolean => {
         case "connected": return true;
         case "rejectionReceived": return false;
         case "rejectionSend": return false;
-        case "requestIgnored": return false;
         case "requestReceived": return true;
         case "requestSend": return true;
     }

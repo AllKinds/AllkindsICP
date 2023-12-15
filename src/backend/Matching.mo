@@ -63,10 +63,6 @@ module {
     let common = Question.getCommon(answers, userA, userB);
     let answersB = Question.getAnswers(answers, userB);
 
-    if (common.size() == 0) {
-      Debug.print("notEnoughAnswers " # Nat.toText(common.size()) # " " # debug_show (answersB));
-    };
-
     let cohesion = switch (score(common)) {
       case (#ok(s)) s;
       case (#err(e)) return #err(e);

@@ -33,13 +33,15 @@ function findUser(username: string): UserMatch | null {
 const m = (): UserMatch => findUser(route.params.username + "") || ({ user: {}, answered: [], uncommon: [] } as unknown as UserMatch);
 
 const connect = (username: string) => {
+    navigateTo("/contacts")
     app.sendFriendRequest(username).then(
-        () => { navigateTo("/contacts") }
+        () => { app.loadFriends(0) }
     )
 }
 
 if (inBrowser()) {
     app.loadUser();
+    app.loadMatches();
 }
 
 let diff = {}

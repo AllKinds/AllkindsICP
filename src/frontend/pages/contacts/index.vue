@@ -10,6 +10,8 @@ if (inBrowser()) {
     app.loadUser();
     app.loadFriends(0);
 }
+
+let match = { user: { username: "" } };
 </script>
 
 
@@ -31,17 +33,20 @@ if (inBrowser()) {
             You have no connections yet. <!-- TODO: add instructions to find friends -->
         </div>
 
-        <NuxtLink v-for="[match, status] in app.getFriends().data" :to="'/contacts/' + match.user.username"
-            class="flex flex-row w-full">
-            <div class="flex-grow m-2">
+        <NuxtLink v-for="[match, status] in app.getFriends().data?.slice().reverse()"
+            :to="'/contacts/' + match.user.username" class="flex flex-row w-full text-xl font-bold">
+            <div class="m-2">
                 {{ match.user.username }}:
             </div>
-            <div class="m-2">
-                {{ match.cohesion }} %
+            <div class="m-2 flex-grow">
+                {{ match.cohesion }}%
                 ({{ match.answered.length }})
             </div>
-            <div class="m-2">
+            <div class="m-2 font-normal text-gray-500">
                 ({{ formatFriendStatus(status) }})
+            </div>
+            <div class="m-2">
+                <Icon :name="friendStatusIcon(status).icon" size="1.5em" :class="friendStatusIcon(status).color" />
             </div>
         </NuxtLink>
     </NetworkDataContainer>

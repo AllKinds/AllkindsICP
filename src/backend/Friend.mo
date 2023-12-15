@@ -52,7 +52,7 @@ module {
     return { next };
   };
 
-  public func request(friends : FriendDB, sender : Principal, recipient : Principal) : Result<(), Error> {
+  public func request(friends : FriendDB, sender : Principal, recipient : Principal, accept : Bool) : Result<(), Error> {
     let senderFriends = getFriends(friends, sender);
     let recipientFriends = getFriends(friends, recipient);
     if (sender == recipient) return #err(#friendAlreadyConnected);
@@ -60,65 +60,50 @@ module {
     let senderStatus = getFriend(senderFriends, recipient);
     let recipientStatus = getFriend(recipientFriends, sender);
 
-    switch ((senderStatus, recipientStatus)) {
-      case (null, null) {
-        // send a new request
-        Map.set(senderFriends, phash, recipient, #requestSend);
-        Map.set(recipientFriends, phash, sender, #requestReceived);
+    if (accept) {
+      switch ((senderStatus, recipientStatus)) {
+        case (null, null) {
+          // send a new request
+          Map.set(senderFriends, phash, recipient, #requestSend);
+          Map.set(recipientFriends, phash, sender, #requestReceived);
+        };
+        case (?(#requestReceived), ?(#requestSend)) {
+          // other user already requested -> connect
+          Map.set(senderFriends, phash, recipient, #connected);
+          Map.set(recipientFriends, phash, sender, #connected);
+        };
+        case (?(#connected), ?(#connected)) {
+          // already connected
+          return #ok;
+        };
+        case (?(#rejectionSend), ?(#rejectionReceived)) {
+          Map.set(senderFriends, phash, recipient, #requestSend);
+          Map.set(recipientFriends, phash, sender, #requestReceived);
+        };
+        case (?(_), ?(#rejectionSend)) {
+          // other user already requested -> connect
+          Map.set(senderFriends, phash, recipient, #rejectionReceived);
+          // recipientFriends unchanged
+        };
+        case (_, _) {
+          return #err(#friendRequestAlreadySend);
+        };
       };
-      case (?(#requestReceived), ?(#requestSend)) {
-        // other user already requested -> connect
-        Map.set(senderFriends, phash, recipient, #connected);
-        Map.set(recipientFriends, phash, sender, #connected);
-      };
-      case (?(#connected), ?(#connected)) {
-        // already connected
-        return #ok;
-      };
-      case (?(#rejectionSend), ?(#rejectionReceived)) {
-        Map.set(senderFriends, phash, recipient, #requestSend);
-        Map.set(recipientFriends, phash, sender, #requestReceived);
-      };
-      case (?(_), ?(#rejectionSend)) {
-        // other user already requested -> connect
-        Map.set(senderFriends, phash, recipient, #rejectionReceived);
-        // recipientFriends unchanged
-      };
-      case (_, _) {
-        return #err(#friendRequestAlreadySend);
+    } else {
+      switch (recipientStatus) {
+        case (?(#rejectionSend)) {
+          // other user already rejected
+          Map.set(senderFriends, phash, recipient, #rejectionSend);
+          Map.set(recipientFriends, phash, sender, #rejectionSend);
+        };
+        case (_) {
+          // send a new request
+          Map.set(senderFriends, phash, recipient, #rejectionSend);
+          Map.set(recipientFriends, phash, sender, #rejectionReceived);
+        };
       };
     };
     // save to modified friend lists in FriendsDB
-    Map.set(friends, phash, sender, senderFriends);
-    Map.set(friends, phash, recipient, recipientFriends);
-
-    #ok;
-  };
-
-  public func reject(friends : FriendDB, sender : Principal, recipient : Principal) : Result<(), Error> {
-    if (Principal.isAnonymous(sender)) { return #err(#notLoggedIn) };
-    if (Principal.isAnonymous(recipient)) { return #err(#userNotFound) };
-    if (sender == recipient) return #err(#friendAlreadyConnected);
-
-    let senderFriends = getFriends(friends, sender);
-    let recipientFriends = getFriends(friends, sender);
-
-    let senderStatus = getFriend(senderFriends, recipient);
-    let recipientStatus = getFriend(recipientFriends, sender);
-
-    switch (recipientStatus) {
-      case (?(#rejectionSend)) {
-        // other user already rejected
-        Map.set(senderFriends, phash, recipient, #rejectionSend);
-        Map.set(recipientFriends, phash, sender, #rejectionSend);
-      };
-      case (_) {
-        // send a new request
-        Map.set(senderFriends, phash, recipient, #rejectionSend);
-        Map.set(recipientFriends, phash, sender, #rejectionReceived);
-      };
-    };
-
     Map.set(friends, phash, sender, senderFriends);
     Map.set(friends, phash, recipient, recipientFriends);
 

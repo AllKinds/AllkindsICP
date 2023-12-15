@@ -217,6 +217,8 @@ actor {
   public shared query ({ caller }) func getFriends() : async ResultFriends {
     let userFriends = Friend.get(db.friends, caller);
 
+    let friends = Iter.toArray(Friend.get(db.friends, caller));
+
     func toUserMatch((p : Principal, status : FriendStatus)) : ?(UserMatch, FriendStatus) {
       let showNonPublic = (status == #connected or status == #requestReceived);
       let #ok(userMatch) = Matching.getUserMatch(db.users, db.questions, db.answers, db.skips, caller, p, showNonPublic) else return null;
@@ -235,15 +237,15 @@ actor {
   /// Send a friend request to a user
   public shared ({ caller }) func sendFriendRequest(username : Text) : async Result<()> {
     let ?id = User.getPrincipal(db.users, username) else return #err(#userNotFound);
-    Friend.request(db.friends, caller, id);
+    Friend.request(db.friends, caller, id, true);
   };
 
   public shared ({ caller }) func answerFriendRequest(username : Text, accept : Bool) : async Result<()> {
     let ?id = User.getPrincipal(db.users, username) else return #err(#userNotFound);
     if (accept) {
-      Friend.request(db.friends, caller, id);
+      Friend.request(db.friends, caller, id, true);
     } else {
-      Friend.reject(db.friends, caller, id);
+      Friend.request(db.friends, caller, id, false);
     };
   };
 
