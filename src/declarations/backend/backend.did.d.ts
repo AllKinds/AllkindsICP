@@ -12,7 +12,8 @@ export interface AnswerDiff {
   'question' : bigint,
   'sameAnswer' : boolean,
 }
-export type Error = { 'notLoggedIn' : null } |
+export type Error = { 'notInTeam' : null } |
+  { 'notLoggedIn' : null } |
   { 'validationError' : null } |
   { 'userNotFound' : null } |
   { 'tooLong' : null } |
@@ -26,8 +27,7 @@ export type Error = { 'notLoggedIn' : null } |
   { 'notRegistered' : null } |
   { 'invalidColor' : null };
 export type Friend = [UserMatch, FriendStatus];
-export type FriendStatus = { 'requestIgnored' : null } |
-  { 'requestReceived' : null } |
+export type FriendStatus = { 'requestReceived' : null } |
   { 'connected' : null } |
   { 'rejectionSend' : null } |
   { 'rejectionReceived' : null } |
@@ -61,8 +61,6 @@ export type ResultQuestion = { 'ok' : Question } |
 export type ResultSkip = { 'ok' : Skip } |
   { 'err' : Error };
 export type ResultUser = { 'ok' : User } |
-  { 'err' : Error };
-export type ResultUserMatch = { 'ok' : UserMatch } |
   { 'err' : Error };
 export type ResultUserMatches = { 'ok' : Array<UserMatch> } |
   { 'err' : Error };
@@ -111,28 +109,39 @@ export interface UserStats {
 }
 export interface _SERVICE {
   'airdrop' : ActorMethod<[string, bigint], Result>,
-  'answerFriendRequest' : ActorMethod<[string, boolean], Result>,
-  'backupAnswers' : ActorMethod<[bigint, bigint], Array<StableQuestion>>,
+  'answerFriendRequest' : ActorMethod<[string, string, boolean], Result>,
+  'backupAnswers' : ActorMethod<
+    [string, bigint, bigint],
+    Array<StableQuestion>
+  >,
   'backupConnections' : ActorMethod<
-    [bigint, bigint],
+    [string, bigint, bigint],
     Array<[Principal, Principal, FriendStatus]>
   >,
-  'backupQuestions' : ActorMethod<[bigint, bigint], Array<StableQuestion>>,
+  'backupQuestions' : ActorMethod<
+    [string, bigint, bigint],
+    Array<StableQuestion>
+  >,
   'backupUsers' : ActorMethod<[bigint, bigint], Array<[Principal, User]>>,
-  'createQuestion' : ActorMethod<[string, string], ResultQuestion>,
-  'createTestData' : ActorMethod<[bigint, bigint], undefined>,
+  'createQuestion' : ActorMethod<[string, string, string], ResultQuestion>,
+  'createTestData' : ActorMethod<[string, bigint, bigint], bigint>,
   'createUser' : ActorMethod<[string, string], ResultUser>,
-  'findMatch' : ActorMethod<[number], ResultUserMatch>,
-  'getAnsweredQuestions' : ActorMethod<[bigint], Array<[Question, Answer]>>,
-  'getFriends' : ActorMethod<[], ResultFriends>,
-  'getMatches' : ActorMethod<[], ResultUserMatches>,
-  'getOwnQuestions' : ActorMethod<[bigint], Array<Question>>,
-  'getUnansweredQuestions' : ActorMethod<[bigint], Array<Question>>,
+  'getAnsweredQuestions' : ActorMethod<
+    [string, bigint],
+    Array<[Question, Answer]>
+  >,
+  'getFriends' : ActorMethod<[string], ResultFriends>,
+  'getMatches' : ActorMethod<[string], ResultUserMatches>,
+  'getOwnQuestions' : ActorMethod<[string, bigint], Array<Question>>,
+  'getUnansweredQuestions' : ActorMethod<[string, bigint], Array<Question>>,
   'getUser' : ActorMethod<[], ResultUser>,
   'selfDestruct' : ActorMethod<[string], undefined>,
-  'sendFriendRequest' : ActorMethod<[string], Result>,
-  'submitAnswer' : ActorMethod<[QuestionID, boolean, bigint], ResultAnswer>,
-  'submitSkip' : ActorMethod<[bigint], ResultSkip>,
+  'sendFriendRequest' : ActorMethod<[string, string], Result>,
+  'submitAnswer' : ActorMethod<
+    [string, QuestionID, boolean, bigint],
+    ResultAnswer
+  >,
+  'submitSkip' : ActorMethod<[string, bigint], ResultSkip>,
   'updateProfile' : ActorMethod<[User], ResultUser>,
   'whoami' : ActorMethod<[], Principal>,
 }

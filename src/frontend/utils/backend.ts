@@ -9,7 +9,6 @@ import { FriendStatus } from "./backend";
 type BackendEffect<T> = Effect.Effect<never, BackendError, T>
 export type FrontendEffect<T> = Effect.Effect<never, FrontendError, T>
 
-
 export const resultToEffect = <T>(result: { err: BackendError } | { ok: T }): BackendEffect<T> => {
     if ("err" in result) {
         return Effect.fail(result.err);
@@ -36,48 +35,48 @@ const effectifyResult = <T>(fn: (actor: BackendActor) => Promise<{ ok: T } | { e
     })
 }
 
-export const loadQuestions = (): FrontendEffect<Question[]> => {
+export const loadQuestions = (team: string): FrontendEffect<Question[]> => {
     const limit = BigInt(20);
-    return effectify((actor) => actor.getUnansweredQuestions(limit))
+    return effectify((actor) => actor.getUnansweredQuestions(team, limit))
 }
 
-export const getAnsweredQuestions = (): FrontendEffect<[Question, Answer][]> => {
+export const getAnsweredQuestions = (team: string): FrontendEffect<[Question, Answer][]> => {
     const limit = BigInt(200);
-    return effectify((actor) => actor.getAnsweredQuestions(limit))
+    return effectify((actor) => actor.getAnsweredQuestions(team, limit))
 }
 
-export const getOwnQuestions = (): FrontendEffect<Question[]> => {
+export const getOwnQuestions = (team: string): FrontendEffect<Question[]> => {
     const limit = BigInt(200);
-    return effectify((actor) => actor.getOwnQuestions(limit))
+    return effectify((actor) => actor.getOwnQuestions(team, limit))
 }
 
 export const loadUser = (): FrontendEffect<User> => {
     return effectifyResult((actor) => actor.getUser())
 }
 
-export const createQuestion = (q: string, c: ColorName): FrontendEffect<void> => {
-    return effectifyResult((actor) => actor.createQuestion(q, c))
+export const createQuestion = (team: string, q: string, c: ColorName): FrontendEffect<void> => {
+    return effectifyResult((actor) => actor.createQuestion(team, q, c))
 }
 
 export const createUser = (name: string, contact: string): FrontendEffect<void> => {
     return effectifyResult((actor) => actor.createUser(name, contact))
 }
 
-export const answerQuestion = (q: BigInt, a: boolean, boost: number): FrontendEffect<Answer> => {
-    return effectifyResult((actor) => actor.submitAnswer(q.valueOf(), a, BigInt(boost)));
+export const answerQuestion = (team: string, q: BigInt, a: boolean, boost: number): FrontendEffect<Answer> => {
+    return effectifyResult((actor) => actor.submitAnswer(team, q.valueOf(), a, BigInt(boost)));
 }
 
-export const skipQuestion = (q: BigInt): FrontendEffect<Skip> => {
-    return effectifyResult((actor) => actor.submitSkip(q.valueOf()));
+export const skipQuestion = (team: string, q: BigInt): FrontendEffect<Skip> => {
+    return effectifyResult((actor) => actor.submitSkip(team, q.valueOf()));
 }
 
-export const loadFriends = (): FrontendEffect<Friend[]> => {
+export const loadFriends = (team: string): FrontendEffect<Friend[]> => {
     console.log("loadFriends requested");
-    return effectifyResult((actor) => actor.getFriends())
+    return effectifyResult((actor) => actor.getFriends(team))
 }
 
-export const loadMatches = (): FrontendEffect<UserMatch[]> => {
-    return effectifyResult((actor) => actor.getMatches())
+export const loadMatches = (team: string): FrontendEffect<UserMatch[]> => {
+    return effectifyResult((actor) => actor.getMatches(team))
 }
 
 export type FriendStatusKey = "requestSend"
@@ -136,10 +135,10 @@ export const canSendRemoveFriendRequest = (status: FriendStatus): boolean => {
 
 
 
-export const sendFriendRequest = (username: string): FrontendEffect<void> => {
-    return effectifyResult((actor) => actor.sendFriendRequest(username))
+export const sendFriendRequest = (team: string, username: string): FrontendEffect<void> => {
+    return effectifyResult((actor) => actor.sendFriendRequest(team, username))
 }
 
-export const answerFriendRequest = (username: string, accept: boolean): FrontendEffect<void> => {
-    return effectifyResult((actor) => actor.answerFriendRequest(username, accept))
+export const answerFriendRequest = (team: string, username: string, accept: boolean): FrontendEffect<void> => {
+    return effectifyResult((actor) => actor.answerFriendRequest(team, username, accept))
 }

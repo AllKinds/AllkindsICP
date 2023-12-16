@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { User, UserMatch } from '~/utils/backend';
+import { UserMatch } from '../../utils/backend';
 
 
 const route = useRoute();

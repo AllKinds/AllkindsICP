@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { Effect, pipe } from "effect";
-import { FrontendError, ErrorKey, formErr } from "~/utils/errors";
-import * as backend from "~/utils/backend";
+import { FrontendError, formErr } from "../utils/errors";
+import * as backend from "../utils/backend";
 
 definePageMeta({ title: "Personal handle" });
 const username = useState("username", () => "");

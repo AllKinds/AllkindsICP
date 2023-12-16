@@ -1,7 +1,6 @@
 <script lang="ts" setup>
-import { Effect } from "effect";
-import { Question } from "~/utils/backend";
-import { ColorName, getColor } from "~/utils/color";
+import { ColorName, getColor } from "../../utils/color";
+import { Question } from "../../utils/backend";
 
 const route = useRoute();
 const question = useState('new-question', () => "")
@@ -12,23 +11,25 @@ const weight = useState('weight', () => 1)
 weight.value = 1;
 let gotoNextQuestion = false;
 
+// TODO: move to app
 const answer = (question: Question, a: boolean, boost: number) => {
     console.log("answering question ", question, a, boost)
     app.removeQuestion(question)
     gotoNextQuestion = true;
-    runNotify(answerQuestion(question.id.valueOf(), a, boost), "Answer saved").then(
+    runNotify(answerQuestion(app.team, question.id.valueOf(), a, boost), "Answer saved").then(
         () => { app.loadQuestions() }
     ).catch(
         () => { app.loadQuestions() }
     );
 }
 
+// TODO: move to app
 const skip = (question: Question) => {
     console.log('skipping', question)
     app.removeQuestion(question)
     gotoNextQuestion = true;
     runNotify(
-        skipQuestion(question.id), "Question skipped"
+        skipQuestion(app.team, question.id), "Question skipped"
     ).then(
         () => { app.loadQuestions() },
     ).catch(

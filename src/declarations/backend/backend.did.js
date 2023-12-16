@@ -1,5 +1,6 @@
 export const idlFactory = ({ IDL }) => {
   const Error = IDL.Variant({
+    'notInTeam' : IDL.Null,
     'notLoggedIn' : IDL.Null,
     'validationError' : IDL.Null,
     'userNotFound' : IDL.Null,
@@ -26,7 +27,6 @@ export const idlFactory = ({ IDL }) => {
     'points' : IDL.Int,
   });
   const FriendStatus = IDL.Variant({
-    'requestIgnored' : IDL.Null,
     'requestReceived' : IDL.Null,
     'connected' : IDL.Null,
     'rejectionSend' : IDL.Null,
@@ -59,6 +59,12 @@ export const idlFactory = ({ IDL }) => {
   });
   const ResultQuestion = IDL.Variant({ 'ok' : Question, 'err' : Error });
   const ResultUser = IDL.Variant({ 'ok' : User, 'err' : Error });
+  const Answer = IDL.Record({
+    'weight' : IDL.Nat,
+    'created' : Time__1,
+    'question' : IDL.Nat,
+    'answer' : IDL.Bool,
+  });
   const Question__1 = IDL.Record({
     'id' : QuestionID__1,
     'created' : Time__1,
@@ -85,13 +91,6 @@ export const idlFactory = ({ IDL }) => {
     'user' : UserInfo,
     'uncommon' : IDL.Vec(Question__1),
   });
-  const ResultUserMatch = IDL.Variant({ 'ok' : UserMatch, 'err' : Error });
-  const Answer = IDL.Record({
-    'weight' : IDL.Nat,
-    'created' : Time__1,
-    'question' : IDL.Nat,
-    'answer' : IDL.Bool,
-  });
   const Friend = IDL.Tuple(UserMatch, FriendStatus);
   const ResultFriends = IDL.Variant({ 'ok' : IDL.Vec(Friend), 'err' : Error });
   const ResultUserMatches = IDL.Variant({
@@ -107,19 +106,23 @@ export const idlFactory = ({ IDL }) => {
   const ResultSkip = IDL.Variant({ 'ok' : Skip, 'err' : Error });
   return IDL.Service({
     'airdrop' : IDL.Func([IDL.Text, IDL.Int], [Result], []),
-    'answerFriendRequest' : IDL.Func([IDL.Text, IDL.Bool], [Result], []),
+    'answerFriendRequest' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Bool],
+        [Result],
+        [],
+      ),
     'backupAnswers' : IDL.Func(
-        [IDL.Nat, IDL.Nat],
+        [IDL.Text, IDL.Nat, IDL.Nat],
         [IDL.Vec(StableQuestion)],
         ['query'],
       ),
     'backupConnections' : IDL.Func(
-        [IDL.Nat, IDL.Nat],
+        [IDL.Text, IDL.Nat, IDL.Nat],
         [IDL.Vec(IDL.Tuple(IDL.Principal, IDL.Principal, FriendStatus))],
         ['query'],
       ),
     'backupQuestions' : IDL.Func(
-        [IDL.Nat, IDL.Nat],
+        [IDL.Text, IDL.Nat, IDL.Nat],
         [IDL.Vec(StableQuestion)],
         ['query'],
       ),
@@ -128,32 +131,39 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(IDL.Tuple(IDL.Principal, User))],
         ['query'],
       ),
-    'createQuestion' : IDL.Func([IDL.Text, IDL.Text], [ResultQuestion], []),
-    'createTestData' : IDL.Func([IDL.Nat, IDL.Nat], [], []),
+    'createQuestion' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text],
+        [ResultQuestion],
+        [],
+      ),
+    'createTestData' : IDL.Func([IDL.Text, IDL.Nat, IDL.Nat], [IDL.Nat], []),
     'createUser' : IDL.Func([IDL.Text, IDL.Text], [ResultUser], []),
-    'findMatch' : IDL.Func([IDL.Nat8], [ResultUserMatch], []),
     'getAnsweredQuestions' : IDL.Func(
-        [IDL.Nat],
+        [IDL.Text, IDL.Nat],
         [IDL.Vec(IDL.Tuple(Question, Answer))],
         ['query'],
       ),
-    'getFriends' : IDL.Func([], [ResultFriends], ['query']),
-    'getMatches' : IDL.Func([], [ResultUserMatches], ['query']),
-    'getOwnQuestions' : IDL.Func([IDL.Nat], [IDL.Vec(Question)], ['query']),
+    'getFriends' : IDL.Func([IDL.Text], [ResultFriends], ['query']),
+    'getMatches' : IDL.Func([IDL.Text], [ResultUserMatches], ['query']),
+    'getOwnQuestions' : IDL.Func(
+        [IDL.Text, IDL.Nat],
+        [IDL.Vec(Question)],
+        ['query'],
+      ),
     'getUnansweredQuestions' : IDL.Func(
-        [IDL.Nat],
+        [IDL.Text, IDL.Nat],
         [IDL.Vec(Question)],
         ['query'],
       ),
     'getUser' : IDL.Func([], [ResultUser], ['query']),
     'selfDestruct' : IDL.Func([IDL.Text], [], ['oneway']),
-    'sendFriendRequest' : IDL.Func([IDL.Text], [Result], []),
+    'sendFriendRequest' : IDL.Func([IDL.Text, IDL.Text], [Result], []),
     'submitAnswer' : IDL.Func(
-        [QuestionID, IDL.Bool, IDL.Nat],
+        [IDL.Text, QuestionID, IDL.Bool, IDL.Nat],
         [ResultAnswer],
         [],
       ),
-    'submitSkip' : IDL.Func([IDL.Nat], [ResultSkip], []),
+    'submitSkip' : IDL.Func([IDL.Text, IDL.Nat], [ResultSkip], []),
     'updateProfile' : IDL.Func([User], [ResultUser], []),
     'whoami' : IDL.Func([], [IDL.Principal], ['query']),
   });

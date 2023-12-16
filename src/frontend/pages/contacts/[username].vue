@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { FriendStatus, User, UserMatch } from '~/utils/backend';
+import { FriendStatus, UserMatch } from '../../utils/backend';
 
 
 const route = useRoute();

@@ -4,9 +4,11 @@ import * as backend from "~/utils/backend";
 import { FrontendError, notifyWithMsg } from "~/utils/errors";
 import { defineStore } from 'pinia'
 import * as errors from "~/utils/errors";
+import { string } from "effect/dist/declarations/src/Equivalence";
 
 export type AppState = {
     user: NetworkData<User>,
+    team: string,
     openQuestions: NetworkData<Question[]>,
     answeredQuestions: NetworkData<Question[]>,
     ownQuestions: NetworkData<Question[]>,
@@ -129,6 +131,7 @@ const combineNetworkData = <A>(old: NetworkData<A>, newer: NetworkData<A>): Netw
 
 const defaultAppState: AppState = {
     user: dataInit,
+    team: "global",
     openQuestions: dataInit,
     answeredQuestions: dataInit,
     ownQuestions: dataInit,
@@ -162,7 +165,7 @@ export const useAppState = defineStore({
         loadQuestions(maxAgeS?: number, msg?: string) {
             if (shouldUpdate(this.openQuestions, maxAgeS)) {
                 const old = this.getOpenQuestions();
-                runStoreNotify(old, backend.loadQuestions(), this.setOpenQuestions, msg)
+                runStoreNotify(old, backend.loadQuestions(this.team), this.setOpenQuestions, msg)
             }
         },
         getAnsweredQuestions(): NetworkData<[Question, Answer][]> {
@@ -176,7 +179,7 @@ export const useAppState = defineStore({
         loadAnsweredQuestions(maxAgeS?: number): void {
             if (shouldUpdate(this.answeredQuestions, maxAgeS)) {
                 const old = this.getAnsweredQuestions();
-                runStoreNotify(old, backend.getAnsweredQuestions(), this.setAnsweredQuestions)
+                runStoreNotify(old, backend.getAnsweredQuestions(this.team), this.setAnsweredQuestions)
             }
         },
         getOwnQuestions(): NetworkData<Question[]> {
@@ -189,7 +192,7 @@ export const useAppState = defineStore({
         loadOwnQuestions(maxAgeS?: number): void {
             if (shouldUpdate(this.ownQuestions, maxAgeS)) {
                 const old = this.getOwnQuestions();
-                runStoreNotify(old, backend.getOwnQuestions(), this.setOwnQuestions)
+                runStoreNotify(old, backend.getOwnQuestions(this.team), this.setOwnQuestions)
             }
         },
         getUser() {
@@ -221,7 +224,7 @@ export const useAppState = defineStore({
         },
         loadFriends(maxAgeS?: number) {
             if (shouldUpdate(this.friends, maxAgeS)) {
-                runStore(this.friends, backend.loadFriends(), this.setFriends)
+                runStore(this.friends, backend.loadFriends(this.team), this.setFriends)
                     .catch(console.error);
             }
         },
@@ -234,15 +237,15 @@ export const useAppState = defineStore({
         },
         loadMatches() {
             if (shouldUpdate(this.matches)) {
-                runStore(this.matches, backend.loadMatches(), this.setMatches)
+                runStore(this.matches, backend.loadMatches(this.team), this.setMatches)
                     .catch(console.error);
             }
         },
         sendFriendRequest(username: string): Promise<void> {
-            return runNotify(backend.sendFriendRequest(username), "Friend request send")
+            return runNotify(backend.sendFriendRequest(this.team, username), "Friend request send")
         },
         answerFriendRequest(username: string, accept: boolean): Promise<void> {
-            return runNotify(backend.answerFriendRequest(username, accept), accept ? "Friend request accepted" : "Friend request rejected")
+            return runNotify(backend.answerFriendRequest(this.team, username, accept), accept ? "Friend request accepted" : "Friend request rejected")
         },
     },
 });
