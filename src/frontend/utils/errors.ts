@@ -9,6 +9,7 @@ export type ErrorKey =
     | "validationError"
     | "userNotFound"
     | "tooLong"
+    | "notInTeam"
     | "insufficientFunds"
     | "notEnoughAnswers"
     | "tooShort"

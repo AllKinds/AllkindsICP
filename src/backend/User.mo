@@ -8,6 +8,7 @@ import Configuration "Configuration";
 import Char "mo:base/Char";
 import Text "mo:base/Text";
 import Map "mo:map/Map";
+import Set "mo:map/Set";
 import Int "mo:base/Int";
 import Error "Error";
 import Iter "mo:base/Iter";
@@ -27,6 +28,7 @@ module {
   type Map<K, V> = Map.Map<K, V>;
   type Result<T, E> = Result.Result<T, E>;
   type Iter<T> = Iter.Iter<T>;
+  type Set<T> = Set.Set<T>;
   let { thash; phash } = Map;
 
   type Error = Error.Error;
@@ -146,7 +148,20 @@ module {
     #ok(newUser);
   };
 
-  public func find(users : UserDB) : Iter<(Principal, User)> {
+  public func find(users : UserDB, teamMembers : Set<Principal>) : Iter<(Principal, User)> {
+    let principals = Set.keys(teamMembers);
+    let iter = {
+      next = func() : ?(Principal, User) {
+        let ?p = principals.next() else return null;
+        let ?u = Map.get(users.info, phash, p) else {
+          // This should never happen and would likely be caused by a bug
+          // in team member management (add non registered member) or in
+          // user deletion (delete from users, but not from members)
+          Debug.trap("Principal in teamMembers but not in users.");
+        };
+        return ?(p, u);
+      };
+    };
     Map.entries(users.info);
   };
 
