@@ -1,34 +1,13 @@
 <script lang="ts" setup>
 definePageMeta({ title: "Project design" });
 
-import { loadQuestions, createQuestion } from "~/utils/backend"
-import { getColor } from "~/utils/color"
-
-const question = useState('new-question', () => "")
 const app = useAppState();
-const loading = useState("loading", () => false);
-
-
-async function create() {
-    loading.value = true;
-    const q = question.value;
-
-    await runNotify(createQuestion(app.team, q, "black"), "Question created successfully.").then(
-        () => {
-            question.value = "";
-            loading.value = false;
-            app.loadQuestions(0);
-        }
-    );
-}
 
 if (inBrowser()) {
     app.getTeam();
     app.loadQuestions(0);
     app.loadUser();
     app.loadTeams();
-} else {
-    //app.openQuestions.status = "init";
 }
 </script>
 

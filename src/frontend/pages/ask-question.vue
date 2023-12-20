@@ -8,9 +8,6 @@ const loading = useState("loading", () => false);
 const color = useState<ColorName>('color', () => "green")
 const weight = useState('weight', () => 1)
 
-async function loadQs() {
-    app.loadQuestions(0)
-}
 
 // TODO: move to app
 async function create() {
@@ -20,7 +17,7 @@ async function create() {
         () => {
             question.value = "";
             loading.value = false;
-            return loadQs();
+            app.loadQuestions(0);
         }
     );
 }

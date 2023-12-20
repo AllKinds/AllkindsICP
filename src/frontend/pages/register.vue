@@ -42,7 +42,7 @@ const checkUser = () => {
 }
 
 if (inBrowser()) {
-    app.loadUser(false)
+    app.loadUser(0, false)
 }
 
 
