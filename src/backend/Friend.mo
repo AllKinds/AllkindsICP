@@ -19,7 +19,7 @@ module {
 
   let { phash } = Map;
 
-  public func emptyDB() : FriendDB = Map.new<Principal, UserFriends>(phash);
+  public func emptyDB() : FriendDB = Map.new<Principal, UserFriends>();
 
   public type FriendStatus = {
     #requestSend;
@@ -123,7 +123,7 @@ module {
   func getFriends(friends : FriendDB, user : Principal) : UserFriends {
     Option.get(
       Map.get(friends, phash, user),
-      Map.new<Principal, FriendStatus>(phash),
+      Map.new<Principal, FriendStatus>(),
     );
   };
 

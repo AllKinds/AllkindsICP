@@ -48,6 +48,8 @@ actor {
   type FriendStatus = Friend.FriendStatus;
   type Error = Error.Error;
   type Team = Team.Team;
+  type TeamInfo = Team.TeamInfo;
+  type TeamUserInfo = Team.TeamUserInfo;
 
   type MatchingFilter = Matching.MatchingFilter;
   type UserMatch = Matching.UserMatch;
@@ -63,7 +65,8 @@ actor {
   type ResultUserMatches = Result<[UserMatch]>;
   type Friend = (UserMatch, FriendStatus);
   type ResultFriends = Result<[Friend]>;
-  type ResultTeam = Result<Team>;
+  type ResultTeam = Result<TeamInfo>;
+  type ResultTeams = Result<[TeamUserInfo]>;
 
   // UTILITY FUNCTIONS
 
@@ -99,16 +102,39 @@ actor {
     // transfer data from old db version
     //migrate_DBv1_v2()
     // Cleanup old stable data
+    db_v1 := {
+      users = User.emptyDB();
+      teams = Team.emptyDB();
+    };
   };
 
   // PUBLIC API
+
+  // Get own principal
   public query ({ caller }) func whoami() : async Principal {
     caller;
+  };
+
+  // Create default new team
+  public shared ({ caller }) func createTeam(teamKey : Text, invite : Text, info : TeamInfo) : async ResultTeam {
+    assertAdmin(caller); // Only controller of the canister can create new teams for now
+
+    Team.create(db.teams, teamKey, invite, info, caller);
+  };
+
+  public shared ({ caller }) func joinTeam(teamKey : Text, invite : Text) : async ResultTeam {
+    Team.addMember(db.teams, teamKey, invite, caller);
+  };
+
+  // Get teams
+  public shared query ({ caller }) func listTeams(known : [Text]) : async ResultTeams {
+    Team.list(db.teams, caller, known);
   };
 
   // Create default new user with only a username
   public shared ({ caller }) func createUser(displayName : Text, contact : Text) : async ResultUser {
     User.add(db.users, displayName, contact, caller);
+
   };
 
   public shared query ({ caller }) func getUser() : async ResultUser {
@@ -376,10 +402,6 @@ actor {
 
     db_v1 := {
       users = User.emptyDB();
-      questions = Question.emptyDB();
-      answers = Question.emptyAnswerDB();
-      skips = Question.emptySkipDB();
-      friends = Friend.emptyDB();
       teams = Team.emptyDB();
     };
     db := db_v1;

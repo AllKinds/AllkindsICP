@@ -35,6 +35,26 @@ type User =
  };
 type Time__1 = int;
 type Time = int;
+type TeamUserInfo = 
+ record {
+   info: TeamInfo;
+   key: text;
+   permissions: Permissions;
+ };
+type TeamInfo__1 = 
+ record {
+   about: text;
+   listed: bool;
+   logo: blob;
+   name: text;
+ };
+type TeamInfo = 
+ record {
+   about: text;
+   listed: bool;
+   logo: blob;
+   name: text;
+ };
 type StableQuestion = 
  record {
    color: text;
@@ -61,6 +81,16 @@ type ResultUser =
  variant {
    err: Error;
    ok: User;
+ };
+type ResultTeams = 
+ variant {
+   err: Error;
+   ok: vec TeamUserInfo;
+ };
+type ResultTeam = 
+ variant {
+   err: Error;
+   ok: TeamInfo__1;
  };
 type ResultSkip = 
  variant {
@@ -107,6 +137,11 @@ type Question =
    points: int;
    question: text;
  };
+type Permissions = 
+ record {
+   isAdmin: bool;
+   isMember: bool;
+ };
 type FriendStatus = 
  variant {
    connected;
@@ -127,11 +162,13 @@ type Error =
    friendRequestAlreadySend;
    insufficientFunds;
    invalidColor;
+   invalidInvite;
    nameNotAvailable;
    notEnoughAnswers;
    notInTeam;
    notLoggedIn;
    notRegistered;
+   teamNotFound;
    tooLong;
    tooShort;
    userNotFound;
@@ -166,6 +203,7 @@ service : {
                                     User;
                                   }) query;
   createQuestion: (text, text, text) -> (ResultQuestion);
+  createTeam: (text, text, TeamInfo__1) -> (ResultTeam);
   createTestData: (text, nat, nat) -> (nat);
   createUser: (text, text) -> (ResultUser);
   getAnsweredQuestions: (text, nat) -> (vec record {
@@ -177,6 +215,8 @@ service : {
   getOwnQuestions: (text, nat) -> (vec Question) query;
   getUnansweredQuestions: (text, nat) -> (vec Question) query;
   getUser: () -> (ResultUser) query;
+  joinTeam: (text, text) -> (ResultTeam);
+  listTeams: (vec text) -> (ResultTeams) query;
   selfDestruct: (text) -> () oneway;
   sendFriendRequest: (text, text) -> (Result);
   submitAnswer: (text, QuestionID, bool, nat) -> (ResultAnswer);

@@ -13,7 +13,7 @@ async function create() {
     loading.value = true;
     const q = question.value;
 
-    await runNotify(createQuestion(q, "black"), "Question created successfully.").then(
+    await runNotify(createQuestion(app.team, q, "black"), "Question created successfully.").then(
         () => {
             question.value = "";
             loading.value = false;
@@ -23,8 +23,10 @@ async function create() {
 }
 
 if (inBrowser()) {
-    app.loadQuestions();
-    app.loadUser()
+    app.getTeam();
+    app.loadQuestions(0);
+    app.loadUser();
+    app.loadTeams();
 } else {
     //app.openQuestions.status = "init";
 }
@@ -32,7 +34,8 @@ if (inBrowser()) {
 
 
 <template>
-    <AllkindsTitle>
+    <AllkindsTitle link-to="/welcome">
+        {{ app.checkTeam() }}
         <NuxtLink to="/my-profile" class="m-auto">
             {{ app.getUser().displayName }}, {{ app.getUser().stats.points }}
             <Icon name="gg:shape-hexagon" class="mb-2" />

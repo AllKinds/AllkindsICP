@@ -1,0 +1,54 @@
+<script lang="ts" setup>
+
+definePageMeta({ title: "Welcome" });
+const app = useAppState();
+const invite = useState("invite-code", () => "");
+
+if (inBrowser()) {
+    app.loadTeams(0)
+}
+
+const getTeam = () => app.getTeam();
+
+const join = () => {
+    app.joinTeam(invite.value).then(() => { navigateTo("/questions") });
+}
+
+</script>
+
+<template>
+    <AllkindsTitle>Welcome</AllkindsTitle>
+    <TextBlock>
+        <h1>Welcome</h1>
+    </TextBlock>
+
+    <NetworkDataContainer :networkdata="app.getTeams()" class="w-full flex-grow flex flex-col">
+        <div class="w-full text-center mb-8 text-lg">
+            Enter invite code for <span class="font-bold">{{ getTeam()?.info.name }} ({{ app.team }})</span>
+        </div>
+
+        <div class="p-4 rounded-lg my-2 w-full">
+
+            <div class="text-xl">
+                {{ getTeam()?.info.name }}
+            </div>
+            <p>
+                {{ getTeam()?.info.about }}
+            </p>
+
+        </div>
+
+        <div class="w-2 flex-grow"></div>
+
+        <div class="text-center w-full">
+            <TextInput v-model.trim="invite" placeholder="invite-code" class="text-center" />
+
+        </div>
+        <div class="w-2 flex-grow"></div>
+
+        <div class="text-center w-full">
+            <Btn @click="join()">Join the team</Btn>
+        </div>
+        <div class="w-2 flex-grow"></div>
+    </NetworkDataContainer>
+</template>

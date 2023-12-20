@@ -46,8 +46,8 @@ module {
   };
 
   public func emptyDB() : UserDB = {
-    info = Map.new<Principal, User>(phash);
-    byUsername = Map.new<Text, Principal>(thash);
+    info = Map.new<Principal, User>();
+    byUsername = Map.new<Text, Principal>();
   };
 
   public func backup(users : UserDB) : Iter<(Principal, User)> {

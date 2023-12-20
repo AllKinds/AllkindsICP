@@ -3,7 +3,7 @@ export type * from "~~/src/declarations/backend/backend.did";
 export type BackendActor = typeof backend;
 import { Effect } from "effect";
 import { BackendError, FrontendError, toBackendError, toNetworkError } from "~/utils/errors";
-import { Question, Answer, Skip, User, Friend, UserMatch } from "./backend";
+import { Question, Answer, Skip, User, Friend, UserMatch, TeamUserInfo } from "./backend";
 import { FriendStatus } from "./backend";
 
 type BackendEffect<T> = Effect.Effect<never, BackendError, T>
@@ -79,6 +79,10 @@ export const loadMatches = (team: string): FrontendEffect<UserMatch[]> => {
     return effectifyResult((actor) => actor.getMatches(team))
 }
 
+export const loadTeams = (known: string[]): FrontendEffect<TeamUserInfo[]> => {
+    return effectifyResult((actor) => actor.listTeams(known))
+}
+
 export type FriendStatusKey = "requestSend"
     | "requestReceived"
     | "connected"
@@ -142,3 +146,9 @@ export const sendFriendRequest = (team: string, username: string): FrontendEffec
 export const answerFriendRequest = (team: string, username: string, accept: boolean): FrontendEffect<void> => {
     return effectifyResult((actor) => actor.answerFriendRequest(team, username, accept))
 }
+
+export const joinTeam = (team: string, code: string): FrontendEffect<void> => {
+    return effectifyResult((actor) => actor.joinTeam(team, code))
+}
+
+

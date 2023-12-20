@@ -127,7 +127,7 @@ const twColor = () => getColor(q().color as ColorName).color;
             <Btn width="w-32" @click="answer(q(), true, weight)">Yes</Btn>
         </div>
         <div class="flex flex-row place-content-evenly">
-            <NuxtLink width="w-72 link" @click="skip(q())">Skip</NuxtLink>
+            <NuxtLink width="w-72 link cursor-pointer" @click="skip(q())">Skip</NuxtLink>
         </div>
     </div>
     <div class="grow w-full rounded-b-xl" :class="twColor()" />

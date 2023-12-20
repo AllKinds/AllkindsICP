@@ -15,7 +15,7 @@ People spend too much time on social media and dating services, yet they only es
 
 Allkinds is a web3 protocol that empowers individuals and organizations to create comprehensive meta profiles encompassing their values, traits, interests, and more. By comparing these meta profiles with others, Allkinds enables users to discover precisely aligned like-minded individuals or organizations.
 
-## Installation for testing out locally
+## Local deployment for testing
 
 II included for faster local authentication testing
 
@@ -33,7 +33,7 @@ mocv use 0.10.2
 # start local testnet
 dfx start --clean --background
 
-# 
+# get the code
 git clone https://github.com/AllKinds/AllkindsICP && cd AllkindsICP
 npm install
 # deploy the canister locally
@@ -43,11 +43,14 @@ dfx deploy
 You can also run the local dev server or generate some test data:
 
 ```bash
+# create a team
+dfx canister call backend createTeam '("sandbox", "test-invite-code", record {about="Temporary test data"; logo=vec {}; name="Test data"; listed=false})'
+dfx canister call backend joinTeam '("sandbox", "test-invite-code")'
+# create 20 questions and 30 users
+dfx canister call backend createTestData '("sandbox", 20, 30)'
+
 # run local server for frontend development
 npm run dev
-
-# create 15 questions and 30 users
-dfx canister call backend createTestData "(15, 30)"
 ```
 
 ## License

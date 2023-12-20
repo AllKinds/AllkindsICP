@@ -10,6 +10,8 @@ export type ErrorKey =
     | "userNotFound"
     | "tooLong"
     | "notInTeam"
+    | "invalidInvite"
+    | "teamNotFound"
     | "insufficientFunds"
     | "notEnoughAnswers"
     | "tooShort"

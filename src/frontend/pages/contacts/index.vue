@@ -7,6 +7,7 @@ const app = useAppState();
 
 
 if (inBrowser()) {
+    app.getTeam();
     app.loadUser();
     app.loadFriends(0);
 }

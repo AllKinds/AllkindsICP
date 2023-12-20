@@ -5,7 +5,10 @@ module {
     #validationError;
     #notRegistered;
     #notLoggedIn;
+
     #notInTeam;
+    #teamNotFound;
+    #invalidInvite;
 
     #userNotFound;
     #friendRequestAlreadySend;

@@ -1,19 +1,22 @@
 import { Effect, pipe } from "effect";
-import { FrontendEffect, Question, Answer, User, Friend, UserMatch } from "~/utils/backend";
+import { FrontendEffect, Question, Answer, User, Friend, UserMatch, TeamInfo, TeamUserInfo } from "~/utils/backend";
 import * as backend from "~/utils/backend";
 import { FrontendError, notifyWithMsg } from "~/utils/errors";
 import { defineStore } from 'pinia'
 import * as errors from "~/utils/errors";
 import { string } from "effect/dist/declarations/src/Equivalence";
+import { forEach } from "effect/dist/declarations/src/Chunk";
 
 export type AppState = {
     user: NetworkData<User>,
     team: string,
+    knownTeams: string[],
     openQuestions: NetworkData<Question[]>,
     answeredQuestions: NetworkData<Question[]>,
     ownQuestions: NetworkData<Question[]>,
     friends: NetworkData<Friend[]>,
-    matches: NetworkData<UserMatch[]>
+    matches: NetworkData<UserMatch[]>,
+    teams: NetworkData<TeamUserInfo[]>,
 };
 
 type NotificationLevel = "ok" | "warning" | "error";
@@ -39,10 +42,10 @@ const dataInit: NetworkData<any> = {
 
 type FrontendEffectToEffect<A> = (effect: FrontendEffect<A>) => FrontendEffect<A>;
 
-const setRequested = <A>(old: NetworkData<A>): NetworkData<A> => {
+const setRequested = <A>(old: NetworkData<A>, reset: boolean): NetworkData<A> => {
     return {
         status: "requested",
-        data: undefined,
+        data: reset ? undefined : old.data,
         err: old.err,
         errCount: old.errCount,
     };
@@ -67,15 +70,14 @@ const setErr = <A>(old: NetworkData<A>, err: FrontendError): NetworkData<A> => {
 }
 
 export const storeToData = <A>(old: NetworkData<A>, effect: FrontendEffect<A>, store: (a: NetworkData<A>) => void): FrontendEffect<A> => {
-    store(setRequested(old));
+    store(setRequested(old, false));
     const before = Effect.sync<void>(() => {
         console.log("requesting")
     })
     const after = Effect.mapBoth<FrontendError, A, FrontendError, A>({
         onSuccess: (a) => {
             console.log("request ok")
-            store(setOk(undefined as A));
-            store(setRequested(old));
+            store(setRequested(old, true));
             setTimeout(() => store(setOk(a)));
             return a;
         },
@@ -128,20 +130,30 @@ const combineNetworkData = <A>(old: NetworkData<A>, newer: NetworkData<A>): Netw
     }
 }
 
+export const inBrowser = (fn?: () => unknown): boolean => {
+    if (fn !== undefined) {
+        if (process.client) fn();
+    }
+    return !!process.client
+}
 
-const defaultAppState: AppState = {
-    user: dataInit,
-    team: "global",
-    openQuestions: dataInit,
-    answeredQuestions: dataInit,
-    ownQuestions: dataInit,
-    friends: dataInit,
-    matches: dataInit,
+const defaultAppState: () => AppState = () => {
+    return {
+        user: dataInit,
+        team: "",
+        knownTeams: ["sandbox", "global", ""],
+        openQuestions: dataInit,
+        answeredQuestions: dataInit,
+        ownQuestions: dataInit,
+        friends: dataInit,
+        matches: dataInit,
+        teams: dataInit,
+    }
 };
 
 export const useAppState = defineStore({
     id: 'app',
-    state: (): AppState => defaultAppState,
+    state: (): AppState => defaultAppState(),
     actions: {
         getOpenQuestions(): NetworkData<Question[]> {
             return this.openQuestions as NetworkData<Question[]>; // TODO remove `as ...`
@@ -203,7 +215,7 @@ export const useAppState = defineStore({
         },
         loadUser(orRedirect: boolean = true) {
             if (shouldUpdate(this.user)) {
-                runStore(this.user, backend.loadUser().pipe(Effect.mapError(
+                return runStore(this.user, backend.loadUser().pipe(Effect.mapError(
                     (err) => {
                         if (!orRedirect) return err;
                         if (errors.is(err, "backend", "notRegistered")) navigateTo("/register");
@@ -246,6 +258,51 @@ export const useAppState = defineStore({
         },
         answerFriendRequest(username: string, accept: boolean): Promise<void> {
             return runNotify(backend.answerFriendRequest(this.team, username, accept), accept ? "Friend request accepted" : "Friend request rejected")
+        },
+
+        getTeams() {
+            return this.teams as NetworkData<TeamUserInfo[]>; // TODO remove `as ...`
+        },
+        setTeams(teams: NetworkData<TeamUserInfo[]>): void {
+            const old = this.teams as NetworkData<TeamUserInfo[]>
+            this.teams = { status: "requested", errCount: 0, data: [] };
+            setTimeout(() => this.teams = combineNetworkData(old, teams));
+        },
+        loadTeams(maxAgeS?: number) {
+            if (shouldUpdate(this.teams, maxAgeS)) {
+                runStore(this.teams, backend.loadTeams(this.knownTeams), this.setTeams)
+                    .catch(console.error);
+            }
+        },
+        setTeam(key: string) {
+            if (inBrowser()) {
+                window.localStorage.setItem("team", key);
+            }
+            this.team = key;
+        },
+        getTeam(orRedirect: boolean = true): TeamUserInfo | null {
+            let t = null;
+            this.team = window.localStorage.getItem("team") || "";
+            if (this.teams.status === "ok") {
+                t = this.teams.data?.find((t) => t.key === this.team) || null;
+                if (!orRedirect) {
+                    // don't redirect
+                } else if (!t) {
+                    navigateTo("/welcome");
+                } else if (!t.permissions.isMember) {
+                    navigateTo("/join-team");
+                };
+            }
+            return t;
+        },
+        checkTeam() {
+            const t = this.getTeam(false);
+            if (t && !t.permissions.isMember) {
+                navigateTo("/join-team")
+            }
+        },
+        joinTeam(code: string): Promise<void> {
+            return runNotify(backend.joinTeam(this.team, code), "Welcome to the team!");
         },
     },
 });
@@ -291,11 +348,4 @@ export const addNotification = (level: NotificationLevel, msg: string): void => 
         case "warning": toast.warning(msg); break;
         case "error": toast.error(msg); break;
     }
-}
-
-export const inBrowser = (fn?: () => unknown): boolean => {
-    if (fn !== undefined) {
-        if (process.client) fn();
-    }
-    return !!process.client
 }

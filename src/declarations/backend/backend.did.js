@@ -10,6 +10,8 @@ export const idlFactory = ({ IDL }) => {
     'tooShort' : IDL.Null,
     'friendAlreadyConnected' : IDL.Null,
     'nameNotAvailable' : IDL.Null,
+    'invalidInvite' : IDL.Null,
+    'teamNotFound' : IDL.Null,
     'alreadyRegistered' : IDL.Null,
     'friendRequestAlreadySend' : IDL.Null,
     'notRegistered' : IDL.Null,
@@ -58,6 +60,13 @@ export const idlFactory = ({ IDL }) => {
     'points' : IDL.Int,
   });
   const ResultQuestion = IDL.Variant({ 'ok' : Question, 'err' : Error });
+  const TeamInfo__1 = IDL.Record({
+    'about' : IDL.Text,
+    'logo' : IDL.Vec(IDL.Nat8),
+    'name' : IDL.Text,
+    'listed' : IDL.Bool,
+  });
+  const ResultTeam = IDL.Variant({ 'ok' : TeamInfo__1, 'err' : Error });
   const ResultUser = IDL.Variant({ 'ok' : User, 'err' : Error });
   const Answer = IDL.Record({
     'weight' : IDL.Nat,
@@ -95,6 +104,25 @@ export const idlFactory = ({ IDL }) => {
   const ResultFriends = IDL.Variant({ 'ok' : IDL.Vec(Friend), 'err' : Error });
   const ResultUserMatches = IDL.Variant({
     'ok' : IDL.Vec(UserMatch),
+    'err' : Error,
+  });
+  const Permissions = IDL.Record({
+    'isMember' : IDL.Bool,
+    'isAdmin' : IDL.Bool,
+  });
+  const TeamInfo = IDL.Record({
+    'about' : IDL.Text,
+    'logo' : IDL.Vec(IDL.Nat8),
+    'name' : IDL.Text,
+    'listed' : IDL.Bool,
+  });
+  const TeamUserInfo = IDL.Record({
+    'key' : IDL.Text,
+    'permissions' : Permissions,
+    'info' : TeamInfo,
+  });
+  const ResultTeams = IDL.Variant({
+    'ok' : IDL.Vec(TeamUserInfo),
     'err' : Error,
   });
   const QuestionID = IDL.Nat;
@@ -136,6 +164,11 @@ export const idlFactory = ({ IDL }) => {
         [ResultQuestion],
         [],
       ),
+    'createTeam' : IDL.Func(
+        [IDL.Text, IDL.Text, TeamInfo__1],
+        [ResultTeam],
+        [],
+      ),
     'createTestData' : IDL.Func([IDL.Text, IDL.Nat, IDL.Nat], [IDL.Nat], []),
     'createUser' : IDL.Func([IDL.Text, IDL.Text], [ResultUser], []),
     'getAnsweredQuestions' : IDL.Func(
@@ -156,6 +189,8 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'getUser' : IDL.Func([], [ResultUser], ['query']),
+    'joinTeam' : IDL.Func([IDL.Text, IDL.Text], [ResultTeam], []),
+    'listTeams' : IDL.Func([IDL.Vec(IDL.Text)], [ResultTeams], ['query']),
     'selfDestruct' : IDL.Func([IDL.Text], [], ['oneway']),
     'sendFriendRequest' : IDL.Func([IDL.Text, IDL.Text], [Result], []),
     'submitAnswer' : IDL.Func(

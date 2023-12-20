@@ -22,6 +22,8 @@ export type Error = { 'notInTeam' : null } |
   { 'tooShort' : null } |
   { 'friendAlreadyConnected' : null } |
   { 'nameNotAvailable' : null } |
+  { 'invalidInvite' : null } |
+  { 'teamNotFound' : null } |
   { 'alreadyRegistered' : null } |
   { 'friendRequestAlreadySend' : null } |
   { 'notRegistered' : null } |
@@ -32,6 +34,7 @@ export type FriendStatus = { 'requestReceived' : null } |
   { 'rejectionSend' : null } |
   { 'rejectionReceived' : null } |
   { 'requestSend' : null };
+export interface Permissions { 'isMember' : boolean, 'isAdmin' : boolean }
 export interface Question {
   'id' : QuestionID__1,
   'created' : Time__1,
@@ -60,6 +63,10 @@ export type ResultQuestion = { 'ok' : Question } |
   { 'err' : Error };
 export type ResultSkip = { 'ok' : Skip } |
   { 'err' : Error };
+export type ResultTeam = { 'ok' : TeamInfo__1 } |
+  { 'err' : Error };
+export type ResultTeams = { 'ok' : Array<TeamUserInfo> } |
+  { 'err' : Error };
 export type ResultUser = { 'ok' : User } |
   { 'err' : Error };
 export type ResultUserMatches = { 'ok' : Array<UserMatch> } |
@@ -76,6 +83,23 @@ export interface StableQuestion {
   'question' : string,
   'color' : string,
   'points' : bigint,
+}
+export interface TeamInfo {
+  'about' : string,
+  'logo' : Uint8Array | number[],
+  'name' : string,
+  'listed' : boolean,
+}
+export interface TeamInfo__1 {
+  'about' : string,
+  'logo' : Uint8Array | number[],
+  'name' : string,
+  'listed' : boolean,
+}
+export interface TeamUserInfo {
+  'key' : string,
+  'permissions' : Permissions,
+  'info' : TeamInfo,
 }
 export type Time = bigint;
 export type Time__1 = bigint;
@@ -124,6 +148,7 @@ export interface _SERVICE {
   >,
   'backupUsers' : ActorMethod<[bigint, bigint], Array<[Principal, User]>>,
   'createQuestion' : ActorMethod<[string, string, string], ResultQuestion>,
+  'createTeam' : ActorMethod<[string, string, TeamInfo__1], ResultTeam>,
   'createTestData' : ActorMethod<[string, bigint, bigint], bigint>,
   'createUser' : ActorMethod<[string, string], ResultUser>,
   'getAnsweredQuestions' : ActorMethod<
@@ -135,6 +160,8 @@ export interface _SERVICE {
   'getOwnQuestions' : ActorMethod<[string, bigint], Array<Question>>,
   'getUnansweredQuestions' : ActorMethod<[string, bigint], Array<Question>>,
   'getUser' : ActorMethod<[], ResultUser>,
+  'joinTeam' : ActorMethod<[string, string], ResultTeam>,
+  'listTeams' : ActorMethod<[Array<string>], ResultTeams>,
   'selfDestruct' : ActorMethod<[string], undefined>,
   'sendFriendRequest' : ActorMethod<[string, string], Result>,
   'submitAnswer' : ActorMethod<

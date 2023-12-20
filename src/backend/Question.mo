@@ -84,8 +84,8 @@ module {
 
   let { phash } = Map;
 
-  public func emptyAnswerDB() : AnswerDB = Map.new<Principal, UserAnswers>(phash);
-  public func emptySkipDB() : SkipDB = Map.new<Principal, UserSkips>(phash);
+  public func emptyAnswerDB() : AnswerDB = Map.new<Principal, UserAnswers>();
+  public func emptySkipDB() : SkipDB = Map.new<Principal, UserSkips>();
 
   public func backup(db : QuestionDB) : Iter<StableQuestion> {
     Buffer.vals(db);
