@@ -23,11 +23,11 @@ const setTeam = (t: TeamUserInfo) => {
 
 <template>
     <AllkindsTitle>Welcome</AllkindsTitle>
-    <TextBlock>
-        <h1>Welcome</h1>
+    <TextBlock align="text-center">
+        <h1>Welcome to Allkinds.teams</h1>
     </TextBlock>
 
-    <NetworkDataContainer :networkdata="app.getTeams()" class="w-full">
+    <NetworkDataContainer :networkdata="app.getTeams()" class="w-full text-lg">
         <div class="w-full text-center mb-8">
             Available teams: {{ app.getTeams().data?.length }}
         </div>
@@ -38,7 +38,7 @@ const setTeam = (t: TeamUserInfo) => {
 
             <Icon v-if="t.permissions.isAdmin" name="tabler:user-shield" size="2em" class="float-right text-green-600" />
             <Icon v-if="t.permissions.isMember" name="tabler:user-check" size="2em" class="float-right text-green-600" />
-            <div class="text-xl">
+            <div class="text-2xl">
                 {{ t.info.name }}
             </div>
             <p>

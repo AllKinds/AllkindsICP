@@ -47,7 +47,7 @@ const join = () => {
         <div class="w-2 flex-grow"></div>
 
         <div class="text-center w-full">
-            <Btn @click="join()">Join the team</Btn>
+            <Btn @click="join()">Join the team</Btn> <!-- TODO: loading indicator -->
         </div>
         <div class="w-2 flex-grow"></div>
     </NetworkDataContainer>

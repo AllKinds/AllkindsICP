@@ -12,7 +12,7 @@ export type AppState = {
     team: string,
     knownTeams: string[],
     openQuestions: NetworkData<Question[]>,
-    answeredQuestions: NetworkData<Question[]>,
+    answeredQuestions: NetworkData<[Question, Answer][]>,
     ownQuestions: NetworkData<Question[]>,
     friends: NetworkData<Friend[]>,
     matches: NetworkData<UserMatch[]>,
@@ -213,8 +213,8 @@ export const useAppState = defineStore({
         setUser(user: NetworkData<User>): void {
             this.user = combineNetworkData(this.user, user)
         },
-        loadUser(orRedirect: boolean = true) {
-            if (shouldUpdate(this.user)) {
+        loadUser(maxAgeS?: number, orRedirect: boolean = true) {
+            if (shouldUpdate(this.user, maxAgeS)) {
                 return runStore(this.user, backend.loadUser().pipe(Effect.mapError(
                     (err) => {
                         if (!orRedirect) return err;

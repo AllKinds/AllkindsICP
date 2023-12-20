@@ -51,12 +51,8 @@ if (inBrowser()) {
     </NuxtLink>
 
     <NetworkDataContainer :networkdata="app.getOpenQuestions()" class="grow mt-4 w-full">
-        <NuxtLink v-for="(q, i) in app.getOpenQuestions().data" :question="q" :selected="i === 0"
-            :to="'/answer-question/' + q.id" :class="getColor(q.color as ColorName).color"
-            class="border p-4 w-full my-2 rounded-lg block text-2xl font-medium">
-            <Icon name="material-symbols:arrow-forward-ios" class="float-right mt-1" />
-            {{ q.question }}
-        </NuxtLink>
+        <Question v-for="(q, _) in app.getOpenQuestions().data" :question="q" :link="true" />
+
         <div v-if="app.getOpenQuestions().data?.length === 0">
             There are no more questions at the moment.
 

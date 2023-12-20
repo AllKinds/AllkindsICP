@@ -47,6 +47,7 @@ const disconnect = (username: string) => {
 }
 
 if (inBrowser()) {
+    app.getTeam();
     app.loadFriends(0);
 }
 
@@ -73,17 +74,10 @@ let diff = {}
         </div>
     </div>
 
-    <div v-for="[q, diff] in m()[0].answered" :class="getColor(diff.sameAnswer ? 'green' : 'black').color"
-        class="w-full p-4 rounded-md m-1" v-if="true">
-        {{ q.question }}
-    </div>
+    <Question v-for="[q, diff] in m()[0].answered" :question="q" :color="diff.sameAnswer ? 'green' : 'black'" />
 
 
-    <NuxtLink v-for="(q, i) in m()[0].uncommon" :question="q" :to="'/answer-question/' + q.id"
-        :class="getColor(q.color as ColorName).color" class="border p-4 w-full my-2 rounded-lg block text-2xl font-medium">
-        <Icon name="material-symbols:arrow-forward-ios" class="float-right mt-1" />
-        {{ q.question }}
-    </NuxtLink>
+    <Question v-for="(q, i) in m()[0].uncommon" :question="q" :link="true" />
 
     <div class="p-12">
     </div>

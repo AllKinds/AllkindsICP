@@ -13,6 +13,7 @@ let gotoNextQuestion = false;
 
 // TODO: move to app
 const answer = (question: Question, a: boolean, boost: number) => {
+    // TODO: show background task pending indicator
     console.log("answering question ", question, a, boost)
     app.removeQuestion(question)
     gotoNextQuestion = true;
@@ -42,25 +43,26 @@ let loaded = false;
 
 function findQuestion(id: bigint, findOther = false) {
     const data = app.openQuestions.data;
-    const data2 = app.answeredQuestions.data;
+    const data2 = app.getAnsweredQuestions().data;
     let q = null;
     if (!data) {
         if (!loaded) {
             loaded = true;
             app.loadQuestions();
         }
-    } else if (data.length === 0) {
+    } else if (data.length === 0 && gotoNextQuestion) {
         navigateTo("/questions");
     } else if (gotoNextQuestion) {
         navigateTo("/answer-question/" + data[0].id);
     } else {
         q = data.find((x) => x.id === id);
         if (!q && data2) {
-            q = data2.find((x) => x.id === id);
+            q = data2.find((x) => x[0].id === id)?.[0];
         }
         if (!q) {
             // goto next question
-            navigateTo("/answer-question/" + data[0].id);
+            if (data.length === 0) navigateTo("/questions");
+            else navigateTo("/answer-question/" + data[0].id);
         }
     }
 
