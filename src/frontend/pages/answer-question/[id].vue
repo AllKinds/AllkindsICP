@@ -26,6 +26,7 @@ const answer = (question: Question, a: boolean, boost: number) => {
 
 // TODO: move to app
 const skip = (question: Question) => {
+    // TODO: show background task pending indicator
     console.log('skipping', question)
     app.removeQuestion(question)
     gotoNextQuestion = true;

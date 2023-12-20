@@ -17,9 +17,9 @@ const join = () => {
 </script>
 
 <template>
-    <AllkindsTitle>Welcome</AllkindsTitle>
+    <AllkindsTitle link-to="/welcome">Allkinds.teams</AllkindsTitle>
     <TextBlock>
-        <h1>Welcome</h1>
+        <h1>Join a team</h1>
     </TextBlock>
 
     <NetworkDataContainer :networkdata="app.getTeams()" class="w-full flex-grow flex flex-col">

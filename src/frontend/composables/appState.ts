@@ -282,7 +282,7 @@ export const useAppState = defineStore({
         },
         getTeam(orRedirect: boolean = true): TeamUserInfo | null {
             let t = null;
-            this.team = window.localStorage.getItem("team") || "";
+            this.team = inBrowser() ? window.localStorage.getItem("team") || "" : "";
             if (this.teams.status === "ok") {
                 t = this.teams.data?.find((t) => t.key === this.team) || null;
                 if (!orRedirect) {

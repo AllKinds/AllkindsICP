@@ -17,17 +17,22 @@ const nuxt = useNuxtApp();
 
 const page = () => route.path.length <= 1 ? "index" : route.path;
 
-const style = () => "background-image: url('/figma/" + page() + ".png');"
-    + "background-size: contain;"
-    + "background-repeat: no-repeat;"
-    + "background-attachment: fixed;"
-    + "background-position: center;"
-    + "font-family: Open Sans;"
+//const style = () => "background-image: url('/figma/" + page() + ".png');"
+//    + "background-size: contain;"
+//    + "background-repeat: no-repeat;"
+//    + "background-attachment: fixed;"
+//    + "background-position: center;"
+//    + "font-family: Open Sans;"
+//    + "font-weight: 600;"
+//    + "height: 100vh;"
+
+const style = () =>
+    "font-family: Open Sans; sans;"
     + "font-weight: 600;"
-    + "height: 100vh;"
+    + "height: 100vh;";
 
 
-if (!process.server) {
+if (inBrowser()) {
     let show = false;
     const toggle = (e: { ctrlKey: boolean }) => {
         show = !show;
@@ -43,7 +48,7 @@ if (!process.server) {
 
     if (isLoggedIn()) {
         console.log("load user data")
-        app.loadUser(false);
+        app.loadUser(undefined, false);
     }
 }
 
