@@ -40,6 +40,8 @@ export function formatBackendError(err: BackendError): string {
             return "Too long";
         case "notEnoughAnswers":
             return "Not enough answers"
+        case "invalidInvite":
+            return "Invite is not valid"
 
         // TODO: format other errors
 

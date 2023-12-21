@@ -9,7 +9,7 @@ const name = useState("team-name", () => "");
 const about = useState("team-about", () => "");
 const invite = useState("invite-code", () => "");
 const logo = useState("team-logo", (): number[] => []);
-const listed = useState("team-listed", () => false);
+const listed = useState("team-listed", () => true);
 
 if (inBrowser()) {
     app.loadTeams(0)
@@ -89,8 +89,8 @@ const setFile = async (e: any) => {
             <div class="w-full text-center mt-2 cursor-pointer">
                 <NuxtLink class="text-xl" @click="listed = !listed">
                     Listed
-                    <Icon v-if="listed" name="ci:checkbox-unchecked" />
-                    <Icon v-else name="tabler:checkbox" />
+                    <Icon v-if="listed" name="tabler:checkbox" />
+                    <Icon v-else name="ci:checkbox-unchecked" />
                 </NuxtLink>
             </div>
             </p>

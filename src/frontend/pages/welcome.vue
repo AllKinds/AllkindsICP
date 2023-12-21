@@ -4,10 +4,20 @@ import { TeamUserInfo } from '~/utils/backend';
 
 definePageMeta({ title: "Welcome" });
 const app = useAppState();
-const team = useState(() => "sandbox");
+const invite = useState("invite-code", () => "");
 
 if (inBrowser()) {
-    app.loadTeams(0)
+    const ref = document.location.hash
+    try {
+        const team = ref.split(":")[0].replace(/[^a-z]/g, "");
+        const code = ref.split(":")[1];
+        if (team.length < 2) throw "";
+        invite.value = code;
+        app.loadTeams(0, team); // TODO: auto select team if it exists
+    } catch {
+        app.loadTeams(0)
+    }
+
 }
 
 const setTeam = (t: TeamUserInfo) => {

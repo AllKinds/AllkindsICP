@@ -114,7 +114,7 @@ module {
   public func addMember(teams : TeamDB, key : Text, invite : Text, caller : Principal) : Result<TeamInfo> {
     let ?team = Map.get(teams, thash, key) else return #err(#teamNotFound);
 
-    if (team.invite != invite) { return #err(#notInTeam) };
+    if (team.invite != invite) { return #err(#invalidInvite) };
 
     let false = Set.put(team.members, phash, caller) else return #err(#alreadyRegistered);
 

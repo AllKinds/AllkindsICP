@@ -49,9 +49,19 @@ dfx canister call backend joinTeam '("sandbox", "test-invite-code")'
 # create 20 questions and 30 users
 dfx canister call backend createTestData '("sandbox", 20, 30)'
 
+
 # run local server for frontend development
 npm run dev
 ```
+
+You can also create teams through the frontend, by navigating to `/create-team`.
+Currently this requires your principal to be a controller of the backend canister.
+
+```bash
+# replace xxxxx... with your principal (shown on /create-team)
+dfx canister update-settings --add-controller xxxxx-xxxxx-xxxxx-xxxxx-xxxxx-xxx
+```
+
 
 ## License
 
