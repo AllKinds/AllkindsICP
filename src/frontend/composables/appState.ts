@@ -17,6 +17,7 @@ export type AppState = {
     friends: NetworkData<Friend[]>,
     matches: NetworkData<UserMatch[]>,
     teams: NetworkData<TeamUserInfo[]>,
+    principal: NetworkData<Principal>,
 };
 
 type NotificationLevel = "ok" | "warning" | "error";
@@ -148,6 +149,7 @@ const defaultAppState: () => AppState = () => {
         friends: dataInit,
         matches: dataInit,
         teams: dataInit,
+        principal: dataInit,
     }
 };
 
@@ -204,7 +206,19 @@ export const useAppState = defineStore({
         loadOwnQuestions(maxAgeS?: number): void {
             if (shouldUpdate(this.ownQuestions, maxAgeS)) {
                 const old = this.getOwnQuestions();
-                runStoreNotify(old, backend.getOwnQuestions(this.team), this.setOwnQuestions)
+                runStoreNotify(old, backend.getOwnQuestions(this.team), this.setOwnQuestions);
+            }
+        },
+        getPrincipal(): NetworkData<Principal> {
+            return this.principal as NetworkData<Principal>;
+        },
+        setPrincipal(principal: NetworkData<Principal>): void {
+            this.principal = combineNetworkData(this.principal, principal)
+        },
+        loadPrincipal(maxAgeS?: number) {
+            if (shouldUpdate(this.principal, maxAgeS)) {
+                return runStore(this.getPrincipal(), backend.getOwnPrinciapl(), this.setPrincipal)
+                    .catch((e) => console.warn("couldn't loadUser " + e));
             }
         },
         getUser() {
@@ -304,6 +318,11 @@ export const useAppState = defineStore({
         joinTeam(code: string): Promise<void> {
             return runNotify(backend.joinTeam(this.team, code), "Welcome to the team!");
         },
+        createTeam(team: string, name: string, about: string, logo: number[], listed: boolean, code: string): Promise<void> {
+            return runNotify(backend.createTeam(team, name, about, logo, listed, code), "Welcome to the team!");
+        },
+
+
     },
 });
 

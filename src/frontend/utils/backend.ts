@@ -1,7 +1,9 @@
 import { backend } from "~~/src/declarations/backend";
+export type { Principal } from "@dfinity/principal";
 export type * from "~~/src/declarations/backend/backend.did";
 export type BackendActor = typeof backend;
 import { Effect } from "effect";
+import type { Principal } from "@dfinity/principal";
 import { BackendError, FrontendError, toBackendError, toNetworkError } from "~/utils/errors";
 import { Question, Answer, Skip, User, Friend, UserMatch, TeamUserInfo } from "./backend";
 import { FriendStatus } from "./backend";
@@ -151,4 +153,13 @@ export const joinTeam = (team: string, code: string): FrontendEffect<void> => {
     return effectifyResult((actor) => actor.joinTeam(team, code))
 }
 
+export const createTeam = (team: string, name: string, about: string, logo: number[], listed: boolean, code: string): FrontendEffect<void> => {
+    debugger
+    return effectifyResult((actor) => actor.createTeam(team, code, { name, about, logo, listed }))
+}
+
+
+export const getOwnPrinciapl = (): FrontendEffect<Principal> => {
+    return effectify((actor) => actor.whoami())
+}
 
