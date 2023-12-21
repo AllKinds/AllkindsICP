@@ -102,10 +102,10 @@ actor {
     // transfer data from old db version
     //migrate_DBv1_v2()
     // Cleanup old stable data
-    db_v1 := {
-      users = User.emptyDB();
-      teams = Team.emptyDB();
-    };
+    //db_v1 := {
+    //  users = User.emptyDB();
+    //  teams = Team.emptyDB();
+    //};
   };
 
   // PUBLIC API

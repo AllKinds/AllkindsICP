@@ -24,7 +24,7 @@ const create = () => {
         logo.value.slice(),
         listed.value,
         invite.value,
-    ).then(() => { navigateTo("/welcome") });
+    ).then(() => { navigateTo("/welcome#" + team.value + ":" + invite.value) });
 }
 
 
@@ -63,7 +63,7 @@ const setFile = async (e: any) => {
             </div>
 
             <div class="mt-4">
-                Logo (.png image, max. size 1MB)
+                Logo (square .png image, max. size 1MB)
 
                 <input class="mt-2" type="file" @change="setFile" />
                 {{ Math.round(logo.length / 1000) }} kb
@@ -71,7 +71,7 @@ const setFile = async (e: any) => {
 
             <p class="mt-4">
                 About the team
-                <TextArea v-model:trim="about" class="w-full mt-2" />
+                <TextArea v-model.trim="about" class="w-full mt-2" />
             </p>
             <p class="mt-4">
                 Team handle (must only contain lower case letters)

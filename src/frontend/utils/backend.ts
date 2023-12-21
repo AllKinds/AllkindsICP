@@ -154,7 +154,6 @@ export const joinTeam = (team: string, code: string): FrontendEffect<void> => {
 }
 
 export const createTeam = (team: string, name: string, about: string, logo: number[], listed: boolean, code: string): FrontendEffect<void> => {
-    debugger
     return effectifyResult((actor) => actor.createTeam(team, code, { name, about, logo, listed }))
 }
 
