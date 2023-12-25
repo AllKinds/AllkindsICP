@@ -54,7 +54,7 @@ dfx canister call backend createTestData '("sandbox", 20, 30)'
 npm run dev
 ```
 
-You can also create teams through the frontend, by navigating to `/create-team`.
+To create teams through the frontend navigating to `/create-team`.
 Currently this requires your principal to be a controller of the backend canister.
 
 ```bash
