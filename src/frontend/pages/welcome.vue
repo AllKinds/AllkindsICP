@@ -45,7 +45,7 @@ const setTeam = (t: TeamUserInfo) => {
 
         <div v-for="t in app.getTeams().data" @click="setTeam(t)"
             class="border border-white p-4 rounded-lg my-2 w-full cursor-pointer flex ">
-            <img :src="toDataUrl(t.info.logo)" height="100" width="100" />
+            <img :src="toDataUrl(t.info.logo)" height="100" width="100" class="rounded-md" />
             <div class="w-full pl-4">
                 <Icon name="material-symbols:arrow-forward-ios" class="float-right mt-1" />
 

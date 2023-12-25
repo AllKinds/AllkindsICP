@@ -16,7 +16,9 @@ const cansisterIdFile = isDev ? "./.dfx/" + network + "/canister_ids.json" : "./
 
 let canisterIds = { frontend: {}, backend: {}, internet_identity: {} } as any
 if (fs.existsSync(cansisterIdFile)) {
-    JSON.parse(fs.readFileSync(cansisterIdFile).toString());
+    canisterIds = JSON.parse(fs.readFileSync(cansisterIdFile).toString());
+} else {
+    console.warn("Canister ID file does not exist:", cansisterIdFile);
 };
 
 const ids = {

@@ -59,7 +59,7 @@ Currently this requires your principal to be a controller of the backend caniste
 
 ```bash
 # replace xxxxx... with your principal (shown on /create-team)
-dfx canister update-settings --add-controller xxxxx-xxxxx-xxxxx-xxxxx-xxxxx-xxx
+dfx canister update-settings --add-controller xxxxx-xxxxx-xxxxx-xxxxx-xxxxx-xxx backend
 ```
 
 

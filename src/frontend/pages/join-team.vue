@@ -23,30 +23,28 @@ const join = () => {
     </TextBlock>
 
     <NetworkDataContainer :networkdata="app.getTeams()" class="w-full flex-grow flex flex-col">
-        <div class="w-full text-center mb-8 text-lg">
+
+        <img :src="toDataUrl(app.getTeam()?.info.logo || [])" height="150" width="150" class="m-auto rounded-2xl" />
+
+        <div class="w-full text-center mt-4 mb-8 text-lg">
             Enter invite code for <span class="font-bold">{{ getTeam()?.info.name }} ({{ app.team }})</span>
         </div>
 
         <div class="p-4 rounded-lg my-2 w-full">
-
-            <div class="text-xl">
-                {{ getTeam()?.info.name }}
-            </div>
             <p>
                 {{ getTeam()?.info.about }}
             </p>
-
         </div>
 
         <div class="w-2 flex-grow"></div>
 
-        <div class="text-center w-full">
+        <div class="text-center w-full mt-4">
             <TextInput v-model.trim="invite" placeholder="invite-code" class="text-center" />
 
         </div>
         <div class="w-2 flex-grow"></div>
 
-        <div class="text-center w-full">
+        <div class="text-center w-full mt-4">
             <Btn @click="join()">Join the team</Btn> <!-- TODO: loading indicator -->
         </div>
         <div class="w-2 flex-grow"></div>
