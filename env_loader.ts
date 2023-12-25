@@ -14,7 +14,10 @@ type Network = "ic" | "local" | "staging";
 
 const cansisterIdFile = isDev ? "./.dfx/" + network + "/canister_ids.json" : "./canister_ids.json";
 
-const canisterIds = JSON.parse(fs.readFileSync(cansisterIdFile).toString());
+let canisterIds = { frontend: {}, backend: {}, internet_identity: {} } as any
+if (fs.existsSync(cansisterIdFile)) {
+    JSON.parse(fs.readFileSync(cansisterIdFile).toString());
+};
 
 const ids = {
     frontend: canisterIds.frontend[network],
