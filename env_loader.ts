@@ -13,6 +13,9 @@ const LOGO_URL = "https://allkinds.xyz/img/allkinds_logo_white.svg"
 type Network = "ic" | "local" | "staging";
 
 const cansisterIdFile = isDev ? "./.dfx/" + network + "/canister_ids.json" : "./canister_ids.json";
+if (isDev) {
+    console.warn("Building in dev mode");
+}
 
 let canisterIds = { frontend: {}, backend: {}, internet_identity: {} } as any
 if (fs.existsSync(cansisterIdFile)) {
@@ -24,7 +27,7 @@ if (fs.existsSync(cansisterIdFile)) {
 const ids = {
     frontend: canisterIds.frontend[network],
     backend: canisterIds.backend[network],
-    ii: canisterIds.internet_identity[network],
+    ii: isDev ? canisterIds.internet_identity[network] : undefined,
 }
 
 const II_URL = isDev ? "http://" + ids.ii + ".localhost:4943" : "https://identity.ic0.app";

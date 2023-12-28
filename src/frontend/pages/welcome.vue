@@ -48,7 +48,9 @@ const setTeam = (t: TeamUserInfo) => {
 
         <div v-for="t in app.getTeams().data" @click="setTeam(t)"
             class="border border-white p-4 rounded-lg my-2 w-full cursor-pointer flex ">
-            <img :src="toDataUrl(t.info.logo)" height="100" width="100" class="rounded-md" />
+            <div>
+                <img :src="toDataUrl(t.info.logo)" height="100" width="100" class="rounded-md" />
+            </div>
             <div class="w-full pl-4">
 
                 <NuxtLink to="/team-info" @click="gotoInfo = true">
@@ -61,7 +63,7 @@ const setTeam = (t: TeamUserInfo) => {
                 <div class="text-2xl">
                     {{ t.info.name }}
                 </div>
-                <p>
+                <p class="whitespace-pre-wrap">
                     {{ t.info.about }}
                 </p>
             </div>

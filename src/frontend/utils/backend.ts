@@ -5,7 +5,7 @@ export type BackendActor = typeof backend;
 import { Effect } from "effect";
 import type { Principal } from "@dfinity/principal";
 import { BackendError, FrontendError, toBackendError, toNetworkError } from "~/utils/errors";
-import { FriendStatus } from "./backend";
+import type { Question, Answer, User, Skip, Friend, UserMatch, TeamUserInfo, TeamStats, QuestionStats, FriendStatus } from "~~/src/declarations/backend/backend.did";
 
 type BackendEffect<T> = Effect.Effect<never, BackendError, T>
 export type FrontendEffect<T> = Effect.Effect<never, FrontendError, T>

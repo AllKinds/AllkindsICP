@@ -72,6 +72,7 @@ type StableQuestion =
    id: QuestionID__1;
    points: int;
    question: text;
+   showCreator: bool;
  };
 type Skip = 
  record {
@@ -205,6 +206,7 @@ type Error =
    notInTeam;
    notLoggedIn;
    notRegistered;
+   questionNotFound;
    teamNotFound;
    tooLong;
    tooShort;

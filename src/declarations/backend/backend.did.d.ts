@@ -16,6 +16,7 @@ export type Error = { 'notInTeam' : null } |
   { 'notLoggedIn' : null } |
   { 'validationError' : null } |
   { 'userNotFound' : null } |
+  { 'questionNotFound' : null } |
   { 'tooLong' : null } |
   { 'insufficientFunds' : null } |
   { 'notEnoughAnswers' : null } |
@@ -103,6 +104,7 @@ export interface StableQuestion {
   'question' : string,
   'color' : string,
   'hidden' : boolean,
+  'showCreator' : boolean,
   'points' : bigint,
 }
 export interface TeamInfo {

@@ -257,9 +257,18 @@ actor {
       weight = 1 + boost;
       created = Time.now();
     };
-    Question.putAnswer(team.answers, a, caller);
+    let prev = Question.putAnswer(team.answers, a, caller);
 
-    let #ok(_) = User.reward(db.users, #createAnswer(boost), caller) else Debug.trap("Bug: Reward failed. checkFunds should have returned an error already");
+    switch (prev) {
+      case (?previous) {
+        if (a.weight > previous.weight) {
+          // TODO: charge for boost?
+        };
+      };
+      case (null) {
+        let #ok(_) = User.reward(db.users, #createAnswer(boost), caller) else Debug.trap("Bug: Reward failed. checkFunds should have returned an error already");
+      };
+    };
 
     #ok(a);
   };
@@ -272,7 +281,7 @@ actor {
     };
 
     let s : Skip = { question; reason = #skip };
-    Question.putSkip(team.skips, s, caller);
+    let prev = Question.putSkip(team.skips, s, caller);
     #ok(s);
   };
 
@@ -498,7 +507,7 @@ actor {
           weight = 1;
           created = Time.now();
         };
-        Question.putAnswer(team.answers, a, principal);
+        ignore Question.putAnswer(team.answers, a, principal);
       };
     };
 

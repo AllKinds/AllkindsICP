@@ -129,20 +129,24 @@ module {
     #ok(toQuestion(q));
   };
 
-  public func putAnswer(answers : AnswerDB, answer : Answer, user : Principal) : () {
+  public func putAnswer(answers : AnswerDB, answer : Answer, user : Principal) : ?Answer {
     let userAnswers = getAnswers(answers, user);
 
     let (withAnswer, previousAnswer) = Trie.put(userAnswers, key(answer.question), Nat.equal, answer);
 
     putAnswers(answers, user, withAnswer);
+
+    return previousAnswer;
   };
 
-  public func putSkip(skips : SkipDB, skip : Skip, user : Principal) : () {
+  public func putSkip(skips : SkipDB, skip : Skip, user : Principal) : ?Skip {
     let userSkips = getSkips(skips, user);
 
     let (withSkip, previousSkip) = Trie.put(userSkips, key(skip.question), Nat.equal, skip);
 
     Map.set(skips, phash, user, withSkip);
+
+    return previousSkip;
   };
 
   func toQuestion(q : StableQuestion) : Question {

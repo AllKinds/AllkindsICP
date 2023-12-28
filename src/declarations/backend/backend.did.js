@@ -4,6 +4,7 @@ export const idlFactory = ({ IDL }) => {
     'notLoggedIn' : IDL.Null,
     'validationError' : IDL.Null,
     'userNotFound' : IDL.Null,
+    'questionNotFound' : IDL.Null,
     'tooLong' : IDL.Null,
     'insufficientFunds' : IDL.Null,
     'notEnoughAnswers' : IDL.Null,
@@ -27,6 +28,7 @@ export const idlFactory = ({ IDL }) => {
     'question' : IDL.Text,
     'color' : IDL.Text,
     'hidden' : IDL.Bool,
+    'showCreator' : IDL.Bool,
     'points' : IDL.Int,
   });
   const FriendStatus = IDL.Variant({
