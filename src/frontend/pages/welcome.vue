@@ -50,15 +50,14 @@ const setTeam = (t: TeamUserInfo) => {
             class="border border-white p-4 rounded-lg my-2 w-full cursor-pointer flex ">
             <img :src="toDataUrl(t.info.logo)" height="100" width="100" class="rounded-md" />
             <div class="w-full pl-4">
-                <Icon name="material-symbols:arrow-forward-ios" class="float-right mt-1" />
 
+                <NuxtLink to="/team-info" @click="gotoInfo = true">
+                    <Icon name="tabler:info-hexagon" size="2em" class="float-right text-white" />
+                </NuxtLink>
                 <Icon v-if="t.permissions.isAdmin" name="tabler:user-shield" size="2em"
                     class="float-right text-green-600" />
                 <Icon v-if="t.permissions.isMember" name="tabler:user-check" size="2em"
                     class="float-right text-green-600" />
-                <NuxtLink to="/team-info" @click="gotoInfo = true">
-                    <Icon name="tabler:info-hexagon" size="2em" class="float-right text-white" />
-                </NuxtLink>
                 <div class="text-2xl">
                     {{ t.info.name }}
                 </div>
@@ -66,7 +65,10 @@ const setTeam = (t: TeamUserInfo) => {
                     {{ t.info.about }}
                 </p>
             </div>
-
         </div>
     </NetworkDataContainer>
+
+    <div class="w-full flex-grow" />
+
+    <Btn to="/create-team" class="w-72 mb-10">Create a new team</Btn>
 </template>
