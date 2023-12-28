@@ -35,7 +35,6 @@ if (await Effect.runPromise(checkAuth(null)).catch((e) => false)) {
         <Btn class="w-72" @click="login('II')">
             Log in with Internet&nbsp;Identity
         </Btn>
-        <Btn class="w-72" @click="login('NFID')"> Log in with email </Btn>
         <Lnk to="/"> Cancel </Lnk>
     </div>
 </template>
