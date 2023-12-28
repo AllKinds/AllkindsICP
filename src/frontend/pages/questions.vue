@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { AppState, inBrowser, useAppState } from '~/composables/appState';
+
 definePageMeta({ title: "Project design" });
 
 const app = useAppState();

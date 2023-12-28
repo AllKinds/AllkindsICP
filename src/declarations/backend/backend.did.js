@@ -26,6 +26,7 @@ export const idlFactory = ({ IDL }) => {
     'creator' : IDL.Principal,
     'question' : IDL.Text,
     'color' : IDL.Text,
+    'hidden' : IDL.Bool,
     'points' : IDL.Int,
   });
   const FriendStatus = IDL.Variant({
@@ -74,7 +75,7 @@ export const idlFactory = ({ IDL }) => {
     'question' : IDL.Nat,
     'answer' : IDL.Bool,
   });
-  const Question__1 = IDL.Record({
+  const Question__2 = IDL.Record({
     'id' : QuestionID__1,
     'created' : Time__1,
     'creator' : IDL.Opt(IDL.Text),
@@ -96,9 +97,9 @@ export const idlFactory = ({ IDL }) => {
   });
   const UserMatch = IDL.Record({
     'cohesion' : IDL.Nat8,
-    'answered' : IDL.Vec(IDL.Tuple(Question__1, AnswerDiff)),
+    'answered' : IDL.Vec(IDL.Tuple(Question__2, AnswerDiff)),
     'user' : UserInfo,
-    'uncommon' : IDL.Vec(Question__1),
+    'uncommon' : IDL.Vec(Question__2),
   });
   const Friend = IDL.Tuple(UserMatch, FriendStatus);
   const ResultFriends = IDL.Variant({ 'ok' : IDL.Vec(Friend), 'err' : Error });
@@ -106,6 +107,33 @@ export const idlFactory = ({ IDL }) => {
     'ok' : IDL.Vec(UserMatch),
     'err' : Error,
   });
+  const Question__1 = IDL.Record({
+    'id' : QuestionID__1,
+    'created' : Time__1,
+    'creator' : IDL.Opt(IDL.Text),
+    'question' : IDL.Text,
+    'color' : IDL.Text,
+    'points' : IDL.Int,
+  });
+  const QuestionStats = IDL.Record({
+    'no' : IDL.Nat,
+    'yes' : IDL.Nat,
+    'question' : Question__1,
+    'answers' : IDL.Nat,
+    'boosts' : IDL.Nat,
+    'skips' : IDL.Nat,
+  });
+  const ResultQuestionStats = IDL.Variant({
+    'ok' : IDL.Vec(QuestionStats),
+    'err' : Error,
+  });
+  const TeamStats = IDL.Record({
+    'answers' : IDL.Nat,
+    'connections' : IDL.Nat,
+    'users' : IDL.Nat,
+    'questions' : IDL.Nat,
+  });
+  const ResultTeamStats = IDL.Variant({ 'ok' : TeamStats, 'err' : Error });
   const Permissions = IDL.Record({
     'isMember' : IDL.Bool,
     'isAdmin' : IDL.Bool,
@@ -120,6 +148,7 @@ export const idlFactory = ({ IDL }) => {
     'key' : IDL.Text,
     'permissions' : Permissions,
     'info' : TeamInfo,
+    'invite' : IDL.Opt(IDL.Text),
   });
   const ResultTeams = IDL.Variant({
     'ok' : IDL.Vec(TeamUserInfo),
@@ -171,6 +200,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'createTestData' : IDL.Func([IDL.Text, IDL.Nat, IDL.Nat], [IDL.Nat], []),
     'createUser' : IDL.Func([IDL.Text, IDL.Text], [ResultUser], []),
+    'deleteQuestion' : IDL.Func([IDL.Text, Question], [Result], []),
     'getAnsweredQuestions' : IDL.Func(
         [IDL.Text, IDL.Nat],
         [IDL.Vec(IDL.Tuple(Question, Answer))],
@@ -183,6 +213,12 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(Question)],
         ['query'],
       ),
+    'getQuestionStats' : IDL.Func(
+        [IDL.Text, IDL.Nat],
+        [ResultQuestionStats],
+        ['query'],
+      ),
+    'getTeamStats' : IDL.Func([IDL.Text], [ResultTeamStats], ['query']),
     'getUnansweredQuestions' : IDL.Func(
         [IDL.Text, IDL.Nat],
         [IDL.Vec(Question)],

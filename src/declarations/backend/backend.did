@@ -8,11 +8,11 @@ type UserStats =
 type UserMatch = 
  record {
    answered: vec record {
-                   Question__1;
+                   Question__2;
                    AnswerDiff;
                  };
    cohesion: nat8;
-   uncommon: vec Question__1;
+   uncommon: vec Question__2;
    user: UserInfo;
  };
 type UserInfo = 
@@ -38,8 +38,16 @@ type Time = int;
 type TeamUserInfo = 
  record {
    info: TeamInfo;
+   invite: opt text;
    key: text;
    permissions: Permissions;
+ };
+type TeamStats = 
+ record {
+   answers: nat;
+   connections: nat;
+   questions: nat;
+   users: nat;
  };
 type TeamInfo__1 = 
  record {
@@ -60,6 +68,7 @@ type StableQuestion =
    color: text;
    created: Time__1;
    creator: principal;
+   hidden: bool;
    id: QuestionID__1;
    points: int;
    question: text;
@@ -87,6 +96,11 @@ type ResultTeams =
    err: Error;
    ok: vec TeamUserInfo;
  };
+type ResultTeamStats = 
+ variant {
+   err: Error;
+   ok: TeamStats;
+ };
 type ResultTeam = 
  variant {
    err: Error;
@@ -96,6 +110,11 @@ type ResultSkip =
  variant {
    err: Error;
    ok: Skip;
+ };
+type ResultQuestionStats = 
+ variant {
+   err: Error;
+   ok: vec QuestionStats;
  };
 type ResultQuestion = 
  variant {
@@ -117,6 +136,15 @@ type Result =
    err: Error;
    ok;
  };
+type Question__2 = 
+ record {
+   color: text;
+   created: Time__1;
+   creator: opt text;
+   id: QuestionID__1;
+   points: int;
+   question: text;
+ };
 type Question__1 = 
  record {
    color: text;
@@ -125,6 +153,15 @@ type Question__1 =
    id: QuestionID__1;
    points: int;
    question: text;
+ };
+type QuestionStats = 
+ record {
+   answers: nat;
+   boosts: nat;
+   no: nat;
+   question: Question__1;
+   skips: nat;
+   yes: nat;
  };
 type QuestionID__1 = nat;
 type QuestionID = nat;
@@ -206,6 +243,7 @@ service : {
   createTeam: (text, text, TeamInfo__1) -> (ResultTeam);
   createTestData: (text, nat, nat) -> (nat);
   createUser: (text, text) -> (ResultUser);
+  deleteQuestion: (text, Question) -> (Result);
   getAnsweredQuestions: (text, nat) -> (vec record {
                                               Question;
                                               Answer;
@@ -213,6 +251,8 @@ service : {
   getFriends: (text) -> (ResultFriends) query;
   getMatches: (text) -> (ResultUserMatches) query;
   getOwnQuestions: (text, nat) -> (vec Question) query;
+  getQuestionStats: (text, nat) -> (ResultQuestionStats) query;
+  getTeamStats: (text) -> (ResultTeamStats) query;
   getUnansweredQuestions: (text, nat) -> (vec Question) query;
   getUser: () -> (ResultUser) query;
   joinTeam: (text, text) -> (ResultTeam);

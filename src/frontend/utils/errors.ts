@@ -12,6 +12,7 @@ export type ErrorKey =
     | "notInTeam"
     | "invalidInvite"
     | "teamNotFound"
+    | "questionNotFound"
     | "insufficientFunds"
     | "notEnoughAnswers"
     | "tooShort"

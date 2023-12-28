@@ -49,6 +49,14 @@ module {
     key : Text;
     info : TeamInfo;
     permissions : Permissions;
+    invite : ?Text;
+  };
+
+  public type TeamStats = {
+    users : Nat;
+    questions : Nat;
+    answers : Nat;
+    connections : Nat;
   };
 
   public type Permissions = { isMember : Bool; isAdmin : Bool };
@@ -80,18 +88,34 @@ module {
     return #ok(info);
   };
 
+  public func getStats(teams : TeamDB, key : Text) : Result<TeamStats> {
+    let ?team = Map.get(teams, thash, key) else return #err(#teamNotFound);
+
+    let stats : TeamStats = {
+      users = Set.size(team.members);
+      questions = Question.count(team.questions);
+      answers = Question.countAnswers(team.answers);
+      connections = Friend.countConnected(team.friends);
+    };
+
+    #ok(stats);
+  };
+
   // List all teams a particular user can see
   public func list(teams : TeamDB, user : Principal, known : [Text]) : Result<[TeamUserInfo]> {
     let all = Map.entries(teams);
     let mapped = Iter.map<(Text, Team), TeamUserInfo>(
       all,
       func((key, x)) {
+        let isAdmin = Set.has(x.admins, phash, user);
+        let isMember = Set.has(x.members, phash, user);
         return {
           key;
           info = x.info;
+          invite = if isAdmin ?x.invite else null;
           permissions = {
-            isMember = Set.has(x.members, phash, user);
-            isAdmin = Set.has(x.admins, phash, user);
+            isMember;
+            isAdmin;
           };
         };
       },
@@ -120,4 +144,6 @@ module {
 
     #ok(team.info);
   };
+
+  public func isAdmin(team : Team, user : Principal) : Bool = Set.has(team.admins, phash, user);
 };

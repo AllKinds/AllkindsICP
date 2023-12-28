@@ -1,11 +1,9 @@
 import { Effect, pipe } from "effect";
-import { FrontendEffect, Question, Answer, User, Friend, UserMatch, TeamInfo, TeamUserInfo } from "~/utils/backend";
+import { FrontendEffect, Question, Answer, User, Friend, UserMatch, TeamStats, TeamUserInfo, QuestionStats } from "~/utils/backend";
 import * as backend from "~/utils/backend";
 import { FrontendError, notifyWithMsg } from "~/utils/errors";
 import { defineStore } from 'pinia'
 import * as errors from "~/utils/errors";
-import { string } from "effect/dist/declarations/src/Equivalence";
-import { forEach } from "effect/dist/declarations/src/Chunk";
 
 export type AppState = {
     user: NetworkData<User>,
@@ -18,6 +16,8 @@ export type AppState = {
     matches: NetworkData<UserMatch[]>,
     teams: NetworkData<TeamUserInfo[]>,
     principal: NetworkData<Principal>,
+    teamStats: NetworkData<TeamStats>,
+    questionStats: NetworkData<QuestionStats[]>,
 };
 
 type NotificationLevel = "ok" | "warning" | "error";
@@ -150,6 +150,8 @@ const defaultAppState: () => AppState = () => {
         matches: dataInit,
         teams: dataInit,
         principal: dataInit,
+        teamStats: dataInit,
+        questionStats: dataInit,
     }
 };
 
@@ -324,7 +326,39 @@ export const useAppState = defineStore({
         createTeam(team: string, name: string, about: string, logo: number[], listed: boolean, code: string): Promise<void> {
             return runNotify(backend.createTeam(team, name, about, logo, listed, code), "Welcome to the team!");
         },
+        deleteQuestion(q: Question) {
+            return runNotify(backend.deleteQuestion(this.team, q), "Question removed")
+        },
 
+        getTeamStats() {
+            return this.teamStats as NetworkData<TeamStats>; // TODO remove `as ...`
+        },
+        setTeamStats(teams: NetworkData<TeamStats>): void {
+            const old = this.teamStats as NetworkData<TeamStats>
+            this.teamStats = { status: "requested", errCount: 0, data: undefined };
+            setTimeout(() => this.teamStats = combineNetworkData(old, teams));
+        },
+        loadTeamStats(maxAgeS?: number) {
+            if (shouldUpdate(this.teamStats, maxAgeS)) {
+                runStore(this.teamStats, backend.loadTeamStats(this.team), this.setTeamStats)
+                    .catch(console.error);
+            }
+        },
+
+        getQuestionStats() {
+            return this.questionStats as NetworkData<QuestionStats[]>; // TODO remove `as ...`
+        },
+        setQuestionStats(stats: NetworkData<QuestionStats[]>): void {
+            const old = this.questionStats as NetworkData<QuestionStats[]>
+            this.questionStats = { status: "requested", errCount: 0, data: undefined };
+            setTimeout(() => this.questionStats = combineNetworkData(old, stats));
+        },
+        loadQuestionStats(maxAgeS?: number) {
+            if (shouldUpdate(this.questionStats, maxAgeS)) {
+                runStore(this.questionStats, backend.loadQuestionStats(this.team), this.setQuestionStats)
+                    .catch(console.error);
+            }
+        },
 
     },
 });

@@ -1,11 +1,39 @@
 <script lang="ts" setup>
+import { addExitAnimateToNode } from 'vue3-toastify/index';
+
 definePageMeta({ title: "Welcome" });
 
 const app = useAppState();
 
 if (inBrowser()) {
+    app.getTeam();
     app.loadTeams(0);
+    app.loadTeamStats(0);
 }
+
+const invite = (): string | undefined => {
+    const team = app.getTeam();
+    if (!team) return undefined;
+    const code = app.getTeam()?.invite;
+    if (!code?.length) return "";
+    return document.location.origin + "/welcome" +
+        "?team=" + encodeURIComponent(app.getTeam()?.key || "") +
+        "&invite=" + encodeURIComponent(code[0]);
+}
+const copy = () => {
+    const link = invite();
+    if (link) {
+        navigator.clipboard.writeText(link);
+        addNotification('ok', "Invite link copied.")
+    } else {
+        addNotification('error', "Couldn't generate invite link.\nDo you have admin permissions?")
+    }
+}
+
+const stats = () => {
+    return app.getTeamStats().data
+}
+
 </script>
 
 <template>
@@ -23,29 +51,29 @@ if (inBrowser()) {
             <div class="w-full">
                 Visibility: {{ app.getTeam()?.info.listed ? 'listed' : 'unlisted' }}
             </div>
-            <div class="w-full text-left">
-                <b>{{ 0 }}</b> users <br>
-                <b>{{ 0 }}</b> questions asked <br>
-                <b>{{ 0 }}</b> answers <br>
-                <b>{{ 0 }}</b> connections created <br>
-            </div>
+            <NetworkDataContainer :networkdata="app.getTeamStats()" class="w-full text-left">
+                <b>{{ stats()?.users }}</b> users <br>
+                <b>{{ stats()?.questions }}</b> questions asked <br>
+                <b>{{ stats()?.answers }}</b> answers <br>
+                <b>{{ stats()?.users }}</b> connections created <br>
+            </NetworkDataContainer>
+            <Icon v-if="app.getTeam()?.permissions.isAdmin" name="tabler:user-shield" size="2em"
+                class="float-right text-green-600" />
+            <Icon v-if="app.getTeam()?.permissions.isMember" name="tabler:user-check" size="2em"
+                class="float-right text-green-600" />
             <TextBlock>
                 <h2>About:</h2>
                 {{ app.getTeam()?.info.about }}
             </TextBlock>
         </div>
 
-
-        <Icon v-if="app.getTeam()?.permissions.isAdmin" name="tabler:user-shield" size="2em"
-            class="float-right text-green-600" />
-        <Icon v-if="app.getTeam()?.permissions.isMember" name="tabler:user-check" size="2em"
-            class="float-right text-green-600" />
-
-        <Btn class="w-80">Copy invite link</Btn>
-        <Btn class="w-80">Ask and answer questions</Btn>
-        <Btn class="w-80">Team members</Btn>
-        <Btn class="w-80">Questions</Btn>
-        <Btn class="w-80">Watch demo</Btn>
+        <div class="text-center">
+            <Btn class="w-80" @click="copy()">Copy invite link</Btn>
+            <Btn class="w-80" to="/questions">Ask and answer questions</Btn>
+            <Btn class="w-80" to="/team-members">Team members</Btn>
+            <Btn class="w-80" to="/question-stats">Manage questions</Btn>
+            <Btn class="w-80">Watch demo</Btn>
+        </div>
 
     </NetworkDataContainer>
 </template>

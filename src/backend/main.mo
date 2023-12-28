@@ -45,11 +45,13 @@ actor {
   type QuestionID = Question.QuestionID;
   type Answer = Question.Answer;
   type Skip = Question.Skip;
+  type QuestionStats = Question.QuestionStats;
   type FriendStatus = Friend.FriendStatus;
   type Error = Error.Error;
   type Team = Team.Team;
   type TeamInfo = Team.TeamInfo;
   type TeamUserInfo = Team.TeamUserInfo;
+  type TeamStats = Team.TeamStats;
 
   type MatchingFilter = Matching.MatchingFilter;
   type UserMatch = Matching.UserMatch;
@@ -67,6 +69,8 @@ actor {
   type ResultFriends = Result<[Friend]>;
   type ResultTeam = Result<TeamInfo>;
   type ResultTeams = Result<[TeamUserInfo]>;
+  type ResultTeamStats = Result<TeamStats>;
+  type ResultQuestionStats = Result<[QuestionStats]>;
 
   // UTILITY FUNCTIONS
 
@@ -131,6 +135,10 @@ actor {
     Team.list(db.teams, caller, known);
   };
 
+  public shared query ({ caller }) func getTeamStats(teamKey : Text) : async ResultTeamStats {
+    Team.getStats(db.teams, teamKey);
+  };
+
   // Create default new user with only a username
   public shared ({ caller }) func createUser(displayName : Text, contact : Text) : async ResultUser {
     User.add(db.users, displayName, contact, caller);
@@ -165,6 +173,24 @@ actor {
     #ok(q);
   };
 
+  public shared ({ caller }) func deleteQuestion(teamKey : Text, question : Question) : async Result<()> {
+    let team = switch (Team.get(db.teams, teamKey, caller)) {
+      case (#ok(t)) t;
+      case (#err(e)) return #err(e);
+    };
+
+    let true = Team.isAdmin(team, caller) else return #err(#notInTeam);
+
+    let q = Question.getQuestion(team.questions, question.id);
+
+    // verify that it is the same question
+    if (q.created != question.created) return #err(#questionNotFound);
+
+    Question.hide(team.questions, question.id, true);
+
+    #ok;
+  };
+
   public shared query ({ caller }) func getUnansweredQuestions(teamKey : Text, limit : Nat) : async [Question] {
     let team = switch (Team.get(db.teams, teamKey, caller)) {
       case (#ok(t)) t;
@@ -186,6 +212,18 @@ actor {
     let iter = Question.answered(team.questions, team.answers, caller);
     let limited = IterTools.take(iter, Nat.min(limit, Configuration.api.maxPageSize));
     Iter.toArray(limited);
+  };
+
+  public shared query ({ caller }) func getQuestionStats(teamKey : Text, limit : Nat) : async ResultQuestionStats {
+    let team = switch (Team.get(db.teams, teamKey, caller)) {
+      case (#ok(t)) t;
+      case (#err(e)) return #err(e);
+    };
+
+    let iter = Question.getQuestionStats(team.questions, team.answers, team.skips);
+    let limited = IterTools.take(iter, Nat.min(limit, Configuration.api.maxPageSize));
+
+    #ok(Iter.toArray(limited));
   };
 
   public shared query ({ caller }) func getOwnQuestions(teamKey : Text, limit : Nat) : async [Question] {
@@ -244,7 +282,7 @@ actor {
       case (#err(e)) return #err(e);
     };
 
-    if (Question.countAnswers(team.answers, caller) < Configuration.matching.minAnswers) {
+    if (Question.countUserAnswers(team.answers, caller) < Configuration.matching.minAnswers) {
       return #err(#notEnoughAnswers);
     };
 
@@ -442,6 +480,15 @@ actor {
           Debug.trap(debug_show (error) # " when creating user " # name);
         };
       };
+
+      let res2 = Team.addMember(db.teams, teamKey, team.invite, principal);
+      switch (res2) {
+        case (#ok(_)) {};
+        case (#err(error)) {
+          Debug.trap(debug_show (error) # " when adding user " # name # " as a memeber");
+        };
+      };
+
       let qs = Question.unanswered(team.questions, team.answers, team.skips, principal);
       for (q in qs) {
         randI += 1;

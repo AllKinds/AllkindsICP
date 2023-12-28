@@ -27,6 +27,7 @@ function canCreate() {
 }
 
 if (inBrowser()) {
+    app.getTeam()
     app.loadUser();
 }
 

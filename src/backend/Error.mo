@@ -19,5 +19,6 @@ module {
     #tooShort;
     #tooLong;
     #invalidColor;
+    #questionNotFound;
   };
 };

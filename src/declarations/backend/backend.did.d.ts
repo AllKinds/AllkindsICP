@@ -45,7 +45,23 @@ export interface Question {
 }
 export type QuestionID = bigint;
 export type QuestionID__1 = bigint;
+export interface QuestionStats {
+  'no' : bigint,
+  'yes' : bigint,
+  'question' : Question__1,
+  'answers' : bigint,
+  'boosts' : bigint,
+  'skips' : bigint,
+}
 export interface Question__1 {
+  'id' : QuestionID__1,
+  'created' : Time__1,
+  'creator' : [] | [string],
+  'question' : string,
+  'color' : string,
+  'points' : bigint,
+}
+export interface Question__2 {
   'id' : QuestionID__1,
   'created' : Time__1,
   'creator' : [] | [string],
@@ -61,9 +77,13 @@ export type ResultFriends = { 'ok' : Array<Friend> } |
   { 'err' : Error };
 export type ResultQuestion = { 'ok' : Question } |
   { 'err' : Error };
+export type ResultQuestionStats = { 'ok' : Array<QuestionStats> } |
+  { 'err' : Error };
 export type ResultSkip = { 'ok' : Skip } |
   { 'err' : Error };
 export type ResultTeam = { 'ok' : TeamInfo__1 } |
+  { 'err' : Error };
+export type ResultTeamStats = { 'ok' : TeamStats } |
   { 'err' : Error };
 export type ResultTeams = { 'ok' : Array<TeamUserInfo> } |
   { 'err' : Error };
@@ -82,6 +102,7 @@ export interface StableQuestion {
   'creator' : Principal,
   'question' : string,
   'color' : string,
+  'hidden' : boolean,
   'points' : bigint,
 }
 export interface TeamInfo {
@@ -96,10 +117,17 @@ export interface TeamInfo__1 {
   'name' : string,
   'listed' : boolean,
 }
+export interface TeamStats {
+  'answers' : bigint,
+  'connections' : bigint,
+  'users' : bigint,
+  'questions' : bigint,
+}
 export interface TeamUserInfo {
   'key' : string,
   'permissions' : Permissions,
   'info' : TeamInfo,
+  'invite' : [] | [string],
 }
 export type Time = bigint;
 export type Time__1 = bigint;
@@ -121,9 +149,9 @@ export interface UserInfo {
 }
 export interface UserMatch {
   'cohesion' : number,
-  'answered' : Array<[Question__1, AnswerDiff]>,
+  'answered' : Array<[Question__2, AnswerDiff]>,
   'user' : UserInfo,
-  'uncommon' : Array<Question__1>,
+  'uncommon' : Array<Question__2>,
 }
 export interface UserStats {
   'asked' : bigint,
@@ -151,6 +179,7 @@ export interface _SERVICE {
   'createTeam' : ActorMethod<[string, string, TeamInfo__1], ResultTeam>,
   'createTestData' : ActorMethod<[string, bigint, bigint], bigint>,
   'createUser' : ActorMethod<[string, string], ResultUser>,
+  'deleteQuestion' : ActorMethod<[string, Question], Result>,
   'getAnsweredQuestions' : ActorMethod<
     [string, bigint],
     Array<[Question, Answer]>
@@ -158,6 +187,8 @@ export interface _SERVICE {
   'getFriends' : ActorMethod<[string], ResultFriends>,
   'getMatches' : ActorMethod<[string], ResultUserMatches>,
   'getOwnQuestions' : ActorMethod<[string, bigint], Array<Question>>,
+  'getQuestionStats' : ActorMethod<[string, bigint], ResultQuestionStats>,
+  'getTeamStats' : ActorMethod<[string], ResultTeamStats>,
   'getUnansweredQuestions' : ActorMethod<[string, bigint], Array<Question>>,
   'getUser' : ActorMethod<[], ResultUser>,
   'joinTeam' : ActorMethod<[string, string], ResultTeam>,

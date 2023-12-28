@@ -1,35 +1,36 @@
 {
-  "name": "allkinds",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "build": "nuxt build --prerender",
-    "dev": "nuxt dev",
-    "generate": "nuxt generate",
-    "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
-  },
-  "devDependencies": {
-    "@dfinity/auth-client": "^0.19.3",
-    "@dfinity/identity": "^0.19.3",
-    "@nuxt/devtools": "latest",
-    "@nuxtjs/google-fonts": "^3.0.2",
-    "@nuxtjs/tailwindcss": "^6.8.0",
-    "@playwright/test": "^1.40.1",
-    "@tailwindcss/typography": "^0.5.10",
-    "@types/node": "^20.10.1",
-    "daisyui": "^3.9.2",
-    "nuxt": "^3.7.4",
-    "nuxt-icon": "^0.5.0",
-    "vue": "^3.3.4",
-    "vue-router": "^4.2.5",
-    "vue-textarea-autogrow-directive": "^0.2.0"
-  },
-  "dependencies": {
-    "@pinia/nuxt": "^0.5.1",
-    "effect": "^2.0.0-next.52",
-    "pinia": "^2.1.7",
-    "theme-change": "^2.5.0",
-    "vue3-toastify": "^0.1.14"
-  }
+    "name": "allkinds",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "nuxt build --prerender",
+        "dev": "nuxt dev",
+        "generate": "nuxt generate",
+        "preview": "nuxt preview",
+        "postinstall": "nuxt prepare",
+        "dfx-generate": "dfx generate && sed -i '/^export const backend/d' src/declarations/backend/index.js"
+    },
+    "devDependencies": {
+        "@dfinity/auth-client": "^0.19.3",
+        "@dfinity/identity": "^0.19.3",
+        "@nuxt/devtools": "latest",
+        "@nuxtjs/google-fonts": "^3.0.2",
+        "@nuxtjs/tailwindcss": "^6.8.0",
+        "@playwright/test": "^1.40.1",
+        "@tailwindcss/typography": "^0.5.10",
+        "@types/node": "^20.10.1",
+        "daisyui": "^3.9.2",
+        "nuxt": "^3.7.4",
+        "nuxt-icon": "^0.5.0",
+        "vue": "^3.3.4",
+        "vue-router": "^4.2.5",
+        "vue-textarea-autogrow-directive": "^0.2.0"
+    },
+    "dependencies": {
+        "@pinia/nuxt": "^0.5.1",
+        "effect": "^2.0.0-next.52",
+        "pinia": "^2.1.7",
+        "theme-change": "^2.5.0",
+        "vue3-toastify": "^0.1.14"
+    }
 }

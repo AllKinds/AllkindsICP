@@ -52,6 +52,15 @@ module {
     return { next };
   };
 
+  public func countConnected(friends : FriendDB) : Nat {
+    Iter.size(
+      Iter.filter<(Principal, Principal, FriendStatus)>(
+        backup(friends),
+        func(a, b, s) = s == #connected,
+      )
+    ) / 2;
+  };
+
   public func request(friends : FriendDB, sender : Principal, recipient : Principal, accept : Bool) : Result<(), Error> {
     let senderFriends = getFriends(friends, sender);
     let recipientFriends = getFriends(friends, recipient);

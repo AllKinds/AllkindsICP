@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { TeamUserInfo } from '~/utils/backend';
 
-
 definePageMeta({ title: "Welcome" });
 const app = useAppState();
 const invite = useState("invite-code", () => "");
@@ -21,9 +20,13 @@ if (inBrowser()) {
 
 }
 
+let gotoInfo = false;
+
 const setTeam = (t: TeamUserInfo) => {
     app.setTeam(t.key);
-    if (t.permissions.isMember) {
+    if (gotoInfo) {
+        navigateTo("/team-info")
+    } else if (t.permissions.isMember) {
         navigateTo("/questions")
     } else {
         navigateTo("/join-team")
@@ -53,6 +56,9 @@ const setTeam = (t: TeamUserInfo) => {
                     class="float-right text-green-600" />
                 <Icon v-if="t.permissions.isMember" name="tabler:user-check" size="2em"
                     class="float-right text-green-600" />
+                <NuxtLink to="/team-info" @click="gotoInfo = true">
+                    <Icon name="tabler:info-hexagon" size="2em" class="float-right text-white" />
+                </NuxtLink>
                 <div class="text-2xl">
                     {{ t.info.name }}
                 </div>

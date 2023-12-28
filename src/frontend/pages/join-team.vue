@@ -11,7 +11,10 @@ if (inBrowser()) {
 const getTeam = () => app.getTeam();
 
 const join = () => {
-    app.joinTeam(invite.value).then(() => { navigateTo("/questions") });
+    app.joinTeam(invite.value).then(() => {
+        app.loadTeams(0);
+        navigateTo("/questions")
+    });
 }
 
 </script>
@@ -39,7 +42,7 @@ const join = () => {
         <div class="w-2 flex-grow"></div>
 
         <div class="text-center w-full mt-4">
-            <TextInput v-model.trim="invite" placeholder="invite-code" class="text-center" />
+            <TextInput v-model.trim="invite" @keyup.enter="join()" placeholder="invite-code" class="text-center" />
 
         </div>
         <div class="w-2 flex-grow"></div>

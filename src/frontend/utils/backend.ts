@@ -5,7 +5,6 @@ export type BackendActor = typeof backend;
 import { Effect } from "effect";
 import type { Principal } from "@dfinity/principal";
 import { BackendError, FrontendError, toBackendError, toNetworkError } from "~/utils/errors";
-import { Question, Answer, Skip, User, Friend, UserMatch, TeamUserInfo } from "./backend";
 import { FriendStatus } from "./backend";
 
 type BackendEffect<T> = Effect.Effect<never, BackendError, T>
@@ -85,6 +84,15 @@ export const loadTeams = (known: string[]): FrontendEffect<TeamUserInfo[]> => {
     return effectifyResult((actor) => actor.listTeams(known))
 }
 
+export const loadTeamStats = (team: string): FrontendEffect<TeamStats> => {
+    return effectifyResult((actor) => actor.getTeamStats(team))
+}
+
+export const loadQuestionStats = (team: string): FrontendEffect<QuestionStats[]> => {
+    const limit = BigInt(200);
+    return effectifyResult((actor) => actor.getQuestionStats(team, limit))
+}
+
 export type FriendStatusKey = "requestSend"
     | "requestReceived"
     | "connected"
@@ -157,6 +165,9 @@ export const createTeam = (team: string, name: string, about: string, logo: numb
     return effectifyResult((actor) => actor.createTeam(team, code, { name, about, logo, listed }))
 }
 
+export const deleteQuestion = (team: string, question: Question): FrontendEffect<void> => {
+    return effectifyResult((actor) => actor.deleteQuestion(team, question))
+}
 
 export const getOwnPrinciapl = (): FrontendEffect<Principal> => {
     return effectify((actor) => actor.whoami())
