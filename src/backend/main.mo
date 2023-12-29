@@ -27,6 +27,7 @@ import Question "Question";
 import User "User";
 import Friend "Friend";
 import Team "Team";
+import Admin "Admin";
 import Matching "Matching";
 import Configuration "Configuration";
 import Error "Error";
@@ -71,6 +72,7 @@ actor {
   type ResultTeams = Result<[TeamUserInfo]>;
   type ResultTeamStats = Result<TeamStats>;
   type ResultQuestionStats = Result<[QuestionStats]>;
+  type AdminPermissions = Admin.Permissions;
 
   // UTILITY FUNCTIONS
 
@@ -81,21 +83,24 @@ actor {
   type SkipDB = Question.SkipDB;
   type FriendDB = Friend.FriendDB;
   type TeamDB = Team.TeamDB;
+  type AdminDB = Admin.AdminDB;
 
   type DBv1 = {
     users : UserDB;
     teams : TeamDB;
   };
 
+  // Stable vars
   stable var db_v1 : DBv1 = {
     users = User.emptyDB();
     teams = Team.emptyDB();
   };
 
+  stable var admins_v1 : AdminDB = Admin.emptyDB();
+
   // alias for current db version
   var db = db_v1;
-
-  var insecureRandom = Prng.SFC64a(); // insecure random numbers
+  var admins = admins_v1;
 
   // Upgrade canister
   system func preupgrade() {
@@ -112,11 +117,23 @@ actor {
     //};
   };
 
+  var insecureRandom = Prng.SFC64a(); // insecure random numbers
+
   // PUBLIC API
 
   // Get own principal
   public query ({ caller }) func whoami() : async Principal {
     caller;
+  };
+
+  public query ({ caller }) func getPermissions() : async {
+    principal : Principal;
+    permissions : AdminPermissions;
+  } {
+    {
+      principal = caller;
+      permissions = Admin.getPermissions(admins, caller);
+    };
   };
 
   // Create default new team
