@@ -78,7 +78,7 @@ module {
       info;
       invite;
       members = Set.new();
-      admins = Set.new();
+      admins = Set.make(phash, admin);
       questions = Question.emptyDB();
       answers = Question.emptyAnswerDB();
       skips = Question.emptySkipDB();
