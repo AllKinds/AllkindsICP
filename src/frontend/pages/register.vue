@@ -70,7 +70,7 @@ if (inBrowser()) {
     <div class="grow" />
 
     <Btn class="m-auto mt-12" :class="{ 'btn-disabled': username === '' }" @click="createUser()">
-        Create
+        Join
     </Btn>
 
     <ICFooter />
