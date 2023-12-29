@@ -20,6 +20,13 @@ export default defineNuxtConfig({
     {
         head: {
             titleTemplate: (t) => { return t ? `${t} - Allkinds` : 'Allkinds' },
+            script: [
+                {
+                    hid: 'sentry',
+                    src: 'https://js.sentry-cdn.com/707065f47a8533141c2cc9ce69029836.min.js',
+                    crossorigin: 'anonymous'
+                }
+            ]
         },
     },
     googleFonts: {
