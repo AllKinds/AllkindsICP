@@ -19,7 +19,7 @@ const q = props.question;
 <template>
     <NuxtLink :to="props.link ? '/answer-question/' + q.id : ''"
         :class="getColor(props.color || q.color as ColorName).color"
-        class="border p-4 w-full my-2 rounded-lg block text-2xl font-medium text-ellipsis overflow-x-hidden">
+        class="border p-4 w-full my-2 rounded-lg block text-2xl font-medium text-ellipsis">
         <Icon v-if="props.link" name="material-symbols:arrow-forward-ios" class="float-right mt-1" />
         <span v-if="props.showScore" class="float-right">{{ q.points }}</span>
         {{ q.question }}

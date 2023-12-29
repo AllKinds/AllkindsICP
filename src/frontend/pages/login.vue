@@ -32,6 +32,8 @@ if (await Effect.runPromise(checkAuth(null)).catch((e) => false)) {
             </p>
         </TextBlock>
 
+        <div class="w-full flex-grow"></div>
+
         <Btn class="w-72" @click="login('II')">
             Log in with Internet&nbsp;Identity
         </Btn>
