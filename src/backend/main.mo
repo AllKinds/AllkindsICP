@@ -322,9 +322,6 @@ actor {
       withoutFriends,
       func(id, user) {
         let res = Matching.getUserMatch(db.users, team.questions, team.answers, team.skips, caller, id, false);
-        if (user.username != "admin") {
-          let #ok(_) = res else Debug.trap("error in getMatches " # debug_show (res) # " with user " # user.username);
-        };
         Result.toOption(res); // TODO?: handle errors instead of removing them?
       },
     );

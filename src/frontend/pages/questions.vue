@@ -15,7 +15,7 @@ if (inBrowser()) {
 
 
 <template>
-    <AllkindsTitle link-to="/welcome">
+    <AllkindsTitle link-to="/team-info">
         {{ app.checkTeam() }}
         <NuxtLink to="/my-profile" class="m-auto">
             {{ app.getUser().displayName }}, {{ app.getUser().stats.points }}
