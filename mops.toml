@@ -4,3 +4,7 @@ itertools = "0.1.1"
 StableBuffer = "https://github.com/f0i/StableBuffer#main"
 map = "9.0.1"
 prng = "0.0.3"
+
+[toolchain]
+moc = "0.10.3"
+pocket-ic = "1.0.0"

@@ -54,7 +54,7 @@ let diff = {}
     </AllkindsTitle>
 
     <div class="p-3 w-full">
-        <NuxtLink class="float-right" @click="connect(m().user.username)">
+        <NuxtLink class="float-right cursor-pointer" @click="connect(m().user.username)">
             <Icon name="prime:user-plus" size="3em" />
         </NuxtLink>
         <div class="text-xl font-bold">

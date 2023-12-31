@@ -19,23 +19,33 @@ Allkinds is a web3 protocol that empowers individuals and organizations to creat
 
 II included for faster local authentication testing
 
-requires at least DFX v0.15.2, Motoko v0.10.2 (use [mocv](https://forum.dfinity.org/t/moc-version-management/19011)) and the [mops](https://mops.one/docs/install) packet manager.
+requires at least DFX v0.15.2 and the [mops](https://mops.one/docs/install) packet manager.
+
+### Initial setup
 
 ```bash
 # install dfx, mops and mocv
 sh -ci "$(curl -fsSL https://internetcomputer.org/install.sh)"
 npm i -g ic-mops
-npm i -g mocv
 
-# set compiler version
-mocv use 0.10.2
-
-# start local testnet
-dfx start --clean --background
+# enable mops toolchain
+mops toolchain init
+. ~/.bashrc # or restart your terminal
 
 # get the code
-git clone https://github.com/AllKinds/AllkindsICP && cd AllkindsICP
+git clone https://github.com/AllKinds/AllkindsICP
+```
+
+### Start dev environment
+
+```bash
+# start local testnet
+dfx start --background # add --clean to start over
+
+# load frontend dependencies
+cd AllkindsICP
 npm install
+
 # deploy the canister locally
 dfx deploy
 ```
