@@ -5,13 +5,6 @@ import { colors } from '~/utils/color';
 defineProps(["modelValue"]);
 defineEmits(["update:modelValue"]);
 
-const el = ref();
-const setColor = {
-
-}
-
-
-
 </script>
 
 <template>

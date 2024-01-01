@@ -1,4 +1,8 @@
 <script lang="ts" setup>
+definePageMeta({
+    title: "Contacts",
+    layout: 'default'
+});
 import { FriendStatus, UserMatch } from '../../utils/backend';
 
 
@@ -56,29 +60,32 @@ let diff = {}
 </script>
 
 <template>
-    <AllkindsTitle class="w-full" logo="ph:x-circle" linkTo="/contacts">
-    </AllkindsTitle>
+    <div class="w-full flex-grow flex flex-col">
+        <AllkindsTitle class="w-full" logo="ph:x-circle" linkTo="/contacts">
+        </AllkindsTitle>
 
-    <div class="p-3 w-full">
-        <NuxtLink class="float-right" @click="connect(m()[0].user.username)" v-if="canSendFriendRequest(m()[1])">
-            <Icon name="prime:user-plus" size="3em" />
-        </NuxtLink>
-        <NuxtLink class="float-right" @click="disconnect(m()[0].user.username)" v-if="canSendRemoveFriendRequest(m()[1])">
-            <Icon name="prime:user-minus" size="3em" />
-        </NuxtLink>
-        <div class="text-xl font-bold">
-            {{ m()[0].user.displayName }} ({{ formatFriendStatus(m()[1]) }})
+        <div class="p-3 w-full">
+            <NuxtLink class="float-right" @click="connect(m()[0].user.username)" v-if="canSendFriendRequest(m()[1])">
+                <Icon name="prime:user-plus" size="3em" />
+            </NuxtLink>
+            <NuxtLink class="float-right" @click="disconnect(m()[0].user.username)"
+                v-if="canSendRemoveFriendRequest(m()[1])">
+                <Icon name="prime:user-minus" size="3em" />
+            </NuxtLink>
+            <div class="text-xl font-bold">
+                {{ m()[0].user.displayName }} ({{ formatFriendStatus(m()[1]) }})
+            </div>
+            <div>
+                Cohesion score: {{ m()[0].cohesion }}% on {{ m()[0].answered.length }} questions
+            </div>
         </div>
-        <div>
-            Cohesion score: {{ m()[0].cohesion }}% on {{ m()[0].answered.length }} questions
+
+        <Question v-for="[q, diff] in m()[0].answered" :question="q" :color="diff.sameAnswer ? 'green' : 'black'" />
+
+
+        <Question v-for="(q, i) in m()[0].uncommon" :question="q" :link="true" />
+
+        <div class="p-12">
         </div>
-    </div>
-
-    <Question v-for="[q, diff] in m()[0].answered" :question="q" :color="diff.sameAnswer ? 'green' : 'black'" />
-
-
-    <Question v-for="(q, i) in m()[0].uncommon" :question="q" :link="true" />
-
-    <div class="p-12">
     </div>
 </template>

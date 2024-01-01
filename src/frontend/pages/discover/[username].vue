@@ -1,6 +1,10 @@
 <script lang="ts" setup>
 import { UserMatch } from '../../utils/backend';
 
+definePageMeta({
+    title: "Contacts",
+    layout: 'default'
+});
 
 const route = useRoute();
 const app = useAppState();
@@ -50,25 +54,27 @@ let diff = {}
 </script>
 
 <template>
-    <AllkindsTitle class="w-full" logo="ph:x-circle" linkTo="/discover">
-    </AllkindsTitle>
+    <div class="w-full flex-grow flex flex-col">
+        <AllkindsTitle class="w-full" logo="ph:x-circle" linkTo="/discover">
+        </AllkindsTitle>
 
-    <div class="p-3 w-full">
-        <NuxtLink class="float-right cursor-pointer" @click="connect(m().user.username)">
-            <Icon name="prime:user-plus" size="3em" />
-        </NuxtLink>
-        <div class="text-xl font-bold">
-            {{ m().user.displayName }}
+        <div class="p-3 w-full">
+            <NuxtLink class="float-right cursor-pointer" @click="connect(m().user.username)">
+                <Icon name="prime:user-plus" size="3em" />
+            </NuxtLink>
+            <div class="text-xl font-bold">
+                {{ m().user.displayName }}
+            </div>
+            <div>
+                Cohesion score: {{ m().cohesion }}% on {{ m().answered.length }} questions
+            </div>
         </div>
-        <div>
-            Cohesion score: {{ m().cohesion }}% on {{ m().answered.length }} questions
+
+        <Question v-for="[q, diff] in m().answered" :question="q" :color="diff.sameAnswer ? 'green' : 'black'" />
+
+        <Question v-for="(q, i) in m().uncommon" :question="q" :link="true" />
+
+        <div class="p-12">
         </div>
-    </div>
-
-    <Question v-for="[q, diff] in m().answered" :question="q" :color="diff.sameAnswer ? 'green' : 'black'" />
-
-    <Question v-for="(q, i) in m().uncommon" :question="q" :link="true" />
-
-    <div class="p-12">
     </div>
 </template>

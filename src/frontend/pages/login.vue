@@ -5,7 +5,10 @@ Page to select login provider and initiate login process
 <script lang="ts" setup>
 import { Effect } from "effect";
 
-definePageMeta({ title: "Log in" });
+definePageMeta({
+    title: "Allkinds",
+    layout: 'default'
+});
 
 async function login(provider: Provider) {
     if (await Effect.runPromise(checkAuth(provider))) {

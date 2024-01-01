@@ -1,5 +1,8 @@
 <script lang="ts" setup>
-definePageMeta({ title: "Contacts" });
+definePageMeta({
+    title: "Contacts",
+    layout: 'default'
+});
 
 const app = useAppState();
 
@@ -11,26 +14,28 @@ if (inBrowser()) {
 
 
 <template>
-    <AllkindsTitle logo="ph:x-circle" logoSize="2em" linkTo="/questions">
-        <NuxtLink to="/my-profile" class="m-auto">
-            {{ app.getUser().displayName }}, {{ app.getUser().stats.points }}
-            <Icon name="gg:shape-hexagon" class="mb-2" />
-        </NuxtLink>
+    <div class="w-full flex-grow flex flex-col">
+        <AllkindsTitle logo="ph:x-circle" logoSize="2em" linkTo="/questions">
+            <NuxtLink to="/my-profile" class="m-auto">
+                {{ app.getUser().displayName }}, {{ app.getUser().stats.points }}
+                <Icon name="gg:shape-hexagon" class="mb-2" />
+            </NuxtLink>
 
-        <div class="w-10"></div>
-    </AllkindsTitle>
+            <div class="w-10"></div>
+        </AllkindsTitle>
 
-    <NetworkDataContainer :networkdata="app.getMatches()" class="w-96 pb-32">
-        <div v-if="app.getMatches().data?.length === 0">
-            No matches found.
-            <br>
-            You need at least 5 questions in common to see each others coherence score.
-        </div>
+        <NetworkDataContainer :networkdata="app.getMatches()" class="w-96 pb-32">
+            <div v-if="app.getMatches().data?.length === 0">
+                No matches found.
+                <br>
+                You need at least 5 questions in common to see each others coherence score.
+            </div>
 
-        <NuxtLink v-for="match in app.getMatches().data" :to="'/discover/' + match.user.username"
-            class="text-xl font-bold flex flex-row w-full p-3">
-            <div class="flex-grow">{{ match.user.displayName }}</div>
-            <div>{{ match.cohesion }}% <span class="">({{ match.answered.length }})</span></div>
-        </NuxtLink>
-    </NetworkDataContainer>
+            <NuxtLink v-for="match in app.getMatches().data" :to="'/discover/' + match.user.username"
+                class="text-xl font-bold flex flex-row w-full p-3">
+                <div class="flex-grow">{{ match.user.displayName }}</div>
+                <div>{{ match.cohesion }}% <span class="">({{ match.answered.length }})</span></div>
+            </NuxtLink>
+        </NetworkDataContainer>
+    </div>
 </template>

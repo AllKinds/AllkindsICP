@@ -1,6 +1,5 @@
-
 <script lang="ts" setup>
-import { Question, answerQuestion, skipQuestion } from '~/utils/backend';
+import { Question } from '~/utils/backend';
 const emit = defineEmits(["answered", "answering"]);
 
 const props = defineProps<{
@@ -9,8 +8,6 @@ const props = defineProps<{
     color?: ColorName,
     showScore?: boolean,
 }>();
-
-console.log("question is", props.question);
 
 const q = props.question;
 

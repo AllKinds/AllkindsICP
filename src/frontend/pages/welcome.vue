@@ -1,7 +1,10 @@
 <script lang="ts" setup>
 import { TeamUserInfo } from '~/utils/backend';
 
-definePageMeta({ title: "Welcome" });
+definePageMeta({
+    title: "Allkinds",
+    layout: 'default'
+});
 const app = useAppState();
 const invite = useState("invite-code", () => "");
 
@@ -17,7 +20,6 @@ if (inBrowser()) {
     } catch {
         app.loadTeams(0)
     }
-
 }
 
 let gotoInfo = false;
@@ -36,41 +38,43 @@ const setTeam = (t: TeamUserInfo) => {
 </script>
 
 <template>
-    <AllkindsTitle>Welcome</AllkindsTitle>
-    <TextBlock align="text-center">
-        <h1>Welcome to Allkinds.teams</h1>
-    </TextBlock>
+    <div class="w-full flex-grow">
+        <AllkindsTitle>Welcome</AllkindsTitle>
+        <TextBlock align="text-center">
+            <h1>Welcome to Allkinds.teams</h1>
+        </TextBlock>
 
-    <NetworkDataContainer :networkdata="app.getTeams()" class="w-full text-lg">
-        <div class="w-full text-center mb-8">
-            Available teams: {{ app.getTeams().data?.length }}
-        </div>
-
-        <div v-for="t in app.getTeams().data" @click="setTeam(t)"
-            class="border border-white p-4 rounded-lg my-2 w-full cursor-pointer flex ">
-            <div>
-                <img :src="toDataUrl(t.info.logo)" height="100" width="100" class="rounded-md" />
+        <NetworkDataContainer :networkdata="app.getTeams()" class="w-full text-lg text-center">
+            <div class="w-full text-center mb-8">
+                Available teams: {{ app.getTeams().data?.length }}
             </div>
-            <div class="w-full pl-4">
 
-                <NuxtLink to="/team-info" @click="gotoInfo = true">
-                    <Icon name="tabler:info-hexagon" size="2em" class="float-right text-white" />
-                </NuxtLink>
-                <Icon v-if="t.permissions.isAdmin" name="tabler:user-shield" size="2em"
-                    class="float-right text-green-600" />
-                <Icon v-if="t.permissions.isMember" name="tabler:user-check" size="2em"
-                    class="float-right text-green-600" />
-                <div class="text-2xl">
-                    {{ t.info.name }}
+            <Btn to="/create-team" class="w-72 mb-10">Create a new team</Btn>
+
+            <div v-for="t in app.getTeams().data" @click="setTeam(t)"
+                class="border border-white p-4 rounded-lg my-2 w-full cursor-pointer flex ">
+                <div>
+                    <img :src="toDataUrl(t.info.logo)" height="100" width="100" class="rounded-md" />
                 </div>
-                <p class="whitespace-pre-wrap">
-                    {{ t.info.about }}
-                </p>
+                <div class="w-full pl-4">
+
+                    <NuxtLink to="/team-info" @click="gotoInfo = true">
+                        <Icon name="tabler:info-hexagon" size="2em" class="float-right text-white" />
+                    </NuxtLink>
+                    <Icon v-if="t.permissions.isAdmin" name="tabler:user-shield" size="2em"
+                        class="float-right text-green-600" />
+                    <Icon v-if="t.permissions.isMember" name="tabler:user-check" size="2em"
+                        class="float-right text-green-600" />
+                    <div class="text-2xl">
+                        {{ t.info.name }}
+                    </div>
+                    <p class="whitespace-pre-wrap">
+                        {{ t.info.about }}
+                    </p>
+                </div>
             </div>
-        </div>
-    </NetworkDataContainer>
+        </NetworkDataContainer>
 
-    <div class="w-full flex-grow" />
-
-    <Btn to="/create-team" class="w-72 mb-10">Create a new team</Btn>
+        <div class="w-full flex-grow" />
+    </div>
 </template>

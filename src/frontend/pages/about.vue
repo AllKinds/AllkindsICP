@@ -1,29 +1,34 @@
 <script lang="ts" setup>
-definePageMeta({ title: "Privacy" });
-
+definePageMeta({
+    title: "About",
+    layout: 'default'
+});
 </script>
 
 <template>
-    <AllkindsTitle>Hello</AllkindsTitle>
+    <div class="w-full flex-grow flex flex-col">
+        <AllkindsTitle>Hello</AllkindsTitle>
 
-    <TextBlock align="text-left" class="w-96">
-        <p>
-            Allkinds.Team is build fully on blockchain, the Internet Computer.
-        </p>
+        <TextBlock align="text-left" class="w-96">
+            <p>
+                Allkinds.Team is build fully on blockchain, the Internet Computer.
+            </p>
 
-        <p>
-            One of it's main features is to guarantee your privacy while asking and answering each others questions.
-        </p>
+            <p>
+                One of it's main features is to guarantee your privacy while asking and answering each others questions.
+            </p>
 
-        <p>
-            While we are just piloting with you, we would like to ask you to track your actions so we can understand how to
-            improve the service.
-        </p>
-    </TextBlock>
+            <p>
+                While we are just piloting with you, we would like to ask you to track your actions so we can understand how
+                to
+                improve the service.
+            </p>
+        </TextBlock>
 
-    <div class="grow" />
+        <div class="grow" />
 
-    <Btn to="/register">Agree</Btn>
+        <Btn to="/register">Agree</Btn>
 
-    <ICFooter />
+        <ICFooter />
+    </div>
 </template>

@@ -1,3 +1,12 @@
+<script lang="ts" setup>
+definePageMeta({
+    title: "About",
+    layout: 'default'
+});
+</script>
+
 <template>
-  <NuxtLink to="/">back</NuxtLink>
+    <div class="w-full flex-grow flex flex-col">
+        <NuxtLink to="/">back</NuxtLink>
+    </div>
 </template>

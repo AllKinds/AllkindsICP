@@ -54,8 +54,8 @@ You can also run the local dev server or generate some test data:
 
 ```bash
 # create a team
-dfx canister call backend createTeam '("sandbox", "test-invite-code", record {about="Temporary test data"; logo=vec {}; name="Test data"; listed=false})'
-dfx canister call backend joinTeam '("sandbox", "test-invite-code")'
+dfx canister call backend createTeam '("sandbox", "testcode", record {about="Temporary test data"; logo=vec {}; name="Test data"; listed=false})'
+dfx canister call backend joinTeam '("sandbox", "testcode")'
 # create 20 questions and 30 users
 dfx canister call backend createTestData '("sandbox", 20, 30)'
 

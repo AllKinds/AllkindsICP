@@ -3,6 +3,7 @@ import { themeChange } from "theme-change";
 import 'vue3-toastify/dist/index.css'
 import { Effect } from "effect";
 
+
 onMounted(() => {
     themeChange(false);
 });
@@ -35,3 +36,24 @@ if (inBrowser()) {
         </div>
     </div>
 </template>
+
+
+<style>
+.page-enter-active,
+.page-leave-active {
+    transition: all 0.15s;
+    transform: translateY(0%);
+}
+
+.page-enter-from {
+    opacity: 0;
+    transform: translateY(+50%);
+    filter: blur(1rem);
+}
+
+.page-leave-to {
+    opacity: 0;
+    transform: translateY(-50%);
+    filter: blur(1rem);
+}
+</style>

@@ -1,12 +1,16 @@
 <script lang="ts" setup>
-defineProps(["modelValue", "placeholder"]);
+const props = defineProps<{
+    modelValue: string,
+    placeholder?: string,
+    minHeight?: number,
+}>();
 defineEmits(["update:modelValue", "ctrl-enter"]);
 
 function resize(e: any) {
     const t = e.target || e;
     t.style.height = "1px";
     const height = t.scrollHeight;
-    const total = height + 2;
+    const total = Math.max(height + 2, props.minHeight || 0);
     t.style.setProperty("height", total + "px");
 }
 
@@ -21,6 +25,7 @@ onMounted(() => {
     t.addEventListener("drop", resize);
     t.addEventListener("drop", resize);
     setTimeout(() => resize(t));
+    setTimeout(() => resize(t), 400);
 });
 
 onUpdated(() => resize(el.value));

@@ -3,7 +3,10 @@ import { Effect, pipe } from "effect";
 import { FrontendError, formErr } from "../utils/errors";
 import * as backend from "../utils/backend";
 
-definePageMeta({ title: "Personal handle" });
+definePageMeta({
+    title: "Allkinds",
+    layout: 'default'
+});
 const username = useState("username", () => "");
 const contact = useState("contact", () => "");
 const loading = useState("loading", () => false);
@@ -48,30 +51,32 @@ if (inBrowser()) {
 
 </script>
 <template>
-    {{ checkUser() }}
-    <AllkindsTitle>Register</AllkindsTitle>
+    <div class="w-full flex-grow">
+        {{ checkUser() }}
+        <AllkindsTitle>Register</AllkindsTitle>
 
-    <TextBlock align="text-left">
-        Your nickname can be anything
-    </TextBlock>
+        <TextBlock align="text-left">
+            Your nickname can be anything
+        </TextBlock>
 
-    <TextInput name="handle" v-model.trim="username" placeholder="username" required class="w-full m-2"
-        :class="{ 'input-disabled': loading }" />
+        <TextInput name="handle" v-model.trim="username" placeholder="username" required class="w-full m-2"
+            :class="{ 'input-disabled': loading }" />
 
-    <TextBlock align="text-left">
-        If you consider to get in touch with people, leave a way to contact you here.
-        <br />
-        (tg, fb, discord, phone, email)
-    </TextBlock>
+        <TextBlock align="text-left">
+            If you consider to get in touch with people, leave a way to contact you here.
+            <br />
+            (tg, fb, discord, phone, email)
+        </TextBlock>
 
-    <TextInput name="handle" v-model.trim="contact" placeholder="Contact" required class="w-full m-2"
-        :class="{ 'input-disabled': loading }" @keyup.enter="createUser()" />
+        <TextInput name="handle" v-model.trim="contact" placeholder="Contact" required class="w-full m-2"
+            :class="{ 'input-disabled': loading }" @keyup.enter="createUser()" />
 
-    <div class="grow" />
+        <div class="grow" />
 
-    <Btn class="m-auto mt-12" :class="{ 'btn-disabled': username === '' }" @click="createUser()">
-        Join
-    </Btn>
+        <Btn class="m-auto mt-12" :class="{ 'btn-disabled': username === '' }" @click="createUser()">
+            Join
+        </Btn>
 
-    <ICFooter />
+        <ICFooter />
+    </div>
 </template>
