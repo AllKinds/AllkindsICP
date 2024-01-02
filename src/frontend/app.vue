@@ -39,6 +39,8 @@ if (inBrowser()) {
 
 
 <style>
+@import url("~/public/app.css");
+
 .page-enter-active,
 .page-leave-active {
     transition: all 0.15s;

@@ -166,7 +166,7 @@ export const useAppState = defineStore({
             const { openQuestions } = storeToRefs(this)
             openQuestions.value = combineNetworkData(this.openQuestions, qs);
         },
-        removeQuestion(q: Question): void {
+        removeOpenQuestion(q: Question): void {
             const data = this.openQuestions as NetworkData<Question[]>
             if (data.data) {
                 const i = data.data.findIndex((x) => x.id === q.id);
@@ -178,10 +178,12 @@ export const useAppState = defineStore({
             this.setOpenQuestions({ status: "requested", errCount: 0 });
             setTimeout(() => this.setOpenQuestions(data));
         },
-        loadQuestions(maxAgeS?: number, msg?: string) {
+        loadOpenQuestions(maxAgeS?: number, msg?: string): Promise<Question[]> {
             if (shouldUpdate(this.openQuestions, maxAgeS)) {
                 const old = this.getOpenQuestions();
-                runStoreNotify(old, backend.loadQuestions(this.team), this.setOpenQuestions, msg)
+                return runStoreNotify(old, backend.loadOpenQuestions(this.team), this.setOpenQuestions, msg)
+            } else {
+                return toPromise(this.getOpenQuestions())
             }
         },
         getAnsweredQuestions(): NetworkData<[Question, Answer][]> {
@@ -386,6 +388,16 @@ const shouldUpdate = <T>(data: NetworkData<T>, maxAgeS?: number): boolean => {
                 return true;
             }
             return false;
+    }
+}
+
+const toPromise = <A>(data: NetworkData<A>): Promise<A> => {
+    if (data.status === "ok") {
+        return Promise.resolve(data.data!)
+    } else if (data.status === "error") {
+        return Promise.reject(data.err)
+    } else {
+        return Promise.reject(data.status)
     }
 }
 

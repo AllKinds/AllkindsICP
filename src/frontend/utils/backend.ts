@@ -36,7 +36,7 @@ const effectifyResult = <T>(fn: (actor: BackendActor) => Promise<{ ok: T } | { e
     })
 }
 
-export const loadQuestions = (team: string): FrontendEffect<Question[]> => {
+export const loadOpenQuestions = (team: string): FrontendEffect<Question[]> => {
     const limit = BigInt(20);
     return effectify((actor) => actor.getUnansweredQuestions(team, limit))
 }

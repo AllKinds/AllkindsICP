@@ -40,9 +40,9 @@ const setTeam = (t: TeamUserInfo) => {
 <template>
     <div class="w-full flex-grow">
         <AllkindsTitle>Welcome</AllkindsTitle>
-        <TextBlock align="text-center">
-            <h1>Welcome to Allkinds.teams</h1>
-        </TextBlock>
+        <h1 class="text-center">
+            We see the world with more meaningful connections.
+        </h1>
 
         <NetworkDataContainer :networkdata="app.getTeams()" class="w-full text-lg text-center">
             <div class="w-full text-center mb-8">

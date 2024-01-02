@@ -9,8 +9,6 @@ definePageMeta({
     layout: 'default'
 });
 
-const largeFont = useLargeFont();
-
 async function login(provider: Provider) {
     if (await Effect.runPromise(checkAuth(provider))) {
         console.log("already logged in");

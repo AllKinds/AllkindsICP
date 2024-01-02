@@ -10,7 +10,7 @@ const app = useAppState();
 
 if (inBrowser()) {
     app.getTeam();
-    app.loadQuestions(0);
+    app.loadOpenQuestions(0);
     app.loadUser();
     app.loadTeams();
 }
@@ -47,7 +47,7 @@ if (inBrowser()) {
 
                 <div class="grow" />
                 <div class="w-full text-center my-10">
-                    <Btn @click="app.loadQuestions(0, 'Questions loaded')">
+                    <Btn @click="app.loadOpenQuestions(0, 'Questions loaded')">
                         Reload &nbsp;
                         <Icon name="charm:refresh" />
                     </Btn>

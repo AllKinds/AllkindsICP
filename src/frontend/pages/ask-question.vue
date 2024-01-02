@@ -1,11 +1,11 @@
 <script lang="ts" setup>
+import { createQuestion } from "../utils/backend"
+import { getColor } from "../utils/color";
+
 definePageMeta({
     title: "About",
     layout: 'default'
 });
-
-import { createQuestion } from "../utils/backend"
-import { getColor } from "../utils/color";
 
 const question = useState('new-question', () => "")
 const app = useAppState();
@@ -22,7 +22,7 @@ async function create() {
         () => {
             question.value = "";
             loading.value = false;
-            app.loadQuestions(0);
+            app.loadOpenQuestions(0);
         }
     );
 }

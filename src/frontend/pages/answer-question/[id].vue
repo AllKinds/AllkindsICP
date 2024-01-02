@@ -21,12 +21,12 @@ let gotoNextQuestion = false;
 const answer = (question: Question, a: boolean, boost: number) => {
     // TODO: show background task pending indicator
     console.log("answering question ", question, a, boost)
-    app.removeQuestion(question)
+    app.removeOpenQuestion(question)
     gotoNextQuestion = true;
     runNotify(answerQuestion(app.team, question.id.valueOf(), a, boost), "1 Answer saved").then(
-        () => { app.loadQuestions() }
+        () => { app.loadOpenQuestions() }
     ).catch(
-        () => { app.loadQuestions() }
+        () => { app.loadOpenQuestions() }
     );
 }
 
@@ -34,14 +34,14 @@ const answer = (question: Question, a: boolean, boost: number) => {
 const skip = (question: Question) => {
     // TODO: show background task pending indicator
     console.log('skipping', question)
-    app.removeQuestion(question)
+    app.removeOpenQuestion(question)
     gotoNextQuestion = true;
     runNotify(
         skipQuestion(app.team, question.id), "Question skipped"
     ).then(
-        () => { app.loadQuestions() },
+        () => { app.loadOpenQuestions() },
     ).catch(
-        () => { app.loadQuestions() }
+        () => { app.loadOpenQuestions() }
     );
 }
 
@@ -55,7 +55,7 @@ function findQuestion(id: bigint, findOther = false) {
     if (!data) {
         if (!loaded) {
             loaded = true;
-            app.loadQuestions();
+            app.loadOpenQuestions();
         }
     } else if (data.length === 0 && gotoNextQuestion) {
         navigateTo("/questions");
