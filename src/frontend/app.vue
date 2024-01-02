@@ -49,8 +49,10 @@ if (inBrowser()) {
 
 .page-enter-from {
     opacity: 0;
-    transform: translateY(+50%);
+    transform: translateY(+10%) scale(0.5);
     filter: blur(1rem);
+    position: absolute;
+    overflow: hidden;
 }
 
 .page-leave-to {

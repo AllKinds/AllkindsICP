@@ -38,15 +38,15 @@ const setTeam = (t: TeamUserInfo) => {
 </script>
 
 <template>
-    <div class="w-full flex-grow">
+    <div class="w-full flex-grow flex flex-col items-center">
         <AllkindsTitle>Welcome</AllkindsTitle>
-        <h1 class="text-center">
+        <h1 class="text-center max-w-sm">
             We see the world with more meaningful connections.
         </h1>
 
-        <NetworkDataContainer :networkdata="app.getTeams()" class="w-full text-lg text-center">
+        <NetworkDataContainer :networkdata="app.getTeams()" class="w-full text-lg text-center mt-10">
             <div class="w-full text-center mb-8">
-                Available teams: {{ app.getTeams().data?.length }}
+                Available tribes: {{ app.getTeams().data?.length }}
             </div>
 
             <Btn to="/create-team" class="w-72 mb-10">Create a new team</Btn>

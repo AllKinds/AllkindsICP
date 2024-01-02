@@ -1,17 +1,17 @@
 export type ColorName = "pink" | "red" | "orange" | "yellow" | "green" | "blue" | "indigo" | "purple" | "black" | "white"
-export type Color = { color: string }
+export type Color = { color: string, bg: string, fg: string, fgBtn: string }
 
 export const colors: { [key: string]: Color } = {
-    white: { color: "bg-white text-black border-gray-500 placeholder-gray-500" },
-    black: { color: "bg-slate-900 text-white" },
-    purple: { color: "bg-purple-500 text-slate-900 placeholder-gray-400" },
-    indigo: { color: "bg-indigo-500 text-white placeholder-gray-400" },
-    blue: { color: "bg-blue-500 text-white placeholder-gray-300" },
-    green: { color: "bg-green-500 text-slate-900 placeholder-gray-500" },
-    yellow: { color: "bg-yellow-500 text-slate-900 placeholder-gray-500" },
-    orange: { color: "bg-orange-500 text-slate-900 placeholder-gray-500" },
-    red: { color: "bg-red-500 text-white placeholder-gray-500" },
-    pink: { color: "bg-pink-500 text-slate-900 placeholder-gray-500" },
+    white: { color: "f-white", bg: "#FFFFFF", fg: "black", fgBtn: "white" },
+    black: { color: "f-black", bg: "#000000", fg: "white", fgBtn: "black" },
+    purple: { color: "f-purple", bg: "#C79BFF", fg: "black", fgBtn: "white" },
+    indigo: { color: "f-indigo", bg: "#5155C1", fg: "white", fgBtn: "black" },
+    blue: { color: "f-blue", bg: "#60ACF1", fg: "black", fgBtn: "white" },
+    green: { color: "g-green", bg: "#51C171", fg: "white", fgBtn: "black" },
+    yellow: { color: "f-yellow", bg: "#FFBB54", fg: "black", fgBtn: "white" },
+    orange: { color: "f-orange", bg: "#FF6854", fg: "black", fgBtn: "white" },
+    red: { color: "f-red", bg: "#FF5754", fg: "white", fgBtn: "black" },
+    pink: { color: "f-pink", bg: "#F99DAB", fg: "black", fgBtn: "white" },
 }
 
 export const getColor = (color: ColorName): Color => {

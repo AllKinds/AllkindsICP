@@ -12,7 +12,7 @@ defineEmits(["update:modelValue"]);
             <Icon name="ph:minus-circle" size="2em" />
         </NuxtLink>
         <div class="text-center relative">
-            <Icon name="gg:shape-hexagon" size="5em" />
+            <Icon name="mdi:hexagon-outline" size="5em" />
             <div class="absolute top-7 w-full text-center">+{{ modelValue }}</div>
 
             <div class="w-full text-center mb-3">Importance</div>

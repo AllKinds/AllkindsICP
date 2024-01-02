@@ -116,29 +116,14 @@ const twColor = () => getColor(q().color as ColorName).color;
 
         <div class="w-full" :class="twColor()">
 
-            <div class="w-full mt-3 flex flex-row place-content-evenly">
-                <NuxtLink class="p-7 link" :class="{ 'text-gray-500 pointer-events-none': weight <= 1 }"
-                    @click="weight = Math.max(1, weight - 1)">
-                    <Icon name="ph:minus-circle" size="2em" />
-                </NuxtLink>
-                <div class="text-center relative">
-                    <Icon name="gg:shape-hexagon" size="5em" />
-                    <div class="absolute top-7 w-full text-center">+{{ weight }}</div>
+            <Importance v-model="weight" />
 
-                    <div class="w-full text-center mb-3">Importance</div>
-                </div>
-                <NuxtLink class="p-7 link" :class="{ 'text-gray-500 pointer-events-none': weight >= 5 }"
-                    @click="weight = Math.min(5, weight + 1)">
-                    <Icon name="ph:plus-circle" size="2em" />
-                </NuxtLink>
-            </div>
-
-            <div class="flex flex-row place-content-evenly">
+            <div class="flex flex-row place-content-evenly mt-4">
                 <Btn width="w-32" @click="answer(q(), false, weight)">No</Btn>
                 <Btn width="w-32" @click="answer(q(), true, weight)">Yes</Btn>
             </div>
             <div class="flex flex-row place-content-evenly">
-                <NuxtLink width="w-72 link cursor-pointer" @click="skip(q())">Skip</NuxtLink>
+                <NuxtLink class="link" @click="skip(q())">Skip</NuxtLink>
             </div>
         </div>
         <div class="grow w-full rounded-b-xl" :class="twColor()" />

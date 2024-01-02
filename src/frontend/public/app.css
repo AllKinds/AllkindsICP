@@ -4,3 +4,108 @@ h1 {
     font-weight: 700;
     line-height: 2em;
 }
+
+::placeholder {
+    color: #777777 !important;
+}
+
+/* app.css */
+.f-white {
+    background-color: #FFFFFF;
+    color: black;
+    border-color: black
+  }
+  .f-white .btn:hover {
+    background-color: black;
+    color: white
+  }
+  
+  .f-black {
+    background-color: #000000;
+    color: white;
+    border-color: white
+  }
+  .f-black .btn:hover {
+    background-color: white;
+    color: black
+  }
+  
+  .f-purple {
+    background-color: #C79BFF;
+    color: black;
+    border-color: black
+  }
+  .f-purple .btn:hover {
+    background-color: black;
+    color: white
+  }
+  
+  .f-indigo {
+    background-color: #5155C1;
+    color: white;
+    border-color: white
+  }
+  .f-indigo .btn:hover {
+    background-color: white;
+    color: black
+  }
+  
+  .f-blue {
+    background-color: #60ACF1;
+    color: black;
+    border-color: black
+  }
+  .f-blue .btn:hover {
+    background-color: black;
+    color: white
+  }
+  
+  .g-green {
+    background-color: #51C171;
+    color: white;
+    border-color: white
+  }
+  .g-green .btn:hover {
+    background-color: white;
+    color: black
+  }
+  
+  .f-yellow {
+    background-color: #FFBB54;
+    color: black;
+    border-color: black
+  }
+  .f-yellow .btn:hover {
+    background-color: black;
+    color: white
+  }
+  
+  .f-orange {
+    background-color: #FF6854;
+    color: black;
+    border-color: black
+  }
+  .f-orange .btn:hover {
+    background-color: black;
+    color: white
+  }
+  
+  .f-red {
+    background-color: #FF5754;
+    color: white;
+    border-color: white
+  }
+  .f-red .btn:hover {
+    background-color: white;
+    color: black
+  }
+  
+  .f-pink {
+    background-color: #F99DAB;
+    color: black;
+    border-color: black
+  }
+  .f-pink .btn:hover {
+    background-color: black;
+    color: white
+  }

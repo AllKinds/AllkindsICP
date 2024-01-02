@@ -3,22 +3,22 @@ definePageMeta({
     title: "Color reference",
     layout: 'default'
 });
-const colors = [
-    "bg-primary",
-    "bg-secondary",
-    "bg-accent",
-    "bg-neutral",
-    "bg-info",
-    "bg-success",
-    "bg-warning",
-    "bg-warning-content",
-    "bg-error",
-];
+
+import { colors } from '~/utils/color';
+
+const css = (c: Color) => {
+    return "." + c.color + " {\n  background-color: " + c.bg + ";\n  color: " + c.fg + ";\n  border-color: " + c.fg + "\n}" +
+        "\n" +
+        "." + c.color + " .btn:hover {\n  background-color: " + c.fg + ";\n  color: " + c.fgBtn + "\n}" +
+        "\n\n"
+}
 
 const icons = [
     "ph:plus-circle",
     "ph:minus-circle",
     "gg:shape-hexagon",
+    "mdi:hexagon-outline",
+    "tabler:info-hexagon",
     "line-md:loading-alt-loop",
     "material-symbols:arrow-forward-ios",
     "prime:users",
@@ -29,19 +29,19 @@ const icons = [
     "tabler:user-check",
     "tabler:trash",
     "charm:refresh",
-    "tabler:info-hexagon",
     "prime:user-plus",
     "prime:user-minus",
 ];
 
-const themes = ["default", "dark", "light", "allkinds", "black"];
+const themes = ["black", "light"];
 </script>
 <template>
-    <div class="w-full flex-grow">
-        <div class="flex">
-            <div v-for="theme in themes" :data-theme="theme">
-                <button class="m-4 btn btn-outline" :data-set-theme="theme">Use {{ theme }}</button>
-                <div v-for="color in colors" class="w-52 h-10" :class="color">{{ color }}</div>
+    <div class="w-92 flex-grow">
+        <div class="flex flex-row flex-wrap">
+            <div v-for="color, name in colors" :class="color.color" class="w-32 text-center p-2">
+                <button :class="color.color" class="m-2 btn btn-outline">{{ name }}</button>
+                <br />
+                {{ name }}
             </div>
         </div>
 
@@ -53,5 +53,10 @@ const themes = ["default", "dark", "light", "allkinds", "black"];
                 </div>
             </div>
         </div>
+
+        <pre>
+/* generated css */
+<span v-for="color, name in colors">{{ css(color) }}</span>
+        </pre>
     </div>
 </template>
