@@ -40,7 +40,7 @@ const stats = () => {
 
 <template>
     <div class="w-full flex-grow">
-        <AllkindsTitle logo="ph:x-circle" link-to="/questions">
+        <AllkindsTitle logo="ph:x-circle" link-to="/welcome">
         </AllkindsTitle>
 
         <NetworkDataContainer :networkdata="app.getTeams()" class="w-full text-lg">
@@ -71,10 +71,10 @@ const stats = () => {
             </div>
 
             <div class="text-center">
-                <Btn class="w-80" @click="copy()">Copy invite link</Btn>
+                <Btn class="w-80" @click="copy()" v-if="app.getTeam()?.permissions.isAdmin">Copy invite link</Btn>
                 <Btn class="w-80" to="/questions">Ask and answer questions</Btn>
                 <Btn class="w-80" to="/team-members">Team members</Btn>
-                <Btn class="w-80" to="/question-stats">Manage questions</Btn>
+                <Btn class="w-80" to="/question-stats" v-if="app.getTeam()?.permissions.isAdmin">Manage questions</Btn>
                 <Btn class="w-80">Watch demo</Btn>
             </div>
 

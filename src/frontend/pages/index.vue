@@ -19,9 +19,7 @@ async function login(provider: Provider) {
 
 <template>
     <div class="w-full flex-grow flex flex-col items-center">
-        <div class="text-xl mt-8 w-full">
-            <AllkindsTitle>Allkinds.Teams</AllkindsTitle>
-        </div>
+        <AllkindsTitle>Allkinds.Teams</AllkindsTitle>
 
         <div class="text-2xl p-4 text-center">
             <div class="max-w-60 my-24 font-bold">

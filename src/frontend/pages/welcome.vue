@@ -29,7 +29,8 @@ const setTeam = (t: TeamUserInfo) => {
     if (gotoInfo) {
         navigateTo("/team-info")
     } else if (t.permissions.isMember) {
-        navigateTo("/questions")
+        navigateTo("/team-info")
+        //navigateTo("/questions")
     } else {
         navigateTo("/join-team")
     }
@@ -46,7 +47,7 @@ const setTeam = (t: TeamUserInfo) => {
 
         <NetworkDataContainer :networkdata="app.getTeams()" class="w-full text-lg text-center mt-10">
             <div class="w-full text-center mb-8">
-                Available tribes: {{ app.getTeams().data?.length }}
+                Available teams: {{ app.getTeams().data?.length }}
             </div>
 
             <Btn to="/create-team" class="w-72 mb-10">Create a new team</Btn>
@@ -58,9 +59,9 @@ const setTeam = (t: TeamUserInfo) => {
                 </div>
                 <div class="w-full pl-4">
 
-                    <NuxtLink to="/team-info" @click="gotoInfo = true">
+                    <!--NuxtLink to="/team-info" @click="gotoInfo = true">
                         <Icon name="tabler:info-hexagon" size="2em" class="float-right text-white" />
-                    </NuxtLink>
+                    </NuxtLink-->
                     <Icon v-if="t.permissions.isAdmin" name="tabler:user-shield" size="2em"
                         class="float-right text-green-600" />
                     <Icon v-if="t.permissions.isMember" name="tabler:user-check" size="2em"

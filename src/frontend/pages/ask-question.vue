@@ -41,12 +41,16 @@ if (inBrowser()) {
 <template>
     <div class="w-full flex-grow flex flex-col">
         <AllkindsTitle class="w-full" logo="ph:x-circle" link-to="/questions">
-            <NuxtLink to="/my-profile" class="m-auto">
+            <NuxtLink to="/my-profile">
                 {{ app.getUser().displayName }}, {{ app.getUser().stats.points }}
                 <Icon name="gg:shape-hexagon" class="mb-2" />
             </NuxtLink>
 
-            <Icon name="prime:users" size="2em" />
+            <template #action>
+                <NuxtLink to="/contacts" slot="action">
+                    <Icon name="prime:users" size="2em" />
+                </NuxtLink>
+            </template>
         </AllkindsTitle>
 
         <div class="grow w-full rounded-t-xl" :class="getColor(color).color" />

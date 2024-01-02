@@ -7,10 +7,16 @@ const props = defineProps<{
 
 </script>
 <template>
-    <div class="font-bold flex justify-left w-full pt-4 pb-3" :class="{ 'text-xl': largeFont }">
-        <NuxtLink :to="props.linkTo">
-            <Logo :logo="props.logo || 'allkinds'" class="ml-3" size="2em" />&nbsp;
+    <div class="font-bold flex flex-row items-baseline w-full py-4" :class="{ 'text-xl': largeFont }">
+        <NuxtLink :to="props.linkTo" class="flex">
+            <Logo :logo="props.logo || 'allkinds'" size="2em" />&nbsp;
         </NuxtLink>
-        <slot />
+
+        <div class="flex-grow px-3 text-center">
+            <slot />
+        </div>
+        <slot name="action">
+            <div style="width: 1em; height: 1em;" />
+        </slot>
     </div>
 </template>

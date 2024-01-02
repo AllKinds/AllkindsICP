@@ -26,9 +26,11 @@ if (inBrowser()) {
                 <Icon name="gg:shape-hexagon" class="mb-2" />
             </NuxtLink>
 
-            <NuxtLink to="/contacts">
-                <Icon name="prime:users" size="2em" />
-            </NuxtLink>
+            <template #action>
+                <NuxtLink to="/contacts" slot="action">
+                    <Icon name="prime:users" size="2em" />
+                </NuxtLink>
+            </template>
         </AllkindsTitle>
 
         <NuxtLink to="/ask-question" class="w-full rounded bg-slate-100 text-gray-500 text-xl p-5 cursor-text">
