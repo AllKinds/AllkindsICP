@@ -24,9 +24,11 @@ let match = { user: { username: "" } };
                 <Icon name="gg:shape-hexagon" class="mb-2" />
             </NuxtLink>
 
-            <NuxtLink to="/discover">
-                <Icon name="prime:user-plus" size="2em" />
-            </NuxtLink>
+            <template #action>
+                <NuxtLink to="/discover">
+                    <Icon name="prime:user-plus" size="2em" />
+                </NuxtLink>
+            </template>
 
         </AllkindsTitle>
 

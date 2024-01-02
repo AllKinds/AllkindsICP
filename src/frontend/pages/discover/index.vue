@@ -14,7 +14,7 @@ if (inBrowser()) {
 
 
 <template>
-    <div class="w-full flex-grow flex flex-col">
+    <div class="w-full flex-grow flex flex-col items-center">
         <AllkindsTitle logo="ph:x-circle" logoSize="2em" linkTo="/questions">
             <NuxtLink to="/my-profile" class="m-auto">
                 {{ app.getUser().displayName }}, {{ app.getUser().stats.points }}
