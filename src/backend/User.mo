@@ -282,7 +282,7 @@ module {
     #ok(newUser);
   };
 
-  func create(displayName : Text, contact : Text) : User {
+  public func create(displayName : Text, contact : Text) : User {
     return {
       username = toUsername(displayName);
       displayName;

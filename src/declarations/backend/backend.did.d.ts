@@ -1,6 +1,10 @@
 import type { Principal } from '@dfinity/principal';
 import type { ActorMethod } from '@dfinity/agent';
 
+export interface AdminPermissions {
+  'createTeam' : boolean,
+  'suspendUser' : boolean,
+}
 export interface Answer {
   'weight' : bigint,
   'created' : Time__1,
@@ -91,6 +95,8 @@ export type ResultTeams = { 'ok' : Array<TeamUserInfo> } |
 export type ResultUser = { 'ok' : User } |
   { 'err' : Error };
 export type ResultUserMatches = { 'ok' : Array<UserMatch> } |
+  { 'err' : Error };
+export type ResultUsers = { 'ok' : Array<User> } |
   { 'err' : Error };
 export interface Skip {
   'question' : bigint,
@@ -189,7 +195,12 @@ export interface _SERVICE {
   'getFriends' : ActorMethod<[string], ResultFriends>,
   'getMatches' : ActorMethod<[string], ResultUserMatches>,
   'getOwnQuestions' : ActorMethod<[string, bigint], Array<Question>>,
+  'getPermissions' : ActorMethod<
+    [],
+    { 'permissions' : AdminPermissions, 'principal' : Principal }
+  >,
   'getQuestionStats' : ActorMethod<[string, bigint], ResultQuestionStats>,
+  'getTeamMembers' : ActorMethod<[string], ResultUsers>,
   'getTeamStats' : ActorMethod<[string], ResultTeamStats>,
   'getUnansweredQuestions' : ActorMethod<[string, bigint], Array<Question>>,
   'getUser' : ActorMethod<[], ResultUser>,

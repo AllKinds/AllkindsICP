@@ -109,6 +109,10 @@ export const idlFactory = ({ IDL }) => {
     'ok' : IDL.Vec(UserMatch),
     'err' : Error,
   });
+  const AdminPermissions = IDL.Record({
+    'createTeam' : IDL.Bool,
+    'suspendUser' : IDL.Bool,
+  });
   const Question__1 = IDL.Record({
     'id' : QuestionID__1,
     'created' : Time__1,
@@ -129,6 +133,7 @@ export const idlFactory = ({ IDL }) => {
     'ok' : IDL.Vec(QuestionStats),
     'err' : Error,
   });
+  const ResultUsers = IDL.Variant({ 'ok' : IDL.Vec(User), 'err' : Error });
   const TeamStats = IDL.Record({
     'answers' : IDL.Nat,
     'connections' : IDL.Nat,
@@ -215,11 +220,22 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(Question)],
         ['query'],
       ),
+    'getPermissions' : IDL.Func(
+        [],
+        [
+          IDL.Record({
+            'permissions' : AdminPermissions,
+            'principal' : IDL.Principal,
+          }),
+        ],
+        ['query'],
+      ),
     'getQuestionStats' : IDL.Func(
         [IDL.Text, IDL.Nat],
         [ResultQuestionStats],
         ['query'],
       ),
+    'getTeamMembers' : IDL.Func([IDL.Text], [ResultUsers], ['query']),
     'getTeamStats' : IDL.Func([IDL.Text], [ResultTeamStats], ['query']),
     'getUnansweredQuestions' : IDL.Func(
         [IDL.Text, IDL.Nat],

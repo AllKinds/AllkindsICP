@@ -18,6 +18,7 @@ export type AppState = {
     principal: NetworkData<Principal>,
     teamStats: NetworkData<TeamStats>,
     questionStats: NetworkData<QuestionStats[]>,
+    teamMembers: NetworkData<User[]>,
 };
 
 type NotificationLevel = "ok" | "warning" | "error";
@@ -152,6 +153,7 @@ const defaultAppState: () => AppState = () => {
         principal: dataInit,
         teamStats: dataInit,
         questionStats: dataInit,
+        teamMembers: dataInit,
     }
 };
 
@@ -298,12 +300,15 @@ export const useAppState = defineStore({
         setTeam(key: string) {
             if (inBrowser()) {
                 window.localStorage.setItem("team", key);
+                if (this.team !== key) {
+                    this.$reset(); // TODO: only reset team specific data
+                    this.team = key;
+                }
             }
-            this.team = key;
         },
         getTeam(orRedirect: boolean = true): TeamUserInfo | null {
             let t = null;
-            this.team = inBrowser() ? window.localStorage.getItem("team") || "" : "";
+            this.setTeam(inBrowser() ? window.localStorage.getItem("team") || "" : "");
             if (this.teams.status === "ok") {
                 t = this.teams.data?.find((t) => t.key === this.team) || null;
                 if (!orRedirect) {
@@ -351,7 +356,7 @@ export const useAppState = defineStore({
             return this.questionStats as NetworkData<QuestionStats[]>; // TODO remove `as ...`
         },
         setQuestionStats(stats: NetworkData<QuestionStats[]>): void {
-            const old = this.questionStats as NetworkData<QuestionStats[]>
+            const old = this.getQuestionStats();
             this.questionStats = { status: "requested", errCount: 0, data: undefined };
             setTimeout(() => this.questionStats = combineNetworkData(old, stats));
         },
@@ -362,6 +367,20 @@ export const useAppState = defineStore({
             }
         },
 
+        getTeamMembers() {
+            return this.teamMembers as NetworkData<User[]>; // TODO remove `as ...`
+        },
+        setTeamMembers(members: NetworkData<User[]>): void {
+            const old = this.getTeamMembers();
+            this.teamMembers = { status: "requested", errCount: 0, data: [] };
+            setTimeout(() => this.teamMembers = combineNetworkData(old, members));
+        },
+        loadTeamMembers(maxAgeS?: number) {
+            if (shouldUpdate(this.teamMembers, maxAgeS)) {
+                runStore(this.teamMembers, backend.loadTeamMembers(this.team), this.setTeamMembers)
+                    .catch(console.error);
+            }
+        },
     },
 });
 

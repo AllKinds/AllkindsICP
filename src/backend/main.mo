@@ -61,6 +61,7 @@ actor {
 
   // Aliases to get deterministic names for use in frontend code
   type ResultUser = Result<User>;
+  type ResultUsers = Result<[User]>;
   type ResultQuestion = Result<Question>;
   type ResultAnswer = Result<Answer>;
   type ResultSkip = Result<Skip>;
@@ -154,6 +155,28 @@ actor {
 
   public shared query ({ caller }) func getTeamStats(teamKey : Text) : async ResultTeamStats {
     Team.getStats(db.teams, teamKey);
+  };
+
+  public shared query ({ caller }) func getTeamMembers(teamKey : Text) : async ResultUsers {
+    let team = switch (Team.get(db.teams, teamKey, caller)) {
+      case (#ok(t)) t;
+      case (#err(e)) return #err(e);
+    };
+    let true = Team.isMember(team, caller) else return #err(#notInTeam);
+
+    let members = Team.getMembers(team);
+    let users = Array.map<Principal, User>(
+      members,
+      func(p) {
+        let u = switch (User.get(db.users, p)) {
+          case (?value) { value };
+          case (null) { User.create("Unknown", "N/A") };
+        };
+        u;
+      },
+    );
+
+    return #ok(users);
   };
 
   // Create default new user with only a username
@@ -340,7 +363,7 @@ actor {
     #ok(Array.freeze(all));
   };
 
-  //returns both Approved and Unapproved friends
+  // returns both approved and unapproved friends
   public shared query ({ caller }) func getFriends(teamKey : Text) : async ResultFriends {
     let team = switch (Team.get(db.teams, teamKey, caller)) {
       case (#ok(t)) t;

@@ -72,7 +72,6 @@ export const skipQuestion = (team: string, q: BigInt): FrontendEffect<Skip> => {
 }
 
 export const loadFriends = (team: string): FrontendEffect<Friend[]> => {
-    console.log("loadFriends requested");
     return effectifyResult((actor) => actor.getFriends(team))
 }
 
@@ -86,6 +85,10 @@ export const loadTeams = (known: string[]): FrontendEffect<TeamUserInfo[]> => {
 
 export const loadTeamStats = (team: string): FrontendEffect<TeamStats> => {
     return effectifyResult((actor) => actor.getTeamStats(team))
+}
+
+export const loadTeamMembers = (team: string): FrontendEffect<User[]> => {
+    return effectifyResult((actor) => actor.getTeamMembers(team))
 }
 
 export const loadQuestionStats = (team: string): FrontendEffect<QuestionStats[]> => {

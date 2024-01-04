@@ -146,4 +146,6 @@ module {
   };
 
   public func isAdmin(team : Team, user : Principal) : Bool = Set.has(team.admins, phash, user);
+  public func isMember(team : Team, user : Principal) : Bool = Set.has(team.members, phash, user);
+  public func getMembers(team : Team) : [Principal] = Set.toArray(team.members);
 };

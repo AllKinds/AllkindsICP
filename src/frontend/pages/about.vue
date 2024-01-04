@@ -6,7 +6,7 @@ definePageMeta({
 </script>
 
 <template>
-    <div class="w-full flex-grow flex flex-col">
+    <div class="w-full flex-grow flex flex-col items-center">
         <AllkindsTitle>Hello</AllkindsTitle>
 
         <TextBlock align="text-left" class="w-96">

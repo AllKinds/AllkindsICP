@@ -82,6 +82,11 @@ type Skip =
              skip;
            };
  };
+type ResultUsers = 
+ variant {
+   err: Error;
+   ok: vec User;
+ };
 type ResultUserMatches = 
  variant {
    err: Error;
@@ -226,17 +231,26 @@ type Answer =
    question: nat;
    weight: nat;
  };
+type AdminPermissions = 
+ record {
+   createTeam: bool;
+   suspendUser: bool;
+ };
 service : {
   airdrop: (text, int) -> (Result);
   answerFriendRequest: (text, text, bool) -> (Result);
+  /// Create a backup of answers
   backupAnswers: (text, nat, nat) -> (vec StableQuestion) query;
+  /// Create a backup of friend status
   backupConnections: (text, nat, nat) ->
    (vec record {
           principal;
           principal;
           FriendStatus;
         }) query;
+  /// Create a backup of questions
   backupQuestions: (text, nat, nat) -> (vec StableQuestion) query;
+  /// Create a backup of users
   backupUsers: (nat, nat) -> (vec record {
                                     principal;
                                     User;
@@ -253,13 +267,20 @@ service : {
   getFriends: (text) -> (ResultFriends) query;
   getMatches: (text) -> (ResultUserMatches) query;
   getOwnQuestions: (text, nat) -> (vec Question) query;
+  getPermissions: () ->
+   (record {
+      permissions: AdminPermissions;
+      "principal": principal;
+    }) query;
   getQuestionStats: (text, nat) -> (ResultQuestionStats) query;
+  getTeamMembers: (text) -> (ResultUsers) query;
   getTeamStats: (text) -> (ResultTeamStats) query;
   getUnansweredQuestions: (text, nat) -> (vec Question) query;
   getUser: () -> (ResultUser) query;
   joinTeam: (text, text) -> (ResultTeam);
   listTeams: (vec text) -> (ResultTeams) query;
   selfDestruct: (text) -> () oneway;
+  /// Send a friend request to a user
   sendFriendRequest: (text, text) -> (Result);
   submitAnswer: (text, QuestionID, bool, nat) -> (ResultAnswer);
   submitSkip: (text, nat) -> (ResultSkip);

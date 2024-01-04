@@ -51,7 +51,7 @@ if (inBrowser()) {
 
 </script>
 <template>
-    <div class="w-full flex-grow flex-col items-center">
+    <div class="w-full flex-grow flex flex-col items-center">
         {{ checkUser() }}
         <AllkindsTitle>Register</AllkindsTitle>
 
@@ -72,10 +72,13 @@ if (inBrowser()) {
             :class="{ 'input-disabled': loading }" @keyup.enter="createUser()" />
 
         <div class="grow" />
+        <div class="grow" />
 
-        <Btn class="m-auto mt-12" :class="{ 'btn-disabled': username === '' }" @click="createUser()">
+        <Btn class="mt-12" :class="{ 'btn-disabled': username === '' }" @click="createUser()">
             Join
         </Btn>
+
+        <div class="grow" />
 
         <ICFooter />
     </div>
