@@ -187,6 +187,7 @@ actor {
 
     let #ok(_) = User.reward(db.users, #createQuestion, caller) else Debug.trap("Bug: Reward failed. checkFunds should have returned an error already");
 
+    ignore User.increment(db.users, #asked, caller);
     #ok(q);
   };
 
@@ -256,7 +257,7 @@ actor {
 
   // Add an answer
   public shared ({ caller }) func submitAnswer(teamKey : Text, question : QuestionID, answer : Bool, weight : Nat) : async ResultAnswer {
-    let boost = Nat.min(weight, Configuration.question.maxBoost);
+    let boost = Nat.max(1, Nat.min(weight, Configuration.question.maxBoost));
 
     switch (User.checkFunds(db.users, #createAnswer(boost), caller)) {
       case (#ok(_)) { /* user has sufficient funds */ };
@@ -271,7 +272,7 @@ actor {
     let a : Answer = {
       question;
       answer;
-      weight = 1 + boost;
+      weight = boost;
       created = Time.now();
     };
     let prev = Question.putAnswer(team.answers, a, caller);
@@ -284,6 +285,12 @@ actor {
       };
       case (null) {
         let #ok(_) = User.reward(db.users, #createAnswer(boost), caller) else Debug.trap("Bug: Reward failed. checkFunds should have returned an error already");
+
+        ignore User.increment(db.users, #answered, caller);
+        if (boost > 1) {
+          let q = Question.get(team.questions, question);
+          ignore User.increment(db.users, #boost, q.creator);
+        };
       };
     };
 

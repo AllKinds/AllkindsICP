@@ -239,6 +239,49 @@ module {
     };
   };
 
+  func incrementAnswered(s : UserStats) : UserStats {
+    return {
+      points = s.points;
+      answered = s.answered + 1;
+      asked = s.asked;
+      boosts = s.boosts;
+    };
+  };
+
+  func incrementAsked(s : UserStats) : UserStats {
+    return {
+      points = s.points;
+      answered = s.answered;
+      asked = s.asked + 1;
+      boosts = s.boosts;
+    };
+  };
+
+  func incrementBoosts(s : UserStats) : UserStats {
+    return {
+      points = s.points;
+      answered = s.answered;
+      asked = s.asked;
+      boosts = s.boosts + 1;
+    };
+  };
+
+  public func increment(users : UserDB, what : { #answered; #asked; #boost }, id : Principal) : Result<User, Error> {
+    let ?u = get(users, id) else return #err(#notRegistered);
+
+    let newStats = switch (what) {
+      case (#answered) { incrementAnswered(u.stats) };
+      case (#asked) { incrementAsked(u.stats) };
+      case (#boost) { incrementBoosts(u.stats) };
+    };
+
+    let newUser = setStats(u, newStats);
+
+    Map.set(users.info, phash, id, newUser);
+
+    #ok(newUser);
+  };
+
   func create(displayName : Text, contact : Text) : User {
     return {
       username = toUsername(displayName);

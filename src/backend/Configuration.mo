@@ -15,7 +15,7 @@ module {
   public let question = {
     minSize : Nat = 5;
     maxSize : Nat = 200;
-    maxBoost : Nat = 10;
+    maxBoost : Nat = 20;
   };
 
   public let user = {

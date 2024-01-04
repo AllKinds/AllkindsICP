@@ -51,7 +51,7 @@ if (inBrowser()) {
 
 </script>
 <template>
-    <div class="w-full flex-grow">
+    <div class="w-full flex-grow flex-col items-center">
         {{ checkUser() }}
         <AllkindsTitle>Register</AllkindsTitle>
 

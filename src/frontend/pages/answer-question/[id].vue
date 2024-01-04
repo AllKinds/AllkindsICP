@@ -95,9 +95,11 @@ const twColor = () => getColor(q().color as ColorName).color;
                 <Icon name="gg:shape-hexagon" class="mb-2" />
             </NuxtLink>
 
-            <NuxtLink to="/contacts">
-                <Icon name="prime:users" size="2em" />
-            </NuxtLink>
+            <template #action>
+                <NuxtLink to="/contacts">
+                    <Icon name="prime:users" size="2em" />
+                </NuxtLink>
+            </template>
         </AllkindsTitle>
 
         <div class="grow w-full rounded-t-xl" :class="twColor()" />
