@@ -24,7 +24,7 @@ const answer = (question: Question, a: boolean, boost: number) => {
     app.removeOpenQuestion(question)
     gotoNextQuestion = true;
     runNotify(answerQuestion(app.team, question.id.valueOf(), a, boost), "1 Answer saved").then(
-        () => { app.loadOpenQuestions() }
+        () => { app.loadOpenQuestions(0) }
     ).catch(
         () => { app.loadOpenQuestions() }
     );
@@ -39,7 +39,7 @@ const skip = (question: Question) => {
     runNotify(
         skipQuestion(app.team, question.id), "Question skipped"
     ).then(
-        () => { app.loadOpenQuestions() },
+        () => { app.loadOpenQuestions(0) },
     ).catch(
         () => { app.loadOpenQuestions() }
     );

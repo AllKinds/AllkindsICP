@@ -17,8 +17,8 @@ defineEmits(["update:modelValue"]);
 
             <div class="w-full text-center mb-3">Importance</div>
         </div>
-        <NuxtLink class="p-7 link" :class="{ 'text-gray-500 pointer-events-none': modelValue >= 5 }"
-            @click="$emit('update:modelValue', Math.min(5, modelValue + 1))">
+        <NuxtLink class="p-7 link" :class="{ 'text-gray-500 pointer-events-none': modelValue >= 20 }"
+            @click="$emit('update:modelValue', Math.min(20, modelValue + 1))">
             <Icon name="ph:plus-circle" size="2em" />
         </NuxtLink>
     </div>

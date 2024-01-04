@@ -5,10 +5,11 @@ definePageMeta({
 });
 
 const app = useAppState();
-
+let hasInvite = false;
 
 if (inBrowser()) {
     app.loadUser(0, false);
+    hasInvite = window.localStorage.getItem("invite") !== undefined
 }
 
 </script>
@@ -29,7 +30,8 @@ if (inBrowser()) {
         <div class="grow" />
 
         <Btn v-if="app.user.status === 'ok'" to="/verify-invite">Next</Btn>
-        <Btn v-else to="/register">Next</Btn>
+        <Btn v-else-if="hasInvite" to="/register">Next</Btn>
+        <Btn v-else to="/select-team">Next</Btn>
 
         <ICFooter />
     </div>

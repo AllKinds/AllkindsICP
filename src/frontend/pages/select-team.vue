@@ -31,7 +31,7 @@ const setTeam = (t: TeamUserInfo) => {
     } else if (t.permissions.isMember) {
         navigateTo("/team-info")
     } else {
-        navigateTo("/welcome")
+        navigateTo("/join/" + t.key)
     }
 }
 

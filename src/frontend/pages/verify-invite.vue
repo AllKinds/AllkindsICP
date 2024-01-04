@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { clear } from 'console';
+
 
 definePageMeta({
     title: "Join a team",
@@ -32,13 +34,19 @@ const isMember = () => {
     return app.getTeam(false)?.permissions.isMember
 }
 
+const clearInvite = () => {
+    window.localStorage.removeItem("invite");
+}
+
+const getTeam = () => app.getTeam(false);
+
 if (inBrowser()) {
     try {
         const obj: { team: string, invite: string } = JSON.parse(window.localStorage.getItem("invite") || "");
         team = obj.team;
         invite = obj.invite;
     } catch (e) {
-        window.localStorage.removeItem("invite");
+        clearInvite();
     }
 
     if (isMember()) {
@@ -57,8 +65,6 @@ if (inBrowser()) {
     }
     app.loadTeams(0);
 }
-
-const getTeam = () => app.getTeam(false);
 
 
 </script>
@@ -96,11 +102,12 @@ const getTeam = () => app.getTeam(false);
 
         <div class="grow" />
 
-        <Btn v-if="isValid" to="/team-info">Next</Btn>
-        <Btn v-if="isInvalid && team" :to="'/join/' + team" class="w-72">Retry with another code</Btn>
-        <Btn v-if="isInvalid" to="/select-team" class="w-72">Select another team</Btn>
-        <Btn v-if="!hasInvite" to="/select-team">Select a team</Btn>
-        <Btn v-if="isMember()" to="/team-info">Goto team</Btn>
+        <Btn v-if="isValid" @click="clearInvite()" to="/team-info">Next</Btn>
+        <Btn v-if="isInvalid && team" @click="clearInvite()" :to="'/join/' + team" class="w-72">Retry with another code
+        </Btn>
+        <Btn v-if="isInvalid" @click="clearInvite()" to="/select-team" class="w-72">Select another team</Btn>
+        <Btn v-if="!hasInvite" @click="clearInvite()" to="/select-team">Select a team</Btn>
+        <Btn v-if="isMember()" @click="clearInvite()" to="/team-info">Goto team</Btn>
 
         <div class="grow" />
     </div>
