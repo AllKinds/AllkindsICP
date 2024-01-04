@@ -9,10 +9,8 @@ import { ColorName, getColor } from "../../utils/color";
 import { Question } from "../../utils/backend";
 
 const route = useRoute();
-const question = useState('new-question', () => "")
 const app = useAppState();
 const loading = useState("loading", () => false);
-const color = useState('color', () => "green")
 const weight = useState('weight', () => 1)
 weight.value = 1;
 let gotoNextQuestion = false;
@@ -24,9 +22,12 @@ const answer = (question: Question, a: boolean, boost: number) => {
     app.removeOpenQuestion(question)
     gotoNextQuestion = true;
     runNotify(answerQuestion(app.team, question.id.valueOf(), a, boost), "1 Answer saved").then(
-        () => { app.loadOpenQuestions(0) }
+        () => {
+            if ((app.openQuestions.data?.length || 0) > 2) { app.loadOpenQuestions() }
+            else { app.loadOpenQuestions(0) }
+        }
     ).catch(
-        () => { app.loadOpenQuestions() }
+        () => { app.loadOpenQuestions(0) }
     );
 }
 
@@ -39,9 +40,12 @@ const skip = (question: Question) => {
     runNotify(
         skipQuestion(app.team, question.id), "Question skipped"
     ).then(
-        () => { app.loadOpenQuestions(0) },
+        () => {
+            if ((app.openQuestions.data?.length || 0) > 2) { app.loadOpenQuestions() }
+            else { app.loadOpenQuestions(0) }
+        },
     ).catch(
-        () => { app.loadOpenQuestions() }
+        () => { app.loadOpenQuestions(0) }
     );
 }
 
