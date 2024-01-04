@@ -30,9 +30,8 @@ const setTeam = (t: TeamUserInfo) => {
         navigateTo("/team-info")
     } else if (t.permissions.isMember) {
         navigateTo("/team-info")
-        //navigateTo("/questions")
     } else {
-        navigateTo("/join-team")
+        navigateTo("/welcome")
     }
 }
 

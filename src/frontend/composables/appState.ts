@@ -235,7 +235,7 @@ export const useAppState = defineStore({
         },
         loadUser(maxAgeS?: number, orRedirect: boolean = true) {
             if (shouldUpdate(this.user, maxAgeS)) {
-                return runStore(this.user, backend.loadUser().pipe(Effect.mapError(
+                return runStore(this.user, backend.loadUser(false).pipe(Effect.mapError(
                     (err) => {
                         if (!orRedirect) return err;
                         if (errors.is(err, "backend", "notRegistered")) navigateTo("/register");
@@ -319,7 +319,7 @@ export const useAppState = defineStore({
                 } else if (!t) {
                     navigateTo("/select-team");
                 } else if (!t.permissions.isMember) {
-                    navigateTo("/join-team");
+                    navigateTo("/join/" + t.key);
                 };
             }
             return t;
@@ -327,7 +327,7 @@ export const useAppState = defineStore({
         checkTeam() {
             const t = this.getTeam(false);
             if (t && !t.permissions.isMember) {
-                navigateTo("/join-team")
+                navigateTo("/join/" + t.key)
             }
         },
         joinTeam(code: string): Promise<void> {

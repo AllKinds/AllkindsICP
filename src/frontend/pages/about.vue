@@ -3,31 +3,33 @@ definePageMeta({
     title: "About",
     layout: 'default'
 });
+
+const app = useAppState();
+
+
+if (inBrowser()) {
+    app.loadUser(0, false);
+}
+
 </script>
 
 <template>
     <div class="w-full flex-grow flex flex-col items-center">
-        <AllkindsTitle>Hello</AllkindsTitle>
+        <AllkindsTitle></AllkindsTitle>
 
-        <TextBlock align="text-left" class="w-96">
-            <p>
-                Allkinds.Team is build fully on blockchain, the Internet Computer.
-            </p>
-
-            <p>
-                One of it's main features is to guarantee your privacy while asking and answering each others questions.
-            </p>
-
-            <p>
-                While we are just piloting with you, we would like to ask you to track your actions so we can understand how
-                to
-                improve the service.
-            </p>
-        </TextBlock>
+        <div>
+            Allkinds.Team is built fully on blockchain (The&nbsp;Internet&nbsp;Computer).
+            <br /><br />
+            It’s main feature is to guarantee your privacy while asking and answering each other questions.
+            <br /><br />
+            While we are just piloting with you - we would like to ask you to track your actions so we understand how to
+            improve the service.
+        </div>
 
         <div class="grow" />
 
-        <Btn to="/register">Agree</Btn>
+        <Btn v-if="app.user.status === 'ok'" to="/verify-invite">Next</Btn>
+        <Btn v-else to="/register">Next</Btn>
 
         <ICFooter />
     </div>

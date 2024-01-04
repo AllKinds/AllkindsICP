@@ -18,9 +18,9 @@ export const resultToEffect = <T>(result: { err: BackendError } | { ok: T }): Ba
     }
 }
 
-const effectify = <T>(fn: (actor: BackendActor) => Promise<T>): FrontendEffect<T> => {
+const effectify = <T>(fn: (actor: BackendActor) => Promise<T>, orRedirect: boolean = true): FrontendEffect<T> => {
     return Effect.gen(function* (_) {
-        const actor = yield* _(useActorOrLogin());
+        const actor = yield* _(useActorOrLogin(orRedirect));
         const result = yield* _(Effect.tryPromise({
             try: () => fn(actor),
             catch: toNetworkError
@@ -40,9 +40,9 @@ const effectifyAnon = <T>(fn: (actor: BackendActor) => Promise<T>): FrontendEffe
     });
 }
 
-const effectifyResult = <T>(fn: (actor: BackendActor) => Promise<{ ok: T } | { err: BackendError }>): FrontendEffect<T> => {
+const effectifyResult = <T>(fn: (actor: BackendActor) => Promise<{ ok: T } | { err: BackendError }>, orRedirect: boolean = true): FrontendEffect<T> => {
     return Effect.gen(function* (_) {
-        const res = yield* _(effectify(fn));
+        const res = yield* _(effectify(fn, orRedirect));
         return yield* _(resultToEffect(res).pipe(Effect.mapError(toBackendError)));
     })
 }
@@ -69,8 +69,8 @@ export const getOwnQuestions = (team: string): FrontendEffect<Question[]> => {
     return effectify((actor) => actor.getOwnQuestions(team, limit))
 }
 
-export const loadUser = (): FrontendEffect<User> => {
-    return effectifyResult((actor) => actor.getUser())
+export const loadUser = (orRedirect = true): FrontendEffect<User> => {
+    return effectifyResult((actor) => actor.getUser(), orRedirect)
 }
 
 export const createQuestion = (team: string, q: string, c: ColorName): FrontendEffect<void> => {

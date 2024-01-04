@@ -107,13 +107,15 @@ export const useActor = (): Ref<typeof backend | null> => {
     return useState<typeof backend | null>("actor", () => null);
 };
 
-export const useActorOrLogin = (): Effect.Effect<never, FrontendError, BackendActor> => {
+export const useActorOrLogin = (orRedirect: boolean = true): Effect.Effect<never, FrontendError, BackendActor> => {
     return Effect.gen(function* (_) {
         yield* _(checkAuth(null));
         const actor = useActor();
         if (actor.value) return yield* _(Effect.succeed(actor.value));
-        console.log("actor.value is null, redirecting to /login")
-        navigateTo("/login");
+        if (orRedirect) {
+            console.log("actor.value is null, redirecting to /login")
+            navigateTo("/login");
+        }
         return yield* _(Effect.fail(toBackendError(notLoggedIn)));
     })
 };
