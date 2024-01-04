@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-
+if (inBrowser()) console.log("loading", document.location.href);
 definePageMeta({
     title: "Invited",
     layout: 'default'

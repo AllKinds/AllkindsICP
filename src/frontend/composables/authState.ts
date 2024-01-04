@@ -134,6 +134,5 @@ export const useAnonActor = (): Effect.Effect<never, FrontendError, BackendActor
 };
 
 export const isLoggedIn = () => {
-    console.log("actor ist", useActor().value);
     return !!useActor().value;
 };

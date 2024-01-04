@@ -3,6 +3,7 @@ Landing page
 -->
 <script lang="ts" setup>
 import { Effect } from "effect";
+if (inBrowser()) console.log("loading", document.location.href);
 
 definePageMeta({
     title: "Login",
@@ -12,6 +13,7 @@ definePageMeta({
 const teamSelected = () => window.localStorage.getItem("team") && !window.localStorage.getItem("invite");
 
 async function login(provider: Provider) {
+    if (!inBrowser()) return;
     if (await Effect.runPromise(checkAuth(provider))) {
         console.log("logged in");
         if (teamSelected()) {
@@ -40,7 +42,7 @@ async function login(provider: Provider) {
         <Btn to="/about" class="w-80"> Learn more </Btn>
 
         <Btn v-if="isLoggedIn() && teamSelected()" class="w-80 mt-2" @click="login('II')">
-            Back to your team
+            Welcome back
         </Btn>
         <Btn v-else-if="isLoggedIn()" class="w-80 mt-2" @click="login('II')">
             Select a team
