@@ -27,7 +27,10 @@ const create = () => {
         logo.value.slice(),
         listed.value,
         invite.value,
-    ).then(() => { navigateTo("/welcome#" + team.value + ":" + invite.value) });
+    ).then(() => {
+        const params = new URLSearchParams({ code: invite.value });
+        navigateTo("/invited/" + team.value + "?" + params.toString())
+    });
 }
 
 
@@ -49,7 +52,7 @@ const setFile = async (e: any) => {
 
 <template>
     <div class="w-full flex-grow">
-        <AllkindsTitle link-to="/welcome">Allkinds.teams</AllkindsTitle>
+        <AllkindsTitle link-to="/select-team">Allkinds.teams</AllkindsTitle>
         <TextBlock>
             <h1>Create a team</h1>
         </TextBlock>

@@ -11,8 +11,8 @@ definePageMeta({
 
 async function login(provider: Provider) {
     if (await Effect.runPromise(checkAuth(provider))) {
-        console.log("already logged in");
-        navigateTo("/welcome");
+        console.log("logged in");
+        navigateTo("/select-team");
     }
 }
 </script>

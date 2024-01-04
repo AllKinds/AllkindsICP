@@ -29,9 +29,27 @@ const effectify = <T>(fn: (actor: BackendActor) => Promise<T>): FrontendEffect<T
     });
 }
 
+const effectifyAnon = <T>(fn: (actor: BackendActor) => Promise<T>): FrontendEffect<T> => {
+    return Effect.gen(function* (_) {
+        const actor = yield* _(useAnonActor());
+        const result = yield* _(Effect.tryPromise({
+            try: () => fn(actor),
+            catch: toNetworkError
+        }));
+        return result;
+    });
+}
+
 const effectifyResult = <T>(fn: (actor: BackendActor) => Promise<{ ok: T } | { err: BackendError }>): FrontendEffect<T> => {
     return Effect.gen(function* (_) {
         const res = yield* _(effectify(fn));
+        return yield* _(resultToEffect(res).pipe(Effect.mapError(toBackendError)));
+    })
+}
+
+const effectifyAnonResult = <T>(fn: (actor: BackendActor) => Promise<{ ok: T } | { err: BackendError }>): FrontendEffect<T> => {
+    return Effect.gen(function* (_) {
+        const res = yield* _(effectifyAnon(fn));
         return yield* _(resultToEffect(res).pipe(Effect.mapError(toBackendError)));
     })
 }
@@ -80,7 +98,7 @@ export const loadMatches = (team: string): FrontendEffect<UserMatch[]> => {
 }
 
 export const loadTeams = (known: string[]): FrontendEffect<TeamUserInfo[]> => {
-    return effectifyResult((actor) => actor.listTeams(known))
+    return effectifyAnonResult((actor) => actor.listTeams(known))
 }
 
 export const loadTeamStats = (team: string): FrontendEffect<TeamStats> => {

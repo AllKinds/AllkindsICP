@@ -291,6 +291,8 @@ export const useAppState = defineStore({
         loadTeams(maxAgeS?: number, known?: string) {
             if (known) {
                 this.knownTeams.push(known);
+                // remove duplicates
+                this.knownTeams = [...new Set(this.knownTeams)];
             }
             if (shouldUpdate(this.teams, maxAgeS)) {
                 runStore(this.teams, backend.loadTeams(this.knownTeams), this.setTeams)
@@ -301,6 +303,7 @@ export const useAppState = defineStore({
             if (inBrowser()) {
                 window.localStorage.setItem("team", key);
                 if (this.team !== key) {
+                    this.knownTeams.push(key);
                     this.$reset(); // TODO: only reset team specific data
                     this.team = key;
                 }
@@ -314,7 +317,7 @@ export const useAppState = defineStore({
                 if (!orRedirect) {
                     // don't redirect
                 } else if (!t) {
-                    navigateTo("/welcome");
+                    navigateTo("/select-team");
                 } else if (!t.permissions.isMember) {
                     navigateTo("/join-team");
                 };
@@ -435,4 +438,9 @@ export const addNotification = (level: NotificationLevel, msg: string): void => 
         case "warning": toast.warning(msg); break;
         case "error": toast.error(msg); break;
     }
+}
+
+export const invitePath = (team: string, invite: string) => {
+    const params = new URLSearchParams({ invite });
+    return "/invited/" + team + "?" + params.toString();
 }

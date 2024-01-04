@@ -13,13 +13,13 @@ definePageMeta({
 async function login(provider: Provider) {
     if (await Effect.runPromise(checkAuth(provider))) {
         console.log("already logged in");
-        navigateTo("/welcome");
+        navigateTo("/select-team");
     }
 }
 
 if (await Effect.runPromise(checkAuth(null)).catch((e) => false)) {
     console.warn("navigated to /login, but already logged in");
-    navigateTo("/welcome");
+    navigateTo("/select-team");
 }
 
 

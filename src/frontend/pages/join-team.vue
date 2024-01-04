@@ -25,7 +25,7 @@ const join = () => {
 
 <template>
     <div class="w-full flex-grow">
-        <AllkindsTitle link-to="/welcome">Allkinds.teams</AllkindsTitle>
+        <AllkindsTitle link-to="/select-team">Allkinds.teams</AllkindsTitle>
         <TextBlock>
             <h1>Join a team</h1>
         </TextBlock>

@@ -17,10 +17,8 @@ const invite = (): string | undefined => {
     const team = app.getTeam();
     if (!team) return undefined;
     const code = app.getTeam()?.invite;
-    if (!code?.length) return "";
-    return document.location.origin + "/welcome" +
-        "?team=" + encodeURIComponent(app.getTeam()?.key || "") +
-        "&invite=" + encodeURIComponent(code[0]);
+    if (!code?.length) return undefined;
+    return document.location.origin + invitePath(app.getTeam()?.key || "", code[0]);
 }
 const copy = () => {
     const link = invite();
@@ -40,7 +38,7 @@ const stats = () => {
 
 <template>
     <div class="w-full flex-grow">
-        <AllkindsTitle logo="ph:x-circle" link-to="/welcome">
+        <AllkindsTitle logo="ph:x-circle" link-to="/select-team">
         </AllkindsTitle>
 
         <NetworkDataContainer :networkdata="app.getTeams()" class="w-full text-lg">

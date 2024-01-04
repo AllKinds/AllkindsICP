@@ -15,6 +15,9 @@ function loginUrl(provider: Provider) {
     return config.II_URL;
 }
 
+// Check if user is logged in or initiate login
+// if `loginWith` is null, no login is initiated
+// returns Effect which succeeds with true if user is logged in, false if not
 export function checkAuth(
     loginWith: Provider | null
 ): Effect.Effect<never, FrontendError, boolean> {
@@ -112,6 +115,19 @@ export const useActorOrLogin = (): Effect.Effect<never, FrontendError, BackendAc
         console.log("actor.value is null, redirecting to /login")
         navigateTo("/login");
         return yield* _(Effect.fail(toBackendError(notLoggedIn)));
+    })
+};
+
+export const useAnonActor = (): Effect.Effect<never, FrontendError, BackendActor> => {
+    return Effect.gen(function* (_) {
+        yield* _(checkAuth(null));
+        const actor = useActor();
+        if (actor.value) return yield* _(Effect.succeed(actor.value));
+        console.log("actor.value is null, creating unauthenticated actor")
+        const config = useRuntimeConfig().public;
+        const agent = new HttpAgent({ host: config.host });
+        const anon = createActor(config.canisterIds.backend, { agent });
+        return yield* _(Effect.succeed(anon));
     })
 };
 

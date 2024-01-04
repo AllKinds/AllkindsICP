@@ -19,9 +19,7 @@ const invite = (): string | undefined => {
     if (!team) return undefined;
     const code = app.getTeam()?.invite;
     if (!code?.length) return "";
-    return document.location.origin + "/welcome" +
-        "?team=" + encodeURIComponent(app.getTeam()?.key || "") +
-        "&invite=" + encodeURIComponent(code[0]);
+    return document.location.origin + invitePath(app.getTeam()?.key || "", code[0]);
 }
 const remove = (user: User) => {
     let confirmed = window.confirm(
@@ -39,7 +37,7 @@ const remove = (user: User) => {
     if (confirmed) {
         // TODO!: implement
         // app.removeMember(user.username)
-        addNotification("error", "Couldn't remover member.")
+        addNotification("error", "Couldn't remover member. (WIP)")
     }
 }
 
