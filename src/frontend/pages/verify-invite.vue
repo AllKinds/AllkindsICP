@@ -47,7 +47,7 @@ if (inBrowser()) {
         app.setTeam(team);
         app.joinTeam(invite).then(() => {
             app.loadTeams(0);
-            navigateTo("/team-info")
+            navigateTo("/team-info"); //TODO?: auto redirect or not?
         }, () => {
             // TODO: set verificationFailed on network error
             isInvalid.value = true;
@@ -97,7 +97,7 @@ const getTeam = () => app.getTeam(false);
         <div class="grow" />
 
         <Btn v-if="isValid" to="/team-info">Next</Btn>
-        <Btn v-if="isInvalid && team" :to="'/team/' + team" class="w-72">Retry with another code</Btn>
+        <Btn v-if="isInvalid && team" :to="'/join/' + team" class="w-72">Retry with another code</Btn>
         <Btn v-if="isInvalid" to="/select-team" class="w-72">Select another team</Btn>
         <Btn v-if="!hasInvite" to="/select-team">Select a team</Btn>
         <Btn v-if="isMember()" to="/team-info">Goto team</Btn>
