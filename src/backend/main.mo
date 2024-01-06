@@ -58,6 +58,7 @@ actor {
 
   type MatchingFilter = Matching.MatchingFilter;
   type UserMatch = Matching.UserMatch;
+  type AdminPermissions = Admin.Permissions;
 
   type Result<T> = Result.Result<T, Error>;
 
@@ -76,7 +77,6 @@ actor {
   type ResultTeams = Result<[TeamUserInfo]>;
   type ResultTeamStats = Result<TeamStats>;
   type ResultQuestionStats = Result<[QuestionStats]>;
-  type AdminPermissions = Admin.Permissions;
 
   // UTILITY FUNCTIONS
 
