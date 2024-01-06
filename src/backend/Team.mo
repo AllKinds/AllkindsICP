@@ -102,7 +102,7 @@ module {
   };
 
   // List all teams a particular user can see
-  public func list(teams : TeamDB, user : Principal, known : [Text]) : Result<[TeamUserInfo]> {
+  public func list(teams : TeamDB, user : Principal, known : [Text], showAll : Bool) : Result<[TeamUserInfo]> {
     let all = Map.entries(teams);
     let mapped = Iter.map<(Text, Team), TeamUserInfo>(
       all,
@@ -122,7 +122,15 @@ module {
     );
     let visible = Iter.filter<TeamUserInfo>(
       mapped,
-      func({ key; info; permissions }) = Array.indexOf(key, known, Text.equal) != null or info.listed or permissions.isMember or permissions.isAdmin,
+      func({ key; info; permissions }) {
+        return (
+          showAll //
+          or Array.indexOf(key, known, Text.equal) != null //
+          or info.listed //
+          or permissions.isMember //
+          or permissions.isAdmin //
+        );
+      },
     );
     #ok(Iter.toArray(visible));
   };

@@ -21,7 +21,8 @@ export type ErrorKey =
     | "alreadyRegistered"
     | "friendRequestAlreadySend"
     | "notRegistered"
-    | "invalidColor";
+    | "invalidColor"
+    | "permissionDenied";
 
 
 export function getErrorKey(err: BackendError): ErrorKey {

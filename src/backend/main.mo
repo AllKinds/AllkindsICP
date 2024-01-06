@@ -37,6 +37,8 @@ import Nat64 "mo:base/Nat64";
 import TextHelper "helper/TextHelper";
 import Nat8Extra "helper/Nat8Extra";
 
+import TypesV1 "deprecated/TypesV1";
+
 actor {
 
   //TYPES INDEX
@@ -60,6 +62,7 @@ actor {
   type Result<T> = Result.Result<T, Error>;
 
   // Aliases to get deterministic names for use in frontend code
+  type ResultVoid = Result<()>;
   type ResultUser = Result<User>;
   type ResultUsers = Result<[User]>;
   type ResultQuestion = Result<Question>;
@@ -97,11 +100,12 @@ actor {
     teams = Team.emptyDB();
   };
 
-  stable var admins_v1 : AdminDB = Admin.emptyDB();
+  stable var admins_v1 : TypesV1.AdminDB = TypesV1.emptyDB();
+  stable var admins_v2 : AdminDB = Admin.emptyDB();
 
   // alias for current db version
   var db = db_v1;
-  var admins = admins_v1;
+  var admins = admins_v2;
 
   // Upgrade canister
   system func preupgrade() {
@@ -116,6 +120,7 @@ actor {
     //  users = User.emptyDB();
     //  teams = Team.emptyDB();
     //};
+    admins_v1 := TypesV1.emptyDB();
   };
 
   var insecureRandom = Prng.SFC64a(); // insecure random numbers
@@ -137,10 +142,18 @@ actor {
     };
   };
 
+  public shared ({ caller }) func setPermissions(name : Text, permissions : AdminPermissions) : async ResultVoid {
+    if (not Principal.isController(caller)) {
+      assertPermission(caller, #all);
+    };
+    let ?p = User.getPrincipal(db.users, name) else return #err(#userNotFound);
+    Admin.setPermissions(admins, p, permissions);
+    #ok;
+  };
+
   // Create default new team
   public shared ({ caller }) func createTeam(teamKey : Text, invite : Text, info : TeamInfo) : async ResultTeam {
-    assertAdmin(caller); // Only controller of the canister can create new teams for now
-
+    if (not Admin.getPermissions(admins, caller).createTeam) return #err(#permissionDenied);
     Team.create(db.teams, teamKey, invite, info, caller);
   };
 
@@ -150,7 +163,8 @@ actor {
 
   // Get teams
   public shared query ({ caller }) func listTeams(known : [Text]) : async ResultTeams {
-    Team.list(db.teams, caller, known);
+    let showAll = Admin.getPermissions(admins, caller).listAllTeams;
+    Team.list(db.teams, caller, known, showAll);
   };
 
   public shared query ({ caller }) func getTeamStats(teamKey : Text) : async ResultTeamStats {
@@ -214,7 +228,7 @@ actor {
     #ok(q);
   };
 
-  public shared ({ caller }) func deleteQuestion(teamKey : Text, question : Question) : async Result<()> {
+  public shared ({ caller }) func deleteQuestion(teamKey : Text, question : Question) : async ResultVoid {
     let team = switch (Team.get(db.teams, teamKey, caller)) {
       case (#ok(t)) t;
       case (#err(e)) return #err(e);
@@ -390,7 +404,7 @@ actor {
   };
 
   /// Send a friend request to a user
-  public shared ({ caller }) func sendFriendRequest(teamKey : Text, username : Text) : async Result<()> {
+  public shared ({ caller }) func sendFriendRequest(teamKey : Text, username : Text) : async ResultVoid {
     let team = switch (Team.get(db.teams, teamKey, caller)) {
       case (#ok(t)) t;
       case (#err(e)) return #err(e);
@@ -400,7 +414,7 @@ actor {
     Friend.request(team.friends, caller, id, true);
   };
 
-  public shared ({ caller }) func answerFriendRequest(teamKey : Text, username : Text, accept : Bool) : async Result<()> {
+  public shared ({ caller }) func answerFriendRequest(teamKey : Text, username : Text, accept : Bool) : async ResultVoid {
     let team = switch (Team.get(db.teams, teamKey, caller)) {
       case (#ok(t)) t;
       case (#err(e)) return #err(e);
@@ -414,6 +428,13 @@ actor {
     };
   };
 
+  func assertPermission(caller : Principal, permission : Admin.Permission) {
+    if (not Admin.hasPermission(admins, caller, permission)) {
+      Debug.trap("Access denied!");
+    };
+  };
+
+  // Trap if caller is not a controller of the canister
   func assertAdmin(caller : Principal) {
     if (not Principal.isController(caller)) {
       Debug.trap("Access denied!");
@@ -475,7 +496,7 @@ actor {
     Iter.toArray(withLimit);
   };
 
-  public shared ({ caller }) func airdrop(user : Text, tokens : Int) : async Result<()> {
+  public shared ({ caller }) func airdrop(user : Text, tokens : Int) : async ResultVoid {
     assertAdmin(caller);
 
     let ?p = User.getPrincipal(db.users, user) else return #err(#userNotFound);

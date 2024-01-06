@@ -20,5 +20,7 @@ module {
     #tooLong;
     #invalidColor;
     #questionNotFound;
+
+    #permissionDenied;
   };
 };

@@ -26,13 +26,70 @@ module {
   public type AdminDB = Map<Principal, Permissions>;
 
   public type Permissions = {
-    createTeam : Bool;
     suspendUser : Bool;
+    editUser : Bool;
+    createTeam : Bool;
+    listAllTeams : Bool;
+    becomeTeamMember : Bool; // without invite
+    becomeTeamAdmin : Bool;
+    createBackup : Bool;
+    restoreBackup : Bool;
+  };
+
+  public type Permission = {
+    #suspendUser;
+    #editUser;
+    #createTeam;
+    #listAllTeams;
+    #becomeTeamMember;
+    #becomeTeamAdmin;
+    #createBackup;
+    #restoreBackup;
+    #all;
   };
 
   let noPermissions = {
-    createTeam = false;
     suspendUser = false;
+    editUser = false;
+    createTeam = false;
+    listAllTeams = false;
+    becomeTeamMember = false;
+    becomeTeamAdmin = false;
+    createBackup = false;
+    restoreBackup = false;
+  };
+
+  public let creatorPermissions = {
+    editUser = false;
+    suspendUser = false;
+    createTeam = true;
+    listAllTeams = false;
+    becomeTeamMember = false;
+    becomeTeamAdmin = false;
+    createBackup = false;
+    restoreBackup = false;
+  };
+
+  public let moderatorPermissions = {
+    editUser = false;
+    suspendUser = true;
+    createTeam = true;
+    listAllTeams = true;
+    becomeTeamMember = true;
+    becomeTeamAdmin = false;
+    createBackup = false;
+    restoreBackup = false;
+  };
+
+  public let adminPermissions = {
+    editUser = true;
+    suspendUser = true;
+    createTeam = true;
+    listAllTeams = true;
+    becomeTeamMember = true;
+    becomeTeamAdmin = true;
+    createBackup = true;
+    restoreBackup = true;
   };
 
   public func getPermissions(admins : AdminDB, user : Principal) : Permissions {
@@ -42,7 +99,22 @@ module {
 
   public func emptyDB() : AdminDB = Map.new<Principal, Permissions>();
 
-  public func setAdmin(admins : AdminDB, user : Principal, permissions : Permissions) {
+  public func setPermissions(admins : AdminDB, user : Principal, permissions : Permissions) {
     ignore Map.put(admins, phash, user, permissions);
+  };
+
+  public func hasPermission(admins : AdminDB, user : Principal, permission : Permission) : Bool {
+    let ps = getPermissions(admins, user);
+    switch (permission) {
+      case (#editUser) { ps.editUser };
+      case (#suspendUser) { ps.suspendUser };
+      case (#createTeam) { ps.createTeam };
+      case (#listAllTeams) { ps.listAllTeams };
+      case (#becomeTeamMember) { ps.becomeTeamMember };
+      case (#becomeTeamAdmin) { ps.becomeTeamAdmin };
+      case (#createBackup) { ps.createBackup };
+      case (#restoreBackup) { ps.createBackup };
+      case (#all) { ps == adminPermissions };
+    };
   };
 };
