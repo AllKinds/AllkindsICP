@@ -2,8 +2,14 @@ import type { Principal } from '@dfinity/principal';
 import type { ActorMethod } from '@dfinity/agent';
 
 export interface AdminPermissions {
+  'becomeTeamMember' : boolean,
   'createTeam' : boolean,
+  'createBackup' : boolean,
+  'listAllTeams' : boolean,
   'suspendUser' : boolean,
+  'editUser' : boolean,
+  'restoreBackup' : boolean,
+  'becomeTeamAdmin' : boolean,
 }
 export interface Answer {
   'weight' : bigint,
@@ -23,6 +29,7 @@ export type Error = { 'notInTeam' : null } |
   { 'questionNotFound' : null } |
   { 'tooLong' : null } |
   { 'insufficientFunds' : null } |
+  { 'permissionDenied' : null } |
   { 'notEnoughAnswers' : null } |
   { 'tooShort' : null } |
   { 'friendAlreadyConnected' : null } |
@@ -74,8 +81,6 @@ export interface Question__2 {
   'color' : string,
   'points' : bigint,
 }
-export type Result = { 'ok' : null } |
-  { 'err' : Error };
 export type ResultAnswer = { 'ok' : Answer } |
   { 'err' : Error };
 export type ResultFriends = { 'ok' : Array<Friend> } |
@@ -97,6 +102,8 @@ export type ResultUser = { 'ok' : User } |
 export type ResultUserMatches = { 'ok' : Array<UserMatch> } |
   { 'err' : Error };
 export type ResultUsers = { 'ok' : Array<User> } |
+  { 'err' : Error };
+export type ResultVoid = { 'ok' : null } |
   { 'err' : Error };
 export interface Skip {
   'question' : bigint,
@@ -168,8 +175,8 @@ export interface UserStats {
   'points' : bigint,
 }
 export interface _SERVICE {
-  'airdrop' : ActorMethod<[string, bigint], Result>,
-  'answerFriendRequest' : ActorMethod<[string, string, boolean], Result>,
+  'airdrop' : ActorMethod<[string, bigint], ResultVoid>,
+  'answerFriendRequest' : ActorMethod<[string, string, boolean], ResultVoid>,
   'backupAnswers' : ActorMethod<
     [string, bigint, bigint],
     Array<StableQuestion>
@@ -187,7 +194,7 @@ export interface _SERVICE {
   'createTeam' : ActorMethod<[string, string, TeamInfo__1], ResultTeam>,
   'createTestData' : ActorMethod<[string, bigint, bigint], bigint>,
   'createUser' : ActorMethod<[string, string], ResultUser>,
-  'deleteQuestion' : ActorMethod<[string, Question], Result>,
+  'deleteQuestion' : ActorMethod<[string, Question], ResultVoid>,
   'getAnsweredQuestions' : ActorMethod<
     [string, bigint],
     Array<[Question, Answer]>
@@ -207,7 +214,8 @@ export interface _SERVICE {
   'joinTeam' : ActorMethod<[string, string], ResultTeam>,
   'listTeams' : ActorMethod<[Array<string>], ResultTeams>,
   'selfDestruct' : ActorMethod<[string], undefined>,
-  'sendFriendRequest' : ActorMethod<[string, string], Result>,
+  'sendFriendRequest' : ActorMethod<[string, string], ResultVoid>,
+  'setPermissions' : ActorMethod<[string, AdminPermissions], ResultVoid>,
   'submitAnswer' : ActorMethod<
     [string, QuestionID, boolean, bigint],
     ResultAnswer

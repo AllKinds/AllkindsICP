@@ -82,6 +82,11 @@ type Skip =
              skip;
            };
  };
+type ResultVoid = 
+ variant {
+   err: Error;
+   ok;
+ };
 type ResultUsers = 
  variant {
    err: Error;
@@ -136,11 +141,6 @@ type ResultAnswer =
  variant {
    err: Error;
    ok: Answer;
- };
-type Result = 
- variant {
-   err: Error;
-   ok;
  };
 type Question__2 = 
  record {
@@ -211,6 +211,7 @@ type Error =
    notInTeam;
    notLoggedIn;
    notRegistered;
+   permissionDenied;
    questionNotFound;
    teamNotFound;
    tooLong;
@@ -233,12 +234,18 @@ type Answer =
  };
 type AdminPermissions = 
  record {
+   becomeTeamAdmin: bool;
+   becomeTeamMember: bool;
+   createBackup: bool;
    createTeam: bool;
+   editUser: bool;
+   listAllTeams: bool;
+   restoreBackup: bool;
    suspendUser: bool;
  };
 service : {
-  airdrop: (text, int) -> (Result);
-  answerFriendRequest: (text, text, bool) -> (Result);
+  airdrop: (text, int) -> (ResultVoid);
+  answerFriendRequest: (text, text, bool) -> (ResultVoid);
   /// Create a backup of answers
   backupAnswers: (text, nat, nat) -> (vec StableQuestion) query;
   /// Create a backup of friend status
@@ -259,7 +266,7 @@ service : {
   createTeam: (text, text, TeamInfo__1) -> (ResultTeam);
   createTestData: (text, nat, nat) -> (nat);
   createUser: (text, text) -> (ResultUser);
-  deleteQuestion: (text, Question) -> (Result);
+  deleteQuestion: (text, Question) -> (ResultVoid);
   getAnsweredQuestions: (text, nat) -> (vec record {
                                               Question;
                                               Answer;
@@ -281,7 +288,8 @@ service : {
   listTeams: (vec text) -> (ResultTeams) query;
   selfDestruct: (text) -> () oneway;
   /// Send a friend request to a user
-  sendFriendRequest: (text, text) -> (Result);
+  sendFriendRequest: (text, text) -> (ResultVoid);
+  setPermissions: (text, AdminPermissions) -> (ResultVoid);
   submitAnswer: (text, QuestionID, bool, nat) -> (ResultAnswer);
   submitSkip: (text, nat) -> (ResultSkip);
   updateProfile: (User) -> (ResultUser);

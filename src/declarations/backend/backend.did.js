@@ -7,6 +7,7 @@ export const idlFactory = ({ IDL }) => {
     'questionNotFound' : IDL.Null,
     'tooLong' : IDL.Null,
     'insufficientFunds' : IDL.Null,
+    'permissionDenied' : IDL.Null,
     'notEnoughAnswers' : IDL.Null,
     'tooShort' : IDL.Null,
     'friendAlreadyConnected' : IDL.Null,
@@ -18,7 +19,7 @@ export const idlFactory = ({ IDL }) => {
     'notRegistered' : IDL.Null,
     'invalidColor' : IDL.Null,
   });
-  const Result = IDL.Variant({ 'ok' : IDL.Null, 'err' : Error });
+  const ResultVoid = IDL.Variant({ 'ok' : IDL.Null, 'err' : Error });
   const QuestionID__1 = IDL.Nat;
   const Time__1 = IDL.Int;
   const StableQuestion = IDL.Record({
@@ -110,8 +111,14 @@ export const idlFactory = ({ IDL }) => {
     'err' : Error,
   });
   const AdminPermissions = IDL.Record({
+    'becomeTeamMember' : IDL.Bool,
     'createTeam' : IDL.Bool,
+    'createBackup' : IDL.Bool,
+    'listAllTeams' : IDL.Bool,
     'suspendUser' : IDL.Bool,
+    'editUser' : IDL.Bool,
+    'restoreBackup' : IDL.Bool,
+    'becomeTeamAdmin' : IDL.Bool,
   });
   const Question__1 = IDL.Record({
     'id' : QuestionID__1,
@@ -169,10 +176,10 @@ export const idlFactory = ({ IDL }) => {
   });
   const ResultSkip = IDL.Variant({ 'ok' : Skip, 'err' : Error });
   return IDL.Service({
-    'airdrop' : IDL.Func([IDL.Text, IDL.Int], [Result], []),
+    'airdrop' : IDL.Func([IDL.Text, IDL.Int], [ResultVoid], []),
     'answerFriendRequest' : IDL.Func(
         [IDL.Text, IDL.Text, IDL.Bool],
-        [Result],
+        [ResultVoid],
         [],
       ),
     'backupAnswers' : IDL.Func(
@@ -207,7 +214,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'createTestData' : IDL.Func([IDL.Text, IDL.Nat, IDL.Nat], [IDL.Nat], []),
     'createUser' : IDL.Func([IDL.Text, IDL.Text], [ResultUser], []),
-    'deleteQuestion' : IDL.Func([IDL.Text, Question], [Result], []),
+    'deleteQuestion' : IDL.Func([IDL.Text, Question], [ResultVoid], []),
     'getAnsweredQuestions' : IDL.Func(
         [IDL.Text, IDL.Nat],
         [IDL.Vec(IDL.Tuple(Question, Answer))],
@@ -246,7 +253,8 @@ export const idlFactory = ({ IDL }) => {
     'joinTeam' : IDL.Func([IDL.Text, IDL.Text], [ResultTeam], []),
     'listTeams' : IDL.Func([IDL.Vec(IDL.Text)], [ResultTeams], ['query']),
     'selfDestruct' : IDL.Func([IDL.Text], [], ['oneway']),
-    'sendFriendRequest' : IDL.Func([IDL.Text, IDL.Text], [Result], []),
+    'sendFriendRequest' : IDL.Func([IDL.Text, IDL.Text], [ResultVoid], []),
+    'setPermissions' : IDL.Func([IDL.Text, AdminPermissions], [ResultVoid], []),
     'submitAnswer' : IDL.Func(
         [IDL.Text, QuestionID, IDL.Bool, IDL.Nat],
         [ResultAnswer],
