@@ -57,10 +57,10 @@ const setFile = async (e: any) => {
             <h1>Create a team</h1>
         </TextBlock>
 
-        <NetworkDataContainer :networkdata="app.getPrincipal()" class="w-full flex-grow flex flex-col">
-            <div class="w-full text-center mb-8 text-lg">
-                Principal <br><b>{{ app.getPrincipal().data?.toText() }}</b> <br> must be set as an admin to create new
-                teams.
+        <NetworkDataContainer :networkdata="app.getUser()" class="w-full flex-grow flex flex-col">
+            <div v-if="app.getUser().data?.permissions.createTeam === false" class="w-full text-center mb-8 text-lg">
+                You don't have permissions to create a new team. <br>
+                Ask an admin to grant permissions to your user ID: <b>{{ app.getUser().data?.user.username }}</b> <br>.
             </div>
 
             <div class="p-4 rounded-lg my-2 w-full">

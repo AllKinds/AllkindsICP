@@ -31,6 +31,8 @@ function canCreate() {
     return question.value.length >= 10 && !loading.value
 }
 
+const user = () => app.getUser().data?.user;
+
 if (inBrowser()) {
     app.getTeam()
     app.loadUser();
@@ -42,7 +44,7 @@ if (inBrowser()) {
     <div class="w-full flex-grow flex flex-col">
         <AllkindsTitle class="w-full" logo="ph:x-circle" link-to="/questions">
             <NuxtLink to="/my-profile">
-                {{ app.getUser().displayName }}, {{ app.getUser().stats.points }}
+                {{ user()?.displayName }}, {{ user()?.stats.points }}
                 <Icon name="gg:shape-hexagon" class="mb-2" />
             </NuxtLink>
 

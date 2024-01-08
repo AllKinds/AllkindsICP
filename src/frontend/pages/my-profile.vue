@@ -1,10 +1,17 @@
 <script lang="ts" setup>
+import { withDefault, UserPermissions } from '../utils/backend';
+
 definePageMeta({
     title: "Allkinds",
     layout: 'default'
 });
 
 const app = useAppState();
+
+const user = () => {
+    const dummy = { user: { stats: {} }, permissions: {} } as UserPermissions;
+    return withDefault(app.getUser(), dummy).user;
+};
 
 if (inBrowser()) {
     app.getTeam();
@@ -28,19 +35,19 @@ if (inBrowser()) {
 
         <div class="w-full">
             <div class="text-3xl font-bold">
-                {{ app.getUser().displayName }}, {{ app.getUser().stats.points }}
+                {{ user().displayName }}, {{ user().stats.points }}
                 <Icon name="gg:shape-hexagon" class="mb-2" />
             </div>
             <div>
-                <span class="font-bold">{{ app.getUser().stats.asked }}</span>
+                <span class="font-bold">{{ user().stats.asked }}</span>
                 questions asked
             </div>
             <div>
-                <span class="font-bold">{{ app.getUser().stats.answered }}</span>
+                <span class="font-bold">{{ user().stats.answered }}</span>
                 questions answered
             </div>
             <div>
-                <span class="font-bold">{{ app.getUser().stats.boosts }}</span>
+                <span class="font-bold">{{ user().stats.boosts }}</span>
                 people boosted your question
             </div>
         </div>

@@ -118,8 +118,8 @@ const isMember = () => {
         <Btn v-else-if="isMember()" class="w-80 mt-2" to="/team-info">
             Goto team
         </Btn>
-        <Btn v-else-if="app.user.status === 'ok'" class="w-80 mt-2" @click="join()">
-            Join the team as {{ app.getUser().displayName }}
+        <Btn v-else-if="app.getUser().status === 'ok'" class="w-80 mt-2" @click="join()">
+            Join the team as {{ app.getUser().data?.user.displayName }}
         </Btn>
         <Btn v-else class="w-80 mt-2" @click="join()">
             Join the team

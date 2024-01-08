@@ -71,7 +71,21 @@ export const idlFactory = ({ IDL }) => {
     'listed' : IDL.Bool,
   });
   const ResultTeam = IDL.Variant({ 'ok' : TeamInfo__1, 'err' : Error });
-  const ResultUser = IDL.Variant({ 'ok' : User, 'err' : Error });
+  const AdminPermissions = IDL.Record({
+    'becomeTeamMember' : IDL.Bool,
+    'createTeam' : IDL.Bool,
+    'createBackup' : IDL.Bool,
+    'listAllTeams' : IDL.Bool,
+    'suspendUser' : IDL.Bool,
+    'editUser' : IDL.Bool,
+    'restoreBackup' : IDL.Bool,
+    'becomeTeamAdmin' : IDL.Bool,
+  });
+  const UserPermissions = IDL.Record({
+    'permissions' : AdminPermissions,
+    'user' : User,
+  });
+  const ResultUser = IDL.Variant({ 'ok' : UserPermissions, 'err' : Error });
   const Answer = IDL.Record({
     'weight' : IDL.Nat,
     'created' : Time__1,
@@ -109,16 +123,6 @@ export const idlFactory = ({ IDL }) => {
   const ResultUserMatches = IDL.Variant({
     'ok' : IDL.Vec(UserMatch),
     'err' : Error,
-  });
-  const AdminPermissions = IDL.Record({
-    'becomeTeamMember' : IDL.Bool,
-    'createTeam' : IDL.Bool,
-    'createBackup' : IDL.Bool,
-    'listAllTeams' : IDL.Bool,
-    'suspendUser' : IDL.Bool,
-    'editUser' : IDL.Bool,
-    'restoreBackup' : IDL.Bool,
-    'becomeTeamAdmin' : IDL.Bool,
   });
   const Question__1 = IDL.Record({
     'id' : QuestionID__1,

@@ -12,6 +12,8 @@ if (inBrowser()) {
     app.loadFriends(0);
 }
 
+const user = () => app.getUser().data?.user;
+
 let match = { user: { username: "" } };
 </script>
 
@@ -20,7 +22,7 @@ let match = { user: { username: "" } };
     <div class="w-full flex-grow flex flex-col">
         <AllkindsTitle logo="ph:x-circle" logoSize="2em" linkTo="/questions">
             <NuxtLink to="/my-profile" class="m-auto">
-                {{ app.getUser().displayName }}, {{ app.getUser().stats.points }}
+                {{ user()?.displayName }}, {{ user()?.stats.points }}
                 <Icon name="gg:shape-hexagon" class="mb-2" />
             </NuxtLink>
 

@@ -88,6 +88,7 @@ if (inBrowser()) {
 }
 
 const twColor = () => getColor(q().color as ColorName).color;
+const user = () => app.getUser().data?.user;
 
 </script>
 
@@ -95,7 +96,7 @@ const twColor = () => getColor(q().color as ColorName).color;
     <div class="w-full flex-grow flex flex-col">
         <AllkindsTitle class="w-full" logo="ph:x-circle" linkTo="/questions">
             <NuxtLink to="/my-profile" class="m-auto">
-                {{ app.getUser().displayName }}, {{ app.getUser().stats.points }}
+                {{ user()?.displayName }}, {{ user()?.stats.points }}
                 <Icon name="gg:shape-hexagon" class="mb-2" />
             </NuxtLink>
 

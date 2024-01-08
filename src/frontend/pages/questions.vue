@@ -7,6 +7,7 @@ definePageMeta({
 });
 
 const app = useAppState();
+const user = () => app.getUser().data?.user;
 
 if (inBrowser()) {
     app.getTeam();
@@ -22,7 +23,7 @@ if (inBrowser()) {
         <AllkindsTitle link-to="/team-info">
             {{ app.checkTeam() }}
             <NuxtLink to="/my-profile" class="m-auto">
-                {{ app.getUser().displayName }}, {{ app.getUser().stats.points }}
+                {{ user()?.displayName }}, {{ user()?.stats.points }}
                 <Icon name="gg:shape-hexagon" class="mb-2" />
             </NuxtLink>
 

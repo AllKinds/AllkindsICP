@@ -6,20 +6,10 @@ definePageMeta({
     layout: 'default'
 });
 const app = useAppState();
-const invite = useState("invite-code", () => "");
 
 if (inBrowser()) {
-    const ref = document.location.hash
-    try {
-        const team = ref.split(":")[0].replace(/[^a-z]/g, "");
-        const code = ref.split(":")[1];
-        if (team.length < 2) throw "";
-        invite.value = code;
-        app.loadTeams(0, team);
-        // TODO: auto select team if it exists
-    } catch {
-        app.loadTeams(0)
-    }
+    app.loadTeams(0);
+    app.loadUser();
 }
 
 let gotoInfo = false;
@@ -33,6 +23,13 @@ const setTeam = (t: TeamUserInfo) => {
     } else {
         navigateTo("/join/" + t.key)
     }
+}
+
+const canCreate = () => {
+    const u = app.getUser();
+    if (u.status !== 'ok') return false;
+
+    return u.data?.permissions.createTeam;
 }
 
 </script>
@@ -49,7 +46,7 @@ const setTeam = (t: TeamUserInfo) => {
                 Available teams: {{ app.getTeams().data?.length }}
             </div>
 
-            <Btn to="/create-team" class="w-72 mb-10">Create a new team</Btn>
+            <Btn v-if="canCreate()" to="/create-team" class="w-72 mb-10">Create a new team</Btn>
 
             <div v-for="t in app.getTeams().data" @click="setTeam(t)"
                 class="border border-white p-4 rounded-lg my-2 w-full cursor-pointer flex ">

@@ -5,6 +5,11 @@ type UserStats =
    boosts: nat;
    points: nat;
  };
+type UserPermissions = 
+ record {
+   permissions: AdminPermissions;
+   user: User;
+ };
 type UserMatch = 
  record {
    answered: vec record {
@@ -100,7 +105,7 @@ type ResultUserMatches =
 type ResultUser = 
  variant {
    err: Error;
-   ok: User;
+   ok: UserPermissions;
  };
 type ResultTeams = 
  variant {

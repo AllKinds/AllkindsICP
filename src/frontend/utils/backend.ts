@@ -5,7 +5,7 @@ export type BackendActor = typeof backend;
 import { Effect } from "effect";
 import type { Principal } from "@dfinity/principal";
 import { BackendError, FrontendError, toBackendError, toNetworkError } from "~/utils/errors";
-import type { Question, Answer, User, Skip, Friend, UserMatch, TeamUserInfo, TeamStats, QuestionStats, FriendStatus } from "~~/src/declarations/backend/backend.did";
+import type { Question, Answer, User, Skip, Friend, UserMatch, TeamUserInfo, TeamStats, QuestionStats, FriendStatus, UserPermissions } from "~~/src/declarations/backend/backend.did";
 
 type BackendEffect<T> = Effect.Effect<never, BackendError, T>
 export type FrontendEffect<T> = Effect.Effect<never, FrontendError, T>
@@ -54,6 +54,11 @@ const effectifyAnonResult = <T>(fn: (actor: BackendActor) => Promise<{ ok: T } |
     })
 }
 
+export const withDefault = <T>(data: NetworkData<T>, fallback: T): T => {
+    return data.data || fallback;
+};
+
+
 export const loadOpenQuestions = (team: string): FrontendEffect<Question[]> => {
     const limit = BigInt(20);
     return effectify((actor) => actor.getUnansweredQuestions(team, limit))
@@ -69,7 +74,7 @@ export const getOwnQuestions = (team: string): FrontendEffect<Question[]> => {
     return effectify((actor) => actor.getOwnQuestions(team, limit))
 }
 
-export const loadUser = (orRedirect = true): FrontendEffect<User> => {
+export const loadUser = (orRedirect = true): FrontendEffect<UserPermissions> => {
     return effectifyResult((actor) => actor.getUser(), orRedirect)
 }
 

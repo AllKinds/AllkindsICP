@@ -39,7 +39,7 @@ async function createUser() {
 }
 
 const checkUser = () => {
-    if (app.getUser().username?.length > 1) {
+    if ((app.getUser().data?.user.username.length || 0) > 1) {
         navigateTo("/questions")
     }
 }
@@ -47,7 +47,6 @@ const checkUser = () => {
 if (inBrowser()) {
     app.loadUser(0, false)
 }
-
 
 </script>
 <template>

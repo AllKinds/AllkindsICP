@@ -61,10 +61,11 @@ actor {
   type AdminPermissions = Admin.Permissions;
 
   type Result<T> = Result.Result<T, Error>;
+  type UserPermissions = { user : User; permissions : AdminPermissions };
 
   // Aliases to get deterministic names for use in frontend code
   type ResultVoid = Result<()>;
-  type ResultUser = Result<User>;
+  type ResultUser = Result<UserPermissions>;
   type ResultUsers = Result<[User]>;
   type ResultQuestion = Result<Question>;
   type ResultAnswer = Result<Answer>;
@@ -195,17 +196,31 @@ actor {
 
   // Create default new user with only a username
   public shared ({ caller }) func createUser(displayName : Text, contact : Text) : async ResultUser {
-    User.add(db.users, displayName, contact, caller);
+    let u = User.add(db.users, displayName, contact, caller);
+    userWithPermissions(u, caller);
+  };
+
+  func userWithPermissions(result : Result<User>, principal : Principal) : ResultUser {
+    Result.mapOk<User, UserPermissions, Error>(
+      result,
+      func(user) {
+        {
+          user;
+          permissions = Admin.getPermissions(admins, principal);
+        };
+      },
+    );
 
   };
 
   public shared query ({ caller }) func getUser() : async ResultUser {
     let ?user = User.get(db.users, caller) else return #err(#notRegistered);
-    #ok(user);
+    userWithPermissions(#ok(user), caller);
   };
 
   public shared ({ caller }) func updateProfile(user : User) : async ResultUser {
-    User.update(db.users, user, caller);
+    let u = User.update(db.users, user, caller);
+    userWithPermissions(u, caller);
   };
 
   public shared ({ caller }) func createQuestion(teamKey : Text, question : Text, color : Text) : async ResultQuestion {

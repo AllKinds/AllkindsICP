@@ -97,7 +97,7 @@ export type ResultTeamStats = { 'ok' : TeamStats } |
   { 'err' : Error };
 export type ResultTeams = { 'ok' : Array<TeamUserInfo> } |
   { 'err' : Error };
-export type ResultUser = { 'ok' : User } |
+export type ResultUser = { 'ok' : UserPermissions } |
   { 'err' : Error };
 export type ResultUserMatches = { 'ok' : Array<UserMatch> } |
   { 'err' : Error };
@@ -167,6 +167,10 @@ export interface UserMatch {
   'answered' : Array<[Question__2, AnswerDiff]>,
   'user' : UserInfo,
   'uncommon' : Array<Question__2>,
+}
+export interface UserPermissions {
+  'permissions' : AdminPermissions,
+  'user' : User,
 }
 export interface UserStats {
   'asked' : bigint,

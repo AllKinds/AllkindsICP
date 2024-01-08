@@ -1,12 +1,12 @@
 import { Effect, pipe } from "effect";
-import { FrontendEffect, Question, Answer, User, Friend, UserMatch, TeamStats, TeamUserInfo, QuestionStats } from "~/utils/backend";
+import { FrontendEffect, Question, Answer, User, UserPermissions, Friend, UserMatch, TeamStats, TeamUserInfo, QuestionStats } from "~/utils/backend";
 import * as backend from "~/utils/backend";
 import { FrontendError, notifyWithMsg } from "~/utils/errors";
 import { defineStore } from 'pinia'
 import * as errors from "~/utils/errors";
 
 export type AppState = {
-    user: NetworkData<User>,
+    user: NetworkData<UserPermissions>,
     team: string,
     knownTeams: string[],
     openQuestions: NetworkData<Question[]>,
@@ -227,10 +227,10 @@ export const useAppState = defineStore({
                     .catch((e) => console.warn("couldn't loadUser " + e));
             }
         },
-        getUser() {
-            return withDefault(this.user, { stats: {} } as User);
+        getUser(): NetworkData<UserPermissions> {
+            return this.user as NetworkData<UserPermissions>;
         },
-        setUser(user: NetworkData<User>): void {
+        setUser(user: NetworkData<UserPermissions>): void {
             this.user = combineNetworkData(this.user, user)
         },
         loadUser(maxAgeS?: number, orRedirect: boolean = true) {
@@ -386,10 +386,6 @@ export const useAppState = defineStore({
         },
     },
 });
-
-const withDefault = <T>(data: NetworkData<T>, fallback: T): T => {
-    return data.data || fallback;
-};
 
 const shouldUpdate = <T>(data: NetworkData<T>, maxAgeS?: number): boolean => {
     switch (data.status) {
