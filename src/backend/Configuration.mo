@@ -16,6 +16,9 @@ module {
     minSize : Nat = 5;
     maxSize : Nat = 200;
     maxBoost : Nat = 20;
+    skipReward : Int = -3;
+    answerReward : Int = 1;
+    boostReward : Int = 2;
   };
 
   public let user = {

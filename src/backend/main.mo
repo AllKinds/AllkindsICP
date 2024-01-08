@@ -343,7 +343,8 @@ actor {
           let q = Question.get(team.questions, question);
           ignore User.increment(db.users, #boost, q.creator);
         };
-        Question.changePoints(team.questions, question, boost);
+        let points = Configuration.question.answerReward + (boost : Int - 1) * Configuration.question.boostReward;
+        Question.changePoints(team.questions, question, points);
       };
     };
 
@@ -359,6 +360,7 @@ actor {
 
     let s : Skip = { question; reason = #skip };
     let prev = Question.putSkip(team.skips, s, caller);
+    Question.changePoints(team.questions, question, Configuration.question.skipReward);
     #ok(s);
   };
 
