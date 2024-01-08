@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { AppState, inBrowser, useAppState } from '~/composables/appState';
 
 definePageMeta({
     title: "Allkinds",

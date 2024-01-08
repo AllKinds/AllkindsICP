@@ -195,7 +195,7 @@ export const deleteQuestion = (team: string, question: Question): FrontendEffect
     return effectifyResult((actor) => actor.deleteQuestion(team, question))
 }
 
-export const getOwnPrinciapl = (): FrontendEffect<Principal> => {
+export const getOwnPrincipal = (): FrontendEffect<Principal> => {
     return effectify((actor) => actor.whoami())
 }
 

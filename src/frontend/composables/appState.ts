@@ -223,7 +223,7 @@ export const useAppState = defineStore({
         },
         loadPrincipal(maxAgeS?: number) {
             if (shouldUpdate(this.principal, maxAgeS)) {
-                return runStore(this.getPrincipal(), backend.getOwnPrinciapl(), this.setPrincipal)
+                return runStore(this.getPrincipal(), backend.getOwnPrincipal(), this.setPrincipal)
                     .catch((e) => console.warn("couldn't loadUser " + e));
             }
         },

@@ -574,7 +574,7 @@ actor {
       switch (res2) {
         case (#ok(_)) {};
         case (#err(error)) {
-          Debug.trap(debug_show (error) # " when adding user " # name # " as a memeber");
+          Debug.trap(debug_show (error) # " when adding user " # name # " as a member");
         };
       };
 
