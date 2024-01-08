@@ -18,7 +18,7 @@ const q = props.question;
         :class="getColor(props.color || q.color as ColorName).color"
         class="border p-4 w-full my-2 rounded-lg block text-2xl font-medium text-ellipsis">
         <Icon v-if="props.link" name="material-symbols:arrow-forward-ios" class="float-right mt-1" />
-        <span v-if="props.showScore" class="float-right">{{ q.points }}</span>
+        <span v-if="props.showScore" class="float-right text-red-400">{{ q.points }}</span>
         {{ q.question }}
         <slot />
     </NuxtLink>

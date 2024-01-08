@@ -13,13 +13,17 @@ const about = useState("team-about", () => "");
 const invite = useState("invite-code", () => "");
 const logo = useState("team-logo", (): number[] => []);
 const listed = useState("team-listed", () => true);
+const loading = useState("loading", () => true);
+loading.value = false;
 
 if (inBrowser()) {
+    app.loadUser(0);
     app.loadTeams(0)
     app.loadPrincipal(0)
 }
 
 const create = () => {
+    loading.value = true;
     app.createTeam(
         team.value,
         name.value,
@@ -30,7 +34,9 @@ const create = () => {
     ).then(() => {
         const params = new URLSearchParams({ invite: invite.value });
         navigateTo("/join/" + team.value + "?" + params.toString())
-    });
+    }).finally(
+        () => loading.value = false
+    );
 }
 
 
@@ -87,11 +93,9 @@ const setFile = async (e: any) => {
 </script>
 
 <template>
-    <div class="w-full flex-grow">
-        <AllkindsTitle link-to="/select-team">Allkinds.teams</AllkindsTitle>
-        <TextBlock>
-            <h1>Create a team</h1>
-        </TextBlock>
+    <div class="w-full flex-grow flex flex-col">
+        <AllkindsTitle link-to="/select-team"></AllkindsTitle>
+        <h1 class="self-center">Create a team</h1>
 
         <NetworkDataContainer :networkdata="app.getUser()" class="w-full flex-grow flex flex-col">
             <div v-if="app.getUser().data?.permissions.createTeam === false" class="w-full text-center mb-8 text-lg">
@@ -146,7 +150,10 @@ const setFile = async (e: any) => {
             <div class="w-2 flex-grow"></div>
 
             <div class="text-center w-full">
-                <Btn @click="create()">Create team</Btn>
+                <Btn v-if="loading">
+                    <Icon name="line-md:loading-alt-loop" />
+                </Btn>
+                <Btn v-else @click="create()">Create team</Btn>
             </div>
             <div class="w-2 flex-grow"></div>
         </NetworkDataContainer>

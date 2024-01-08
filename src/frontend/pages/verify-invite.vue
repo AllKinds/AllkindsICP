@@ -46,6 +46,7 @@ if (inBrowser()) {
         team = obj.team;
         invite = obj.invite;
     } catch (e) {
+        console.error("Failed to parse invite:", e);
         clearInvite();
     }
 
@@ -66,7 +67,6 @@ if (inBrowser()) {
     }
     app.loadTeams(0);
 }
-
 
 </script>
 

@@ -31,7 +31,7 @@ module {
     createTeam : Bool;
     listAllTeams : Bool;
     becomeTeamMember : Bool; // without invite
-    becomeTeamAdmin : Bool;
+    becomeTeamAdmin : Bool; // can remove users, edit questions or delete the team
     createBackup : Bool;
     restoreBackup : Bool;
   };
@@ -51,7 +51,7 @@ module {
   let noPermissions = {
     suspendUser = false;
     editUser = false;
-    createTeam = false;
+    createTeam = true;
     listAllTeams = false;
     becomeTeamMember = false;
     becomeTeamAdmin = false;

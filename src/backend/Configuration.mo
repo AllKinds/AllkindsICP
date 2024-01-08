@@ -28,8 +28,8 @@ module {
   };
 
   public let matching = {
-    minAnswers : Nat = 10; // Users have to answer at least this many questions to start matching or get matched
-    minCommonQuestions : Nat = 5; // number of common questions to consider two users for matching
+    minAnswers : Nat = 5; // Users have to answer at least this many questions to start matching or get matched
+    minCommonQuestions : Nat = 4; // number of common questions to consider two users for matching
   };
 
   public let api = {
