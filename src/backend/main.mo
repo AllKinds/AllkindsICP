@@ -343,6 +343,7 @@ actor {
           let q = Question.get(team.questions, question);
           ignore User.increment(db.users, #boost, q.creator);
         };
+        Question.changePoints(team.questions, question, boost);
       };
     };
 
