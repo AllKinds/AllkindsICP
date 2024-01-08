@@ -65,13 +65,14 @@ npm run dev
 ```
 
 To create teams through the frontend navigating to `/create-team`.
-Currently this requires your principal to be a controller of the backend canister.
+You need explicit permissions to access this function.
+Permissions can be granted by a controller of the canister:
 
 ```bash
-# replace xxxxx... with your principal (shown on /create-team)
-dfx canister update-settings --add-controller xxxxx-xxxxx-xxxxx-xxxxx-xxxxx-xxx backend
+# replace my-username with your actual user name
+dfx canister call backend setPermissions '("my-username", record {becomeTeamMember=true; createTeam=true; createBackup=true; listAllTeams=true; suspendUser=true; editUser=true; 
+restoreBackup=true; becomeTeamAdmin=true})'
 ```
-
 
 ## License
 

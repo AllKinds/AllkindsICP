@@ -11,15 +11,16 @@ definePageMeta({
 });
 
 const teamSelected = () => window.localStorage.getItem("team") && !window.localStorage.getItem("invite");
+const hasInvite = () => window.localStorage.getItem("invite");
 
 async function login(provider: Provider) {
     if (!inBrowser()) return;
     if (await Effect.runPromise(checkAuth(provider))) {
         console.log("logged in");
-        if (teamSelected()) {
-            navigateTo("/team-info")
+        if (hasInvite()) {
+            navigateTo("/welcome")
         } else {
-            navigateTo("/welcome");
+            navigateTo("/team-info");
         }
     }
 }
@@ -44,7 +45,7 @@ async function login(provider: Provider) {
         <Btn v-if="isLoggedIn() && teamSelected()" class="w-80 mt-2" @click="login('II')">
             Welcome back
         </Btn>
-        <Btn v-else-if="isLoggedIn()" class="w-80 mt-2" @click="login('II')">
+        <Btn v-else-if="isLoggedIn()" class="w-80 mt-2" to="/select-team">
             Select a team
         </Btn>
         <Btn v-else class="w-80 mt-2" @click="login('II')">

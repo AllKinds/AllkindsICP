@@ -438,5 +438,5 @@ export const addNotification = (level: NotificationLevel, msg: string): void => 
 
 export const invitePath = (team: string, invite: string) => {
     const params = new URLSearchParams({ invite });
-    return "/invited/" + team + "?" + params.toString();
+    return "/join/" + team + "?" + params.toString();
 }

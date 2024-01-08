@@ -9,8 +9,8 @@ definePageMeta({
 
 const app = useAppState();
 
-let team: string | undefined;
-let invite: string | undefined;
+let team: string | undefined = undefined;
+let invite: string | undefined = undefined;
 
 let isValid = useState("verify-valid");
 isValid.value = false;
@@ -59,6 +59,7 @@ if (inBrowser()) {
         }, () => {
             // TODO: set verificationFailed on network error
             isInvalid.value = true;
+            clearInvite();
         });
     } else {
         hasInvite.value = false;
@@ -76,12 +77,12 @@ if (inBrowser()) {
         <h1>Verifying invite</h1>
         <div class="grow" />
 
-        <NetworkDataContainer :networkdata="app.getTeams()" class="w-full flex-grow flex flex-col">
+        <NetworkDataContainer v-if="hasInvite" :networkdata="app.getTeams()" class="w-full grow flex flex-col">
 
             <img :src="toDataUrl(getTeam()?.info.logo || [])" height="150" width="150" class="m-auto rounded-2xl" />
 
             <div class="w-full text-center mt-4 mb-8 text-lg">
-                Verifying invite for <span class="font-bold">{{ getTeam()?.info.name }} ({{ app.team }})</span>
+                Verifying invite for <span class="font-bold">{{ getTeam()?.info.name }} ({{ team }})</span>
             </div>
 
             <div class="p-4 rounded-lg my-2 w-full">
@@ -92,6 +93,9 @@ if (inBrowser()) {
 
             <div class="w-2 flex-grow"></div>
         </NetworkDataContainer>
+        <div v-else class="grow">
+            <img :src="toDataUrl(getTeam()?.info.logo || [])" height="150" width="150" class="m-auto rounded-2xl" />
+        </div>
 
         <Icon v-if="loading()" name="line-md:loading-alt-loop" size="3em" />
 

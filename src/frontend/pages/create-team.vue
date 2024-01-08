@@ -28,24 +28,60 @@ const create = () => {
         listed.value,
         invite.value,
     ).then(() => {
-        const params = new URLSearchParams({ code: invite.value });
-        navigateTo("/invited/" + team.value + "?" + params.toString())
+        const params = new URLSearchParams({ invite: invite.value });
+        navigateTo("/join/" + team.value + "?" + params.toString())
     });
 }
 
 
 const setFile = async (e: any) => {
     const file = e.target.files[0];
-    const tooBig = file.size > 1000500;
-    const wrongType = file.type !== "image/png";
-    if (tooBig || wrongType) {
-        addNotification("error", tooBig ? "File is too large" : "File is not a .png image")
-        logo.value = [];
-        e.target.value = null;
-        return false;
-    }
+    //const tooBig = file.size > 1000500;
+    //const wrongType = file.type !== "image/png";
+    //if (tooBig || wrongType) {
+    //    addNotification("error", tooBig ? "File is too large" : "File is not a .png image")
+    //    logo.value = [];
+    //    e.target.value = null;
+    //    return false;
+    //}
 
-    logo.value = [...new Uint8Array(await file.slice().arrayBuffer())];
+    //logo.value = [...new Uint8Array(await file.slice().arrayBuffer())];
+
+    if (file) {
+        const reader = new FileReader();
+        var canvas = document.getElementById('logoPreview') as HTMLCanvasElement;
+        var ctx = canvas.getContext('2d');
+
+
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                const scaleFactor = Math.min(canvas.width / img.width, canvas.height / img.height);
+                const newWidth = img.width * scaleFactor;
+                const newHeight = img.height * scaleFactor;
+                // Draw the image on the canvas
+                ctx?.clearRect(0, 0, canvas.width, canvas.height);
+                ctx?.drawImage(
+                    img,
+                    (canvas.width - newWidth) / 2,
+                    (canvas.height - newHeight) / 2,
+                    newWidth, newHeight
+                );
+
+                canvas.toBlob((blob) => {
+                    blob?.arrayBuffer().then(
+                        (v) => logo.value = [...new Uint8Array(v)]
+                    )
+                }, "image/png")
+            };
+
+            // Set the source of the image to the loaded data URL
+            img.src = e.target?.result as string;
+        };
+
+        // Read the file as a data URL
+        reader.readAsDataURL(file);
+    }
 }
 
 </script>
@@ -73,6 +109,7 @@ const setFile = async (e: any) => {
                 <div class="mt-4">
                     Logo (square .png image, max. size 1MB)
 
+                    <canvas id="logoPreview" width="512" height="512" style="width: 64px; height: 64px;"></canvas>
                     <input class="mt-2" type="file" @change="setFile" />
                     {{ Math.round(logo.length / 1000) }} kb
                 </div>
