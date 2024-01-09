@@ -255,6 +255,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'getUser' : IDL.Func([], [ResultUser], ['query']),
     'joinTeam' : IDL.Func([IDL.Text, IDL.Text], [ResultTeam], []),
+    'leaveTeam' : IDL.Func([IDL.Text, IDL.Text], [ResultVoid], []),
     'listTeams' : IDL.Func([IDL.Vec(IDL.Text)], [ResultTeams], ['query']),
     'selfDestruct' : IDL.Func([IDL.Text], [], ['oneway']),
     'sendFriendRequest' : IDL.Func([IDL.Text, IDL.Text], [ResultVoid], []),

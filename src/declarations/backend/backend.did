@@ -290,6 +290,7 @@ service : {
   getUnansweredQuestions: (text, nat) -> (vec Question) query;
   getUser: () -> (ResultUser) query;
   joinTeam: (text, text) -> (ResultTeam);
+  leaveTeam: (text, text) -> (ResultVoid);
   listTeams: (vec text) -> (ResultTeams) query;
   selfDestruct: (text) -> () oneway;
   /// Send a friend request to a user

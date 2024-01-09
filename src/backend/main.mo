@@ -143,11 +143,11 @@ actor {
     };
   };
 
-  public shared ({ caller }) func setPermissions(name : Text, permissions : AdminPermissions) : async ResultVoid {
+  public shared ({ caller }) func setPermissions(user : Text, permissions : AdminPermissions) : async ResultVoid {
     if (not Principal.isController(caller)) {
       assertPermission(caller, #all);
     };
-    let ?p = User.getPrincipal(db.users, name) else return #err(#userNotFound);
+    let ?p = User.getPrincipal(db.users, user) else return #err(#userNotFound);
     Admin.setPermissions(admins, p, permissions);
     #ok;
   };
@@ -160,6 +160,14 @@ actor {
 
   public shared ({ caller }) func joinTeam(teamKey : Text, invite : Text) : async ResultTeam {
     Team.addMember(db.teams, teamKey, invite, caller);
+  };
+
+  public shared ({ caller }) func leaveTeam(teamKey : Text, user : Text) : async ResultVoid {
+    let ?p = User.getPrincipal(db.users, user) else return #err(#userNotFound);
+    let isAllowed = p == caller or Admin.getPermissions(admins, caller).suspendUser;
+    if (not isAllowed) { return #err(#permissionDenied) };
+
+    Team.removeMember(db.teams, teamKey, p);
   };
 
   // Get teams

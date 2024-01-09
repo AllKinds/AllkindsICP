@@ -153,6 +153,14 @@ module {
     #ok(team.info);
   };
 
+  public func removeMember(teams : TeamDB, key : Text, user : Principal) : Result<()> {
+    let ?team = Map.get(teams, thash, key) else return #err(#teamNotFound);
+
+    let true = Set.remove(team.members, phash, user) else return #err(#userNotFound);
+
+    #ok;
+  };
+
   public func isAdmin(team : Team, user : Principal) : Bool = Set.has(team.admins, phash, user);
   public func isMember(team : Team, user : Principal) : Bool = Set.has(team.members, phash, user);
   public func getMembers(team : Team) : [Principal] = Set.toArray(team.members);

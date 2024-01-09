@@ -216,6 +216,7 @@ export interface _SERVICE {
   'getUnansweredQuestions' : ActorMethod<[string, bigint], Array<Question>>,
   'getUser' : ActorMethod<[], ResultUser>,
   'joinTeam' : ActorMethod<[string, string], ResultTeam>,
+  'leaveTeam' : ActorMethod<[string, string], ResultVoid>,
   'listTeams' : ActorMethod<[Array<string>], ResultTeams>,
   'selfDestruct' : ActorMethod<[string], undefined>,
   'sendFriendRequest' : ActorMethod<[string, string], ResultVoid>,
