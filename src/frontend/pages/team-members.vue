@@ -8,6 +8,8 @@ definePageMeta({
 });
 
 const app = useAppState();
+const loading = useState('loading', () => true);
+loading.value = false;
 
 if (inBrowser()) {
     app.getTeam();
@@ -35,9 +37,15 @@ const remove = (user: User) => {
     );
 
     if (confirmed) {
-        // TODO!: implement
-        // app.removeMember(user.username)
-        addNotification("error", "Couldn't remover member. (WIP)")
+        loading.value = true;
+        app.leaveTeam(user.username).then(
+            () => { app.loadTeamMembers(0) }
+        ).then(
+            () => { addNotification("ok", "User is removed from team") },
+            () => { addNotification("error", "Couldn't remove member") },
+        ).finally(
+            () => { loading.value = false }
+        );
     }
 }
 
@@ -67,7 +75,8 @@ const remove = (user: User) => {
                     </span>
                 </div>
                 <NuxtLink class="cursor-pointer" @click="remove(user)">
-                    <Icon name="prime:user-minus" size="2em" />
+                    <Icon v-if="loading" name="line-md:loading-alt-loop" size="2em" />
+                    <Icon v-else name="prime:user-minus" size="2em" />
                 </NuxtLink>
             </div>
         </NetworkDataContainer>

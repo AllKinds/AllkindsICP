@@ -187,6 +187,10 @@ export const joinTeam = (team: string, code: string): FrontendEffect<void> => {
     return effectifyResult((actor) => actor.joinTeam(team, code))
 }
 
+export const leaveTeam = (team: string, user: string): FrontendEffect<void> => {
+    return effectifyResult((actor) => actor.leaveTeam(team, user))
+}
+
 export const createTeam = (team: string, name: string, about: string, logo: number[], listed: boolean, code: string): FrontendEffect<void> => {
     return effectifyResult((actor) => actor.createTeam(team, code, { name, about, logo, listed }))
 }

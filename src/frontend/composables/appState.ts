@@ -333,6 +333,9 @@ export const useAppState = defineStore({
         joinTeam(code: string): Promise<void> {
             return runNotify(backend.joinTeam(this.team, code), "Welcome to the team!");
         },
+        leaveTeam(user: string): Promise<void> {
+            return runNotify(backend.leaveTeam(this.team, user), "Welcome to the team!");
+        },
         createTeam(team: string, name: string, about: string, logo: number[], listed: boolean, code: string): Promise<void> {
             return runNotify(backend.createTeam(team, name, about, logo, listed, code), "Welcome to the team!");
         },
