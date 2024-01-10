@@ -8,8 +8,9 @@ definePageMeta({
 const app = useAppState();
 
 if (inBrowser()) {
+    app.getTeam();
     app.loadTeams(0);
-    app.loadUser();
+    app.loadUser(undefined, false);
 }
 
 let gotoInfo = false;

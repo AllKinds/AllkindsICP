@@ -29,7 +29,7 @@ if (await Effect.runPromise(checkAuth(null)).catch((e) => false)) {
     <div class="grow flex flex-col items-center">
         <TextBlock class="max-w-sm text-center" align="text-center">
             <p>
-                Allkinds is powered by the Internet Computer.<br />
+                Allkinds is powered by the Internet&nbsp;Computer.<br />
                 It’s fully decentralised and secured. <br />
                 <img src="/icp.png" class="w-20 inline" />
             </p>

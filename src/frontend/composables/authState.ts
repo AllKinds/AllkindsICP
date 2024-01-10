@@ -34,7 +34,7 @@ export function checkAuth(
 
     const authClient = Effect.tryPromise({
         try: () => AuthClient.create({
-            idleOptions: { idleTimeout: 7 * 24 * 60 * 60 * 1000 * 1000 * 1000 }
+            idleOptions: { disableIdle: true }
         }),
         catch: (e) => toNetworkError("Failed to create AuthClient: " + e),
     });
