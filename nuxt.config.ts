@@ -14,7 +14,13 @@ export default defineNuxtConfig({
         '@nuxtjs/google-fonts',
     ],
     runtimeConfig: {
-        public: dfx_env()
+        public: {
+            ...dfx_env(),
+            ...{
+                posthogPublicKey: 'phc_dyI7umiKIWSNOMLkhcOHaaCalWoyFysQeyDdvrg1gWz',
+                posthogHost: 'https://app.posthog.com'
+            },
+        },
     },
     app:
     {
@@ -22,11 +28,11 @@ export default defineNuxtConfig({
         head: {
             titleTemplate: (t) => { return t ? `${t} - Allkinds` : 'Allkinds' },
             script: [
-                {
-                    //hid: 'sentry',
-                    //src: 'https://js.sentry-cdn.com/707065f47a8533141c2cc9ce69029836.min.js',
-                    //crossorigin: 'anonymous'
-                }
+                //{
+                //    hid: 'sentry',
+                //    src: 'https://js.sentry-cdn.com/707065f47a8533141c2cc9ce69029836.min.js',
+                //    crossorigin: 'anonymous'
+                //},
             ]
         },
     },

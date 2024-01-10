@@ -193,7 +193,7 @@ actor {
       func(p) {
         let u = switch (User.get(db.users, p)) {
           case (?value) { value };
-          case (null) { User.create("Unknown", "N/A") };
+          case (null) { User.create(Principal.toText(p), "N/A") };
         };
         u;
       },

@@ -322,6 +322,12 @@ export const useAppState = defineStore({
                 }
             }
         },
+        /**
+         * Get team info or return null if selected team is not in teams, or teams are not loaded
+         * 
+         * @param orRedirect Redirect to `/select-team` if team doesn't exist
+         *                         or to `/join/<team>` if current user is not a team member
+         */
         getTeam(orRedirect: boolean = true): TeamUserInfo | null {
             let t = null;
             this.setTeam(inBrowser() ? window.localStorage.getItem("team") || "" : "");
@@ -347,7 +353,7 @@ export const useAppState = defineStore({
             return runNotify(backend.joinTeam(this.team, code), "Welcome to the team!");
         },
         leaveTeam(user: string): Promise<void> {
-            return runNotify(backend.leaveTeam(this.team, user), "Welcome to the team!");
+            return runNotify(backend.leaveTeam(this.team, user));
         },
         createTeam(team: string, name: string, about: string, logo: number[], listed: boolean, code: string): Promise<void> {
             return runNotify(backend.createTeam(team, name, about, logo, listed, code), "Welcome to the team!");
