@@ -19,6 +19,7 @@ export type AppState = {
     teamStats: NetworkData<TeamStats>,
     questionStats: NetworkData<QuestionStats[]>,
     teamMembers: NetworkData<User[]>,
+    loadingCounter: number,
 };
 
 type NotificationLevel = "ok" | "warning" | "error";
@@ -154,6 +155,7 @@ const defaultAppState: () => AppState = () => {
         teamStats: dataInit,
         questionStats: dataInit,
         teamMembers: dataInit,
+        loadingCounter: 0,
     }
 };
 
@@ -161,6 +163,17 @@ export const useAppState = defineStore({
     id: 'app',
     state: (): AppState => defaultAppState(),
     actions: {
+        setLoading(p: Promise<unknown>) {
+            this.loadingCounter++;
+            Promise.resolve(p).finally(() => this.loadingCounter--);
+        },
+        getLoading(): number {
+            if (this.loadingCounter < 0) {
+                console.error("loadingCounter was negative: ", this.loadingCounter);
+                this.loadingCounter = 0;
+            }
+            return this.loadingCounter
+        },
         getOpenQuestions(): NetworkData<Question[]> {
             return this.openQuestions as NetworkData<Question[]>; // TODO remove `as ...`
         },
