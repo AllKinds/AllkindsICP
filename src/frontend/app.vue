@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { themeChange } from "theme-change";
 import 'vue3-toastify/dist/index.css';
+import { inBrowser } from "./composables/appState";
 
 const app = useAppState();
 const auth = useAuthState();
@@ -10,7 +11,7 @@ onMounted(() => {
 });
 
 onNuxtReady(() => {
-    auth.check();
+    checkAuth();
 });
 
 

@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { useAuthState } from '#imports';
 import { Effect } from 'effect';
 
 definePageMeta({
@@ -7,12 +8,12 @@ definePageMeta({
 });
 
 const app = useAppState();
+const auth = useAuthState();
 
 const logout = () => {
-    Effect.runPromise(logoutActor()).then(() => {
-        app.$reset();
-        navigateTo("/");
-    });
+    auth.logout();
+    app.$reset();
+    navigateTo("/");
 };
 
 if (inBrowser()) {

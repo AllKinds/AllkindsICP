@@ -3,6 +3,7 @@ Landing page
 -->
 <script lang="ts" setup>
 
+
 definePageMeta({
     title: "Login",
     layout: 'default'
@@ -12,12 +13,14 @@ const teamSelected = () => window.localStorage.getItem("team") && !window.localS
 const hasInvite = () => window.localStorage.getItem("invite");
 
 const auth = useAuthState();
+await checkAuth();
 
 async function login(provider: Provider) {
     if (!inBrowser()) return;
 
-    const res = await auth.login(provider);
-    if (res.tag === "ok") {
+    const res = await loginTest(provider);
+    if (res.ok) {
+        auth.setClient(res.val);
         console.log("logged in");
         if (hasInvite()) {
             navigateTo("/welcome")
@@ -47,7 +50,10 @@ async function login(provider: Provider) {
 
         <Btn to="/about" class="w-80"> Learn more </Btn>
 
-        <Btn v-if="auth.loggedIn && teamSelected()" class="w-80 mt-2" to="/team-info">
+        <Btn v-if="auth.loggedIn && hasInvite()" class="w-80 mt-2" to="/welcome">
+            Join
+        </Btn>
+        <Btn v-else-if="auth.loggedIn && teamSelected()" class="w-80 mt-2" to="/team-info">
             Welcome back
         </Btn>
         <Btn v-else-if="auth.loggedIn" class="w-80 mt-2" to="/select-team">

@@ -2,44 +2,48 @@ import { backend } from "~~/src/declarations/backend";
 export type { Principal } from "@dfinity/principal";
 export type * from "~~/src/declarations/backend/backend.did";
 export type BackendActor = typeof backend;
+import { Effect } from "effect";
 import type { Principal } from "@dfinity/principal";
 import { BackendError, FrontendError, toBackendError, toNetworkError } from "~/utils/errors";
 import type { Question, Answer, User, Skip, Friend, UserMatch, TeamUserInfo, TeamStats, QuestionStats, FriendStatus, UserPermissions } from "~~/src/declarations/backend/backend.did";
-import type { Result } from "./result";
+import { useAuthState } from "../composables/authState";
 
-type BackendResult<T> = Result<T, BackendError>
-export type FrontendResult<T> = Result<T, FrontendError>
+type BackendEffect<T> = Effect.Effect<never, BackendError, T>
+export type FrontendEffect<T> = Effect.Effect<never, FrontendError, T>
 
-export const resultToEffect = <T>(result: { err: BackendError } | { ok: T }): BackendResult<T> => {
+export const resultToEffect = <T>(result: { err: BackendError } | { ok: T }): BackendEffect<T> => {
     if ("err" in result) {
-        return toErr(result.err);
+        return Effect.fail(result.err);
     } else {
-        return toOk(result.ok);
+        return Effect.succeed(result.ok);
     }
 }
 
-const effectify = <T>(fn: (actor: BackendActor) => Promise<T>, orRedirect: boolean = true): () => Promise<FrontendResult<T>> => {
-    return () => {
-        return new Promise((resolve) => {
-            actor = _(useActorOrLogin(orRedirect));
-            if (!actor) {
-                resolve(toErr())
-            } else {
-                fn(actor).then(
-                    (val) => resolve(toOk(val)),
-                    (e) => resolve(toErr(toNetworkError(e)))
-                )
-            }
-        }
+const effectify = <T>(fn: (actor: BackendActor) => Promise<T>, orRedirect: boolean = true): FrontendEffect<T> => {
+    return Effect.gen(function* (_) {
+        yield* _(Effect.tryPromise({
+            try: () => checkAuth(),
+            catch: toNetworkError
+        }));
+        const actor = useAuthState().actor(orRedirect);
+        if (!actor) { yield* _(Effect.fail(toNetworkError("not logged in!"))) }
 
-    }
-
-});
+        const result = yield* _(Effect.tryPromise({
+            try: () => fn(actor),
+            catch: toNetworkError
+        }));
+        return result;
+    });
 }
 
 const effectifyAnon = <T>(fn: (actor: BackendActor) => Promise<T>): FrontendEffect<T> => {
     return Effect.gen(function* (_) {
-        const actor = yield* _(useAnonActor());
+        yield* _(Effect.tryPromise({
+            try: () => checkAuth(),
+            catch: toNetworkError
+        }));
+        console.log("get anonActor");
+        const actor = anonActor();
         const result = yield* _(Effect.tryPromise({
             try: () => fn(actor),
             catch: toNetworkError

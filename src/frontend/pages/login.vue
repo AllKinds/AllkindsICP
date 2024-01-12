@@ -12,14 +12,18 @@ definePageMeta({
 const auth = useAuthState();
 
 async function login(provider: Provider) {
-    if ((await auth.login(provider)).tag === 'ok') {
+    console.log("start login")
+    const res = await loginTest(provider);
+    if (res.ok) {
         console.log("logged in");
         navigateTo("/select-team");
+    } else {
+        console.log("Login failed", res)
     }
 }
 
-const isAuth = await auth.check();
-if (isAuth.tag === 'ok' && isAuth.val) {
+const isAuth = await checkAuth();
+if (isAuth.ok && isAuth.val) {
     console.warn("navigated to /login, but already logged in");
     navigateTo("/select-team");
 }

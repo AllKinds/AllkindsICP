@@ -15,9 +15,10 @@ var team: string;
 
 async function login(provider: Provider) {
     storeInvite();
-    await auth.login(provider).then(
+    await loginTest(provider).then(
         (res) => {
-            if (res.tag === 'ok') {
+            if (res.ok) {
+                auth.setClient(res.val);
                 navigateTo("/welcome");
             } else {
                 addNotification("error", "Login failed\n" + res.err)
