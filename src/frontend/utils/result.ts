@@ -1,12 +1,10 @@
-import { ok } from "assert";
-import { FrontendError } from "./errors";
 
-export type Result<T> = { tag: 'ok', val: T } | { tag: 'err', err: FrontendError };
+export type Result<T, E> = { ok: true, val: T } | { ok: false, err: E };
 
-export const toOk = <T>(val: T): Result<T> => {
-    return { tag: 'ok', val: val };
+export const toOk = <T, E>(val: T): Result<T, E> => {
+    return { ok: true, val: val };
 }
 
-export const toErr = <T>(err: FrontendError): Result<T> => {
-    return { tag: 'err', err: err };
+export const toErr = <T, E>(err: E): Result<T, E> => {
+    return { ok: false, err: err };
 }

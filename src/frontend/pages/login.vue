@@ -3,25 +3,26 @@ Page to select login provider and initiate login process
 -->
 
 <script lang="ts" setup>
-import { Effect } from "effect";
 
 definePageMeta({
     title: "Allkinds",
     layout: 'default'
 });
 
+const auth = useAuthState();
+
 async function login(provider: Provider) {
-    if (await Effect.runPromise(checkAuth(provider))) {
-        console.log("already logged in");
+    if ((await auth.login(provider)).tag === 'ok') {
+        console.log("logged in");
         navigateTo("/select-team");
     }
 }
 
-if (await Effect.runPromise(checkAuth(null)).catch((e) => false)) {
+const isAuth = await auth.check();
+if (isAuth.tag === 'ok' && isAuth.val) {
     console.warn("navigated to /login, but already logged in");
     navigateTo("/select-team");
 }
-
 
 </script>
 

@@ -2,31 +2,39 @@ import { backend } from "~~/src/declarations/backend";
 export type { Principal } from "@dfinity/principal";
 export type * from "~~/src/declarations/backend/backend.did";
 export type BackendActor = typeof backend;
-import { Effect } from "effect";
 import type { Principal } from "@dfinity/principal";
 import { BackendError, FrontendError, toBackendError, toNetworkError } from "~/utils/errors";
 import type { Question, Answer, User, Skip, Friend, UserMatch, TeamUserInfo, TeamStats, QuestionStats, FriendStatus, UserPermissions } from "~~/src/declarations/backend/backend.did";
+import type { Result } from "./result";
 
-type BackendEffect<T> = Effect.Effect<never, BackendError, T>
-export type FrontendEffect<T> = Effect.Effect<never, FrontendError, T>
+type BackendResult<T> = Result<T, BackendError>
+export type FrontendResult<T> = Result<T, FrontendError>
 
-export const resultToEffect = <T>(result: { err: BackendError } | { ok: T }): BackendEffect<T> => {
+export const resultToEffect = <T>(result: { err: BackendError } | { ok: T }): BackendResult<T> => {
     if ("err" in result) {
-        return Effect.fail(result.err);
+        return toErr(result.err);
     } else {
-        return Effect.succeed(result.ok);
+        return toOk(result.ok);
     }
 }
 
-const effectify = <T>(fn: (actor: BackendActor) => Promise<T>, orRedirect: boolean = true): FrontendEffect<T> => {
-    return Effect.gen(function* (_) {
-        const actor = yield* _(useActorOrLogin(orRedirect));
-        const result = yield* _(Effect.tryPromise({
-            try: () => fn(actor),
-            catch: toNetworkError
-        }));
-        return result;
-    });
+const effectify = <T>(fn: (actor: BackendActor) => Promise<T>, orRedirect: boolean = true): () => Promise<FrontendResult<T>> => {
+    return () => {
+        return new Promise((resolve) => {
+            actor = _(useActorOrLogin(orRedirect));
+            if (!actor) {
+                resolve(toErr())
+            } else {
+                fn(actor).then(
+                    (val) => resolve(toOk(val)),
+                    (e) => resolve(toErr(toNetworkError(e)))
+                )
+            }
+        }
+
+    }
+
+});
 }
 
 const effectifyAnon = <T>(fn: (actor: BackendActor) => Promise<T>): FrontendEffect<T> => {

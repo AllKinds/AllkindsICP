@@ -8,6 +8,7 @@ definePageMeta({
 });
 
 const app = useAppState();
+const auth = useAuthState();
 
 let team: string | undefined = undefined;
 let invite: string | undefined = undefined;
@@ -27,7 +28,7 @@ const loading = () => {
 
 let userLoaded = false;
 const isMember = () => {
-    if (!userLoaded && isLoggedIn()) {
+    if (!userLoaded && auth.loggedIn) {
         app.loadUser(0, false);
         userLoaded = true;
     }

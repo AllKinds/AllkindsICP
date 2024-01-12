@@ -1,18 +1,18 @@
 <script lang="ts" setup>
 import { themeChange } from "theme-change";
-import 'vue3-toastify/dist/index.css'
-import { Effect } from "effect";
+import 'vue3-toastify/dist/index.css';
 
+const app = useAppState();
+const auth = useAuthState();
 
 onMounted(() => {
     themeChange(false);
 });
 
 onNuxtReady(() => {
-    Effect.runPromise(checkAuth(null));
+    auth.check();
 });
 
-const app = useAppState();
 
 const style = () =>
     "font-family: Open Sans; sans;"
@@ -21,9 +21,7 @@ const style = () =>
 
 
 if (inBrowser()) {
-    createAuthClient(false);
-    createAuthClient(true);
-    if (isLoggedIn()) {
+    if (auth.loggedIn) {
         console.log("load user data")
         app.loadUser(undefined, false);
     }

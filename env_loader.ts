@@ -1,7 +1,4 @@
 import fs from "fs";
-import dfxJson from "./dfx.json";
-import join from "path";
-import { frontend } from "./src/declarations/frontend";
 
 const network = process.env["DFX_NETWORK"] ?? "local";
 const isDev = network !== "ic";
@@ -12,16 +9,16 @@ const LOGO_URL = "https://allkinds.xyz/img/allkinds_logo_white.svg"
 
 type Network = "ic" | "local" | "staging";
 
-const cansisterIdFile = isDev ? "./.dfx/" + network + "/canister_ids.json" : "./canister_ids.json";
+const canisterIdFile = isDev ? "./.dfx/" + network + "/canister_ids.json" : "./canister_ids.json";
 if (isDev) {
     console.warn("Building in dev mode");
 }
 
 let canisterIds = { frontend: {}, backend: {}, internet_identity: {} } as any
-if (fs.existsSync(cansisterIdFile)) {
-    canisterIds = JSON.parse(fs.readFileSync(cansisterIdFile).toString());
+if (fs.existsSync(canisterIdFile)) {
+    canisterIds = JSON.parse(fs.readFileSync(canisterIdFile).toString());
 } else {
-    console.warn("Canister ID file does not exist:", cansisterIdFile);
+    console.warn("Canister ID file does not exist:", canisterIdFile);
 };
 
 const ids = {

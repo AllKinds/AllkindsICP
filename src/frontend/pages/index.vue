@@ -11,31 +11,24 @@ definePageMeta({
 const teamSelected = () => window.localStorage.getItem("team") && !window.localStorage.getItem("invite");
 const hasInvite = () => window.localStorage.getItem("invite");
 
+const auth = useAuthState();
+
 async function login(provider: Provider) {
     if (!inBrowser()) return;
-    const authClient = useAuthClient().value;
-    if (authClient.tag === "ok") {
-        initiateLogin(authClient.val, provider).then(
-            () => {
-                console.log("logged in");
-                if (hasInvite()) {
-                    navigateTo("/welcome")
-                } else {
-                    navigateTo("/team-info");
-                }
-            },
-            (e) => {
-                addNotification('error', "Log in failed:\n" + e);
-            }
-        );
+
+    const res = await auth.login(provider);
+    if (res.tag === "ok") {
+        console.log("logged in");
+        if (hasInvite()) {
+            navigateTo("/welcome")
+        } else {
+            navigateTo("/team-info");
+        }
     } else {
-        console.error("auth client not ok:", authClient);
+        addNotification('error', "Log in failed:\n" + res.err); // TODO format error
     }
 }
 
-if (inBrowser()) {
-
-}
 </script>
 
 <template>
@@ -54,10 +47,10 @@ if (inBrowser()) {
 
         <Btn to="/about" class="w-80"> Learn more </Btn>
 
-        <Btn v-if="isLoggedIn() && teamSelected()" class="w-80 mt-2" to="/team-info">
+        <Btn v-if="auth.loggedIn && teamSelected()" class="w-80 mt-2" to="/team-info">
             Welcome back
         </Btn>
-        <Btn v-else-if="isLoggedIn()" class="w-80 mt-2" to="/select-team">
+        <Btn v-else-if="auth.loggedIn" class="w-80 mt-2" to="/select-team">
             Select a team
         </Btn>
         <Btn v-else class="w-80 mt-2" @click="login('II')">

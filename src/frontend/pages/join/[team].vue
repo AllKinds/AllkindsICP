@@ -7,19 +7,24 @@ definePageMeta({
 
 
 const app = useAppState();
+const auth = useAuthState();
 const route = useRoute();
 const invite = useState<string>("invite-code", () => "");
 var inviteSet = false;
 var team: string;
-var code: string;
 
 async function login(provider: Provider) {
     storeInvite();
-    await runNotify(checkAuth(provider));
-    if (!isLoggedIn()) {
-        addNotification("error", "Login failed");
-        return;
-    }
+    await auth.login(provider).then(
+        (res) => {
+            if (res.tag === 'ok') {
+                navigateTo("/welcome");
+            } else {
+                addNotification("error", "Login failed\n" + res.err)
+            }
+        },
+        (e) => addNotification("error", "Login failed\n" + e)
+    );
 
     console.log("logged in");
     app.loadUser(0, false);
@@ -34,7 +39,7 @@ const storeInvite = () => {
 }
 
 const join = () => {
-    if (!isLoggedIn()) {
+    if (!auth.loggedIn) {
         console.log("Not logged in, start login")
         login('II')
     } else if (app.user.status === 'ok') {
@@ -69,7 +74,7 @@ if (inBrowser()) {
 
 let userLoaded = false;
 const isMember = () => {
-    if (!userLoaded && isLoggedIn()) {
+    if (!userLoaded && auth.loggedIn) {
         app.loadUser(0, false);
         userLoaded = true;
     }
@@ -113,7 +118,7 @@ const isMember = () => {
         </div>
 
         {{ isMember() ? "" : "" }}
-        <Btn v-if="!isLoggedIn()" class="w-80 mt-2" @click="join()">
+        <Btn v-if="!auth.loggedIn" class="w-80 mt-2" @click="join()">
             Join with Internet&nbsp;Identity
         </Btn>
         <Btn v-else-if="isMember()" class="w-80 mt-2" to="/team-info">
