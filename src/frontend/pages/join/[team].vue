@@ -35,6 +35,7 @@ const storeInvite = () => {
 
 const join = () => {
     if (!isLoggedIn()) {
+        console.log("Not logged in, start login")
         login('II')
     } else if (app.user.status === 'ok') {
         storeInvite();

@@ -4,6 +4,7 @@ import { HttpAgent } from "@dfinity/agent";
 import { Effect } from "effect";
 import { BackendActor } from "~/utils/backend";
 import { FrontendError, notLoggedIn, toBackendError, toNetworkError } from "~/utils/errors";
+import { isNumberObject } from "util/types";
 
 export type Provider = "II" | "NFID";
 
@@ -15,8 +16,34 @@ function loginUrl(provider: Provider) {
     return config.II_URL;
 }
 
-// Check if user is logged in or initiate login
-// if `loginWith` is null, no login is initiated
+export const createAuthClient = async (anon: boolean = false, force: boolean = false) => {
+    const client = useAuthClient(anon);
+    if (client.value.tag === "ok" && !force) return;
+
+    await newAuthClient(anon);
+}
+
+type AuthClientOrErr = Result<AuthClient>;
+export const useAuthClient = (anon = false): Ref<AuthClientOrErr> => {
+    if (anon) {
+        return useState<AuthClientOrErr>("anonAuthClient", () => { return toErr(toNetworkError("init")) });
+    } else {
+        return useState<AuthClientOrErr>("authClient", () => { return toErr(toNetworkError("init")) });
+    }
+}
+
+const newAuthClient = async (anon = false) => {
+    await AuthClient.create({
+        idleOptions: { disableIdle: true }
+    }).then(
+        (client) => { useAuthClient(anon).value = toOk(client) },
+        (e) => {
+            useAuthClient(anon).value = toErr(toNetworkError("Failed to create AuthClient: " + e))
+        },
+    )
+}
+
+// Check if user is logged in
 // returns Effect which succeeds with true if user is logged in, false if not
 export function checkAuth(
     loginWith: Provider | null
@@ -48,32 +75,13 @@ export function checkAuth(
             catch: toNetworkError,
         });
 
-    function login(a: AuthClient, provider: Provider): Effect.Effect<never, FrontendError, void> {
-
-        return Effect.async((resume) => {
-            a.login({
-                identityProvider: loginUrl(provider),
-                onSuccess: (() => resume(Effect.succeed(null))),
-                onError: ((e) => resume(Effect.fail(toNetworkError("Could not log in: " + e)))),
-                // 7 days in nanoseconds
-                maxTimeToLive: BigInt(7 * 24 * 60 * 60 * 1000 * 1000 * 1000),
-            });
-        });
-    }
-    const actor = useState<typeof backend | null>("actor", () => null);
+    const actor = useActor();
 
     const prog = Effect.gen(function* (_) {
         const client = yield* _(authClient);
         const isAuth = yield* _(isAuthenticated(client));
-        if (!isAuth) {
-            // return if login is not requested
-            if (!loginWith) return false;
-
-            yield* _(login(client, loginWith));
-        }
-
-        // return if login failed
-        if (!(yield* _(isAuthenticated(client)))) return false;
+        // return if not logged in
+        if (!isAuth) { return false; }
 
         if (!actor.value) {
             const identity = client.getIdentity();
@@ -92,9 +100,24 @@ export function checkAuth(
     return prog;
 }
 
+export const initiateLogin = (a: AuthClient, provider: Provider): Promise<void> => {
+    console.log("start login with", provider);
+
+    return new Promise((resolve, reject) =>
+        a.login({
+            identityProvider: loginUrl(provider),
+            onSuccess: () => resolve(undefined),
+            onError: (e) => reject("Could not log in: " + e),
+            // 7 days in nanoseconds
+            maxTimeToLive: BigInt(7 * 24 * 60 * 60 * 1000 * 1000 * 1000),
+        })
+    );
+
+}
+
 export const logoutActor = (): Effect.Effect<never, never, void> => {
     console.log("Logging out actor");
-    if (typeof window === "undefined") {
+    if (!inBrowser()) {
         return Effect.succeed(null);
     }
 
@@ -102,6 +125,7 @@ export const logoutActor = (): Effect.Effect<never, never, void> => {
         const authClient = yield* _(Effect.promise(() => AuthClient.create()));
         yield* _(Effect.promise(() => authClient.logout()));
         useActor().value = null;
+        useAuthClient().value = toErr(toNetworkError("init"));
         return;
     });
 };

@@ -21,7 +21,8 @@ const style = () =>
 
 
 if (inBrowser()) {
-    console.log("app loading", document.location.href);
+    createAuthClient(false);
+    createAuthClient(true);
     if (isLoggedIn()) {
         console.log("load user data")
         app.loadUser(undefined, false);

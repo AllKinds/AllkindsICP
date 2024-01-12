@@ -2,8 +2,6 @@
 Landing page
 -->
 <script lang="ts" setup>
-import { Effect } from "effect";
-if (inBrowser()) console.log("loading", document.location.href);
 
 definePageMeta({
     title: "Login",
@@ -15,14 +13,28 @@ const hasInvite = () => window.localStorage.getItem("invite");
 
 async function login(provider: Provider) {
     if (!inBrowser()) return;
-    if (await Effect.runPromise(checkAuth(provider))) {
-        console.log("logged in");
-        if (hasInvite()) {
-            navigateTo("/welcome")
-        } else {
-            navigateTo("/team-info");
-        }
+    const authClient = useAuthClient().value;
+    if (authClient.tag === "ok") {
+        initiateLogin(authClient.val, provider).then(
+            () => {
+                console.log("logged in");
+                if (hasInvite()) {
+                    navigateTo("/welcome")
+                } else {
+                    navigateTo("/team-info");
+                }
+            },
+            (e) => {
+                addNotification('error', "Log in failed:\n" + e);
+            }
+        );
+    } else {
+        console.error("auth client not ok:", authClient);
     }
+}
+
+if (inBrowser()) {
+
 }
 </script>
 
@@ -42,7 +54,7 @@ async function login(provider: Provider) {
 
         <Btn to="/about" class="w-80"> Learn more </Btn>
 
-        <Btn v-if="isLoggedIn() && teamSelected()" class="w-80 mt-2" @click="login('II')">
+        <Btn v-if="isLoggedIn() && teamSelected()" class="w-80 mt-2" to="/team-info">
             Welcome back
         </Btn>
         <Btn v-else-if="isLoggedIn()" class="w-80 mt-2" to="/select-team">

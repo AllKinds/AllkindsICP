@@ -18,7 +18,7 @@ export default defineNuxtConfig({
             ...dfx_env(),
             ...{
                 posthogPublicKey: 'phc_dyI7umiKIWSNOMLkhcOHaaCalWoyFysQeyDdvrg1gWz',
-                posthogHost: 'https://app.posthog.com'
+                posthogHost: 'https://app.posthog.com',
             },
         },
     },
