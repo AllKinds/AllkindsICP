@@ -71,7 +71,7 @@ const stats = () => {
             <div class="text-center">
                 <Btn class="w-80" @click="copy()" v-if="app.getTeam()?.permissions.isAdmin">Copy invite link</Btn>
                 <Btn class="w-80" to="/questions">Ask and answer questions</Btn>
-                <Btn class="w-80" to="/team-members">Team members</Btn>
+                <Btn class="w-80" to="/team-members" v-if="app.getTeam()?.permissions.isAdmin">Team members</Btn>
                 <Btn class="w-80" to="/question-stats" v-if="app.getTeam()?.permissions.isAdmin">Manage questions</Btn>
                 <Btn class="w-80">Watch demo</Btn>
             </div>
