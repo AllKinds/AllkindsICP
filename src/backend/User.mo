@@ -325,48 +325,4 @@ module {
       picture = user.picture;
     };
   };
-
-  //returns user info opt property if not undefined and public viewable
-  func checkPublic<T>((t : ?T, pub : IsPublic), showNonPublic : Bool) : (?T) {
-    if (pub or showNonPublic) { t } else { null };
-  };
-
-  func filterPublic<T>(props : [(T, IsPublic)], showNonPublic : Bool) : [T] {
-    Array.mapFilter<(T, IsPublic), T>(
-      props,
-      func(t, pub) = if (pub or showNonPublic) { ?t } else { null },
-    );
-  };
-
-  func toAge(birth : Time) : ?Nat8 {
-    let diff = Time.now() - birth;
-    if (diff < 0) return null;
-    let age = diff / YEAR;
-    if (age > Nat8.toNat(Configuration.user.maxAge)) return ?Configuration.user.maxAge;
-
-    // TODO: calculate exact time with consideration of leap years
-    ?Nat8.fromIntWrap(age);
-  };
-
-  func toBirth(age : Nat8) : Time {
-    // TODO: calculate exact time with consideration of leap years
-    Time.now() - (Nat8.toNat(age) * YEAR);
-  };
-
-  func setAge((ageOrBirth, isPublic) : (?Int, Bool)) : (?Time, Bool) {
-    switch (ageOrBirth) {
-      case (null)(null, isPublic);
-      case (?number) {
-        if (number <= 200 and number >= 0) {
-          // This is overlapping with the possible time stamps
-          // chance of collision is very small: 200 nanoseconds per year,
-          // so no real risk, but it's ugly
-          (?toBirth(Nat8.fromIntWrap(number)), isPublic);
-        } else if (number < Time.now() and number > toBirth(200)) {
-          (?number, isPublic);
-        } else { (null, isPublic) };
-      };
-    };
-  };
-
 };

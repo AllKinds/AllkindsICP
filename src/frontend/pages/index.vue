@@ -13,7 +13,7 @@ const teamSelected = () => window.localStorage.getItem("team") && !window.localS
 const hasInvite = () => window.localStorage.getItem("invite");
 
 const auth = useAuthState();
-await checkAuth();
+await checkAuth(false);
 
 async function login(provider: Provider) {
     if (!inBrowser()) return;

@@ -101,6 +101,8 @@ export type ResultUser = { 'ok' : UserPermissions } |
   { 'err' : Error };
 export type ResultUserMatches = { 'ok' : Array<UserMatch> } |
   { 'err' : Error };
+export type ResultUserPermissions = { 'ok' : Array<UserPermissions> } |
+  { 'err' : Error };
 export type ResultUsers = { 'ok' : Array<User> } |
   { 'err' : Error };
 export type ResultVoid = { 'ok' : null } |
@@ -208,7 +210,11 @@ export interface _SERVICE {
   'getOwnQuestions' : ActorMethod<[string, bigint], Array<Question>>,
   'getPermissions' : ActorMethod<
     [],
-    { 'permissions' : AdminPermissions, 'principal' : Principal }
+    {
+      'permissions' : AdminPermissions,
+      'principal' : Principal,
+      'user' : [] | [User],
+    }
   >,
   'getQuestionStats' : ActorMethod<[string, bigint], ResultQuestionStats>,
   'getTeamMembers' : ActorMethod<[string], ResultUsers>,
@@ -217,6 +223,7 @@ export interface _SERVICE {
   'getUser' : ActorMethod<[], ResultUser>,
   'joinTeam' : ActorMethod<[string, string], ResultTeam>,
   'leaveTeam' : ActorMethod<[string, string], ResultVoid>,
+  'listAdmins' : ActorMethod<[], ResultUserPermissions>,
   'listTeams' : ActorMethod<[Array<string>], ResultTeams>,
   'selfDestruct' : ActorMethod<[string], undefined>,
   'sendFriendRequest' : ActorMethod<[string, string], ResultVoid>,

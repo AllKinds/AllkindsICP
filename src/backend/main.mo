@@ -67,6 +67,7 @@ actor {
   type ResultVoid = Result<()>;
   type ResultUser = Result<UserPermissions>;
   type ResultUsers = Result<[User]>;
+  type ResultUserPermissions = Result<[UserPermissions]>;
   type ResultQuestion = Result<Question>;
   type ResultAnswer = Result<Answer>;
   type ResultSkip = Result<Skip>;
@@ -134,10 +135,12 @@ actor {
   };
 
   public query ({ caller }) func getPermissions() : async {
+    user : ?User;
     principal : Principal;
     permissions : AdminPermissions;
   } {
     {
+      user = User.get(db.users, caller);
       principal = caller;
       permissions = Admin.getPermissions(admins, caller);
     };
@@ -150,6 +153,22 @@ actor {
     let ?p = User.getPrincipal(db.users, user) else return #err(#userNotFound);
     Admin.setPermissions(admins, p, permissions);
     #ok;
+  };
+
+  public shared query ({ caller }) func listAdmins() : async ResultUserPermissions {
+    assertPermission(caller, #createBackup);
+
+    func toUserPermissions((principal : Principal, permissions : AdminPermissions)) : ?UserPermissions {
+      let ?user = User.get(db.users, principal) else return null;
+      return ?{ permissions; user };
+    };
+
+    let all = IterTools.mapFilter<(Principal, AdminPermissions), UserPermissions>(
+      Admin.list(admins),
+      toUserPermissions,
+    );
+
+    #ok(Iter.toArray<UserPermissions>(all));
   };
 
   // Create default new team

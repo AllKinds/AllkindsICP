@@ -3,7 +3,7 @@ import { AuthClient } from "@dfinity/auth-client";
 import { HttpAgent } from "@dfinity/agent";
 import { BackendActor } from "~/utils/backend";
 import { toNetworkError } from "~/utils/errors";
-import { inBrowser } from "./appState";
+import { addNotification, inBrowser } from "./appState";
 import { Result, toErr } from "../utils/result";
 import { navigateTo } from "../../../.nuxt/imports";
 import { FrontendError } from "../utils/errors";
@@ -19,7 +19,6 @@ function loginUrl(provider: Provider) {
 }
 
 type AuthState = {
-    client?: AuthClient,
     loggedIn: boolean, // cached status
     backendActor?: BackendActor;
 }
@@ -30,30 +29,28 @@ export const useAuthState = defineStore({
     id: 'auth',
     state: (): AuthState => {
         return {
-            client: undefined,
             loggedIn: false,
             backendActor: undefined,
         }
     },
     actions: {
-        setClient(client: AuthClient): void {
-            this.client = client;
-            this.loggedIn = true;
+        setClient(loggedIn: boolean = true): void {
+            this.loggedIn = loggedIn;
         },
-        getClient(): AuthClient | undefined {
-            return this.client as AuthClient
+        getClient(): AuthClient | null {
+            return client
         },
         logout() {
-            if (!this.client) return;
-            this.client.logout();
-            this.client = undefined;
+            if (!client) return;
+            client.logout();
             this.backendActor = undefined;
+            client = null;
             this.loggedIn = false;
         },
         actor(orRedirect: boolean = true): BackendActor | undefined {
-            if (!this.backendActor && this.client) {
+            if (!this.backendActor && client) {
                 const config = useRuntimeConfig().public;
-                const identity = this.client.getIdentity();
+                const identity = client.getIdentity();
                 // Using the identity obtained from the auth client, we can create an agent to interact with the IC.
                 const agent = new HttpAgent({ identity: identity, host: config.host });
 
@@ -77,9 +74,8 @@ const newAuthClient = (anon = false): Promise<AuthClient> => {
 };
 
 export const anonActor = (): BackendActor => {
-    if (!inBrowser()) return null!;
-    if (useAuthState().loggedIn) { return useAuthState().actor()! };
-    console.log("auth.actor is null, creating unauthenticated actor");
+    if (!inBrowser()) throw ("not in browser");
+    if (useAuthState().loggedIn) { return useAuthState().actor(false)! };
     const config = useRuntimeConfig().public;
     const agent = new HttpAgent({ host: config.host });
     (window as any).global = window;
@@ -87,32 +83,40 @@ export const anonActor = (): BackendActor => {
     return anon;
 }
 
-export const loginTest = (provider: Provider): PRes<AuthClient> => {
-    return new Promise<Result<AuthClient, FrontendError>>(async (resolve, reject) => {
-        const client = await newAuthClient();
+let client: AuthClient | null = null;
 
-        client.login({
-            identityProvider: loginUrl(provider),
-            onSuccess: () => {
-                useAuthState().loggedIn = true;
-                resolve(toOk(client));
-            },
-            onError: (e) => resolve(toErr(toNetworkError("Could not log in: " + e))),
-            // 7 days in nanoseconds
-            maxTimeToLive: BigInt(7 * 24 * 60 * 60 * 1000 * 1000 * 1000),
-        });
+export const loginTest = (provider: Provider): PRes<AuthClient> => {
+    //const client =
+    //    await newAuthClient();
+    let resolver: any;
+    client?.login({
+        identityProvider: loginUrl(provider),
+        onSuccess: () => {
+            resolver(toOk(client));
+        },
+        onError: (e) => {
+            console.error("login failed", e);
+            addNotification("error", "Login failed");
+            resolver(toErr(toNetworkError("login failed")));
+        },
+        // 7 days in nanoseconds
+        maxTimeToLive: BigInt(7 * 24 * 60 * 60 * 1000 * 1000 * 1000),
     });
+
+    return new Promise((resolve: any) => {
+        resolver = (val: unknown) => { resolve(val) }
+    })
 };
 
 export const checkAuth = async (orLogin: boolean = true): PRes<boolean> => {
     if (!inBrowser()) { return Promise.resolve(toOk(true)) };
 
-    const client: AuthClient = useAuthState().getClient() ?? await newAuthClient();
+    client = client ?? await newAuthClient();
     try {
         let loggedIn = await client.isAuthenticated();
         if (!loggedIn && orLogin) { navigateTo("/login") }
         else if (loggedIn && client) {
-            useAuthState().setClient(client)
+            useAuthState().setClient(loggedIn)
         }
         return toOk(loggedIn);
     } catch (e) {

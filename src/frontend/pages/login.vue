@@ -22,7 +22,7 @@ async function login(provider: Provider) {
     }
 }
 
-const isAuth = await checkAuth();
+const isAuth = await checkAuth(false);
 if (isAuth.ok && isAuth.val) {
     console.warn("navigated to /login, but already logged in");
     navigateTo("/select-team");

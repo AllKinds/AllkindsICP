@@ -111,7 +111,6 @@ if (inBrowser()) {
         <Btn v-if="isInvalid && team" @click="clearInvite()" :to="'/join/' + team" class="w-72">Retry with another code
         </Btn>
         <Btn v-if="isInvalid" @click="clearInvite()" to="/select-team" class="w-72">Select another team</Btn>
-        <Btn v-if="!hasInvite" @click="clearInvite()" to="/select-team" class="w-72">Select a team</Btn>
         <Btn v-if="isMember()" @click="clearInvite()" to="/team-info" class="w-72">Goto team</Btn>
 
         <div class="grow" />

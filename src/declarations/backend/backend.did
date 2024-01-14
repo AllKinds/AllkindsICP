@@ -97,6 +97,11 @@ type ResultUsers =
    err: Error;
    ok: vec User;
  };
+type ResultUserPermissions = 
+ variant {
+   err: Error;
+   ok: vec UserPermissions;
+ };
 type ResultUserMatches = 
  variant {
    err: Error;
@@ -283,6 +288,7 @@ service : {
    (record {
       permissions: AdminPermissions;
       "principal": principal;
+      user: opt User;
     }) query;
   getQuestionStats: (text, nat) -> (ResultQuestionStats) query;
   getTeamMembers: (text) -> (ResultUsers) query;
@@ -291,6 +297,7 @@ service : {
   getUser: () -> (ResultUser) query;
   joinTeam: (text, text) -> (ResultTeam);
   leaveTeam: (text, text) -> (ResultVoid);
+  listAdmins: () -> (ResultUserPermissions) query;
   listTeams: (vec text) -> (ResultTeams) query;
   selfDestruct: (text) -> () oneway;
   /// Send a friend request to a user

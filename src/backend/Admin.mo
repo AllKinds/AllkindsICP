@@ -20,6 +20,7 @@ import TupleHelper "helper/TupleHelper";
 import StableBuffer "mo:StableBuffer/StableBuffer";
 
 module {
+  type Iter<T> = Iter.Iter<T>;
   type Map<K, V> = Map.Map<K, V>;
   let { thash; phash } = Map;
 
@@ -101,6 +102,10 @@ module {
 
   public func setPermissions(admins : AdminDB, user : Principal, permissions : Permissions) {
     ignore Map.put(admins, phash, user, permissions);
+  };
+
+  public func list(admins : AdminDB) : Iter<(Principal, Permissions)> {
+    Map.entries(admins);
   };
 
   public func hasPermission(admins : AdminDB, user : Principal, permission : Permission) : Bool {

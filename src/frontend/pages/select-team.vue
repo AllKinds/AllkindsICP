@@ -8,7 +8,7 @@ definePageMeta({
 const app = useAppState();
 
 if (inBrowser()) {
-    app.getTeam();
+    app.getTeam(false);
     app.loadTeams(0);
     app.loadUser(undefined, false);
 }

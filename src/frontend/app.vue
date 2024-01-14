@@ -11,7 +11,6 @@ onMounted(() => {
 });
 
 onNuxtReady(() => {
-    checkAuth();
 });
 
 
@@ -42,6 +41,7 @@ if (inBrowser()) {
 <style>
 @import url("~/public/app.css");
 
+/* Transitions */
 .page-enter-active,
 .page-leave-active {
     transition: all 0.15s;
@@ -61,4 +61,25 @@ if (inBrowser()) {
     transform: translateY(-50%);
     filter: blur(1rem);
 }
+
+.slide-left-enter-active,
+.slide-left-leave-active,
+.slide-right-enter-active,
+.slide-right-leave-active {
+    transition: all 0.2s;
+}
+
+.slide-left-leave-to,
+.slide-right-enter-from {
+    opacity: 0;
+    transform: translate(-100px, 0);
+}
+
+.slide-left-enter-from,
+.slide-right-leave-to {
+    opacity: 0;
+    transform: translate(100px, 0);
+}
+
+/**/
 </style>

@@ -22,11 +22,15 @@ export const resultToEffect = <T>(result: { err: BackendError } | { ok: T }): Ba
 const effectify = <T>(fn: (actor: BackendActor) => Promise<T>, orRedirect: boolean = true): FrontendEffect<T> => {
     return Effect.gen(function* (_) {
         yield* _(Effect.tryPromise({
-            try: () => checkAuth(),
+            try: () => checkAuth(orRedirect),
             catch: toNetworkError
         }));
         const actor = useAuthState().actor(orRedirect);
-        if (!actor) { yield* _(Effect.fail(toNetworkError("not logged in!"))) }
+        if (!actor) {
+            yield* _(Effect.fail(toNetworkError("not logged in!")))
+            // can't be reached because of Effect.fail above
+            throw ("Unreachable code");
+        }
 
         const result = yield* _(Effect.tryPromise({
             try: () => fn(actor),
@@ -39,7 +43,7 @@ const effectify = <T>(fn: (actor: BackendActor) => Promise<T>, orRedirect: boole
 const effectifyAnon = <T>(fn: (actor: BackendActor) => Promise<T>): FrontendEffect<T> => {
     return Effect.gen(function* (_) {
         yield* _(Effect.tryPromise({
-            try: () => checkAuth(),
+            try: () => checkAuth(false),
             catch: toNetworkError
         }));
         console.log("get anonActor");
@@ -124,6 +128,10 @@ export const loadTeamStats = (team: string): FrontendEffect<TeamStats> => {
 
 export const loadTeamMembers = (team: string): FrontendEffect<User[]> => {
     return effectifyResult((actor) => actor.getTeamMembers(team))
+}
+
+export const loadAdmins = (): FrontendEffect<UserPermissions[]> => {
+    return effectifyResult((actor) => actor.listAdmins())
 }
 
 export const loadQuestionStats = (team: string): FrontendEffect<QuestionStats[]> => {

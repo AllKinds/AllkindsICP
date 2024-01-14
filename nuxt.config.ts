@@ -24,7 +24,7 @@ export default defineNuxtConfig({
     },
     app:
     {
-        pageTransition: { name: "page", mode: 'out-in' },
+        pageTransition: { name: "slide-left", mode: 'out-in' },
         head: {
             titleTemplate: (t) => { return t ? `${t} - Allkinds` : 'Allkinds' },
             script: [

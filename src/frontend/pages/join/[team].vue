@@ -86,7 +86,7 @@ const isMember = () => {
 
 <template>
     <div class="w-full flex-grow flex flex-col items-center">
-        <AllkindsTitle>
+        <AllkindsTitle link-to="/select-team">
             Allkinds.Teams
         </AllkindsTitle>
 
