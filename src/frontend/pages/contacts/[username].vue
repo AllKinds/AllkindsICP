@@ -78,6 +78,9 @@ let diff = {}
             <div>
                 Cohesion score: {{ m()[0].cohesion }}% on {{ m()[0].answered.length }} questions
             </div>
+            <div v-if="friendStatusToKey(m()[1]) === 'connected'">
+                Contact: {{ m()[0].user.contact }}
+            </div>
         </div>
 
         <Question v-for="[q, diff] in m()[0].answered" :question="q" :color="diff.sameAnswer ? 'green' : 'black'" />
