@@ -39,6 +39,11 @@ const stats = () => {
 <template>
     <div class="w-full flex-grow">
         <AllkindsTitle logo="ph:x-circle" link-to="/select-team">
+            <template #action>
+                <NuxtLink to="/questions" slot="action">
+                    <Icon name="mynaui:layers-three" size="2em" />
+                </NuxtLink>
+            </template>
         </AllkindsTitle>
 
         <NetworkDataContainer :networkdata="app.getTeams()" class="w-full text-lg">

@@ -64,13 +64,13 @@ export const idlFactory = ({ IDL }) => {
     'points' : IDL.Int,
   });
   const ResultQuestion = IDL.Variant({ 'ok' : Question, 'err' : Error });
-  const TeamInfo__1 = IDL.Record({
+  const TeamInfo = IDL.Record({
     'about' : IDL.Text,
     'logo' : IDL.Vec(IDL.Nat8),
     'name' : IDL.Text,
     'listed' : IDL.Bool,
   });
-  const ResultTeam = IDL.Variant({ 'ok' : TeamInfo__1, 'err' : Error });
+  const ResultTeam = IDL.Variant({ 'ok' : TeamInfo, 'err' : Error });
   const AdminPermissions = IDL.Record({
     'becomeTeamMember' : IDL.Bool,
     'createTeam' : IDL.Bool,
@@ -160,7 +160,7 @@ export const idlFactory = ({ IDL }) => {
     'isMember' : IDL.Bool,
     'isAdmin' : IDL.Bool,
   });
-  const TeamInfo = IDL.Record({
+  const TeamInfo__1 = IDL.Record({
     'about' : IDL.Text,
     'logo' : IDL.Vec(IDL.Nat8),
     'name' : IDL.Text,
@@ -169,7 +169,7 @@ export const idlFactory = ({ IDL }) => {
   const TeamUserInfo = IDL.Record({
     'key' : IDL.Text,
     'permissions' : Permissions,
-    'info' : TeamInfo,
+    'info' : TeamInfo__1,
     'invite' : IDL.Opt(IDL.Text),
   });
   const ResultTeams = IDL.Variant({
@@ -215,11 +215,7 @@ export const idlFactory = ({ IDL }) => {
         [ResultQuestion],
         [],
       ),
-    'createTeam' : IDL.Func(
-        [IDL.Text, IDL.Text, TeamInfo__1],
-        [ResultTeam],
-        [],
-      ),
+    'createTeam' : IDL.Func([IDL.Text, IDL.Text, TeamInfo], [ResultTeam], []),
     'createTestData' : IDL.Func([IDL.Text, IDL.Nat, IDL.Nat], [IDL.Nat], []),
     'createUser' : IDL.Func([IDL.Text, IDL.Text], [ResultUser], []),
     'deleteQuestion' : IDL.Func([IDL.Text, Question], [ResultVoid], []),
@@ -273,6 +269,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'submitSkip' : IDL.Func([IDL.Text, IDL.Nat], [ResultSkip], []),
     'updateProfile' : IDL.Func([User], [ResultUser], []),
+    'updateTeam' : IDL.Func([IDL.Text, IDL.Text, TeamInfo], [ResultTeam], []),
     'whoami' : IDL.Func([], [IDL.Principal], ['query']),
   });
 };

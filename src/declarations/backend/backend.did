@@ -42,7 +42,7 @@ type Time__1 = int;
 type Time = int;
 type TeamUserInfo = 
  record {
-   info: TeamInfo;
+   info: TeamInfo__1;
    invite: opt text;
    key: text;
    permissions: Permissions;
@@ -125,7 +125,7 @@ type ResultTeamStats =
 type ResultTeam = 
  variant {
    err: Error;
-   ok: TeamInfo__1;
+   ok: TeamInfo;
  };
 type ResultSkip = 
  variant {
@@ -273,7 +273,7 @@ service : {
                                     User;
                                   }) query;
   createQuestion: (text, text, text) -> (ResultQuestion);
-  createTeam: (text, text, TeamInfo__1) -> (ResultTeam);
+  createTeam: (text, text, TeamInfo) -> (ResultTeam);
   createTestData: (text, nat, nat) -> (nat);
   createUser: (text, text) -> (ResultUser);
   deleteQuestion: (text, Question) -> (ResultVoid);
@@ -306,5 +306,6 @@ service : {
   submitAnswer: (text, QuestionID, bool, nat) -> (ResultAnswer);
   submitSkip: (text, nat) -> (ResultSkip);
   updateProfile: (User) -> (ResultUser);
+  updateTeam: (text, text, TeamInfo) -> (ResultTeam);
   whoami: () -> (principal) query;
 }

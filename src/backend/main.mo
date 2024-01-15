@@ -173,8 +173,13 @@ actor {
 
   // Create default new team
   public shared ({ caller }) func createTeam(teamKey : Text, invite : Text, info : TeamInfo) : async ResultTeam {
-    if (not Admin.getPermissions(admins, caller).createTeam) return #err(#permissionDenied);
+    if (not Admin.hasPermission(admins, caller, #createTeam)) return #err(#permissionDenied);
     Team.create(db.teams, teamKey, invite, info, caller);
+  };
+
+  public shared ({ caller }) func updateTeam(teamKey : Text, invite : Text, info : TeamInfo) : async ResultTeam {
+    if (not Admin.hasPermission(admins, caller, #becomeTeamAdmin)) return #err(#permissionDenied);
+    Team.update(db.teams, teamKey, invite, info, caller);
   };
 
   public shared ({ caller }) func joinTeam(teamKey : Text, invite : Text) : async ResultTeam {

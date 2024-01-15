@@ -360,6 +360,9 @@ export const useAppState = defineStore({
         createTeam(team: string, name: string, about: string, logo: number[], listed: boolean, code: string): Promise<void> {
             return runNotify(backend.createTeam(team, name, about, logo, listed, code), "Welcome to the team!");
         },
+        updateTeam(team: string, name: string, about: string, logo: number[], listed: boolean, code: string): Promise<void> {
+            return runNotify(backend.updateTeam(team, name, about, logo, listed, code), "Welcome to the team!");
+        },
         deleteQuestion(q: Question) {
             return runNotify(backend.deleteQuestion(this.team, q), "Question removed")
         },

@@ -1,7 +1,12 @@
 export default defineNuxtRouteMiddleware((to, from) => {
-    console.log("navigate from", from, "to", to);
-    debugger;
+
+    const order = from.path.localeCompare(to.path) > 0;
+    const name = order ? 'slide-left' : 'slide-right';
+
+    console.log("navigate from", from, "to", to, "with transition", name);
+
+
     to.meta.pageTransition = {
-        name: +to.params.id > +from.params.id ? 'slide-left' : 'slide-right'
+        name
     };
 })

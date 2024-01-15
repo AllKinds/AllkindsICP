@@ -91,7 +91,7 @@ export type ResultQuestionStats = { 'ok' : Array<QuestionStats> } |
   { 'err' : Error };
 export type ResultSkip = { 'ok' : Skip } |
   { 'err' : Error };
-export type ResultTeam = { 'ok' : TeamInfo__1 } |
+export type ResultTeam = { 'ok' : TeamInfo } |
   { 'err' : Error };
 export type ResultTeamStats = { 'ok' : TeamStats } |
   { 'err' : Error };
@@ -143,7 +143,7 @@ export interface TeamStats {
 export interface TeamUserInfo {
   'key' : string,
   'permissions' : Permissions,
-  'info' : TeamInfo,
+  'info' : TeamInfo__1,
   'invite' : [] | [string],
 }
 export type Time = bigint;
@@ -197,7 +197,7 @@ export interface _SERVICE {
   >,
   'backupUsers' : ActorMethod<[bigint, bigint], Array<[Principal, User]>>,
   'createQuestion' : ActorMethod<[string, string, string], ResultQuestion>,
-  'createTeam' : ActorMethod<[string, string, TeamInfo__1], ResultTeam>,
+  'createTeam' : ActorMethod<[string, string, TeamInfo], ResultTeam>,
   'createTestData' : ActorMethod<[string, bigint, bigint], bigint>,
   'createUser' : ActorMethod<[string, string], ResultUser>,
   'deleteQuestion' : ActorMethod<[string, Question], ResultVoid>,
@@ -234,5 +234,6 @@ export interface _SERVICE {
   >,
   'submitSkip' : ActorMethod<[string, bigint], ResultSkip>,
   'updateProfile' : ActorMethod<[User], ResultUser>,
+  'updateTeam' : ActorMethod<[string, string, TeamInfo], ResultTeam>,
   'whoami' : ActorMethod<[], Principal>,
 }

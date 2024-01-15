@@ -88,6 +88,26 @@ module {
     return #ok(info);
   };
 
+  public func update(teams : TeamDB, key : Text, invite : Text, info : TeamInfo, admin : Principal) : Result<TeamInfo> {
+    let ?old = Map.get(teams, thash, key) else return #err(#teamNotFound);
+    let admins = old.admins;
+    Set.add(admins, phash, admin);
+
+    let team : Team = {
+      info;
+      invite;
+      members = old.members;
+      admins;
+      questions = old.questions;
+      answers = old.answers;
+      skips = old.skips;
+      friends = old.friends;
+    };
+    let ?t = Map.put(teams, thash, key, team) else Debug.trap("Team must exist");
+    return #ok(info);
+
+  };
+
   public func getStats(teams : TeamDB, key : Text) : Result<TeamStats> {
     let ?team = Map.get(teams, thash, key) else return #err(#teamNotFound);
 
