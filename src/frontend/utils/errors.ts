@@ -41,7 +41,7 @@ export function formatBackendError(err: BackendError): string {
         case "tooLong":
             return "Too long";
         case "notEnoughAnswers":
-            return "Not enough answers"
+            return "You need to answer at least 10 questions to see people here."
         case "invalidInvite":
             return "Invite is not valid"
 

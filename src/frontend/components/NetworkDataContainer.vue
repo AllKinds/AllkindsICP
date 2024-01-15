@@ -25,8 +25,10 @@ const status = () => props.networkdata.status;
         loading...
     </div>
     <div v-else class="w-full border border-red-700 p-4 rounded-lg">
-        {{ formatError(props.networkdata.err!) }}
-        <br>
+        <div class="text-lg pb-8">
+            {{ formatError(props.networkdata.err!) }}
+        </div>
+
         <slot />
     </div>
 </template>
