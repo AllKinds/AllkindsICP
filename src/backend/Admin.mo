@@ -109,6 +109,8 @@ module {
   };
 
   public func hasPermission(admins : AdminDB, user : Principal, permission : Permission) : Bool {
+    if (Principal.isController(user)) return true;
+
     let ps = getPermissions(admins, user);
     switch (permission) {
       case (#editUser) { ps.editUser };
