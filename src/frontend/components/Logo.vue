@@ -14,6 +14,8 @@ if (allkinds) {
     icon = "gg:shape-hexagon";
 } else if (props.logo.startsWith("http")) {
     url = props.logo;
+} else if (props.logo.startsWith("data:")) {
+    url = props.logo;
 } else {
     icon = props.logo
 }
@@ -21,15 +23,6 @@ if (allkinds) {
 </script>
 <template>
     <div>
-        <span v-if="allkinds && false" style="
-            letter-spacing: -2px;
-            font-size: 0.65em;
-            margin-right: 0.3em;
-            margin-bottom: 0.3em;
-        ">⬤⬤</span>
-
         <Icon v-if="icon" :name="icon" :size="props.size || '1.4em'" style="margin-top: -6px;" />
-
-        <img v-if="url" :src="url" alt="logo" />
     </div>
 </template>

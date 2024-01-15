@@ -19,7 +19,7 @@ if (inBrowser()) {
 
 <template>
     <div class="w-full flex-grow flex flex-col">
-        <AllkindsTitle link-to="/team-stats">
+        <AllkindsTitle link-to="/team-stats" :logo-url="toDataUrl(app.getTeam()?.info.logo || [])">
             {{ app.checkTeam() }}
             <NuxtLink to="/my-profile" class="m-auto">
                 {{ user()?.displayName }}, {{ user()?.stats.points }}

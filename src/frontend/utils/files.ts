@@ -1,6 +1,6 @@
 
 export const toDataUrl = (image: number[] | Uint8Array, mode: "team" | "user" = "team", name: string = "") => {
-    if (image.length < 10) {
+    if (!image || image.length < 10) {
         // Image not set, return a white circle as placeholder
         if (mode === "team")
             return circlesDataUrl("808", "080");

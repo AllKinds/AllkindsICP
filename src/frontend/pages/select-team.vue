@@ -37,7 +37,7 @@ const canCreate = () => {
 
 <template>
     <div class="w-full flex-grow flex flex-col items-center">
-        <AllkindsTitle>Welcome</AllkindsTitle>
+        <AllkindsTitle>Welcome to allkinds</AllkindsTitle>
         <h1 class="text-center max-w-sm">
             We see the world with more meaningful connections.
         </h1>

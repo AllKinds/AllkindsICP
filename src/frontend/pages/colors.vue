@@ -31,6 +31,7 @@ const icons = [
     "charm:refresh",
     "prime:user-plus",
     "prime:user-minus",
+    "mynaui:layers-three",
 ];
 
 const themes = ["black", "light"];

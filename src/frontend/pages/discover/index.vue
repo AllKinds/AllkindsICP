@@ -16,7 +16,7 @@ if (inBrowser()) {
 
 <template>
     <div class="w-full flex-grow flex flex-col items-center">
-        <AllkindsTitle logo="ph:x-circle" logoSize="2em" linkTo="/questions">
+        <AllkindsTitle logo="prime:users" logoSize="2em" linkTo="/questions">
             <NuxtLink to="/my-profile" class="m-auto">
                 {{ user()?.displayName }}, {{ user()?.stats.points }}
                 <Icon name="gg:shape-hexagon" class="mb-2" />
