@@ -27,6 +27,9 @@ export default defineNuxtConfig({
         pageTransition: { name: "slide-left", mode: 'out-in' },
         head: {
             titleTemplate: (t) => { return t ? `${t} - Allkinds` : 'Allkinds' },
+            link: [
+                { rel: 'icon', type: 'image/png', href: '/hexagon-white.png' },
+            ],
             script: [
                 //{
                 //    hid: 'sentry',
