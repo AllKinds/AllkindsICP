@@ -72,13 +72,13 @@ if (inBrowser()) {
 .slide-left-leave-to,
 .slide-right-enter-from {
     opacity: 0;
-    transform: translate(-100px, 0);
+    transform: translate(-200px, 0);
 }
 
 .slide-left-enter-from,
 .slide-right-leave-to {
     opacity: 0;
-    transform: translate(100px, 0);
+    transform: translate(200px, 0);
 }
 
 /**/

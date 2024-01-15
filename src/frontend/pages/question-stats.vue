@@ -13,10 +13,6 @@ if (inBrowser()) {
     app.loadQuestionStats(0);
 }
 
-const stats = () => {
-    return app.getQuestionStats().data
-}
-
 const deleteQuestion = (q: any) => { // TODO: replace type any with Question
     return app.deleteQuestion(q).then(
         () => app.loadQuestionStats(0)
