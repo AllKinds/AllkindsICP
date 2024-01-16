@@ -171,6 +171,17 @@ actor {
     #ok(Iter.toArray<UserPermissions>(all));
   };
 
+  public shared query ({ caller }) func listUsers() : async ResultUsers {
+    assertPermission(caller, #createBackup);
+
+    let all = Iter.map<(Principal, User), User>(
+      User.list(db.users),
+      func((p, u)) = u,
+    );
+
+    #ok(Iter.toArray<User>(all));
+  };
+
   // Create default new team
   public shared ({ caller }) func createTeam(teamKey : Text, invite : Text, info : TeamInfo) : async ResultTeam {
     if (not Admin.hasPermission(admins, caller, #createTeam)) return #err(#permissionDenied);

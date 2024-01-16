@@ -225,6 +225,7 @@ export interface _SERVICE {
   'leaveTeam' : ActorMethod<[string, string], ResultVoid>,
   'listAdmins' : ActorMethod<[], ResultUserPermissions>,
   'listTeams' : ActorMethod<[Array<string>], ResultTeams>,
+  'listUsers' : ActorMethod<[], ResultUsers>,
   'selfDestruct' : ActorMethod<[string], undefined>,
   'sendFriendRequest' : ActorMethod<[string, string], ResultVoid>,
   'setPermissions' : ActorMethod<[string, AdminPermissions], ResultVoid>,

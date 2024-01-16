@@ -20,6 +20,7 @@ export type AppState = {
     questionStats: NetworkData<QuestionStats[]>,
     teamMembers: NetworkData<User[]>,
     admins: NetworkData<UserPermissions[]>
+    users: NetworkData<User[]>
     loadingCounter: number,
 };
 
@@ -157,6 +158,7 @@ const defaultAppState: () => AppState = () => {
         questionStats: dataInit,
         teamMembers: dataInit,
         admins: dataInit,
+        users: dataInit,
         loadingCounter: 0,
     }
 };
@@ -423,6 +425,20 @@ export const useAppState = defineStore({
         loadAdmins(maxAgeS?: number) {
             if (shouldUpdate(this.admins, maxAgeS)) {
                 runStore(this.admins, backend.loadAdmins(), this.setAdmins)
+                    .catch(console.error);
+            }
+        },
+        getUsers() {
+            return this.users as NetworkData<User[]>; // TODO remove `as ...`
+        },
+        setUsers(users: NetworkData<User[]>): void {
+            const old = this.getUsers();
+            this.users = { status: "requested", errCount: 0, data: [] };
+            setTimeout(() => this.users = combineNetworkData(old, users));
+        },
+        loadUsers(maxAgeS?: number) {
+            if (shouldUpdate(this.users, maxAgeS)) {
+                runStore(this.users, backend.loadUsers(), this.setUsers)
                     .catch(console.error);
             }
         },

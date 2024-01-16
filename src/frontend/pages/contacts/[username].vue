@@ -65,10 +65,11 @@ let diff = {}
         </AllkindsTitle>
 
         <div class="p-3 w-full">
-            <NuxtLink class="float-right" @click="connect(m()[0].user.username)" v-if="canSendFriendRequest(m()[1])">
+            <NuxtLink class="float-right cursor-pointer" @click="connect(m()[0].user.username)"
+                v-if="canSendFriendRequest(m()[1])">
                 <Icon name="prime:user-plus" size="3em" />
             </NuxtLink>
-            <NuxtLink class="float-right" @click="disconnect(m()[0].user.username)"
+            <NuxtLink class="float-right cursor-pointer" @click="disconnect(m()[0].user.username)"
                 v-if="canSendRemoveFriendRequest(m()[1])">
                 <Icon name="prime:user-minus" size="3em" />
             </NuxtLink>
@@ -84,7 +85,6 @@ let diff = {}
         </div>
 
         <Question v-for="[q, diff] in m()[0].answered" :question="q" :color="diff.sameAnswer ? 'green' : 'black'" />
-
 
         <Question v-for="(q, i) in m()[0].uncommon" :question="q" :link="true" />
 

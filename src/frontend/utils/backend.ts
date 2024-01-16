@@ -134,6 +134,10 @@ export const loadAdmins = (): FrontendEffect<UserPermissions[]> => {
     return effectifyResult((actor) => actor.listAdmins())
 }
 
+export const loadUsers = (): FrontendEffect<UserPermissions[]> => {
+    return effectifyResult((actor) => actor.listUsers())
+}
+
 export const loadQuestionStats = (team: string): FrontendEffect<QuestionStats[]> => {
     const limit = BigInt(200);
     return effectifyResult((actor) => actor.getQuestionStats(team, limit))

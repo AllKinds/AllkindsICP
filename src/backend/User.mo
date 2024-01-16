@@ -54,6 +54,10 @@ module {
     Map.entries(users.info);
   };
 
+  public func list(users : UserDB) : Iter<(Principal, User)> {
+    Map.entries(users.info);
+  };
+
   /// Information about a user.
   /// This contains private data and should not be returned to other users directly
   /// see UserInfo for non sensitive information

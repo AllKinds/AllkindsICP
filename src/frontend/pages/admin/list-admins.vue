@@ -18,6 +18,9 @@ if (inBrowser()) {
 
         <h1>All admins</h1>
         <NetworkDataContainer :networkdata="app.getAdmins()">
+            <div>
+                Number of users with custom permissions: {{ app.getAdmins().data?.length }}
+            </div>
             <div v-for="admin in app.getAdmins().data">
                 {{ admin.user.displayName }}
                 ({{ admin.user.username }})

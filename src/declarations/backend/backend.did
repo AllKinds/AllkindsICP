@@ -299,6 +299,7 @@ service : {
   leaveTeam: (text, text) -> (ResultVoid);
   listAdmins: () -> (ResultUserPermissions) query;
   listTeams: (vec text) -> (ResultTeams) query;
+  listUsers: () -> (ResultUsers) query;
   selfDestruct: (text) -> () oneway;
   /// Send a friend request to a user
   sendFriendRequest: (text, text) -> (ResultVoid);
