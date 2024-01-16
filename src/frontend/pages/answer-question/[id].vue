@@ -113,9 +113,9 @@ const user = () => app.getUser().data?.user;
             <div v-if="loading" class="text-center w-full">
                 <Icon name="line-md:loading-alt-loop" size="5em" class="absolute mt-8" />
             </div>
-            <span class="text-2xl">
+            <div class="text-4xl text-center">
                 {{ q().question }}
-            </span>
+            </div>
         </div>
 
         <div class="grow w-full" :class="twColor()" />
