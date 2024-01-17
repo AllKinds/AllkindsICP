@@ -24,13 +24,13 @@ if (inBrowser()) {
             <table class="table text-lg">
                 <tr v-for="user in app.getUsers().data" class="hover:bg-slate-900">
                     <td>{{ user.displayName }}</td>
-                    <td>({{ user.username }}):</td>
-                    <td>{{ user.stats.points }}
-                        <Icon name="gg:shape-hexagon" />,
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.stats.points }}&nbsp;
+                        <Icon name="gg:shape-hexagon" />
                     </td>
-                    <td>{{ user.stats.asked }} Q,</td>
-                    <td>{{ user.stats.answered }} A,</td>
-                    <td>{{ user.stats.boosts }} +</td>
+                    <td>{{ user.stats.asked }}&nbsp;Q</td>
+                    <td>{{ user.stats.answered }}&nbsp;A</td>
+                    <td>{{ user.stats.boosts }}&nbsp;+</td>
                 </tr>
             </table>
         </NetworkDataContainer>

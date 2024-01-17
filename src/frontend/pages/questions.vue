@@ -50,7 +50,7 @@ if (inBrowser()) {
                 <div class="grow" />
                 <div class="w-full text-center my-10">
                     <Btn @click="app.loadOpenQuestions(0, 'Questions loaded')">
-                        Reload &nbsp;
+                        Refresh &nbsp;
                         <Icon name="charm:refresh" />
                     </Btn>
                 </div>

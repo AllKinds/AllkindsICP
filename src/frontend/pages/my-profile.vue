@@ -54,7 +54,8 @@ if (inBrowser()) {
 
         <div class="w-full text-xl font-bold mt-4">Your questions</div>
         <NetworkDataContainer :networkdata="app.getOwnQuestions()" class="grow mt-4 w-full">
-            <Question v-for="(q, i) in app.getOwnQuestions().data" :question="q" :showScore="false" :link="true" />
+            <Question v-for="(q, i) in app.getOwnQuestions().data" :question="q" :showScore="true" :link="true">
+            </Question>
             <div v-if="app.getOwnQuestions().data?.length === 0" class="w-full">
                 You have not asked a question yet.
                 <div class="w-full text-center my-10">

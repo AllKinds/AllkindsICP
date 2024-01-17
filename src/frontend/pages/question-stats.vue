@@ -48,7 +48,8 @@ const deleteQuestion = (q: any) => { // TODO: replace type any with Question
             </div>
 
             <NetworkDataContainer :networkdata="app.getQuestionStats()" class="w-full text-left">
-                <Question v-for="stats in app.getQuestionStats().data" :question="stats.question" :link="false">
+                <Question v-for="stats in app.getQuestionStats().data" :question="stats.question" :link="false"
+                    :show-score="true">
                     <div class="w-full mt-4">
                         {{ stats.no }} no | {{ stats.yes }} yes
                         <Icon name="tabler:trash" class="float-right cursor-pointer"
