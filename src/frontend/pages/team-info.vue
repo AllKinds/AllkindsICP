@@ -78,7 +78,7 @@ const stats = () => {
                 <Btn class="w-80" to="/questions">Ask and answer questions</Btn>
                 <Btn class="w-80" to="/team-members" v-if="app.getTeam()?.permissions.isAdmin">Team members</Btn>
                 <Btn class="w-80" to="/question-stats" v-if="app.getTeam()?.permissions.isAdmin">Manage questions</Btn>
-                <Btn class="w-80">Watch demo</Btn>
+                <Btn class="w-80" to="https://youtu.be/IHE1zuxkkt0">Watch demo</Btn>
             </div>
 
         </NetworkDataContainer>
