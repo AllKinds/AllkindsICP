@@ -4,12 +4,14 @@ import * as backend from "~/utils/backend";
 import { FrontendError, notifyWithMsg } from "~/utils/errors";
 import { defineStore } from 'pinia'
 import * as errors from "~/utils/errors";
+import { NetworkDataContainer } from "#build/components";
 
 export type AppState = {
     user: NetworkData<UserPermissions>,
     team: string,
     knownTeams: string[],
     openQuestions: NetworkData<Question[]>,
+    answeredIds: bigint[],
     answeredQuestions: NetworkData<[Question, Answer][]>,
     ownQuestions: NetworkData<Question[]>,
     friends: NetworkData<Friend[]>,
@@ -148,6 +150,7 @@ const defaultAppState: () => AppState = () => {
         team: "",
         knownTeams: ["sandbox", "global", ""],
         openQuestions: dataInit,
+        answeredIds: [],
         answeredQuestions: dataInit,
         ownQuestions: dataInit,
         friends: dataInit,
@@ -181,16 +184,24 @@ export const useAppState = defineStore({
         getOpenQuestions(): NetworkData<Question[]> {
             return this.openQuestions as NetworkData<Question[]>; // TODO remove `as ...`
         },
-        setOpenQuestions(qs: NetworkData<Question[]>): void {
-            const { openQuestions } = storeToRefs(this)
+        setOpenQuestions(qs: NetworkData<Question[]>, noAnswered: boolean = true): void {
+            const { openQuestions } = storeToRefs(this);
+            if (qs.status === 'ok') {
+                const data = qs.data ?? [];
+                qs.data = data.filter((x) => this.answeredIds.indexOf(x.id) < 0);
+
+            }
             openQuestions.value = combineNetworkData(this.openQuestions, qs);
         },
         removeOpenQuestion(q: Question): void {
             const data = this.openQuestions as NetworkData<Question[]>
+            this.answeredIds.push(q.id);
+            if (this.answeredIdsReset) { clearTimeout(this.answeredIdsReset) }
+            this.answeredIdsReset = setTimeout(() => { this.answeredIds = [] }, 10_000)
             if (data.data) {
                 const i = data.data.findIndex((x) => x.id === q.id);
                 if (1 >= 0) {
-                    console.log("index of", q, "is", i, "in", this.openQuestions.data)
+                    //console.log("index of", q, "is", i, "in", this.openQuestions.data)
                     data.data.splice(i, 1);
                 }
             }

@@ -53,7 +53,7 @@ const skip = (question: Question) => {
 let loaded = false;
 
 function findQuestion(id: bigint, findOther = false) {
-    const data = app.openQuestions.data;
+    let data = app.openQuestions.data;
     const data2 = app.getAnsweredQuestions().data;
     let q = null;
     if (!data) {
