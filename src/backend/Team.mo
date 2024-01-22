@@ -184,4 +184,9 @@ module {
   public func isAdmin(team : Team, user : Principal) : Bool = Set.has(team.admins, phash, user);
   public func isMember(team : Team, user : Principal) : Bool = Set.has(team.members, phash, user);
   public func getMembers(team : Team) : [Principal] = Set.toArray(team.members);
+
+  public func isTeamAdmin(teams : TeamDB, key : Text, user : Principal) : Bool {
+    let ?team = Map.get(teams, thash, key) else return false;
+    Set.has(team.admins, phash, user);
+  };
 };

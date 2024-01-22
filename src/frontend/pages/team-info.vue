@@ -74,11 +74,13 @@ const stats = () => {
             </div>
 
             <div class="text-center">
+                <Btn class="w-80" to="update-team" v-if="app.getTeam()?.permissions.isAdmin">
+                    Edit team
+                </Btn>
                 <Btn class="w-80" @click="copy()" v-if="app.getTeam()?.permissions.isAdmin">Copy invite link</Btn>
                 <Btn class="w-80" to="/questions">Ask and answer questions</Btn>
                 <Btn class="w-80" to="/team-members" v-if="app.getTeam()?.permissions.isAdmin">Team members</Btn>
                 <Btn class="w-80" to="/question-stats" v-if="app.getTeam()?.permissions.isAdmin">Manage questions</Btn>
-                <Btn class="w-80" to="https://youtu.be/w2L3rpT2qGQ">Watch demo</Btn>
             </div>
 
         </NetworkDataContainer>

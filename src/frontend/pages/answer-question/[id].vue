@@ -14,12 +14,20 @@ const loading = useState("loading", () => false);
 const weight = useState('weight', () => 1)
 weight.value = 1;
 let gotoNextQuestion = false;
+let disappearing: Question | null = null;
 
 // TODO: move to app
 const answer = (question: Question, a: boolean, boost: number) => {
+    if (isLoading()) return;
     // TODO: show background task pending indicator
     console.log("answering question ", question, a, boost)
-    app.removeOpenQuestion(question)
+    disappearing = question;
+    app.removeOpenQuestion(question);
+    loading.value = true;
+    setTimeout(() => {
+        disappearing = null
+        loading.value = false;
+    }, 600); // fake delay
     gotoNextQuestion = true;
     runNotify(answerQuestion(app.team, question.id.valueOf(), a, boost), "1 Answer saved").then(
         () => {
@@ -33,10 +41,17 @@ const answer = (question: Question, a: boolean, boost: number) => {
 
 // TODO: move to app
 const skip = (question: Question) => {
+    if (isLoading()) return;
     // TODO: show background task pending indicator
     console.log('skipping', question)
     app.removeOpenQuestion(question)
+    disappearing = question;
     gotoNextQuestion = true;
+    loading.value = true;
+    setTimeout(() => {
+        disappearing = null
+        loading.value = false;
+    }, 600); // fake delay
     runNotify(
         skipQuestion(app.team, question.id), "Question skipped"
     ).then(
@@ -52,10 +67,12 @@ const skip = (question: Question) => {
 
 let loaded = false;
 
-function findQuestion(id: bigint, findOther = false) {
+function findQuestion(id: bigint, findOther = false): Question | null {
+    if (disappearing) return disappearing;
+
     let data = app.openQuestions.data;
     const data2 = app.getAnsweredQuestions().data;
-    let q = null;
+    let q: Question | null = null;
     if (!data) {
         if (!loaded) {
             loaded = true;
@@ -64,11 +81,12 @@ function findQuestion(id: bigint, findOther = false) {
     } else if (data.length === 0 && gotoNextQuestion) {
         navigateTo("/questions");
     } else if (gotoNextQuestion) {
-        navigateTo("/answer-question/" + data[0].id);
+        const nextId = data[0].id;
+        navigateTo("/answer-question/" + nextId)
     } else {
-        q = data.find((x) => x.id === id);
+        q = data.find((x) => x.id === id) ?? null;
         if (!q && data2) {
-            q = data2.find((x) => x[0].id === id)?.[0];
+            q = data2.find((x) => x[0].id === id)?.[0] ?? null;
         }
         if (!q) {
             // goto next question
@@ -89,6 +107,7 @@ if (inBrowser()) {
 
 const twColor = () => getColor(q().color as ColorName).color;
 const user = () => app.getUser().data?.user;
+const isLoading = () => loading.value || gotoNextQuestion;
 
 </script>
 
@@ -110,7 +129,7 @@ const user = () => app.getUser().data?.user;
         <div class="grow w-full rounded-t-xl" :class="twColor()" />
 
         <div class="p-5 w-full max-w-xl" :class="twColor()">
-            <div v-if="loading" class="text-center w-full">
+            <div v-if="isLoading()" class="text-center w-full">
                 <Icon name="line-md:loading-alt-loop" size="5em" class="absolute mt-8" />
             </div>
             <div class="text-4xl text-center">

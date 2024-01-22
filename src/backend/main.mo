@@ -189,7 +189,7 @@ actor {
   };
 
   public shared ({ caller }) func updateTeam(teamKey : Text, invite : Text, info : TeamInfo) : async ResultTeam {
-    if (not Admin.hasPermission(admins, caller, #becomeTeamAdmin)) return #err(#permissionDenied);
+    if (not Team.isTeamAdmin(db.teams, teamKey, caller)) return #err(#permissionDenied);
     Team.update(db.teams, teamKey, invite, info, caller);
   };
 
@@ -199,7 +199,7 @@ actor {
 
   public shared ({ caller }) func leaveTeam(teamKey : Text, user : Text) : async ResultVoid {
     let ?p = User.getPrincipal(db.users, user) else return #err(#userNotFound);
-    let isAllowed = p == caller or Admin.getPermissions(admins, caller).suspendUser;
+    let isAllowed = p == caller or Team.isTeamAdmin(db.teams, teamKey, caller);
     if (not isAllowed) { return #err(#permissionDenied) };
 
     Team.removeMember(db.teams, teamKey, p);
