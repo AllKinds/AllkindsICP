@@ -35,6 +35,8 @@ const NFID_URL = isDev ? II_URL : ("https://nfid.one" +
     LOGO_URL +
     "#authorize"
 );
+const FRONTEND_URL = isDev ? "http://" + ids.frontend + ".localhost:4943"
+    : "https://" + ids.frontend + ".icp0.io";
 
 const host = isDev ? "http://localhost:4943" : "https://icp-api.io";
 
@@ -42,6 +44,7 @@ export function dfx_env() {
     return {
         network, isDev, isStaging,
         II_URL, NFID_URL,
+        FRONTEND_URL,
         canisterIds: ids,
         host,
     }

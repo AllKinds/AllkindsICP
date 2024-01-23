@@ -86,8 +86,8 @@ export const anonActor = (): BackendActor => {
 let client: AuthClient | null = null;
 
 export const loginTest = (provider: Provider): PRes<AuthClient> => {
-    //const client =
-    //    await newAuthClient();
+    const config = useRuntimeConfig().public;
+
     let resolver: any;
     client?.login({
         identityProvider: loginUrl(provider),
@@ -101,6 +101,7 @@ export const loginTest = (provider: Provider): PRes<AuthClient> => {
         },
         // 7 days in nanoseconds
         maxTimeToLive: BigInt(7 * 24 * 60 * 60 * 1000 * 1000 * 1000),
+        derivationOrigin: config.FRONTEND_URL,
     });
 
     return new Promise((resolve: any) => {
