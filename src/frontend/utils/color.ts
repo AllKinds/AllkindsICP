@@ -16,6 +16,19 @@ export const colors: { [key: string]: Color } = {
 
 export const getColor = (color: ColorName): Color => {
     const c = colors[color];
-    if (c) return c;
-    return colors['black']
+    return c ?? colors['black']
+}
+
+export type Icon = { to: string, icon: string };
+
+export const icons = [
+    { to: "/discover", icon: "prime:user-plus" },
+    { to: "/questions", icon: "mynaui:layers-three" },
+    { to: "/contacts", icon: "prime:users" },
+    { to: "", icon: "gg:shape-hexagon" },
+];
+
+export const getIcon = (path: string): Icon => {
+    const i = icons.find((x) => path.startsWith(x.to));
+    return i ?? { to: "", icon: "gg:shape-hexagon" };
 }

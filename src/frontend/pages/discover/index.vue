@@ -8,6 +8,7 @@ const app = useAppState();
 const user = () => app.getUser().data?.user;
 
 if (inBrowser()) {
+    app.getTeam();
     app.loadUser();
     app.loadMatches();
 }
@@ -16,13 +17,16 @@ if (inBrowser()) {
 
 <template>
     <div class="w-full flex-grow flex flex-col items-center">
-        <AllkindsTitle logo="prime:users" logoSize="2em" linkTo="/questions">
+        <AllkindsTitle logoSize="2em" linkTo="/questions">
             <NuxtLink to="/my-profile" class="m-auto">
                 {{ user()?.displayName }}, {{ user()?.stats.points }}
                 <Icon name="gg:shape-hexagon" class="mb-2" />
             </NuxtLink>
 
-            <div class="w-10"></div>
+            <template #action>
+                <IconLink to="/contacts" />
+            </template>
+
         </AllkindsTitle>
 
         <NetworkDataContainer :networkdata="app.getMatches()" class="w-96 pb-32">

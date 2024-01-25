@@ -6,12 +6,14 @@ const props = defineProps<{
     logoUrl?: string,
 }>();
 
+const icon = props.logo ?? getIcon(props.linkTo ?? "").icon;
+
 </script>
 <template>
     <div class="font-bold flex flex-row items-baseline w-full py-4" :class="{ 'text-xl': largeFont }">
         <NuxtLink :to="props.linkTo" class="flex">
             <img v-if="props.logoUrl" :src="props.logoUrl" width="32" class="rounded-md" style="margin-top: -6px;" />&nbsp;
-            <Icon v-else :name="props.logo || 'gg:shape-hexagon'" size="2em" style="margin-top: -6px;" />
+            <Icon v-else :name="icon" size="2em" style="margin-top: -6px;" />
         </NuxtLink>
 
         <div class="flex-grow px-3 text-center">

@@ -27,9 +27,7 @@ if (inBrowser()) {
             </NuxtLink>
 
             <template #action>
-                <NuxtLink to="/contacts" slot="action">
-                    <Icon name="prime:users" size="2em" />
-                </NuxtLink>
+                <IconLink to="/discover" />
             </template>
         </AllkindsTitle>
 

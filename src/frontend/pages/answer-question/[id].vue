@@ -120,9 +120,7 @@ const isLoading = () => loading.value || gotoNextQuestion;
             </NuxtLink>
 
             <template #action>
-                <NuxtLink to="/contacts">
-                    <Icon name="prime:users" size="2em" />
-                </NuxtLink>
+                <IconLink to="/discover" />
             </template>
         </AllkindsTitle>
 

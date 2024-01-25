@@ -1,10 +1,7 @@
 const rules = [
-    { from: "/contacts", to: "/discover", transition: "slide-left" },
-    { from: "/discover", to: "/contacts", transition: "slide-right" },
-    { from: "/select-team", to: "", transition: "page" },
-    { from: "", to: "/select-team", transition: "page" },
-    { from: "/answer-question/", to: "", transition: "page" },
-    { from: "", to: "/answer-question/", transition: "page" },
+    { from: "/discover", to: "/contacts", transition: "slide-left", reverse: "slide-right" },
+    { from: "/select-team", to: "", transition: "page", reverse: "page" },
+    { from: "/answer-question/", to: "", transition: "page", reverse: "page" },
 ]
 
 export default defineNuxtRouteMiddleware((to, from) => {
@@ -15,6 +12,12 @@ export default defineNuxtRouteMiddleware((to, from) => {
     rules.forEach(rule => {
         if (from.path.startsWith(rule.from) && to.path.startsWith(rule.to)) {
             name = rule.transition;
+        }
+    });
+
+    rules.forEach(rule => {
+        if (from.path.startsWith(rule.to) && to.path.startsWith(rule.from) && rule.reverse) {
+            name = rule.reverse;
         }
     });
 

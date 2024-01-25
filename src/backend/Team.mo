@@ -74,6 +74,9 @@ module {
     if (Text.contains(key, #predicate(func(c) = not (Char.isLowercase(c) and Char.isAlphabetic(c))))) {
       return #err(#validationError);
     };
+    if (key == "") {
+      return #err(#validationError);
+    };
     let team : Team = {
       info;
       invite;
@@ -143,7 +146,7 @@ module {
     let visible = Iter.filter<TeamUserInfo>(
       mapped,
       func({ key; info; permissions }) {
-        return (
+        return key != "" and (
           showAll //
           or Array.indexOf(key, known, Text.equal) != null //
           or info.listed //
