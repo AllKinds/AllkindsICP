@@ -196,6 +196,13 @@ actor {
     Team.addMember(db.teams, teamKey, invite, caller);
   };
 
+  public shared ({ caller }) func setTeamAdmin(teamKey : Text, user : Text, admin: Bool) : async ResultTeam {
+    if (not Team.isTeamAdmin(db.teams, teamKey, caller)) return #err(#permissionDenied);
+    let ?p = User.getPrincipal(db.users, user) else return #err(#userNotFound);
+
+    Team.setAdmin(db.teams, teamKey, p, admin);
+  };
+
   public shared ({ caller }) func leaveTeam(teamKey : Text, user : Text) : async ResultVoid {
     let ?p = User.getPrincipal(db.users, user) else return #err(#userNotFound);
     let isAllowed = p == caller or Team.isTeamAdmin(db.teams, teamKey, caller);
@@ -224,6 +231,28 @@ actor {
     let members = Team.getMembers(team);
     let users = Array.map<Principal, User>(
       members,
+      func(p) {
+        let u = switch (User.get(db.users, p)) {
+          case (?value) { value };
+          case (null) { User.create(Principal.toText(p), "N/A") };
+        };
+        u;
+      },
+    );
+
+    return #ok(users);
+  };
+
+  public shared query ({ caller }) func getTeamAdmins(teamKey : Text) : async ResultUsers {
+    let team = switch (Team.get(db.teams, teamKey, caller)) {
+      case (#ok(t)) t;
+      case (#err(e)) return #err(e);
+    };
+    let true = Team.isAdmin(team, caller) else return #err(#notInTeam);
+
+    let admins = Team.getAdmins(team);
+    let users = Array.map<Principal, User>(
+      admins,
       func(p) {
         let u = switch (User.get(db.users, p)) {
           case (?value) { value };

@@ -291,6 +291,7 @@ service : {
       user: opt User;
     }) query;
   getQuestionStats: (text, nat) -> (ResultQuestionStats) query;
+  getTeamAdmins: (text) -> (ResultUsers) query;
   getTeamMembers: (text) -> (ResultUsers) query;
   getTeamStats: (text) -> (ResultTeamStats) query;
   getUnansweredQuestions: (text, nat) -> (vec Question) query;
@@ -304,6 +305,7 @@ service : {
   /// Send a friend request to a user
   sendFriendRequest: (text, text) -> (ResultVoid);
   setPermissions: (text, AdminPermissions) -> (ResultVoid);
+  setTeamAdmin: (text, text, bool) -> (ResultTeam);
   submitAnswer: (text, QuestionID, bool, nat) -> (ResultAnswer);
   submitSkip: (text, nat) -> (ResultSkip);
   updateProfile: (User) -> (ResultUser);

@@ -1,5 +1,6 @@
 import type { Principal } from '@dfinity/principal';
 import type { ActorMethod } from '@dfinity/agent';
+import type { IDL } from '@dfinity/candid';
 
 export type AddTentativeDeviceResponse = {
     'device_registration_mode_off' : null
@@ -117,7 +118,8 @@ export interface DeviceWithUsage {
 export type FrontendHostname = string;
 export type GetDelegationResponse = { 'no_such_delegation' : null } |
   { 'signed_delegation' : SignedDelegation };
-export type GetIdAliasError = { 'Unauthorized' : null } |
+export type GetIdAliasError = { 'InternalCanisterError' : string } |
+  { 'Unauthorized' : Principal } |
   { 'NoSuchCredentials' : string };
 export interface GetIdAliasRequest {
   'rp_id_alias_jwt' : string,
@@ -158,6 +160,18 @@ export interface IdentityInfo {
   'metadata' : MetadataMapV2,
   'authn_method_registration' : [] | [AuthnMethodRegistrationInfo],
 }
+export type IdentityInfoError = { 'InternalCanisterError' : string } |
+  { 'Unauthorized' : Principal };
+export type IdentityMetadataReplaceError = {
+    'InternalCanisterError' : string
+  } |
+  { 'Unauthorized' : Principal } |
+  {
+    'StorageSpaceExceeded' : {
+      'space_required' : bigint,
+      'space_available' : bigint,
+    }
+  };
 export type IdentityNumber = bigint;
 export type IdentityRegisterError = { 'BadCaptcha' : null } |
   { 'CanisterFull' : null } |
@@ -200,7 +214,8 @@ export type MetadataMapV2 = Array<
       { 'Bytes' : Uint8Array | number[] },
   ]
 >;
-export type PrepareIdAliasError = { 'Unauthorized' : null };
+export type PrepareIdAliasError = { 'InternalCanisterError' : string } |
+  { 'Unauthorized' : Principal };
 export interface PrepareIdAliasRequest {
   'issuer' : FrontendHostname,
   'relying_party' : FrontendHostname,
@@ -337,12 +352,12 @@ export interface _SERVICE {
   'identity_info' : ActorMethod<
     [IdentityNumber],
     { 'Ok' : IdentityInfo } |
-      { 'Err' : null }
+      { 'Err' : IdentityInfoError }
   >,
   'identity_metadata_replace' : ActorMethod<
     [IdentityNumber, MetadataMapV2],
     { 'Ok' : null } |
-      { 'Err' : null }
+      { 'Err' : IdentityMetadataReplaceError }
   >,
   'identity_register' : ActorMethod<
     [AuthnMethodData, CaptchaResult, [] | [Principal]],
@@ -373,3 +388,4 @@ export interface _SERVICE {
     VerifyTentativeDeviceResponse
   >,
 }
+export declare const idlFactory: IDL.InterfaceFactory;

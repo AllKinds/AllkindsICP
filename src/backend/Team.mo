@@ -187,9 +187,22 @@ module {
     #ok;
   };
 
+  public func setAdmin(teams: TeamDB, key: Text, user: Principal, admin: Bool): Result<TeamInfo> {
+    let ?team = Map.get(teams, thash, key) else return #err(#teamNotFound);
+
+    if(admin) {
+      let false = Set.put(team.admins, phash, user) else return #err(#alreadyRegistered);
+    } else {
+      let true = Set.remove(team.admins, phash, user) else return #err(#userNotFound);
+    };
+
+    #ok(team.info);
+  };
+
   public func isAdmin(team : Team, user : Principal) : Bool = Set.has(team.admins, phash, user);
   public func isMember(team : Team, user : Principal) : Bool = Set.has(team.members, phash, user);
   public func getMembers(team : Team) : [Principal] = Set.toArray(team.members);
+  public func getAdmins(team : Team) : [Principal] = Set.toArray(team.admins);
 
   public func isTeamAdmin(teams : TeamDB, key : Text, user : Principal) : Bool {
     let ?team = Map.get(teams, thash, key) else return false;

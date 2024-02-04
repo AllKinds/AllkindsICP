@@ -247,6 +247,7 @@ export const idlFactory = ({ IDL }) => {
         [ResultQuestionStats],
         ['query'],
       ),
+    'getTeamAdmins' : IDL.Func([IDL.Text], [ResultUsers], ['query']),
     'getTeamMembers' : IDL.Func([IDL.Text], [ResultUsers], ['query']),
     'getTeamStats' : IDL.Func([IDL.Text], [ResultTeamStats], ['query']),
     'getUnansweredQuestions' : IDL.Func(
@@ -263,6 +264,7 @@ export const idlFactory = ({ IDL }) => {
     'selfDestruct' : IDL.Func([IDL.Text], [], ['oneway']),
     'sendFriendRequest' : IDL.Func([IDL.Text, IDL.Text], [ResultVoid], []),
     'setPermissions' : IDL.Func([IDL.Text, AdminPermissions], [ResultVoid], []),
+    'setTeamAdmin' : IDL.Func([IDL.Text, IDL.Text, IDL.Bool], [ResultTeam], []),
     'submitAnswer' : IDL.Func(
         [IDL.Text, QuestionID, IDL.Bool, IDL.Nat],
         [ResultAnswer],
