@@ -166,7 +166,7 @@ module {
         return ?(p, u);
       };
     };
-    Map.entries(users.info);
+    //Map.entries(users.info);
   };
 
   /// Check how much an action is rewarded or costs

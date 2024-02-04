@@ -1,4 +1,6 @@
 const rules = [
+  { from: "/welcom", to: "/about", transition: "slide-left", reverse: "slide-right" },
+  { from: "/about", to: "/register", transition: "slide-left", reverse: "slide-right" },
   { from: "/discover", to: "/contacts", transition: "slide-left", reverse: "slide-right" },
   { from: "/select-team", to: "", transition: "page", reverse: "page" },
   { from: "/answer-question/", to: "", transition: "page", reverse: "page" },
