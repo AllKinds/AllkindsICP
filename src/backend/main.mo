@@ -173,7 +173,6 @@ actor {
 
   public shared query ({ caller }) func listUsers() : async ResultUsers {
     assertPermission(caller, #createBackup);
-
     let all = Iter.map<(Principal, User), User>(
       User.list(db.users),
       func((p, u)) = u,
