@@ -77,6 +77,9 @@ module {
     if (key == "") {
       return #err(#validationError);
     };
+    if(info.name == "") { return #err(#validationError); };
+    if(info.name.size() > 42) { return #err(#tooLong); };
+    if(info.about.size() > 512) { return #err(#tooLong); };
     let team : Team = {
       info;
       invite;
