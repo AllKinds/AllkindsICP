@@ -138,7 +138,7 @@ export const loadAdmins = (): FrontendEffect<UserPermissions[]> => {
   return effectifyResult((actor) => actor.listAdmins())
 }
 
-export const loadUsers = (): FrontendEffect<UserPermissions[]> => {
+export const loadUsers = (): FrontendEffect<User[]> => {
   return effectifyResult((actor) => actor.listUsers())
 }
 
