@@ -5,6 +5,22 @@ h1 {
     line-height: 2em;
 }
 
+.grape-nuts-regular {
+  font-family: "Grape Nuts", cursive;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 36px;
+}
+
+
+.lexend-big {
+  font-family: "Lexend", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+}
+
+
 ::placeholder {
     color: #777777 !important;
 }

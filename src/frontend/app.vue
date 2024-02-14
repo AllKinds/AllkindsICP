@@ -15,9 +15,11 @@ onNuxtReady(() => {
 
 
 const style = () =>
-    "font-family: Open Sans; sans;"
+    "font-family: Lexend, sans-serif;"
+    + "font-optical-sizing: auto;"
     + "font-weight: 600;"
-    + "height: 100vh;";
+    + "height: 100vh;"
+    + "font-style: normal;";
 
 
 if (inBrowser()) {
@@ -39,6 +41,8 @@ if (inBrowser()) {
 
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Grape+Nuts&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Grape+Nuts&family=Lexend:wght@600&display=swap');
 @import url("~/public/app.css");
 
 /* Transitions */
