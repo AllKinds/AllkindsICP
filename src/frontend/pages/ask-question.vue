@@ -36,6 +36,7 @@ const user = () => app.getUser().data?.user;
 if (inBrowser()) {
     app.getTeam()
     app.loadUser();
+    setTimeout(() => window.document.getElementsByTagName("textarea")[0]?.focus(), 400)
 }
 
 </script>

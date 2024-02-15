@@ -36,7 +36,7 @@ setTimeout(() => balance.value?.restart(), 300)
             </template>
         </AllkindsTitle>
 
-        <Btn to="/ask-question" class="w-96 m-5">
+        <Btn to="/ask-question" class="w-96 m-5 self-center">
             Ask your yes/no question
         </Btn>
 
