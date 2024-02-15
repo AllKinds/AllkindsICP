@@ -15,7 +15,7 @@ if (inBrowser()) {
     app.loadUser();
     app.loadTeams();
 }
-const balance = ref(null);
+const balance = ref<any>(null);
 setTimeout(() => balance.value?.restart(), 300)
 </script>
 

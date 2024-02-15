@@ -20,7 +20,7 @@ async function login(provider: Provider) {
 
     const res = await loginTest(provider);
     if (res.ok) {
-        auth.setClient(res.val);
+        auth.setClient(!!res.val);
         console.log("logged in");
         if (hasInvite()) {
             navigateTo("/welcome")

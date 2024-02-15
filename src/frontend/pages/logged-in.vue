@@ -11,10 +11,20 @@ definePageMeta({
 
 const app = useAppState();
 
+const hasInvite = () => window.localStorage.getItem("invite");
+const teamSelected = () => window.localStorage.getItem("team") && !window.localStorage.getItem("invite");
+
 if (inBrowser()) {
     // loadUser will redirect to /register or /login if user doesn't exist
     app.loadUser(0).then(
-        (u) => { navigateTo("/questions") }
+        (u) => {
+            if (hasInvite())
+                navigateTo("/verify-invite")
+            else if (teamSelected())
+                navigateTo("/questions")
+            else
+                navigateTo("/select-team")
+        }
     );
 }
 
