@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-const largeFont = useLargeFont();
 const props = defineProps<{
     logo?: string,
     linkTo?: string,
@@ -10,14 +9,27 @@ const icon = props.logo ?? getIcon(props.linkTo ?? "").icon;
 
 </script>
 <template>
-    <div class="font-bold flex flex-row items-baseline w-full py-4" :class="{ 'text-xl': largeFont }">
-        <NuxtLink :to="props.linkTo" class="flex">
-            <img v-if="props.logoUrl" :src="props.logoUrl" width="32" class="rounded-md" style="margin-top: -6px;" />&nbsp;
-            <Icon v-else :name="icon" size="2em" style="margin-top: -6px;" />
+    <div class="font-bold flex flex-row items-center w-full py-1 text-xl">
+        <NuxtLink :to="props.linkTo" v-if="props.logoUrl">
+            <img :src="props.logoUrl" height="50" width="50" class="mb-2 rounded-md bg-gray-900 hover:border-2" />
         </NuxtLink>
+        <IconLink :to="props.linkTo ?? ''" :logo="props.logo" v-else-if="props.linkTo" />
+        <div v-else style="width: 1em; height: 1em;" />
 
-        <div class="flex-grow px-3 text-center">
-            <slot />
+        <div class="flex-grow px-1 text-center flex-row">
+            <slot>
+                <div class="grape-nuts-regular">
+                    <Icon name="ph:hexagon" size="0.8em" class="mr-4" />
+                    <a style="color: #C79BFF">A</a>
+                    <a style="color: #5155C1">l</a>
+                    <a style="color: #51C171">l</a>
+                    <a style="color: #FFBB54">k</a>
+                    <a style="color: #FF6854">i</a>
+                    <a style="color: #FF5754">n</a>
+                    <a style="color: #F99DAB">d</a>
+                    <a style="color: #21A7A0">s</a>
+                </div>
+            </slot>
         </div>
         <slot name="action">
             <div style="width: 1em; height: 1em;" />

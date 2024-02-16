@@ -38,11 +38,10 @@ const stats = () => {
 
 <template>
     <div class="w-full flex-grow">
-        <AllkindsTitle logo="ph:x-circle" link-to="/select-team">
+        <AllkindsTitle link-to="/select-team">
+            <span />
             <template #action>
-                <NuxtLink to="/questions" slot="action">
-                    <Icon name="mynaui:layers-three" size="2em" />
-                </NuxtLink>
+                <IconLink to="/questions" />
             </template>
         </AllkindsTitle>
 

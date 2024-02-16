@@ -6,7 +6,6 @@ const props = defineProps({
     disabled: String,
 });
 
-const largeFont = useLargeFont();
 const outline = (props.outline || 'btn-outline');
 const width = (props.width || '');
 const disabled = (props.disabled?.startsWith('t') ? 'btn-disabled' : '')
@@ -14,7 +13,7 @@ const disabled = (props.disabled?.startsWith('t') ? 'btn-disabled' : '')
 
 <template>
     <NuxtLink :to="to" class="px-4 py-2 rounded-full link underline" :class="width + ' ' + outline + ' ' + disabled">
-        <span :class="{ 'text-xl': largeFont }">
+        <span class="text-xl">
             <slot />
         </span>
     </NuxtLink>

@@ -23,7 +23,7 @@ async function login(provider: Provider) {
         auth.setClient(!!res.val);
         console.log("logged in");
         if (hasInvite()) {
-            navigateTo("/welcome")
+            navigateTo("/logged-in")
         } else {
             navigateTo("/team-info");
         }
@@ -57,9 +57,9 @@ async function login(provider: Provider) {
         <div class="grow flex flex-col items-center">
         </div>
 
-        <Btn to="/about" class="w-80"> Learn more </Btn>
+        <Btn to="/intro-1" class="w-80"> Learn more </Btn>
 
-        <Btn v-if="auth.loggedIn && hasInvite()" class="w-80 mt-2" to="/welcome">
+        <Btn v-if="auth.loggedIn && hasInvite()" class="w-80 mt-2" to="/logged-in">
             Join
         </Btn>
         <Btn v-else-if="auth.loggedIn && teamSelected()" class="w-80 mt-2" to="/team-info">

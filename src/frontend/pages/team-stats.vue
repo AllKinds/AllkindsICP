@@ -39,11 +39,10 @@ const stats = () => {
 
 <template>
     <div class="w-full flex-grow">
-        <AllkindsTitle logo="ph:x-circle" link-to="/select-team">
+        <AllkindsTitle link-to="/select-team">
+            <span></span>
             <template #action>
-                <NuxtLink to="/questions" slot="action">
-                    <Icon name="mynaui:layers-three" size="2em" />
-                </NuxtLink>
+                <IconLink to="/questions" />
             </template>
         </AllkindsTitle>
 
@@ -62,7 +61,7 @@ const stats = () => {
                     <b>{{ stats()?.users }}</b> users <br>
                     <b>{{ stats()?.questions }}</b> questions asked <br>
                     <b>{{ stats()?.answers }}</b> answers <br>
-                    <b>{{ stats()?.users }}</b> connections created <br>
+                    <b>{{ stats()?.connections }}</b> connections created <br>
                 </NetworkDataContainer>
                 <Icon v-if="app.getTeam()?.permissions.isAdmin" name="tabler:user-shield" size="2em"
                     class="float-right text-green-600" />

@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 
-const largeFont = useLargeFont();
 const auth = useAuthState();
 
 const logout = () => {
@@ -10,11 +9,11 @@ const logout = () => {
 </script>
 
 <template>
-    <NuxtLink to="/login" class="btn" :class="{ 'text-xl': largeFont }" v-if="auth.loggedIn">
+    <NuxtLink to="/login" class="btn text-xl" v-if="auth.loggedIn">
         Login
         <Icon name="material-symbols:login" />
     </NuxtLink>
-    <button class="btn" :class="{ 'text-xl': largeFont }" v-else @click="logout">
+    <button class="btn text-xl" v-else @click="logout">
         Logout
         <Icon name="material-symbols:logout" />
     </button>

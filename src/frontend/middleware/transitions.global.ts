@@ -1,10 +1,9 @@
 const rules = [
     { from: "/logged-in", to: "", transition: "slide-left", reverse: "slide-left" },
-    { from: "/welcom", to: "/about", transition: "slide-left", reverse: "slide-right" },
-    { from: "/about", to: "/register", transition: "slide-left", reverse: "slide-right" },
     { from: "/discover", to: "/contacts", transition: "slide-left", reverse: "slide-right" },
     { from: "/select-team", to: "", transition: "page", reverse: "page" },
     { from: "/answer-question/", to: "", transition: "page", reverse: "page" },
+    { from: "/ask-question", to: "/discover", transition: "slide-left", reverse: "slide-right" },
 
     { from: "/questions", to: "/my-profile", transition: "page", reverse: "page" },
     { from: "/my-profile", to: "/settings", transition: "slide-left", reverse: "slide-right" },

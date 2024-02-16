@@ -1,14 +1,15 @@
 <script lang="ts" setup>
-const props = defineProps({
-    to: String,
-});
+const props = defineProps<{
+    to: string,
+    logo?: string,
+}>();
 
-const icon = getIcon(props.to ?? "");
+const icon = getIcon(props.logo ?? props.to);
 
 </script>
 
 <template>
-    <NuxtLink :to="props.to">
-        <Icon :name="icon.icon" size="2em" />
-    </NuxtLink>
+    <Btn :to="props.to" class="p-1.5 w-auto">
+        <Icon :name="icon.icon" size="1.8em" />
+    </Btn>
 </template>
