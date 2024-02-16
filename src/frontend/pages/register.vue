@@ -26,7 +26,9 @@ async function createUser() {
         validateUsername(username.value),
         () => backend.createUser(username.value, contact.value),
         Effect.match({
-            onSuccess: () => { },
+            onSuccess: () => {
+                navigateTo("/about");
+            },
             onFailure: (err) => {
                 if (err.tag === "backend" && getErrorKey(err.err) === "alreadyRegistered") {
                     navigateTo("/questions")
