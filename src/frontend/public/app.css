@@ -20,6 +20,14 @@ h1 {
   font-style: normal;
 }
 
+.lexend-regular {
+  font-family: "Lexend", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 100;
+  font-style: normal;
+  font-size: 32px;
+}
+
 
 ::placeholder {
     color: #777777 !important;
