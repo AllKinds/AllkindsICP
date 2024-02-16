@@ -47,7 +47,7 @@ async function login(provider: Provider) {
             <a style="color: #21A7A0">s</a>
             </div></AllkindsTitle>
 
-        <div class="text-4xl p-4 text-center">
+        <div class="text-4xl p-8 text-center">
             <div class="lexend-big">
                 Discover allkinds<br>of like-minded <br>people.
             </div>
