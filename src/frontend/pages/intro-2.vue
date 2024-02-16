@@ -27,7 +27,7 @@ if (inBrowser()) {
             <a style="color: #21A7A0">s</a>
             </div></AllkindsTitle>
 
-        <div class="p-4 text-center">
+        <div class="p-8 text-center">
             <div class="lexend-regular">
                 Answer each other's questions. <br><br>Your responses are always safe.
             </div>

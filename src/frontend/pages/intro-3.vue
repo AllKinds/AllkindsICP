@@ -28,7 +28,7 @@ if (inBrowser()) {
             <a style="color: #21A7A0">s</a>
             </div></AllkindsTitle>
 
-        <div class="p-4 text-center">
+        <div class="p-8 text-center">
             <div class="lexend-regular">
                 Connect with those who resonates, and see where you align and differ.
             </div>
