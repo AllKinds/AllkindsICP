@@ -27,6 +27,15 @@ if (inBrowser()) {
         console.log("load user data")
         app.loadUser(undefined, false);
     }
+
+    try {
+        const body = document.getElementsByTagName("body")[0];
+        body.onkeyup = (e) => {
+            if (e.ctrlKey && e.key == '.') {
+                body.classList.toggle("debug")
+            }
+        }
+    } catch { }
 }
 
 </script>
