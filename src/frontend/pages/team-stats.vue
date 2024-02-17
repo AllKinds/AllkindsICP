@@ -40,7 +40,7 @@ const stats = () => {
 <template>
     <div class="w-full flex-grow">
         <AllkindsTitle link-to="/select-team">
-            <span></span>
+            <span />
             <template #action>
                 <IconLink to="/questions" />
             </template>

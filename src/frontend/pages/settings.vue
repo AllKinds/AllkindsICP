@@ -26,8 +26,8 @@ if (inBrowser()) {
 
 <template>
     <div class="w-full flex-grow">
-        <AllkindsTitle logo="ph:x-circle" logoSize="2em" linkTo="/questions">
-
+        <AllkindsTitle logo="x" logoSize="2em" linkTo="/questions">
+            <span />
         </AllkindsTitle>
 
         <div class="flex flex-col">

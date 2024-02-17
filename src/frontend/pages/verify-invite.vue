@@ -73,7 +73,7 @@ if (inBrowser()) {
 
 <template>
     <div class="w-full flex-grow flex flex-col items-center">
-        <AllkindsTitle link-to="/select-team"></AllkindsTitle>
+        <AllkindsTitle link-to="/select-team"><span /></AllkindsTitle>
 
         <h1>Verifying invite</h1>
         <div class="grow" />

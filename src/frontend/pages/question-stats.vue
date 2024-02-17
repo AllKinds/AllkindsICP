@@ -24,6 +24,7 @@ const deleteQuestion = (q: any) => { // TODO: replace type any with Question
 <template>
     <div class="w-full flex-grow">
         <AllkindsTitle logo="ph:x-circle" link-to="/team-info">
+            <span />
         </AllkindsTitle>
 
         <NetworkDataContainer :networkdata="app.getTeams()" class="w-full text-lg">
