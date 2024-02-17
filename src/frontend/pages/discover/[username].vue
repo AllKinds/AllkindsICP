@@ -56,6 +56,7 @@ let diff = {}
 <template>
     <div class="w-full flex-grow flex flex-col">
         <AllkindsTitle class="w-full" logo="ph:x-circle" linkTo="/discover">
+            <span />
         </AllkindsTitle>
 
         <div class="p-3 w-full">

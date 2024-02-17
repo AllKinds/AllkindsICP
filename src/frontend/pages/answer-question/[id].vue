@@ -113,7 +113,7 @@ const isLoading = () => loading.value || gotoNextQuestion;
 
 <template>
     <div class="w-full flex-grow flex flex-col">
-        <AllkindsTitle class="w-full" logo="ph:x-circle" linkTo="/questions">
+        <AllkindsTitle class="w-full" logo="x" linkTo="/questions">
             <NuxtLink to="/my-profile" class="m-auto">
                 {{ user()?.displayName }}, {{ user()?.stats.points }}
                 <Icon name="gg:shape-hexagon" class="mb-2" />
