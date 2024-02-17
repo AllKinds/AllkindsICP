@@ -27,6 +27,7 @@ export const icons = [
     { to: "/questions", icon: "mynaui:layers-three" },
     { to: "/contacts", icon: "tabler:user-check" },
     { to: "/select-team", icon: "clarity:rack-server-line" },
+    { to: "/settings", icon: "ph-gear" },
     { to: "/", icon: "gg:shape-hexagon" },
     { to: "x", icon: "ph:x" },
 ];

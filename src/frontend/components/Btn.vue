@@ -15,7 +15,7 @@ const width = () => (props.width || 'w-60');
 
 <template>
     <NuxtLink :to="to" :class="[width(), outline(), props.disabled ? 'pointer-events-none opacity-50' : '']"
-        class="m-3 p-4 border rounded-full text-center cursor-pointer active:scale-95 transition-all hover:bg-white hover:text-black inline-block">
+        class="my-3 p-4 border border-2 rounded-full text-center cursor-pointer active:scale-95 transition-all hover:bg-white hover:text-black inline-block">
         <Icon name="line-md:loading-alt-loop" v-if="props.loading" class="text-s text-center w-full" />
         <span class="text-xl">
             <slot />

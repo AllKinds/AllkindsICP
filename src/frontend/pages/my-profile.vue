@@ -24,12 +24,10 @@ if (inBrowser()) {
 
 <template>
     <div class="w-full flex-grow">
-        <AllkindsTitle logo="ph:x-circle" logoSize="2em" linkTo="/questions">
+        <AllkindsTitle logo="x" linkTo="/questions">
 
             <template #action>
-                <NuxtLink to="/settings">
-                    <Icon name="ph:gear" size="2em" />
-                </NuxtLink>
+                <IconLink to="/settings" />
             </template>
         </AllkindsTitle>
 
