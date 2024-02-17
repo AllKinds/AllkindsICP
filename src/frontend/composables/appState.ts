@@ -322,15 +322,16 @@ export const useAppState = defineStore({
             this.teams = { status: "requested", errCount: 0, data: [] };
             setTimeout(() => this.teams = combineNetworkData(old, teams));
         },
-        loadTeams(maxAgeS?: number, known?: string) {
+        loadTeams(maxAgeS?: number, known?: string): Promise<TeamUserInfo[]> {
             if (known) {
                 this.knownTeams.push(known);
                 // remove duplicates
                 this.knownTeams = [...new Set(this.knownTeams)];
             }
             if (shouldUpdate(this.teams, maxAgeS)) {
-                runStore(this.teams, backend.loadTeams(this.knownTeams), this.setTeams)
-                    .catch(console.error);
+                return runStore(this.teams, backend.loadTeams(this.knownTeams), this.setTeams)
+            } else {
+                return Promise.resolve(this.getTeams());
             }
         },
         setTeam(key: string) {

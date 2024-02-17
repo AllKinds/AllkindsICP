@@ -33,7 +33,9 @@ if (inBrowser()) {
         <div class="flex flex-col">
             <!-- TODO: link to something -->
             <Btn to="https://github.com/AllKinds/AllkindsICP/wiki/Allkinds" class="w-96">More about Allkinds.Teams</Btn>
-            <Btn to="https://allkinds.xyz" class="w-96 mt-10">We want to hear from you</Btn>
+            <Btn to="https://github.com/AllKinds/AllkindsICP/wiki/Allkinds#i-have-feedback-or-a-question-how-can-i-contact-you"
+                class="w-96 mt-10">We want to hear from you
+            </Btn>
             <Btn @click="logout()" class="w-96">Sign out</Btn>
 
 

@@ -11,7 +11,8 @@ const icon = props.logo ?? getIcon(props.linkTo ?? "").icon;
 <template>
     <div class="font-bold flex flex-row items-center w-full py-1 px-0 ml-0 text-xl">
         <NuxtLink :to="props.linkTo" v-if="props.logoUrl">
-            <img :src="props.logoUrl" height="50" width="50" class="mb-2 rounded-md bg-gray-900 hover:border-2" />
+            <img :src="props.logoUrl" height="68" width="68"
+                class="mb-2 rounded-md bg-gray-900 hover:border-2 hover:bg-white" />
         </NuxtLink>
         <IconLink :to="props.linkTo ?? ''" :logo="props.logo" v-else-if="props.linkTo" />
         <div v-else style="width: 1em; height: 1em;" />

@@ -26,7 +26,7 @@ setTimeout(() => balance.value?.restart(), 300)
             {{ app.checkTeam() }}
             <NuxtLink to="/my-profile" class="border-b-2">
                 {{ user()?.displayName }},
-                <NumberAnimation :to="user()?.stats.points" :from=0 ref="balance" duration=0.3 autoplay easing="linear"
+                <NumberAnimation :to="user()?.stats.points" :from=0 ref="balance" :duration="0.3" autoplay easing="linear"
                     :format="Math.round" />
                 <Icon name="gg:shape-hexagon" class="mb-2" />
             </NuxtLink>
