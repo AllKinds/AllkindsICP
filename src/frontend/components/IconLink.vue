@@ -10,6 +10,6 @@ const icon = getIcon(props.logo ?? props.to);
 
 <template>
     <Btn :to="props.to" class="p-[7px] w-auto m-0">
-        <Icon :name="icon.icon" size="1.8em" />
+        <Icon :name="icon.icon" size="1.4em" />
     </Btn>
 </template>
