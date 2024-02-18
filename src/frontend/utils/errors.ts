@@ -94,6 +94,10 @@ export const formErr = (key: ErrorKey): FrontendError => {
     return { tag: "form", err: err as BackendError }
 }
 
+export const notifyError = (err: FrontendError) => {
+    addNotification("error", formatError(err));
+}
+
 const notifyWith = <R, A>(effect: Effect.Effect<R, FrontendError, A>, msg?: (a: A) => string): Effect.Effect<R, FrontendError, A> => {
     return Effect.mapBoth(effect, {
         onFailure: (e) => { addNotification("error", formatError(e)); return e; },

@@ -13,14 +13,11 @@ const auth = useAuthState();
 let team: string | undefined = undefined;
 let invite: string | undefined = undefined;
 
-let isValid = useState("verify-valid");
-isValid.value = false;
+let isValid = ref(false);
 
-let isInvalid = useState("verify-invalid");
-isInvalid.value = false;
+let isInvalid = ref<null | string>(null);
 
-let hasInvite = useState("verify-has-invite");
-hasInvite.value = true;
+let hasInvite = ref(true);
 
 const loading = () => {
     return hasInvite.value && !isInvalid.value && !isValid.value && !isMember();
@@ -53,6 +50,7 @@ if (inBrowser()) {
 
     if (isMember()) {
         // already joined
+        clearInvite();
     } else if ((team !== undefined) && (invite !== undefined)) {
         app.setTeam(team);
         app.joinTeam(invite).then(() => {
@@ -60,11 +58,12 @@ if (inBrowser()) {
             navigateTo("/team-info"); //TODO?: auto redirect or not?
         }, () => {
             // TODO: set verificationFailed on network error
-            isInvalid.value = true;
+            isInvalid.value = invite ?? null;
             clearInvite();
         });
     } else {
         hasInvite.value = false;
+        clearInvite();
     }
     app.loadTeams(0);
 }
@@ -73,7 +72,7 @@ if (inBrowser()) {
 
 <template>
     <div class="w-full flex-grow flex flex-col items-center">
-        <AllkindsTitle link-to="/select-team"><span /></AllkindsTitle>
+        <AllkindsTitle link-to="/select-team" @click="clearInvite()"><span /></AllkindsTitle>
 
         <h1>Verifying invite</h1>
         <div class="grow" />
@@ -101,7 +100,7 @@ if (inBrowser()) {
         <Icon v-if="loading()" name="line-md:loading-alt-loop" size="3em" />
 
         <div v-if="isValid"> Invite is valid. You successfully joined the team! </div>
-        <div v-if="isInvalid"> Invite is invalid. </div>
+        <div v-if="isInvalid !== null"> Invite is invalid. (invite code: '{{ isInvalid }}') </div>
         <div v-if="!hasInvite"> Invite was not set. </div>
         <div v-if="isMember()"> You are already a member of this team. </div>
 

@@ -1,15 +1,15 @@
 <script lang="ts" setup>
 import { Effect, pipe } from "effect";
-import { FrontendError, formErr } from "../utils/errors";
+import { FrontendError, formErr, notifyError } from "../utils/errors";
 import * as backend from "../utils/backend";
 
 definePageMeta({
     title: "Allkinds",
     layout: 'default'
 });
-const username = useState("username", () => "");
-const contact = useState("contact", () => "");
-const loading = useState("loading", () => false);
+const username = ref("");
+const contact = ref("");
+const loading = ref(false);
 const app = useAppState();
 
 const validateUsername = (u: string): Effect.Effect<never, FrontendError, void> => {
@@ -20,14 +20,25 @@ const validateUsername = (u: string): Effect.Effect<never, FrontendError, void> 
     return Effect.succeed(null);
 };
 
+const getUsernameError = (u: string): FrontendError | null => {
+    if (u.length < 2) return formErr("tooShort");
+    if (u.length > 20) return formErr("tooLong");
+    if (!/^[a-zA-Z][a-zA-Z0-9]*$/.test(u)) return formErr("validationError");
+
+    return null;
+}
+
 // TODO: move to backend.ts
 async function createUser() {
+    const err = getUsernameError(username.value);
+    if (err) { notifyError(err); return; }
+
     const prog = pipe(
         validateUsername(username.value),
         () => backend.createUser(username.value, contact.value),
         Effect.match({
             onSuccess: () => {
-                navigateTo("/about");
+                navigateTo("/intro-1");
             },
             onFailure: (err) => {
                 if (err.tag === "backend" && getErrorKey(err.err) === "alreadyRegistered") {
@@ -37,7 +48,7 @@ async function createUser() {
         }),
     );
 
-    await runNotify(prog, "").then(() => { navigateTo("/questions") }).catch(console.warn);
+    await runNotify(prog, "").catch(console.warn);
 }
 
 const checkUser = () => {

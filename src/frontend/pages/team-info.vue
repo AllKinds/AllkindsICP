@@ -60,7 +60,7 @@ const stats = () => {
                     <b>{{ stats()?.users }}</b> users <br>
                     <b>{{ stats()?.questions }}</b> questions asked <br>
                     <b>{{ stats()?.answers }}</b> answers <br>
-                    <b>{{ stats()?.users }}</b> connections created <br>
+                    <b>{{ stats()?.connections }}</b> connections created <br>
                 </NetworkDataContainer>
                 <Icon v-if="app.getTeam()?.permissions.isAdmin" name="tabler:user-shield" size="2em"
                     class="float-right text-green-600" />
