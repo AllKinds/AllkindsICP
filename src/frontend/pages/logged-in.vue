@@ -25,7 +25,7 @@ if (inBrowser()) {
             else
                 navigateTo("/select-team")
         }
-    );
+    ).catch(console.warn);
 }
 
 </script>

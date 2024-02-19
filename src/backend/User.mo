@@ -161,7 +161,8 @@ module {
           // This should never happen and would likely be caused by a bug
           // in team member management (add non registered member) or in
           // user deletion (delete from users, but not from members)
-          Debug.trap("Principal in teamMembers but not in users.");
+          //Debug.trap("Principal in teamMembers but not in users.");
+          return null;
         };
         return ?(p, u);
       };

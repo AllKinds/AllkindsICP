@@ -36,6 +36,7 @@ import Prng "mo:prng";
 import Nat64 "mo:base/Nat64";
 import TextHelper "helper/TextHelper";
 import Nat8Extra "helper/Nat8Extra";
+import Performance "Performance";
 
 import TypesV1 "deprecated/TypesV1";
 
@@ -108,6 +109,7 @@ actor {
   // alias for current db version
   var db = db_v1;
   var admins = admins_v2;
+  let performance = Performance.emptyDB();
 
   // Upgrade canister
   system func preupgrade() {
@@ -196,7 +198,7 @@ actor {
     Team.addMember(db.teams, teamKey, invite, caller);
   };
 
-  public shared ({ caller }) func setTeamAdmin(teamKey : Text, user : Text, admin: Bool) : async ResultTeam {
+  public shared ({ caller }) func setTeamAdmin(teamKey : Text, user : Text, admin : Bool) : async ResultTeam {
     if (not Team.isTeamAdmin(db.teams, teamKey, caller)) return #err(#permissionDenied);
     let ?p = User.getPrincipal(db.users, user) else return #err(#userNotFound);
 
