@@ -39,7 +39,7 @@ setTimeout(() => balance.value?.restart(), 300)
 
         <div class="w-full flex-grow flex flex-col  overflow-y-auto h-72 scrollbar-none rounded-lg">
 
-            <Btn to="/ask-question" class="w-96 m-5 self-center">
+            <Btn to="/ask-question" class="w-96 my-5 self-center">
                 Ask your yes/no question
             </Btn>
 
