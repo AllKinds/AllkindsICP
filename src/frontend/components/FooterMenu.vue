@@ -3,7 +3,7 @@
 
 </script>
 <template>
-    <div class="w-full h-20 flex flex-row justify-between text-sm">
+    <div class="w-full h-20 flex flex-row justify-between text-xs">
         <NuxtLink to="/questions"
             class="p-[7px] w-auto m-0 flex flex-col items-center hover:text-black hover:bg-white rounded-lg">
             <Icon :name="getIcon('/questions').icon" size="2rem" class="mt-2" />
@@ -17,12 +17,12 @@
         <NuxtLink to="/contacts"
             class="p-[7px] w-auto m-0 flex flex-col items-center hover:text-black hover:bg-white rounded-lg">
             <Icon :name="getIcon('/contacts').icon" size="2rem" class="mt-2" />
-            My contacts
+            My&nbsp;contacts
         </NuxtLink>
         <NuxtLink to="/my-profile"
             class="p-[7px] w-auto m-0 flex flex-col items-center hover:text-black hover:bg-white rounded-lg">
             <Icon :name="getIcon('/my-profile').icon" size="2rem" class="mt-2" />
-            My profile
+            My&nbsp;profile
         </NuxtLink>
     </div>
 </template>
