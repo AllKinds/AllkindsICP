@@ -5,6 +5,7 @@ import { FrontendError, notifyWithMsg } from "~/utils/errors";
 import { defineStore } from 'pinia'
 import * as errors from "~/utils/errors";
 import { NetworkDataContainer } from "#build/components";
+import { promise } from "effect/dist/declarations/src/Effect";
 
 export type AppState = {
     user: NetworkData<UserPermissions>,
@@ -46,6 +47,13 @@ const dataInit: NetworkData<any> = {
     err: undefined,
     lastErr: undefined,
     errCount: 0,
+}
+const networkDataToPromise = <T>(data: NetworkData<T>): Promise<T> => {
+    if (data.status === "ok") return Promise.resolve(data.data!);
+    if (data.status === "error") return Promise.reject(data.err);
+
+    // TODO: how to handle pending?
+    return Promise.reject(data.err);
 }
 
 
@@ -275,9 +283,8 @@ export const useAppState = defineStore({
                         return err;
                     }
                 )), this.setUser)
-                    .catch((e) => console.warn("couldn't loadUser " + e));
             } else {
-                return Promise.resolve(this.getUser());
+                return networkDataToPromise(this.getUser());
             }
         },
         getFriends() {
@@ -331,7 +338,7 @@ export const useAppState = defineStore({
             if (shouldUpdate(this.teams, maxAgeS)) {
                 return runStore(this.teams, backend.loadTeams(this.knownTeams), this.setTeams)
             } else {
-                return Promise.resolve(this.getTeams());
+                return networkDataToPromise(this.getTeams());
             }
         },
         setTeam(key: string) {

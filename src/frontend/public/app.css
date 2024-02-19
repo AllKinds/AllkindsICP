@@ -42,6 +42,14 @@ body.debug {
   cursor: pointer;
 }
 
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 h1 {
     font-size: 1.5em;
     color: white;

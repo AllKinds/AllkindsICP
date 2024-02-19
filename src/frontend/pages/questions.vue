@@ -22,6 +22,7 @@ setTimeout(() => balance.value?.restart(), 300)
 
 <template>
     <div class="w-full flex-grow flex flex-col">
+
         <AllkindsTitle link-to="/team-stats" :logo-url="toDataUrl(app.getTeam()?.info.logo || [])">
             {{ app.checkTeam() }}
             <NuxtLink to="/my-profile" class="border-b-2">
@@ -36,30 +37,35 @@ setTimeout(() => balance.value?.restart(), 300)
             </template>
         </AllkindsTitle>
 
-        <Btn to="/ask-question" class="w-96 m-5 self-center">
-            Ask your yes/no question
-        </Btn>
+        <div class="w-full flex-grow flex flex-col  overflow-y-auto h-72 scrollbar-none rounded-lg">
 
-        <NetworkDataContainer :networkdata="app.getOpenQuestions()" class="grow mt-4 w-full">
-            <Question v-for="( q, _ ) in  app.getOpenQuestions().data " :question="q" :link="true" />
+            <Btn to="/ask-question" class="w-96 m-5 self-center">
+                Ask your yes/no question
+            </Btn>
 
-            <div v-if="app.getOpenQuestions().data?.length === 0" class="text-center text-xl my-16">
-                There are no more questions at the moment.
+            <NetworkDataContainer :networkdata="app.getOpenQuestions()" class="grow mt-4 w-full">
+                <Question v-for="( q, _ ) in  app.getOpenQuestions().data " :question="q" :link="true" />
 
-                <p>
-                    <br>
-                    Ask one above or check back later.
-                </p>
+                <div v-if="app.getOpenQuestions().data?.length === 0" class="text-center text-xl my-16">
+                    There are no more questions at the moment.
 
-                <div class="grow" />
-                <div class="w-full text-center my-16">
-                    <Btn @click="app.loadOpenQuestions(0, 'Questions loaded')">
-                        Refresh &nbsp;
-                        <Icon name="charm:refresh" />
-                    </Btn>
+                    <p>
+                        <br>
+                        Ask one above or check back later.
+                    </p>
+
+                    <div class="grow" />
+                    <div class="w-full text-center my-16">
+                        <Btn @click="app.loadOpenQuestions(0, 'Questions loaded')">
+                            Refresh &nbsp;
+                            <Icon name="charm:refresh" />
+                        </Btn>
+                    </div>
+                    <div class="grow" />
                 </div>
-                <div class="grow" />
-            </div>
-        </NetworkDataContainer>
+            </NetworkDataContainer>
+        </div>
+
+        <FooterMenu />
     </div>
 </template>
