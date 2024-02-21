@@ -77,9 +77,9 @@ module {
     if (key == "") {
       return #err(#validationError);
     };
-    if(info.name == "") { return #err(#validationError); };
-    if(info.name.size() > 42) { return #err(#tooLong); };
-    if(info.about.size() > 512) { return #err(#tooLong); };
+    if (info.name == "") { return #err(#validationError) };
+    if (info.name.size() > 42) { return #err(#tooLong) };
+    if (info.about.size() > 512) { return #err(#tooLong) };
     let team : Team = {
       info;
       invite;
@@ -187,10 +187,10 @@ module {
     #ok;
   };
 
-  public func setAdmin(teams: TeamDB, key: Text, user: Principal, admin: Bool): Result<TeamInfo> {
+  public func setAdmin(teams : TeamDB, key : Text, user : Principal, admin : Bool) : Result<TeamInfo> {
     let ?team = Map.get(teams, thash, key) else return #err(#teamNotFound);
 
-    if(admin) {
+    if (admin) {
       let false = Set.put(team.admins, phash, user) else return #err(#alreadyRegistered);
     } else {
       let true = Set.remove(team.admins, phash, user) else return #err(#userNotFound);

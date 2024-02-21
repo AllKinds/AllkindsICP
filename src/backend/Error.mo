@@ -3,7 +3,7 @@ module {
     #alreadyRegistered;
     #nameNotAvailable;
     #validationError;
-    #notRegistered;
+    #notRegistered : Principal;
     #notLoggedIn;
 
     #notInTeam;

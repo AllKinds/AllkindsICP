@@ -278,8 +278,14 @@ export const useAppState = defineStore({
                 return runStore(this.user, backend.loadUser(false).pipe(Effect.mapError(
                     (err) => {
                         if (!orRedirect) return err;
-                        if (errors.is(err, "backend", "notRegistered")) navigateTo("/register");
-                        if (errors.is(err, "backend", "notLoggedIn")) navigateTo("/login");
+                        if (errors.is(err, "backend", "notRegistered")) {
+                            console.log("redirect to /register because user is not registered", err)
+                            navigateTo("/register");
+                        }
+                        else if (errors.is(err, "backend", "notLoggedIn")) {
+                            console.log("redirect to /login because user is not logged in", err)
+                            navigateTo("/login");
+                        }
                         return err;
                     }
                 )), this.setUser)

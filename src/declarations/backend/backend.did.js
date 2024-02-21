@@ -16,7 +16,7 @@ export const idlFactory = ({ IDL }) => {
     'teamNotFound' : IDL.Null,
     'alreadyRegistered' : IDL.Null,
     'friendRequestAlreadySend' : IDL.Null,
-    'notRegistered' : IDL.Null,
+    'notRegistered' : IDL.Principal,
     'invalidColor' : IDL.Null,
   });
   const ResultVoid = IDL.Variant({ 'ok' : IDL.Null, 'err' : Error });
@@ -210,6 +210,7 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(IDL.Tuple(IDL.Principal, User))],
         ['query'],
       ),
+    'cleanup' : IDL.Func([IDL.Text, IDL.Nat], [IDL.Text], []),
     'createQuestion' : IDL.Func(
         [IDL.Text, IDL.Text, IDL.Text],
         [ResultQuestion],

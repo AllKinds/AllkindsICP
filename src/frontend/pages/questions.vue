@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+// @ts-ignore ts(7016)
 import NumberAnimation from 'vue-number-animation';
 
 definePageMeta({
@@ -39,8 +40,8 @@ setTimeout(() => balance.value?.restart(), 300)
 
         <div class="w-full flex-grow flex flex-col  overflow-y-auto h-72 scrollbar-none rounded-lg">
 
-            <Btn to="/ask-question" class="w-96 my-5 self-center">
-                Ask your yes/no question
+            <Btn to="/ask-question" class="w-72 my-5 self-center">
+                Ask&nbsp;your&nbsp;yes/no&nbsp;question
             </Btn>
 
             <NetworkDataContainer :networkdata="app.getOpenQuestions()" class="grow mt-4 w-full">

@@ -237,3 +237,4 @@ export interface _SERVICE {
   'validate_take_ownership' : ActorMethod<[], ValidationResult>,
 }
 export declare const idlFactory: IDL.InterfaceFactory;
+export declare const init: ({ IDL }: { IDL: IDL }) => IDL.Type[];

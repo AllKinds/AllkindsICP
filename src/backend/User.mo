@@ -136,7 +136,7 @@ module {
   };
 
   public func update(users : UserDB, user : User, id : Principal) : Result<User, Error> {
-    let ?u = get(users, id) else return #err(#notRegistered);
+    let ?u = get(users, id) else return #err(#notRegistered(id));
     let newUser : User = {
       username = u.username; // can't be changed by user
       displayName = user.displayName;
@@ -185,7 +185,7 @@ module {
   };
 
   public func checkFunds(users : UserDB, action : RewardableAction, id : Principal) : Result<Nat, Error> {
-    let ?u = get(users, id) else return #err(#notRegistered);
+    let ?u = get(users, id) else return #err(#notRegistered(id));
 
     let amount : Int = rewardSize(action);
 
@@ -198,7 +198,7 @@ module {
   };
 
   public func reward(users : UserDB, action : RewardableAction, id : Principal) : Result<User, Error> {
-    let ?u = get(users, id) else return #err(#notRegistered);
+    let ?u = get(users, id) else return #err(#notRegistered(id));
 
     let amount : Int = rewardSize(action);
 
@@ -272,7 +272,7 @@ module {
   };
 
   public func increment(users : UserDB, what : { #answered; #asked; #boost }, id : Principal) : Result<User, Error> {
-    let ?u = get(users, id) else return #err(#notRegistered);
+    let ?u = get(users, id) else return #err(#notRegistered(id));
 
     let newStats = switch (what) {
       case (#answered) { incrementAnswered(u.stats) };

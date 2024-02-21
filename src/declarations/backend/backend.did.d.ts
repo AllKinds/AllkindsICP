@@ -39,7 +39,7 @@ export type Error = { 'notInTeam' : null } |
   { 'teamNotFound' : null } |
   { 'alreadyRegistered' : null } |
   { 'friendRequestAlreadySend' : null } |
-  { 'notRegistered' : null } |
+  { 'notRegistered' : Principal } |
   { 'invalidColor' : null };
 export type Friend = [UserMatch, FriendStatus];
 export type FriendStatus = { 'requestReceived' : null } |
@@ -197,6 +197,7 @@ export interface _SERVICE {
     Array<StableQuestion>
   >,
   'backupUsers' : ActorMethod<[bigint, bigint], Array<[Principal, User]>>,
+  'cleanup' : ActorMethod<[string, bigint], string>,
   'createQuestion' : ActorMethod<[string, string, string], ResultQuestion>,
   'createTeam' : ActorMethod<[string, string, TeamInfo], ResultTeam>,
   'createTestData' : ActorMethod<[string, bigint, bigint], bigint>,
@@ -242,3 +243,4 @@ export interface _SERVICE {
   'whoami' : ActorMethod<[], Principal>,
 }
 export declare const idlFactory: IDL.InterfaceFactory;
+export declare const init: ({ IDL }: { IDL: IDL }) => IDL.Type[];

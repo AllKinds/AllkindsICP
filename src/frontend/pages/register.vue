@@ -58,7 +58,10 @@ const checkUser = () => {
 }
 
 if (inBrowser()) {
-    app.loadUser(0, false)
+    app.loadUser(0, false).then(() => {
+        console.error("Navigate to /register, but already registered. Something is wrong. Redirecting to /logged-in");
+        navigateTo("/logged-in")
+    })
 }
 
 </script>

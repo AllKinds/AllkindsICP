@@ -220,7 +220,7 @@ type Error =
    notEnoughAnswers;
    notInTeam;
    notLoggedIn;
-   notRegistered;
+   notRegistered: principal;
    permissionDenied;
    questionNotFound;
    teamNotFound;
@@ -272,6 +272,7 @@ service : {
                                     principal;
                                     User;
                                   }) query;
+  cleanup: (text, nat) -> (text);
   createQuestion: (text, text, text) -> (ResultQuestion);
   createTeam: (text, text, TeamInfo) -> (ResultTeam);
   createTestData: (text, nat, nat) -> (nat);

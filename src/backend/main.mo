@@ -34,6 +34,7 @@ import Error "Error";
 import Iter "mo:base/Iter";
 import Prng "mo:prng";
 import Nat64 "mo:base/Nat64";
+import Set "mo:map/Set";
 import TextHelper "helper/TextHelper";
 import Nat8Extra "helper/Nat8Extra";
 import Performance "Performance";
@@ -63,6 +64,8 @@ actor {
 
   type Result<T> = Result.Result<T, Error>;
   type UserPermissions = { user : User; permissions : AdminPermissions };
+
+  let { thash; phash } = Set;
 
   // Aliases to get deterministic names for use in frontend code
   type ResultVoid = Result<()>;
@@ -195,6 +198,7 @@ actor {
   };
 
   public shared ({ caller }) func joinTeam(teamKey : Text, invite : Text) : async ResultTeam {
+    if (Principal.isAnonymous(caller)) return #err(#notLoggedIn);
     Team.addMember(db.teams, teamKey, invite, caller);
   };
 
@@ -287,7 +291,7 @@ actor {
   };
 
   public shared query ({ caller }) func getUser() : async ResultUser {
-    let ?user = User.get(db.users, caller) else return #err(#notRegistered);
+    let ?user = User.get(db.users, caller) else return #err(#notRegistered(caller));
     userWithPermissions(#ok(user), caller);
   };
 
@@ -608,6 +612,31 @@ actor {
       teams = Team.emptyDB();
     };
     db := db_v1;
+  };
+
+  public shared ({ caller }) func leanup(teamKey : Text, mode : Nat) : async Text {
+    assertAdmin(caller);
+
+    let team = switch (Team.get(db.teams, teamKey, caller)) {
+      case (#ok(t)) t;
+      case (#err(e)) return Debug.trap("couldn't get team");
+    };
+
+    switch (mode) {
+      case (1) {
+        let members = Set.toArray(team.members);
+        for (m in members.vals()) {
+          if (Principal.isAnonymous(m)) {
+            Set.delete(team.members, phash, m);
+          };
+        };
+        return "done";
+      };
+      case (n) {
+        return "Not implemented: mode " # Nat.toText(n);
+      };
+    };
+
   };
 
   public shared ({ caller }) func createTestData(teamKey : Text, questions : Nat, users : Nat) : async Nat {
