@@ -85,22 +85,19 @@ const isMember = () => {
 </script>
 
 <template>
-    <div class="w-full flex-grow flex flex-col items-center">
-        <AllkindsTitle link-to="/select-team">
-            Allkinds.Teams
-        </AllkindsTitle>
+     <div class="w-full flex-grow flex flex-col items-center">
+        <AllkindsTitle class="py-16" />
 
         <div class="grow" />
 
         <h1>
-            Find friends among your colleagues
+            Discover meaningful connections within
         </h1>
 
         <div class="grow" />
 
         <NetworkDataContainer :networkdata="app.getTeams()">
             <div v-if="app.getTeam(false)" class=" flex flex-col items-center">
-                <div>You were invited by:</div>
                 <h1>
                     {{ app.getTeam(false)?.info.name }}
                 </h1>
