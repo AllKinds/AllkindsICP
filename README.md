@@ -1,8 +1,11 @@
 # Allkinds
 
-Allkinds allows individuals to find like-minded people or organizations in a very precise and private manner. This happens in a very natural way - by asking questions about what people consider important and answering questions from other people. Allkinds then calculates the cohesion score by the number of the same questions weighted on the importance of every question for each user.
+Allkinds is a social network.
+On Allkinds people connect by anonymously asking and answering each other yes/no questions about what ever they consider important. Then people can discover those whose answers resonate the most and connect. Once connected people can compare their answers thus learning a lot about each other.
 
-You can try our MVP here: <https://xroyo-niaaa-aaaal-act6a-cai.icp0.io/>
+Essentially people connect upon values expressed by themselves through questions in a private manner.
+
+Within this iteration of the project we've launched the MVP where individuals can discover like-minded people within groups. Please check it here: https://allkinds.xyz
 
 ## Introduction
 
@@ -13,7 +16,13 @@ People spend too much time on social media and dating services, yet they only es
 
 ### Solution
 
-Allkinds is a web3 protocol that empowers individuals and organizations to create comprehensive meta profiles encompassing their values, traits, interests, and more. By comparing these meta profiles with others, Allkinds enables users to discover precisely aligned like-minded individuals or organizations.
+Allkinds is a web3 network and protocol that allows people can discover like-minded people around and potentially create a meaningful relationships.
+
+The interface of Allkinds is straightforward. People connect through the following algorithm:
+Anonymously ask yes/no questions on topics they consider important.
+Answer not only their own questions but also questions from others, indicating the importance of each question.
+Allkinds calculates the cohesion score between any users (accounts) as a percentage of shared answers to the same questions, weighted by the importance indicated by each person.
+This way, people can discover those who resonate more (or less) and connect.
 
 ## Local deployment for testing
 
@@ -85,16 +94,24 @@ Allkinds project is licensed under the AGPL license.
 - [Allkinds Lite paper](https://allkinds.xyz/Allkinds_litepaper.pdf)
 
 ## Roadmap
-
-- [x] Landing page
-- [x] Fully working MVP (II&NFID auth, question/answers, basic cohesion algorithm) built on the ICP
-- [ ] Redesign
-- [ ] Share my profile/invite features
-- [ ] NLP/AI functionality (recommendation system for question, cohesion on categories, etc.)
-- [ ] Geo-location services
-- [ ] Organization accounts
-- [ ] Built-in/integrated messenger
-- [ ] DAO&Protocol functionality
+- [x] $5K Dfinity grant approved, November 2023
+- [x] The First milestone of the current grant completed, January 2024
+- [x] Allkinds MVP pilot launched with a private sturtup, January 2024
+- [x] Allkinds MVP launched within a few communities, January
+- [ ] Final Demo milestone of the current grant completed, February 2024
+- [ ] Application for the follow up grant sent
+- [ ] Development of the next iteration of the project started
+  - [ ] Extend core team to 5-6 people, develop mobile apps adding these features:
+  - [ ] Messenger, notifications
+  - [ ] Wallet
+  - [ ] Geolocation features
+  - [ ] Invitation system
+  - [ ] Fully working tokenomics
+  - [ ] Proposals
+  - [ ] SNS ready
+- [ ] Launch and promote Allkinds Season #1 through personal invites from the core team - June, 2024
+- [ ] Launch Allkinds Season #2 publicly with SNS - December, 2024
+- [ ] Launch Allkinds protocol - 2025
 
 ## Acknowledgements
 
