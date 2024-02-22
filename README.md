@@ -1,5 +1,6 @@
 # Allkinds
 
+## Introduction
 Allkinds is a social network.
 On Allkinds people connect by anonymously asking and answering each other yes/no questions about what ever they consider important. Then people can discover those whose answers resonate the most and connect. Once connected people can compare their answers thus learning a lot about each other.
 
@@ -7,14 +8,14 @@ Essentially people connect upon values expressed by themselves through questions
 
 Within this iteration of the project we've launched the MVP where individuals can discover like-minded people within groups. Please check it here: [allkinds.xyz](https://allkinds.xyz)
 
-## Introduction
 
-### Problem
+
+## Problem
 
 Despite the presence of numerous solutions in the market, the issue of loneliness is worsening. Having a Facebook 'friend' does not equate to having a genuine friend, and Tinder-like matches often fail to lead to sustainable relationships.
 People spend too much time on social media and dating services, yet they only establish shallow connections. As a result, approximately 60% of the global population considers themselves either lonely, left out, or lacking meaningful relationships.
 
-### Solution
+## Solution
 
 Allkinds is a web3 network and a protocol that allows individuals to discover like-minded people around and create meaningful relationships.
 
