@@ -5,7 +5,7 @@ On Allkinds people connect by anonymously asking and answering each other yes/no
 
 Essentially people connect upon values expressed by themselves through questions in a private manner.
 
-Within this iteration of the project we've launched the MVP where individuals can discover like-minded people within groups. Please check it here: https://allkinds.xyz
+Within this iteration of the project we've launched the MVP where individuals can discover like-minded people within groups. Please check it here: [allkinds.xyz](https://allkinds.xyz)
 
 ## Introduction
 
@@ -16,7 +16,9 @@ People spend too much time on social media and dating services, yet they only es
 
 ### Solution
 
-Allkinds is a web3 network and protocol that allows people can discover like-minded people around and potentially create a meaningful relationships.
+Allkinds is a web3 network and a protocol that allows individuals to discover like-minded people around and create meaningful relationships.
+
+Allkinds implemented as a webapp on the [Internet Computer](https://internetcomputer.org) platform.
 
 The interface of Allkinds is straightforward. People connect through the following algorithm:
 Anonymously ask yes/no questions on topics they consider important.
