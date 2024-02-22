@@ -614,12 +614,12 @@ actor {
     db := db_v1;
   };
 
-  public shared ({ caller }) func leanup(teamKey : Text, mode : Nat) : async Text {
+  public shared ({ caller }) func cleanup(teamKey : Text, mode : Nat) : async Result<Text> {
     assertAdmin(caller);
 
     let team = switch (Team.get(db.teams, teamKey, caller)) {
       case (#ok(t)) t;
-      case (#err(e)) return Debug.trap("couldn't get team");
+      case (#err(e)) return #err(e);
     };
 
     switch (mode) {
@@ -630,10 +630,10 @@ actor {
             Set.delete(team.members, phash, m);
           };
         };
-        return "done";
+        return #ok("done");
       };
       case (n) {
-        return "Not implemented: mode " # Nat.toText(n);
+        return #ok("Not implemented: mode " # Nat.toText(n));
       };
     };
 

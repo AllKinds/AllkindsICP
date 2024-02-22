@@ -16,16 +16,18 @@ const teamSelected = () => window.localStorage.getItem("team") && !window.localS
 
 if (inBrowser()) {
     // loadUser will redirect to /register or /login if user doesn't exist
-    app.loadUser(0).then(
-        (u) => {
-            if (hasInvite())
-                navigateTo("/verify-invite")
-            else if (teamSelected())
-                navigateTo("/questions")
-            else
-                navigateTo("/select-team")
-        }
-    ).catch(console.warn);
+    setTimeout(() => {
+        app.loadUser(0).then(
+            (u) => {
+                if (hasInvite())
+                    navigateTo("/verify-invite")
+                else if (teamSelected())
+                    navigateTo("/questions")
+                else
+                    navigateTo("/select-team")
+            }
+        ).catch(console.warn);
+    }, 200);
 }
 
 </script>

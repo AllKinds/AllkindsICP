@@ -178,6 +178,8 @@ const defaultAppState: () => AppState = () => {
     }
 };
 
+export const appState = ref<AppState>(defaultAppState());
+
 export const useAppState = defineStore({
     id: 'app',
     state: (): AppState => defaultAppState(),
@@ -271,11 +273,13 @@ export const useAppState = defineStore({
             return this.user as NetworkData<UserPermissions>;
         },
         setUser(user: NetworkData<UserPermissions>): void {
-            this.user = combineNetworkData(this.user, user)
+            const old = this.getUser();
+            this.user = combineNetworkData(old, user)
         },
         loadUser(maxAgeS?: number, orRedirect: boolean = true): Promise<UserPermissions> {
-            if (shouldUpdate(this.user, maxAgeS)) {
-                return runStore(this.user, backend.loadUser(false).pipe(Effect.mapError(
+            const old = this.getUser();
+            if (shouldUpdate(old, maxAgeS)) {
+                return runStore(old, backend.loadUser(false).pipe(Effect.mapError(
                     (err) => {
                         if (!orRedirect) return err;
                         if (errors.is(err, "backend", "notRegistered")) {
@@ -457,8 +461,9 @@ export const useAppState = defineStore({
             setTimeout(() => this.teamAdmins = combineNetworkData(old, admins));
         },
         loadTeamAdmins(maxAgeS?: number) {
-            if (shouldUpdate(this.teamAdmins, maxAgeS)) {
-                runStore(this.teamAdmins, backend.loadTeamAdmins(this.team), this.setTeamAdmins)
+            const current = this.getTeamAdmins();
+            if (shouldUpdate(current, maxAgeS)) {
+                runStore(current, backend.loadTeamAdmins(this.team), this.setTeamAdmins)
                     .catch(console.error);
             }
         },
@@ -472,8 +477,8 @@ export const useAppState = defineStore({
             setTimeout(() => this.admins = combineNetworkData(old, admins));
         },
         loadAdmins(maxAgeS?: number) {
-            if (shouldUpdate(this.admins, maxAgeS)) {
-                runStore(this.admins, backend.loadAdmins(), this.setAdmins)
+            if (shouldUpdate(this.getAdmins(), maxAgeS)) {
+                runStore(this.getAdmins(), backend.loadAdmins(), this.setAdmins)
                     .catch(console.error);
             }
         },

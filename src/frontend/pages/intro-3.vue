@@ -27,7 +27,7 @@ if (inBrowser()) {
 
         <div class="grow" />
 
-        <Btn to="/questions">Ok, start</Btn>
+        <Btn to="/logged-in">Ok, start</Btn>
 
         <ICFooter />
     </div>

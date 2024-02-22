@@ -42,7 +42,7 @@ async function createUser() {
             },
             onFailure: (err) => {
                 if (err.tag === "backend" && getErrorKey(err.err) === "alreadyRegistered") {
-                    navigateTo("/questions")
+                    navigateTo("/logged-in")
                 }
             }
         }),
@@ -53,7 +53,7 @@ async function createUser() {
 
 const checkUser = () => {
     if ((app.getUser().data?.user.username.length || 0) > 1) {
-        navigateTo("/questions")
+        navigateTo("/logged-in")
     }
 }
 
