@@ -28,7 +28,7 @@ This way, people can discover those who resonate more (or less) and connect.
 
 II included for faster local authentication testing
 
-requires at least DFX v0.15.2 and the [mops](https://mops.one/docs/install) packet manager.
+requires at least DFX v0.17.0 and the [mops](https://mops.one/docs/install) packet manager.
 
 ### Initial setup
 
