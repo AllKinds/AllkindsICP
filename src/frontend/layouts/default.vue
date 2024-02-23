@@ -1,5 +1,5 @@
 <template>
-    <div class="">
+    <div class="bg-red-700">
         <slot />
         <ActionBar />
     </div>

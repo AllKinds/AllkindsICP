@@ -4,7 +4,8 @@ import NumberAnimation from 'vue-number-animation';
 
 definePageMeta({
     title: "Allkinds",
-    layout: 'default'
+    layout: 'default',
+    footerMenu: true,
 });
 
 const app = useAppState();
@@ -67,6 +68,5 @@ setTimeout(() => balance.value?.restart(), 300)
             </NetworkDataContainer>
         </div>
 
-        <FooterMenu />
     </div>
 </template>

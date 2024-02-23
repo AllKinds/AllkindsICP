@@ -22,12 +22,12 @@ function findUser(username: string): [UserMatch, FriendStatus] | null {
         }
     } else if (data.length === 0) {
         console.warn("no user in matches");
-        navigateTo("/contacts");
+        navTo("/contacts");
     } else {
         u = data.find((x) => x[0].user.username === username) as [UserMatch, FriendStatus] | null;
         if (!u) {
             console.warn("user not found in matches", username, data);
-            navigateTo("/contacts");
+            navTo("/contacts");
         }
     }
 
@@ -37,14 +37,14 @@ function findUser(username: string): [UserMatch, FriendStatus] | null {
 const m = () => findUser(route.params.username + "") || ([{ user: {}, answered: [], uncommon: [] }, {}] as unknown as [UserMatch, FriendStatus]);
 
 const connect = (username: string) => {
-    navigateTo("/contacts")
+    navTo("/contacts")
     app.sendFriendRequest(username).then(
         () => { app.loadFriends(0) }
     )
 }
 
 const disconnect = (username: string) => {
-    navigateTo("/contacts")
+    navTo("/contacts")
     app.answerFriendRequest(username, false).then(
         () => { app.loadFriends(0) }
     )

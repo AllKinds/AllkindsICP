@@ -6,6 +6,9 @@ import { defineStore } from 'pinia'
 import * as errors from "~/utils/errors";
 import { NetworkDataContainer } from "#build/components";
 import { promise } from "effect/dist/declarations/src/Effect";
+import { KeysOf } from "nuxt/dist/app/composables/asyncData";
+import { App } from "vue";
+import { next } from "effect/dist/declarations/src/Random";
 
 export type AppState = {
     user: NetworkData<UserPermissions>,
@@ -35,9 +38,8 @@ export type DataStatus = "init" | "requested" | "error" | "ok";
 export type NetworkData<T> = {
     status: DataStatus;
     data?: T;
-    lastOK?: Date;
+    lastOK?: number;
     err?: FrontendError;
-    lastErr?: Date;
     errCount: number;
 };
 const dataInit: NetworkData<any> = {
@@ -45,7 +47,6 @@ const dataInit: NetworkData<any> = {
     data: undefined,
     lastOK: undefined,
     err: undefined,
-    lastErr: undefined,
     errCount: 0,
 }
 const networkDataToPromise = <T>(data: NetworkData<T>): Promise<T> => {
@@ -72,7 +73,7 @@ const setOk = <A>(data: A): NetworkData<A> => {
     return {
         status: "ok",
         data,
-        lastOK: new Date(),
+        lastOK: new Date().valueOf(),
         errCount: 0,
     }
 }
@@ -81,7 +82,6 @@ const setErr = <A>(old: NetworkData<A>, err: FrontendError): NetworkData<A> => {
     return {
         status: "error",
         err,
-        lastErr: new Date(),
         errCount: 1,
     }
 }
@@ -156,11 +156,14 @@ export const inBrowser = (fn?: () => unknown): boolean => {
 
 const defaultAppState: () => AppState = () => {
     return {
-        user: dataInit,
         team: "",
         knownTeams: ["sandbox", "global", ""],
-        openQuestions: dataInit,
+        loadingCounter: 0,
+        answeredIdsReset: undefined,
         answeredIds: [],
+
+        user: dataInit,
+        openQuestions: dataInit,
         answeredQuestions: dataInit,
         ownQuestions: dataInit,
         friends: dataInit,
@@ -173,12 +176,89 @@ const defaultAppState: () => AppState = () => {
         teamAdmins: dataInit,
         admins: dataInit,
         users: dataInit,
-        loadingCounter: 0,
-        answeredIdsReset: undefined,
     }
 };
 
 export const appState = ref<AppState>(defaultAppState());
+
+const initData = <T>() => ref<NetworkData<T>>(dataInit);
+
+const appData = {
+    team: "",
+    knownTeams: ["sandbox", "global", ""],
+    loadingCounter: 0,
+    answeredIdsReset: undefined,
+    answeredIds: [],
+
+    admins: initData<UserPermissions[]>(),
+    answeredQuestions: initData<[Question, Answer][]>(),
+    friends: initData<Friend[]>(),
+    matches: initData<UserMatch[]>(),
+    openQuestions: initData<Question[]>(),
+    ownQuestions: initData<Question[]>(),
+    principal: initData<Principal>(),
+    questionStats: initData<QuestionStats[]>(),
+    teamAdmins: initData<User[]>(),
+    teamMembers: initData<User[]>(),
+    teamStats: initData<TeamStats>(),
+    teams: initData<TeamUserInfo[]>(),
+    user: initData<UserPermissions>(),
+    users: initData<User[]>(),
+}
+
+export const getAppState = () => {
+    return {
+        user: mk<UserPermissions>(appData.user, backend.loadUser),
+        users: mk<User[]>(appData.users, backend.loadUsers),
+    }
+};
+
+const mk = <T>(store: Ref<NetworkData<T>>, action: any, empty: any = null) => {
+    const get = (): NetworkData<T> => store.value;
+    const set = (next: NetworkData<T>): void => {
+        const old = get();
+        store.value = { status: "requested", errCount: 0, data: empty };
+        setTimeout(() => store.value = combineNetworkData(old, next));
+    };
+    const load = (maxAgeS?: number): Promise<T> => {
+        const old = get();
+        if (shouldUpdate(old, maxAgeS)) {
+            return runStore(old, action(), set)
+        } else {
+            return networkDataToPromise(old);
+
+        };
+    };
+
+    return { get, set, load };
+};
+
+let navTarget: string | null = null;
+let navActive: string | null = null;
+export const navTo = (path: string) => {
+    // already set as final target
+    if (navTarget === path) return;
+
+    // already set as current target
+    if (navActive === path) return;
+    if (navActive) {
+        console.warn("queueing navigation to", path, "while navigation to", navActive, "is active");
+        navTarget = path;
+        return;
+    } else {
+        navActive = path;
+        navigateTo(path);
+        setTimeout(() => {
+            const nextTarget = navTarget === navActive ? null : navTarget;
+            navActive = null;
+            navTarget = null;
+            if (nextTarget) {
+                navTo(nextTarget);
+            };
+        }, 250);
+    }
+
+}
 
 export const useAppState = defineStore({
     id: 'app',
@@ -284,11 +364,11 @@ export const useAppState = defineStore({
                         if (!orRedirect) return err;
                         if (errors.is(err, "backend", "notRegistered")) {
                             console.log("redirect to /register because user is not registered", err)
-                            navigateTo("/register");
+                            navTo("/register");
                         }
                         else if (errors.is(err, "backend", "notLoggedIn")) {
                             console.log("redirect to /login because user is not logged in", err)
-                            navigateTo("/login");
+                            navTo("/login");
                         }
                         return err;
                     }
@@ -375,9 +455,9 @@ export const useAppState = defineStore({
                 if (!orRedirect) {
                     // don't redirect
                 } else if (!t) {
-                    navigateTo("/select-team");
+                    navTo("/select-team");
                 } else if (!t.permissions.isMember) {
-                    navigateTo("/join/" + t.key);
+                    navTo("/join/" + t.key);
                 };
             }
             return t;
@@ -385,7 +465,7 @@ export const useAppState = defineStore({
         checkTeam() {
             const t = this.getTeam(false);
             if (t && !t.permissions.isMember) {
-                navigateTo("/join/" + t.key)
+                navTo("/join/" + t.key)
             }
         },
         joinTeam(code: string): Promise<void> {

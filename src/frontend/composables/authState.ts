@@ -5,7 +5,6 @@ import { BackendActor } from "~/utils/backend";
 import { toNetworkError } from "~/utils/errors";
 import { addNotification, inBrowser } from "./appState";
 import { Result, toErr } from "../utils/result";
-import { navigateTo } from "../../../.nuxt/imports";
 import { FrontendError } from "../utils/errors";
 
 export type Provider = "II" | "NFID";
@@ -64,7 +63,7 @@ export const useAuthState = defineStore({
                 }
             }
             if (!this.backendActor) {
-                if (orRedirect) navigateTo("/login");
+                if (orRedirect) navTo("/login");
                 return undefined;
             }
             return this.backendActor as BackendActor;
@@ -121,7 +120,7 @@ export const checkAuth = async (orLogin: boolean = true): PRes<boolean> => {
     client = client ?? await newAuthClient();
     try {
         let loggedIn = await client.isAuthenticated();
-        if (!loggedIn && orLogin) { navigateTo("/login") }
+        if (!loggedIn && orLogin) { navTo("/login") }
         else if (loggedIn && client) {
             useAuthState().setClient(loggedIn)
         }

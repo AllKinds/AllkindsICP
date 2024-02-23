@@ -23,9 +23,9 @@ async function login(provider: Provider) {
         auth.setClient(!!res.val);
         console.log("logged in");
         if (hasInvite()) {
-            navigateTo("/logged-in")
+            navTo("/logged-in")
         } else {
-            navigateTo("/team-info");
+            navTo("/team-info");
         }
     } else {
         addNotification('error', "Log in failed:\n" + res.err); // TODO format error

@@ -33,7 +33,7 @@ const create = () => {
         invite.value,
     ).then(() => {
         const params = new URLSearchParams({ invite: invite.value });
-        navigateTo("/join/" + team.value + "?" + params.toString())
+        navTo("/join/" + team.value + "?" + params.toString())
     }).finally(
         () => loading.value = false
     );

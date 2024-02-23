@@ -38,11 +38,11 @@ async function createUser() {
         () => backend.createUser(username.value, contact.value),
         Effect.match({
             onSuccess: () => {
-                navigateTo("/intro-1");
+                navTo("/intro-1");
             },
             onFailure: (err) => {
                 if (err.tag === "backend" && getErrorKey(err.err) === "alreadyRegistered") {
-                    navigateTo("/logged-in")
+                    navTo("/logged-in")
                 }
             }
         }),
@@ -53,14 +53,14 @@ async function createUser() {
 
 const checkUser = () => {
     if ((app.getUser().data?.user.username.length || 0) > 1) {
-        navigateTo("/logged-in")
+        navTo("/logged-in")
     }
 }
 
 if (inBrowser()) {
     app.loadUser(0, false).then(() => {
         console.error("Navigate to /register, but already registered. Something is wrong. Redirecting to /logged-in");
-        navigateTo("/logged-in")
+        navTo("/logged-in")
     })
 }
 

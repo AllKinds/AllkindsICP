@@ -21,6 +21,7 @@ const style = () =>
     + "height: 100vh;"
     + "font-style: normal;";
 
+const debug = ref(false);
 
 if (inBrowser()) {
     if (auth.loggedIn) {
@@ -32,7 +33,9 @@ if (inBrowser()) {
         const body = document.getElementsByTagName("body")[0];
         body.onkeyup = (e) => {
             if (e.ctrlKey && e.key == '.') {
-                body.classList.toggle("debug")
+                debug.value = !debug.value;
+                if (debug.value) body.classList.add("debug")
+                else body.classList.remove("debug")
             }
         }
     } catch { }
@@ -41,10 +44,14 @@ if (inBrowser()) {
 </script>
 
 <template>
-    <div class="w-full h-full transition-all" :style="style()">
-        <div class="m-auto max-w-lg h-full flex flex-col items-center p-3">
-            <NuxtPage />
+    <div class="h-full transition-all flex flex-col overflow-x-hidden" :style="style()">
+        <div class="w-full h-72 overflow-y-auto flex-grow scrollbar-none overflow-x-hidden">
+            <div class="m-auto max-w-lg h-full flex flex-col items-center p-3">
+                <NuxtPage />
+            </div>
         </div>
+        <pre class="absolute top-1 right-1 text-xs opacity-40" v-if="debug">{{ $route.path }} {{ $route.meta }}</pre>
+        <FooterMenu class="max-w-lg self-center" v-if="$route.meta.footerMenu" />
     </div>
 </template>
 

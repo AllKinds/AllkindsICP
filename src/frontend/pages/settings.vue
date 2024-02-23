@@ -13,7 +13,7 @@ const auth = useAuthState();
 const logout = () => {
     auth.logout();
     app.$reset();
-    navigateTo("/");
+    navTo("/");
 };
 
 if (inBrowser()) {

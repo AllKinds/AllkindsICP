@@ -19,7 +19,7 @@ async function login(provider: Provider) {
         (res) => {
             if (res.ok) {
                 auth.setClient(!!res.val);
-                navigateTo("/logged-in");
+                navTo("/logged-in");
             } else {
                 addNotification("error", "Login failed\n" + res.err)
             }
@@ -29,7 +29,7 @@ async function login(provider: Provider) {
 
     console.log("logged in");
     app.loadUser(0, false);
-    navigateTo("/logged-in");
+    navTo("/logged-in");
 }
 
 const storeInvite = () => {
@@ -45,10 +45,10 @@ const join = () => {
         login('II')
     } else if (app.user.status === 'ok') {
         storeInvite();
-        navigateTo("/verify-invite");
+        navTo("/verify-invite");
     } else {
         storeInvite();
-        navigateTo("/logged-in");
+        navTo("/logged-in");
     }
 }
 
@@ -85,7 +85,7 @@ const isMember = () => {
 </script>
 
 <template>
-     <div class="w-full flex-grow flex flex-col items-center">
+    <div class="w-full flex-grow flex flex-col items-center">
         <AllkindsTitle class="py-16" />
 
         <div class="grow" />

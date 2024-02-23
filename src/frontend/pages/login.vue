@@ -16,7 +16,7 @@ async function login(provider: Provider) {
     const res = await loginTest(provider);
     if (res.ok) {
         console.log("logged in");
-        navigateTo("/logged-in");
+        navTo("/logged-in");
     } else {
         console.log("Login failed", res)
     }
@@ -25,7 +25,7 @@ async function login(provider: Provider) {
 const isAuth = await checkAuth(false);
 if (isAuth.ok && isAuth.val) {
     console.warn("navigated to /login, but already logged in");
-    navigateTo("/logged-in");
+    navTo("/logged-in");
 }
 
 </script>

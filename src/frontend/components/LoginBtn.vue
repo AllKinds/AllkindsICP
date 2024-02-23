@@ -4,7 +4,7 @@ const auth = useAuthState();
 
 const logout = () => {
     auth.logout();
-    navigateTo("/");
+    navTo("/");
 };
 </script>
 

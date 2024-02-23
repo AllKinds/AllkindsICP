@@ -3,7 +3,7 @@ import { withDefault, UserPermissions } from '../utils/backend';
 
 definePageMeta({
     title: "Allkinds",
-    layout: 'default'
+    footerMenu: true,
 });
 
 const app = useAppState();

@@ -3,7 +3,7 @@
 
 </script>
 <template>
-    <div class="w-full h-20 flex flex-row justify-between text-xs">
+    <div class="w-full h-20 grid grid-cols-4 gap-1 text-xs">
         <NuxtLink to="/questions"
             class="p-[7px] w-auto m-0 flex flex-col items-center hover:text-black hover:bg-white rounded-lg">
             <Icon :name="getIcon('/questions').icon" size="2rem" class="mt-2" />

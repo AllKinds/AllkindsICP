@@ -20,11 +20,11 @@ if (inBrowser()) {
         app.loadUser(0).then(
             (u) => {
                 if (hasInvite())
-                    navigateTo("/verify-invite")
+                    navTo("/verify-invite")
                 else if (teamSelected())
-                    navigateTo("/questions")
+                    navTo("/questions")
                 else
-                    navigateTo("/select-team")
+                    navTo("/select-team")
             }
         ).catch(console.warn);
     }, 200);

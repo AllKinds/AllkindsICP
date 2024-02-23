@@ -22,12 +22,12 @@ function findUser(username: string): UserMatch | null {
         }
     } else if (data.length === 0) {
         console.warn("no user in matches");
-        navigateTo("/discover");
+        navTo("/discover");
     } else {
         u = data.find((x) => x.user.username === username) as UserMatch | null;
         if (!u) {
             console.warn("user not found in matches", username, data);
-            navigateTo("/discover");
+            navTo("/discover");
         }
     }
 
@@ -37,7 +37,7 @@ function findUser(username: string): UserMatch | null {
 const m = (): UserMatch => findUser(route.params.username + "") || ({ user: {}, answered: [], uncommon: [] } as unknown as UserMatch);
 
 const connect = (username: string) => {
-    navigateTo("/contacts")
+    navTo("/contacts")
     app.sendFriendRequest(username).then(
         () => { app.loadFriends(0) }
     )

@@ -55,7 +55,7 @@ if (inBrowser()) {
         app.setTeam(team);
         app.joinTeam(invite).then(() => {
             app.loadTeams(0);
-            navigateTo("/team-info"); //TODO?: auto redirect or not?
+            navTo("/team-info"); //TODO?: auto redirect or not?
         }, () => {
             // TODO: set verificationFailed on network error
             isInvalid.value = invite ?? null;

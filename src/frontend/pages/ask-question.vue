@@ -4,7 +4,7 @@ import { getColor } from "../utils/color";
 
 definePageMeta({
     title: "About",
-    layout: 'default'
+    layout: 'default',
 });
 
 const question = useState('new-question', () => "")

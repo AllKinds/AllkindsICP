@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 definePageMeta({
     title: "Contacts",
-    layout: 'default'
+    layout: 'default',
+    footerMenu: true,
 });
 
 const app = useAppState();
@@ -41,6 +42,7 @@ if (inBrowser()) {
                 <div class="flex-grow">{{ match.user.displayName }}</div>
                 <div>{{ match.cohesion }}% <span class="">({{ match.answered.length }})</span></div>
             </NuxtLink>
+
         </NetworkDataContainer>
     </div>
 </template>

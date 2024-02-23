@@ -1,7 +1,10 @@
 <script lang="ts" setup>
 import { Effect } from 'effect';
 
-definePageMeta({ title: "Contacts" });
+definePageMeta({
+    title: "Contacts",
+    footerMenu: true,
+});
 
 const app = useAppState();
 

@@ -79,10 +79,10 @@ function findQuestion(id: bigint, findOther = false): Question | null {
             app.loadOpenQuestions();
         }
     } else if (data.length === 0 && gotoNextQuestion) {
-        navigateTo("/questions");
+        navTo("/questions");
     } else if (gotoNextQuestion) {
         const nextId = data[0].id;
-        navigateTo("/answer-question/" + nextId)
+        navTo("/answer-question/" + nextId)
     } else {
         q = data.find((x) => x.id === id) ?? null;
         if (!q && data2) {
@@ -90,8 +90,8 @@ function findQuestion(id: bigint, findOther = false): Question | null {
         }
         if (!q) {
             // goto next question
-            if (data.length === 0) navigateTo("/questions");
-            else navigateTo("/answer-question/" + data[0].id);
+            if (data.length === 0) navTo("/questions");
+            else navTo("/answer-question/" + data[0].id);
         }
     }
 

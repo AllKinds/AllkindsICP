@@ -18,11 +18,11 @@ let gotoInfo = false;
 const setTeam = (t: TeamUserInfo) => {
     app.setTeam(t.key);
     if (gotoInfo) {
-        navigateTo("/team-info")
+        navTo("/team-info")
     } else if (t.permissions.isMember) {
-        navigateTo("/team-info")
+        navTo("/team-info")
     } else {
-        navigateTo("/join/" + t.key)
+        navTo("/join/" + t.key)
     }
 }
 
