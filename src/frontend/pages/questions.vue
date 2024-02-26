@@ -33,10 +33,6 @@ setTimeout(() => balance.value?.restart(), 300)
                     :format="Math.round" />
                 <Icon name="gg:shape-hexagon" class="mb-2" />
             </NuxtLink>
-
-            <template #action>
-                <IconLink to="/discover" />
-            </template>
         </AllkindsTitle>
 
         <div class="w-full flex-grow flex flex-col  overflow-y-auto h-72 scrollbar-none rounded-lg">

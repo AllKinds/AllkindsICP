@@ -22,15 +22,11 @@ let match = { user: { username: "" } };
 
 <template>
     <div class="w-full flex-grow flex flex-col">
-        <AllkindsTitle logoSize="2em" linkTo="/discover">
+        <AllkindsTitle>
             <NuxtLink to="/my-profile" class="m-auto">
                 {{ user()?.displayName }}, {{ user()?.stats.points }}
                 <Icon name="gg:shape-hexagon" class="mb-2" />
             </NuxtLink>
-
-            <template #action>
-                <div class="w-10"></div>
-            </template>
         </AllkindsTitle>
 
         <NetworkDataContainer :networkdata="app.getFriends()" class="w-full">

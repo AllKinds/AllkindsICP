@@ -18,16 +18,11 @@ if (inBrowser()) {
 
 <template>
     <div class="w-full flex-grow flex flex-col items-center">
-        <AllkindsTitle logoSize="2em" linkTo="/questions">
+        <AllkindsTitle>
             <NuxtLink to="/my-profile" class="m-auto">
                 {{ user()?.displayName }}, {{ user()?.stats.points }}
                 <Icon name="gg:shape-hexagon" class="mb-2" />
             </NuxtLink>
-
-            <template #action>
-                <IconLink to="/contacts" />
-            </template>
-
         </AllkindsTitle>
 
         <NetworkDataContainer :networkdata="app.getMatches()" class="w-96 pb-32">
