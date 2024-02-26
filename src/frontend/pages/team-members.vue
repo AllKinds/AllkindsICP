@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { User } from '~/utils/backend';
+import type { User } from '~/utils/backend';
 
 
 definePageMeta({

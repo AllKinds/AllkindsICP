@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { Effect, pipe } from "effect";
-import { FrontendError, formErr, notifyError } from "../utils/errors";
+import { type FrontendError, formErr, notifyError } from "../utils/errors";
 import * as backend from "../utils/backend";
 
 definePageMeta({
@@ -36,14 +36,16 @@ async function createUser() {
     const prog = pipe(
         validateUsername(username.value),
         () => backend.createUser(username.value, contact.value),
-        Effect.match({
-            onSuccess: () => {
+        Effect.tapBoth({
+            onSuccess: (a) => {
                 navTo("/intro-1");
+                return Effect.succeed(a);
             },
             onFailure: (err) => {
                 if (err.tag === "backend" && getErrorKey(err.err) === "alreadyRegistered") {
                     navTo("/logged-in")
                 }
+                return Effect.fail(err)
             }
         }),
     );

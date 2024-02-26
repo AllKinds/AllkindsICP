@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { Effect } from 'effect';
 
 definePageMeta({
     title: "Contacts",

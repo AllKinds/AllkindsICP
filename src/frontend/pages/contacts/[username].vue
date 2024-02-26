@@ -3,7 +3,7 @@ definePageMeta({
     title: "Contacts",
     layout: 'default'
 });
-import { FriendStatus, UserMatch } from '../../utils/backend';
+import type { FriendStatus, UserMatch } from '../../utils/backend';
 
 
 const route = useRoute();

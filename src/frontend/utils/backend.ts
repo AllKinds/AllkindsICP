@@ -4,12 +4,12 @@ export type * from "~~/src/declarations/backend/backend.did";
 export type BackendActor = typeof backend;
 import { Effect } from "effect";
 import type { Principal } from "@dfinity/principal";
-import { BackendError, FrontendError, toBackendError, toNetworkError } from "~/utils/errors";
+import { type BackendError, type FrontendError, toBackendError, toNetworkError } from "../utils/errors";
 import type { Question, Answer, User, Skip, Friend, UserMatch, TeamUserInfo, TeamStats, QuestionStats, FriendStatus, UserPermissions } from "~~/src/declarations/backend/backend.did";
 import { useAuthState } from "../composables/authState";
 
-type BackendEffect<T> = Effect.Effect<never, BackendError, T>
-export type FrontendEffect<T> = Effect.Effect<never, FrontendError, T>
+type BackendEffect<T> = Effect.Effect<T, BackendError, never>
+export type FrontendEffect<T> = Effect.Effect<T, FrontendError, never>
 
 export const resultToEffect = <T>(result: { err: BackendError } | { ok: T }): BackendEffect<T> => {
     if ("err" in result) {

@@ -9,8 +9,6 @@ definePageMeta({
     layout: 'default'
 });
 
-const auth = useAuthState();
-
 async function login(provider: Provider) {
     console.log("start login")
     const res = await loginTest(provider);

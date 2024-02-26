@@ -9,7 +9,9 @@ const mapping = [
 ]
 const rules = [
     { from: "/logged-in", to: "", transition: "slide-left", reverse: "slide-left" },
+    { from: "/verify", to: "/team", transition: "slide-left", reverse: "slide-left" },
     { from: "/select-team", to: "", transition: "page", reverse: "page" },
+    { from: "/answer-question", to: "/questions", transition: "page", reverse: "page" },
     { from: "/register", to: "", transition: "page", reverse: "page" },
 ]
 

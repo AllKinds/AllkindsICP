@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { Question } from '~/utils/backend';
+import { type Question } from '~/utils/backend';
 const emit = defineEmits(["answered", "answering"]);
 
 const props = defineProps<{

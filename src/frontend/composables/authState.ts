@@ -1,11 +1,11 @@
 import { createActor } from "../../declarations/backend";
 import { AuthClient } from "@dfinity/auth-client";
 import { HttpAgent } from "@dfinity/agent";
-import { BackendActor } from "~/utils/backend";
+import { type BackendActor } from "~/utils/backend";
 import { toNetworkError } from "~/utils/errors";
 import { addNotification, inBrowser } from "./appState";
-import { Result, toErr } from "../utils/result";
-import { FrontendError } from "../utils/errors";
+import { type Result, toErr } from "../utils/result";
+import { type FrontendError } from "../utils/errors";
 
 export type Provider = "II" | "NFID";
 
@@ -50,7 +50,7 @@ export const useAuthState = defineStore({
             if (!this.backendActor && client) {
                 const config = useRuntimeConfig().public;
                 const identity = client.getIdentity();
-                console.log("recreate actor from client:", client, client.getIdentity());
+                console.log("restore actor from client:");
                 if (identity.getPrincipal().toString().length > 10) {
                     // Using the identity obtained from the auth client, we can create an agent to interact with the IC.
                     const agent = new HttpAgent({ identity: identity, host: config.host });

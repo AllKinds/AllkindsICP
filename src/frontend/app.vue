@@ -45,13 +45,15 @@ if (inBrowser()) {
 
 <template>
     <div class="h-full transition-all flex flex-col overflow-x-hidden" :style="style()">
-        <div class="w-full h-72 overflow-y-auto flex-grow scrollbar-none overflow-x-hidden">
-            <div class="m-auto max-w-lg h-full flex flex-col items-center p-3">
-                <NuxtPage />
+        <NuxtLayout>
+            <div class="w-full h-72 overflow-y-auto flex-grow scrollbar-none overflow-x-hidden">
+                <div class="m-auto max-w-lg h-full flex flex-col items-center p-3">
+                    <NuxtPage />
+                </div>
             </div>
-        </div>
-        <pre class="absolute top-1 right-1 text-xs opacity-40" v-if="debug">{{ $route.path }} {{ $route.meta }}</pre>
-        <FooterMenu class="max-w-lg self-center" v-if="$route.meta.footerMenu" />
+            <pre class="absolute top-1 right-1 text-xs opacity-40" v-if="debug">{{ $route.path }} {{ $route.meta }}</pre>
+            <FooterMenu class="max-w-lg self-center" v-if="$route.meta.footerMenu" />
+        </NuxtLayout>
     </div>
 </template>
 

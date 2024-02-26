@@ -1,14 +1,9 @@
 import { Effect, pipe } from "effect";
-import { FrontendEffect, Question, Answer, User, UserPermissions, Friend, UserMatch, TeamStats, TeamUserInfo, QuestionStats } from "~/utils/backend";
+import type { FrontendEffect, Question, Answer, User, UserPermissions, Friend, UserMatch, TeamStats, TeamUserInfo, QuestionStats } from "~/utils/backend";
 import * as backend from "~/utils/backend";
-import { FrontendError, notifyWithMsg } from "~/utils/errors";
+import { type FrontendError, notifyWithMsg } from "~/utils/errors";
 import { defineStore } from 'pinia'
 import * as errors from "~/utils/errors";
-import { NetworkDataContainer } from "#build/components";
-import { promise } from "effect/dist/declarations/src/Effect";
-import { KeysOf } from "nuxt/dist/app/composables/asyncData";
-import { App } from "vue";
-import { next } from "effect/dist/declarations/src/Random";
 
 export type AppState = {
     user: NetworkData<UserPermissions>,
@@ -91,17 +86,17 @@ export const storeToData = <A>(old: NetworkData<A>, effect: FrontendEffect<A>, s
     const before = Effect.sync<void>(() => {
         console.log("requesting")
     })
-    const after = Effect.mapBoth<FrontendError, A, FrontendError, A>({
+    const after = Effect.tapBoth<FrontendError, A, FrontendError, never, A, A, FrontendError, never>({
         onSuccess: (a) => {
             console.log("request ok")
             store(setRequested(old, true));
             setTimeout(() => store(setOk(a)));
-            return a;
+            return Effect.succeed(a);
         },
         onFailure: (e) => {
             console.log("request error")
             store(setErr(old, e))
-            return e;
+            return Effect.fail(e);
         },
     })
     return pipe(
@@ -235,8 +230,9 @@ const mk = <T>(store: Ref<NetworkData<T>>, action: any, empty: any = null) => {
 
 let navTarget: string | null = null;
 let navActive: string | null = null;
-let navInit = false;
 export const navTo = (path: string) => {
+    navigateTo(path);
+    return;
     // already set as final target
     if (navTarget === path) {
         console.warn("navigation target already set to", path);
@@ -259,13 +255,8 @@ export const navTo = (path: string) => {
         return;
     }
 
-    if (navInit) {
-        navActive = path;
-        navigateTo(path);
-    } else {
-        navTarget = path;
-        navActive = "";
-    }
+    navActive = path;
+    navigateTo(path);
     setTimeout(() => {
         const nextTarget = navTarget === navActive ? null : navTarget;
         navActive = null;

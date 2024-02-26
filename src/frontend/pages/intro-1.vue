@@ -5,11 +5,9 @@ definePageMeta({
 });
 
 const app = useAppState();
-let hasInvite = false;
 
 if (inBrowser()) {
     app.loadUser(0, false);
-    hasInvite = !!window.localStorage.getItem("invite")
 }
 
 </script>

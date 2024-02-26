@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { fileURLToPath } from 'url';
 
 definePageMeta({
     title: "Welcome",

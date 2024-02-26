@@ -5,8 +5,8 @@ definePageMeta({
     layout: 'default'
 });
 
-import { ColorName, getColor } from "../../utils/color";
-import { Question } from "../../utils/backend";
+import { type ColorName, getColor } from "../../utils/color";
+import { type Question } from "../../utils/backend";
 
 const route = useRoute();
 const app = useAppState();
@@ -66,6 +66,7 @@ const skip = (question: Question) => {
 
 
 let loaded = false;
+let navigatedAway = false;
 
 function findQuestion(id: bigint, findOther = false): Question | null {
     if (disappearing) return disappearing;
@@ -79,10 +80,13 @@ function findQuestion(id: bigint, findOther = false): Question | null {
             app.loadOpenQuestions();
         }
     } else if (data.length === 0 && gotoNextQuestion) {
-        navTo("/questions");
+        if (!navigatedAway) navTo("/questions");
+        navigatedAway = true;
     } else if (gotoNextQuestion) {
         const nextId = data[0].id;
-        navTo("/answer-question/" + nextId)
+        gotoNextQuestion = false;
+        if (!navigatedAway) navTo("/answer-question/" + nextId)
+        navigatedAway = true;
     } else {
         q = data.find((x) => x.id === id) ?? null;
         if (!q && data2) {
@@ -91,7 +95,10 @@ function findQuestion(id: bigint, findOther = false): Question | null {
         if (!q) {
             // goto next question
             if (data.length === 0) navTo("/questions");
-            else navTo("/answer-question/" + data[0].id);
+            else {
+                if (!navigatedAway) navTo("/answer-question/" + data[0].id);
+                navigatedAway = true;
+            }
         }
     }
 

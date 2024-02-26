@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { useAuthState } from '#imports';
-import { Effect } from 'effect';
 
 definePageMeta({
     title: "Allkinds",

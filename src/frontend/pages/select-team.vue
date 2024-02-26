@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { TeamUserInfo } from '~/utils/backend';
+import type { TeamUserInfo } from '~/utils/backend';
 
 definePageMeta({
     title: "Allkinds",

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { withDefault, UserPermissions } from '../utils/backend';
+import { withDefault, type UserPermissions } from '../utils/backend';
 
 definePageMeta({
     title: "Allkinds",

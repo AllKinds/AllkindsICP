@@ -1,7 +1,5 @@
 
 <script lang="ts" setup>
-import { NetworkData } from '~/composables/appState';
-
 
 const props = defineProps<{
     networkdata: NetworkData<unknown>,

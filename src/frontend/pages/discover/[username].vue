@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { UserMatch } from '../../utils/backend';
+import type { UserMatch } from '../../utils/backend';
 
 definePageMeta({
     title: "Contacts",
