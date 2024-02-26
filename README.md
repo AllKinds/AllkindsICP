@@ -86,6 +86,18 @@ dfx canister call backend setPermissions '("my-username", record {becomeTeamMemb
 restoreBackup=true; becomeTeamAdmin=true})'
 ```
 
+## Maintenance
+
+```bash
+# check cycle balance
+dfx canister status --network ic backend
+dfx canister status --network ic frontend
+
+# top up cycle balance
+dfx canister deposit-cycles 1000000000 backend --network ic
+dfx canister deposit-cycles 1000000000 frontend --network ic
+```
+
 ## License
 
 Allkinds project is licensed under the AGPL license.

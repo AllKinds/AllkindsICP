@@ -35,6 +35,7 @@ import Iter "mo:base/Iter";
 import Prng "mo:prng";
 import Nat64 "mo:base/Nat64";
 import Set "mo:map/Set";
+import Map "mo:map/Map";
 import TextHelper "helper/TextHelper";
 import Nat8Extra "helper/Nat8Extra";
 import Performance "Performance";
@@ -617,10 +618,7 @@ actor {
   public shared ({ caller }) func cleanup(teamKey : Text, mode : Nat) : async Result<Text> {
     assertAdmin(caller);
 
-    let team = switch (Team.get(db.teams, teamKey, caller)) {
-      case (#ok(t)) t;
-      case (#err(e)) return #err(e);
-    };
+    let ?team = Map.get(db.teams, thash, teamKey) else return #err(#teamNotFound);
 
     switch (mode) {
       case (1) {
@@ -630,7 +628,7 @@ actor {
             Set.delete(team.members, phash, m);
           };
         };
-        return #ok("done");
+        return #ok("done: remove anonymous principals");
       };
       case (n) {
         return #ok("Not implemented: mode " # Nat.toText(n));

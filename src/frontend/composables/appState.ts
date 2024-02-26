@@ -235,28 +235,45 @@ const mk = <T>(store: Ref<NetworkData<T>>, action: any, empty: any = null) => {
 
 let navTarget: string | null = null;
 let navActive: string | null = null;
+let navInit = false;
 export const navTo = (path: string) => {
     // already set as final target
-    if (navTarget === path) return;
+    if (navTarget === path) {
+        console.warn("navigation target already set to", path);
+        return;
+    }
+    if (navTarget) {
+        console.warn("changing navigation target from", navTarget, "to", path);
+        navTarget = path;
+        return;
+    }
 
     // already set as current target
-    if (navActive === path) return;
+    if (navActive === path) {
+        console.warn("navigation already active to", path);
+        return;
+    }
     if (navActive) {
         console.warn("queueing navigation to", path, "while navigation to", navActive, "is active");
         navTarget = path;
         return;
-    } else {
+    }
+
+    if (navInit) {
         navActive = path;
         navigateTo(path);
-        setTimeout(() => {
-            const nextTarget = navTarget === navActive ? null : navTarget;
-            navActive = null;
-            navTarget = null;
-            if (nextTarget) {
-                navTo(nextTarget);
-            };
-        }, 250);
+    } else {
+        navTarget = path;
+        navActive = "";
     }
+    setTimeout(() => {
+        const nextTarget = navTarget === navActive ? null : navTarget;
+        navActive = null;
+        navTarget = null;
+        if (nextTarget) {
+            navTo(nextTarget);
+        };
+    }, 250);
 
 }
 

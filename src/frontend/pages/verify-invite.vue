@@ -44,7 +44,7 @@ if (inBrowser()) {
         team = obj.team;
         invite = obj.invite;
     } catch (e) {
-        console.error("Failed to parse invite:", e);
+        console.warn("Failed to parse invite:", e);
         clearInvite();
     }
 
@@ -55,7 +55,7 @@ if (inBrowser()) {
         app.setTeam(team);
         app.joinTeam(invite).then(() => {
             app.loadTeams(0);
-            navTo("/team-info"); //TODO?: auto redirect or not?
+            navTo("/team-info");
         }, () => {
             // TODO: set verificationFailed on network error
             isInvalid.value = invite ?? null;

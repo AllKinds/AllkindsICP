@@ -21,12 +21,7 @@ async function login(provider: Provider) {
     const res = await loginTest(provider);
     if (res.ok) {
         auth.setClient(!!res.val);
-        console.log("logged in");
-        if (hasInvite()) {
-            navTo("/logged-in")
-        } else {
-            navTo("/team-info");
-        }
+        navTo("/logged-in");
     } else {
         addNotification('error', "Log in failed:\n" + res.err); // TODO format error
     }
