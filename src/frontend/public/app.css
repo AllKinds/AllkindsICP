@@ -50,6 +50,10 @@ body.debug {
   scrollbar-width: none;
 }
 
+.menu-active {
+    color: #06FF6E;
+}
+
 h1 {
     font-size: 1.5em;
     color: white;
