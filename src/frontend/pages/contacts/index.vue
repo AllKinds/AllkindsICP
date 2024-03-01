@@ -23,7 +23,7 @@ let match = { user: { username: "" } };
 <template>
     <div class="w-full flex-grow flex flex-col">
         <AllkindsTitle>
-            <NuxtLink to="/my-profile" class="m-auto">
+            <NuxtLink to="/my-profile">
                 {{ user()?.displayName }}, {{ user()?.stats.points }}
                 <Icon name="gg:shape-hexagon" class="mb-2" />
             </NuxtLink>

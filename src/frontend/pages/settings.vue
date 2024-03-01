@@ -25,7 +25,7 @@ if (inBrowser()) {
 
 <template>
     <div class="w-full flex-grow">
-        <AllkindsTitle logo="x" logoSize="2em" linkTo="/questions">
+        <AllkindsTitle logo="x" logoSize="2em" linkTo="/my-profile">
             <span />
         </AllkindsTitle>
 

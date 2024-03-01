@@ -27,7 +27,7 @@ setTimeout(() => balance.value?.restart(), 300)
 
         <AllkindsTitle link-to="/team-stats" :logo-url="toDataUrl(app.getTeam()?.info.logo || [])">
             {{ app.checkTeam() }}
-            <NuxtLink to="/my-profile" class="border-b-2">
+            <NuxtLink to="/my-profile">
                 {{ user()?.displayName }},
                 <NumberAnimation :to="user()?.stats.points" :from=0 ref="balance" :duration="0.3" autoplay easing="linear"
                     :format="Math.round" />
