@@ -103,6 +103,19 @@ module {
     #ok(user);
   };
 
+  public func delete(users : UserDB, id : Principal, username : Text) : Result<(), Error> {
+    let ?user = get(users, id) else return #err(#notRegistered(id));
+    let ?principal = getPrincipal(users, username) else return #err(#userNotFound);
+    if (principal != id) {
+      return #err(#validationError);
+    };
+
+    Map.delete(users.info, phash, id);
+    Map.delete(users.byUsername, thash, username);
+
+    return #ok;
+  };
+
   public func get(users : UserDB, id : Principal) : ?User {
     Map.get(users.info, phash, id);
   };

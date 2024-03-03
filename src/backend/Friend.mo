@@ -119,6 +119,13 @@ module {
     #ok;
   };
 
+  /// Deletes friend from the friend status of user. The reverse connection will not be modified!
+  public func delete(friends : FriendDB, user : Principal, friend : Principal) {
+    let userFriends = getFriends(friends, user);
+    Map.delete(userFriends, phash, friend);
+    Map.set(friends, phash, user, userFriends);
+  };
+
   public func get(friends : FriendDB, user : Principal) : Iter<(Principal, FriendStatus)> {
     Map.entries(getFriends(friends, user));
   };

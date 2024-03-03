@@ -152,6 +152,11 @@ type ResultAnswer =
    err: Error;
    ok: Answer;
  };
+type Result = 
+ variant {
+   err: Error;
+   ok: text;
+ };
 type Question__2 = 
  record {
    color: text;
@@ -272,12 +277,14 @@ service : {
                                     principal;
                                     User;
                                   }) query;
-  cleanup: (text, nat) -> (text);
+  cleanup: (text, nat) -> (Result);
   createQuestion: (text, text, text) -> (ResultQuestion);
   createTeam: (text, text, TeamInfo) -> (ResultTeam);
   createTestData: (text, nat, nat) -> (nat);
   createUser: (text, text) -> (ResultUser);
+  deleteAnswers: (text, text) -> (ResultVoid);
   deleteQuestion: (text, Question) -> (ResultVoid);
+  deleteUser: (text) -> (ResultVoid);
   getAnsweredQuestions: (text, nat) -> (vec record {
                                               Question;
                                               Answer;

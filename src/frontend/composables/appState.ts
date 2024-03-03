@@ -494,6 +494,12 @@ export const useAppState = defineStore({
         deleteQuestion(q: Question) {
             return runNotify(backend.deleteQuestion(this.team, q), "Question removed")
         },
+        deleteAnswers(confirm: string) {
+            return runNotify(backend.deleteAnswers(this.team, confirm), "Answers removed")
+        },
+        deleteUser(confirm: string) {
+            return runNotify(backend.deleteUser(confirm), "User removed")
+        },
 
         getTeamStats() {
             return this.teamStats as NetworkData<TeamStats>; // TODO remove `as ...`
@@ -504,8 +510,9 @@ export const useAppState = defineStore({
             setTimeout(() => this.teamStats = combineNetworkData(old, teams));
         },
         loadTeamStats(maxAgeS?: number) {
-            if (shouldUpdate(this.teamStats, maxAgeS)) {
-                runStore(this.teamStats, backend.loadTeamStats(this.team), this.setTeamStats)
+            const old = this.getTeamStats();
+            if (shouldUpdate(old, maxAgeS)) {
+                runStore(old, backend.loadTeamStats(this.team), this.setTeamStats)
                     .catch(console.error);
             }
         },
@@ -519,8 +526,9 @@ export const useAppState = defineStore({
             setTimeout(() => this.questionStats = combineNetworkData(old, stats));
         },
         loadQuestionStats(maxAgeS?: number) {
-            if (shouldUpdate(this.questionStats, maxAgeS)) {
-                runStore(this.questionStats, backend.loadQuestionStats(this.team), this.setQuestionStats)
+            const old = this.getQuestionStats();
+            if (shouldUpdate(old, maxAgeS)) {
+                runStore(old, backend.loadQuestionStats(this.team), this.setQuestionStats)
                     .catch(console.error);
             }
         },

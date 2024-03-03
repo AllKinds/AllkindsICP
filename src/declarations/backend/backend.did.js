@@ -55,6 +55,7 @@ export const idlFactory = ({ IDL }) => {
     'picture' : IDL.Opt(IDL.Vec(IDL.Nat8)),
     'stats' : UserStats,
   });
+  const Result = IDL.Variant({ 'ok' : IDL.Text, 'err' : Error });
   const Question = IDL.Record({
     'id' : QuestionID__1,
     'created' : Time__1,
@@ -210,7 +211,7 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Vec(IDL.Tuple(IDL.Principal, User))],
         ['query'],
       ),
-    'cleanup' : IDL.Func([IDL.Text, IDL.Nat], [IDL.Text], []),
+    'cleanup' : IDL.Func([IDL.Text, IDL.Nat], [Result], []),
     'createQuestion' : IDL.Func(
         [IDL.Text, IDL.Text, IDL.Text],
         [ResultQuestion],
@@ -219,7 +220,9 @@ export const idlFactory = ({ IDL }) => {
     'createTeam' : IDL.Func([IDL.Text, IDL.Text, TeamInfo], [ResultTeam], []),
     'createTestData' : IDL.Func([IDL.Text, IDL.Nat, IDL.Nat], [IDL.Nat], []),
     'createUser' : IDL.Func([IDL.Text, IDL.Text], [ResultUser], []),
+    'deleteAnswers' : IDL.Func([IDL.Text, IDL.Text], [ResultVoid], []),
     'deleteQuestion' : IDL.Func([IDL.Text, Question], [ResultVoid], []),
+    'deleteUser' : IDL.Func([IDL.Text], [ResultVoid], []),
     'getAnsweredQuestions' : IDL.Func(
         [IDL.Text, IDL.Nat],
         [IDL.Vec(IDL.Tuple(Question, Answer))],

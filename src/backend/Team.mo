@@ -182,7 +182,28 @@ module {
   public func removeMember(teams : TeamDB, key : Text, user : Principal) : Result<()> {
     let ?team = Map.get(teams, thash, key) else return #err(#teamNotFound);
 
-    let true = Set.remove(team.members, phash, user) else return #err(#userNotFound);
+    let true = Set.remove(team.members, phash, user) else return #err(#notInTeam);
+
+    // delete answers of the user
+    Map.delete(team.answers, phash, user);
+    Map.delete(team.skips, phash, user);
+
+    // delete friends
+    let userFriends = Friend.get(team.friends, user);
+    for ((friend, status) in userFriends) {
+      Friend.delete(team.friends, friend, user); // remove user from friend's connections
+    };
+    Map.delete(team.friends, phash, user);
+
+    #ok;
+  };
+
+  public func deleteAnswers(teams : TeamDB, key : Text, user : Principal) : Result<()> {
+    let ?team = Map.get(teams, thash, key) else return #err(#teamNotFound);
+
+    // delete answers of the user
+    Map.delete(team.answers, phash, user);
+    Map.delete(team.skips, phash, user);
 
     #ok;
   };

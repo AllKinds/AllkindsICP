@@ -218,6 +218,37 @@ actor {
     Team.removeMember(db.teams, teamKey, p);
   };
 
+  public shared ({ caller }) func deleteUser(user : Text) : async ResultVoid {
+    let ?p = User.getPrincipal(db.users, user) else return #err(#userNotFound);
+    if (caller != p) return #err(#permissionDenied);
+    assert (caller == p);
+
+    // remove user from all teams
+    let teams = switch (Team.list(db.teams, p, [], false)) {
+      case (#ok(v)) { v };
+      case (#err(e)) { return #err(e) };
+    };
+    for (team in teams.vals()) {
+      ignore Team.removeMember(db.teams, team.key, p);
+      ignore Team.setAdmin(db.teams, team.key, p, false);
+    };
+
+    // TODO?: unassign questions
+
+    // unregister user
+    return User.delete(db.users, p, user);
+  };
+
+  public shared ({ caller }) func deleteAnswers(teamKey : Text, user : Text) : async ResultVoid {
+    let ?p = User.getPrincipal(db.users, user) else return #err(#userNotFound);
+    if (caller != p) return #err(#permissionDenied);
+    assert (caller == p);
+
+    ignore Team.deleteAnswers(db.teams, teamKey, p);
+
+    return #ok;
+  };
+
   // Get teams
   public shared query ({ caller }) func listTeams(known : [Text]) : async ResultTeams {
     let showAll = Admin.getPermissions(admins, caller).listAllTeams;
@@ -481,8 +512,6 @@ actor {
     };
 
     let userFriends = Friend.get(team.friends, caller);
-
-    let friends = Iter.toArray(Friend.get(team.friends, caller));
 
     func toUserMatch((p : Principal, status : FriendStatus)) : ?(UserMatch, FriendStatus) {
       let showNonPublic = (status == #connected or status == #requestReceived);

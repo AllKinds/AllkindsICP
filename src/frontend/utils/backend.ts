@@ -235,6 +235,14 @@ export const deleteQuestion = (team: string, question: Question): FrontendEffect
     return effectifyResult((actor) => actor.deleteQuestion(team, question))
 }
 
+export const deleteAnswers = (team: string, user: string): FrontendEffect<void> => {
+    return effectifyResult((actor) => actor.deleteAnswers(team, user))
+}
+
+export const deleteUser = (user: string): FrontendEffect<void> => {
+    return effectifyResult((actor) => actor.deleteUser(user))
+}
+
 export const getOwnPrincipal = (): FrontendEffect<Principal> => {
     return effectify((actor) => actor.whoami())
 }

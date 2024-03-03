@@ -19,6 +19,7 @@ if (inBrowser()) {
     app.loadAnsweredQuestions();
     app.loadOwnQuestions();
 }
+
 </script>
 
 

@@ -82,6 +82,8 @@ export interface Question__2 {
     'color': string,
     'points': bigint,
 }
+export type Result = { 'ok': string } |
+{ 'err': Error };
 export type ResultAnswer = { 'ok': Answer } |
 { 'err': Error };
 export type ResultFriends = { 'ok': Array<Friend> } |
@@ -197,12 +199,14 @@ export interface _SERVICE {
         Array<StableQuestion>
     >,
     'backupUsers': ActorMethod<[bigint, bigint], Array<[Principal, User]>>,
-    'cleanup': ActorMethod<[string, bigint], string>,
+    'cleanup': ActorMethod<[string, bigint], Result>,
     'createQuestion': ActorMethod<[string, string, string], ResultQuestion>,
     'createTeam': ActorMethod<[string, string, TeamInfo], ResultTeam>,
     'createTestData': ActorMethod<[string, bigint, bigint], bigint>,
     'createUser': ActorMethod<[string, string], ResultUser>,
+    'deleteAnswers': ActorMethod<[string, string], ResultVoid>,
     'deleteQuestion': ActorMethod<[string, Question], ResultVoid>,
+    'deleteUser': ActorMethod<[string], ResultVoid>,
     'getAnsweredQuestions': ActorMethod<
         [string, bigint],
         Array<[Question, Answer]>
