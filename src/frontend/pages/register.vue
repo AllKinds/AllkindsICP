@@ -80,9 +80,10 @@ if (inBrowser()) {
             :class="{ 'input-disabled': loading }" />
 
         <TextBlock align="text-left">
-            If you consider to get in touch with people, leave a way to contact you here.
+            Provide your email if you wish to be contacted by others. 
+            We will also notify you when others connect with you.
             <br />
-            (tg, fb, discord, phone, email)
+            Email
         </TextBlock>
 
         <TextInput name="handle" v-model.trim="contact" placeholder="Contact" required class="w-full m-2"

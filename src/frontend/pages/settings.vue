@@ -85,9 +85,9 @@ if (inBrowser()) {
         </AllkindsTitle>
 
         <div class="flex flex-col">
-            <Btn to="https://github.com/AllKinds/AllkindsICP/wiki/Allkinds" class="w-96">More about Allkinds.Teams</Btn>
+            <Btn to="https://github.com/AllKinds/AllkindsICP/wiki/Allkinds" class="w-96">More about Allkinds</Btn>
             <Btn to="https://github.com/AllKinds/AllkindsICP/wiki/Allkinds#i-have-feedback-or-a-question-how-can-i-contact-you"
-                class="w-96 mt-10">We want to hear from you
+                class="w-96 mt-10">Get in touch
             </Btn>
             <Btn @click="logout()" class="w-96">Sign out</Btn>
 
