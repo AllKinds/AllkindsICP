@@ -10,6 +10,11 @@ type UserPermissions =
    permissions: AdminPermissions;
    user: User;
  };
+type UserNotifications = 
+ record {
+   notifications: vec Notification;
+   user: User;
+ };
 type UserMatch = 
  record {
    answered: vec record {
@@ -17,6 +22,7 @@ type UserMatch =
                    AnswerDiff;
                  };
    cohesion: nat8;
+   errors: vec Error__1;
    uncommon: vec Question__2;
    user: UserInfo;
  };
@@ -38,7 +44,6 @@ type User =
    stats: UserStats;
    username: text;
  };
-type Time__1 = int;
 type Time = int;
 type TeamUserInfo = 
  record {
@@ -71,7 +76,7 @@ type TeamInfo =
 type StableQuestion = 
  record {
    color: text;
-   created: Time__1;
+   created: Time;
    creator: principal;
    hidden: bool;
    id: QuestionID__1;
@@ -91,6 +96,11 @@ type ResultVoid =
  variant {
    err: Error;
    ok;
+ };
+type ResultUsersNotifications = 
+ variant {
+   err: Error;
+   ok: vec UserNotifications;
  };
 type ResultUsers = 
  variant {
@@ -160,7 +170,7 @@ type Result =
 type Question__2 = 
  record {
    color: text;
-   created: Time__1;
+   created: Time;
    creator: opt text;
    id: QuestionID__1;
    points: int;
@@ -169,7 +179,7 @@ type Question__2 =
 type Question__1 = 
  record {
    color: text;
-   created: Time__1;
+   created: Time;
    creator: opt text;
    id: QuestionID__1;
    points: int;
@@ -189,7 +199,7 @@ type QuestionID = nat;
 type Question = 
  record {
    color: text;
-   created: Time__1;
+   created: Time;
    creator: opt text;
    id: QuestionID__1;
    points: int;
@@ -199,6 +209,15 @@ type Permissions =
  record {
    isAdmin: bool;
    isMember: bool;
+ };
+type Notification = 
+ record {
+   event: variant {
+            friendRequests: nat;
+            newQuestions: nat;
+            rewards: nat;
+          };
+   team: text;
  };
 type FriendStatus = 
  variant {
@@ -212,6 +231,27 @@ type Friend =
  record {
    UserMatch;
    FriendStatus;
+ };
+type Error__1 = 
+ variant {
+   alreadyRegistered;
+   friendAlreadyConnected;
+   friendRequestAlreadySend;
+   insufficientFunds;
+   invalidColor;
+   invalidInvite;
+   nameNotAvailable;
+   notEnoughAnswers;
+   notInTeam;
+   notLoggedIn;
+   notRegistered: principal;
+   permissionDenied;
+   questionNotFound;
+   teamNotFound;
+   tooLong;
+   tooShort;
+   userNotFound;
+   validationError;
  };
 type Error = 
  variant {
@@ -243,7 +283,7 @@ type AnswerDiff =
 type Answer = 
  record {
    answer: bool;
-   created: Time__1;
+   created: Time;
    question: nat;
    weight: nat;
  };
@@ -308,7 +348,7 @@ service : {
   leaveTeam: (text, text) -> (ResultVoid);
   listAdmins: () -> (ResultUserPermissions) query;
   listTeams: (vec text) -> (ResultTeams) query;
-  listUsers: () -> (ResultUsers) query;
+  listUsers: () -> (ResultUsersNotifications) query;
   selfDestruct: (text) -> () oneway;
   /// Send a friend request to a user
   sendFriendRequest: (text, text) -> (ResultVoid);

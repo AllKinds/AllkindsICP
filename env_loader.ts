@@ -27,9 +27,7 @@ const ids = {
     ii: isDev ? canisterIds.internet_identity[network] : undefined,
 }
 
-const II_URL = isDev ? "http://" + ids.ii + ".localhost:8080" : "https://identity.ic0.app";
-//const II_URL = isDev ? " http://127.0.0.1:8080/?canisterId=" + ids.ii : "https://identity.ic0.app";
-//const II_URL = isDev ? "http://" + ids.ii + ".localhost:4943" : "https://identity.ic0.app";
+const II_URL = isDev ? "http://" + ids.ii + ".localhost:4943" : "https://identity.ic0.app";
 
 const NFID_URL = isDev ? II_URL : ("https://nfid.one" +
     "/authenticate/?applicationName=" +

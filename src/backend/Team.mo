@@ -13,55 +13,24 @@ import User "User";
 import Friend "Friend";
 import Matching "Matching";
 import Error "Error";
+import Types "Types";
 
 module {
   type Map<K, V> = Map.Map<K, V>;
   type Set<T> = Set.Set<T>;
 
-  type UserDB = User.UserDB;
-  type QuestionDB = Question.QuestionDB;
-  type AnswerDB = Question.AnswerDB;
-  type SkipDB = Question.SkipDB;
-  type FriendDB = Friend.FriendDB;
+  type UserDB = Types.UserDB;
+  type QuestionDB = Types.QuestionDB;
+  type AnswerDB = Types.AnswerDB;
+  type SkipDB = Types.SkipDB;
+  type FriendDB = Types.FriendDB;
   type Error = Error.Error;
-  type Result<T> = Result.Result<T, Error>;
-
-  public type Team = {
-    info : TeamInfo;
-    invite : Text; // secret to prevent unauthorized users from joining the team
-    members : Set<Principal>;
-    admins : Set<Principal>;
-
-    questions : QuestionDB;
-    answers : AnswerDB;
-    skips : SkipDB;
-    friends : FriendDB;
-  };
-
-  public type TeamInfo = {
-    name : Text;
-    about : Text;
-    logo : Blob;
-    listed : Bool;
-  };
-
-  public type TeamUserInfo = {
-    key : Text;
-    info : TeamInfo;
-    permissions : Permissions;
-    invite : ?Text;
-  };
-
-  public type TeamStats = {
-    users : Nat;
-    questions : Nat;
-    answers : Nat;
-    connections : Nat;
-  };
-
-  public type Permissions = { isMember : Bool; isAdmin : Bool };
-
-  public type TeamDB = Map<Text, Team>;
+  type Result<T> = Types.Result<T>;
+  type Team = Types.Team;
+  type TeamDB = Types.TeamDB;
+  type TeamInfo = Types.TeamInfo;
+  type TeamStats = Types.TeamStats;
+  type TeamUserInfo = Types.TeamUserInfo;
 
   let { thash; phash } = Map;
 

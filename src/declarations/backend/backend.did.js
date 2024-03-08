@@ -21,10 +21,10 @@ export const idlFactory = ({ IDL }) => {
   });
   const ResultVoid = IDL.Variant({ 'ok' : IDL.Null, 'err' : Error });
   const QuestionID__1 = IDL.Nat;
-  const Time__1 = IDL.Int;
+  const Time = IDL.Int;
   const StableQuestion = IDL.Record({
     'id' : QuestionID__1,
-    'created' : Time__1,
+    'created' : Time,
     'creator' : IDL.Principal,
     'question' : IDL.Text,
     'color' : IDL.Text,
@@ -39,7 +39,6 @@ export const idlFactory = ({ IDL }) => {
     'rejectionReceived' : IDL.Null,
     'requestSend' : IDL.Null,
   });
-  const Time = IDL.Int;
   const UserStats = IDL.Record({
     'asked' : IDL.Nat,
     'answered' : IDL.Nat,
@@ -58,7 +57,7 @@ export const idlFactory = ({ IDL }) => {
   const Result = IDL.Variant({ 'ok' : IDL.Text, 'err' : Error });
   const Question = IDL.Record({
     'id' : QuestionID__1,
-    'created' : Time__1,
+    'created' : Time,
     'creator' : IDL.Opt(IDL.Text),
     'question' : IDL.Text,
     'color' : IDL.Text,
@@ -89,13 +88,13 @@ export const idlFactory = ({ IDL }) => {
   const ResultUser = IDL.Variant({ 'ok' : UserPermissions, 'err' : Error });
   const Answer = IDL.Record({
     'weight' : IDL.Nat,
-    'created' : Time__1,
+    'created' : Time,
     'question' : IDL.Nat,
     'answer' : IDL.Bool,
   });
   const Question__2 = IDL.Record({
     'id' : QuestionID__1,
-    'created' : Time__1,
+    'created' : Time,
     'creator' : IDL.Opt(IDL.Text),
     'question' : IDL.Text,
     'color' : IDL.Text,
@@ -113,10 +112,31 @@ export const idlFactory = ({ IDL }) => {
     'displayName' : IDL.Text,
     'picture' : IDL.Opt(IDL.Vec(IDL.Nat8)),
   });
+  const Error__1 = IDL.Variant({
+    'notInTeam' : IDL.Null,
+    'notLoggedIn' : IDL.Null,
+    'validationError' : IDL.Null,
+    'userNotFound' : IDL.Null,
+    'questionNotFound' : IDL.Null,
+    'tooLong' : IDL.Null,
+    'insufficientFunds' : IDL.Null,
+    'permissionDenied' : IDL.Null,
+    'notEnoughAnswers' : IDL.Null,
+    'tooShort' : IDL.Null,
+    'friendAlreadyConnected' : IDL.Null,
+    'nameNotAvailable' : IDL.Null,
+    'invalidInvite' : IDL.Null,
+    'teamNotFound' : IDL.Null,
+    'alreadyRegistered' : IDL.Null,
+    'friendRequestAlreadySend' : IDL.Null,
+    'notRegistered' : IDL.Principal,
+    'invalidColor' : IDL.Null,
+  });
   const UserMatch = IDL.Record({
     'cohesion' : IDL.Nat8,
     'answered' : IDL.Vec(IDL.Tuple(Question__2, AnswerDiff)),
     'user' : UserInfo,
+    'errors' : IDL.Vec(Error__1),
     'uncommon' : IDL.Vec(Question__2),
   });
   const Friend = IDL.Tuple(UserMatch, FriendStatus);
@@ -127,7 +147,7 @@ export const idlFactory = ({ IDL }) => {
   });
   const Question__1 = IDL.Record({
     'id' : QuestionID__1,
-    'created' : Time__1,
+    'created' : Time,
     'creator' : IDL.Opt(IDL.Text),
     'question' : IDL.Text,
     'color' : IDL.Text,
@@ -175,6 +195,22 @@ export const idlFactory = ({ IDL }) => {
   });
   const ResultTeams = IDL.Variant({
     'ok' : IDL.Vec(TeamUserInfo),
+    'err' : Error,
+  });
+  const Notification = IDL.Record({
+    'team' : IDL.Text,
+    'event' : IDL.Variant({
+      'rewards' : IDL.Nat,
+      'newQuestions' : IDL.Nat,
+      'friendRequests' : IDL.Nat,
+    }),
+  });
+  const UserNotifications = IDL.Record({
+    'notifications' : IDL.Vec(Notification),
+    'user' : User,
+  });
+  const ResultUsersNotifications = IDL.Variant({
+    'ok' : IDL.Vec(UserNotifications),
     'err' : Error,
   });
   const QuestionID = IDL.Nat;
@@ -264,7 +300,7 @@ export const idlFactory = ({ IDL }) => {
     'leaveTeam' : IDL.Func([IDL.Text, IDL.Text], [ResultVoid], []),
     'listAdmins' : IDL.Func([], [ResultUserPermissions], ['query']),
     'listTeams' : IDL.Func([IDL.Vec(IDL.Text)], [ResultTeams], ['query']),
-    'listUsers' : IDL.Func([], [ResultUsers], ['query']),
+    'listUsers' : IDL.Func([], [ResultUsersNotifications], ['query']),
     'selfDestruct' : IDL.Func([IDL.Text], [], ['oneway']),
     'sendFriendRequest' : IDL.Func([IDL.Text, IDL.Text], [ResultVoid], []),
     'setPermissions' : IDL.Func([IDL.Text, AdminPermissions], [ResultVoid], []),

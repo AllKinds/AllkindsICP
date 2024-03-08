@@ -6,6 +6,7 @@ import Error "Error";
 import Iter "mo:base/Iter";
 import IterTools "mo:itertools/Iter";
 import Debug "mo:base/Debug";
+import Types "Types";
 
 module {
 
@@ -13,21 +14,13 @@ module {
   type Result<K, V> = Result.Result<K, V>;
   type Error = Error.Error;
   type Iter<T> = Iter.Iter<T>;
-
-  public type FriendDB = Map<Principal, UserFriends>;
-  type UserFriends = Map<Principal, FriendStatus>;
+  type FriendDB = Types.FriendDB;
+  type FriendStatus = Types.FriendStatus;
+  type UserFriends = Types.UserFriends;
 
   let { phash } = Map;
 
   public func emptyDB() : FriendDB = Map.new<Principal, UserFriends>();
-
-  public type FriendStatus = {
-    #requestSend;
-    #requestReceived;
-    #connected;
-    #rejectionSend;
-    #rejectionReceived;
-  };
 
   public func backup(friends : FriendDB) : Iter<(Principal, Principal, FriendStatus)> {
     let usersA = Map.entries(friends);

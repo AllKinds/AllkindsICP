@@ -18,36 +18,15 @@ import TextHelper "helper/TextHelper";
 import Option "mo:base/Option";
 import TupleHelper "helper/TupleHelper";
 import StableBuffer "mo:StableBuffer/StableBuffer";
+import Types "Types";
 
 module {
   type Iter<T> = Iter.Iter<T>;
   type Map<K, V> = Map.Map<K, V>;
+  type AdminDB = Types.AdminDB;
+  type Permission = Types.AdminPermission;
+  type Permissions = Types.AdminPermissions;
   let { thash; phash } = Map;
-
-  public type AdminDB = Map<Principal, Permissions>;
-
-  public type Permissions = {
-    suspendUser : Bool;
-    editUser : Bool;
-    createTeam : Bool;
-    listAllTeams : Bool;
-    becomeTeamMember : Bool; // without invite
-    becomeTeamAdmin : Bool; // can remove users, edit questions or delete the team
-    createBackup : Bool;
-    restoreBackup : Bool;
-  };
-
-  public type Permission = {
-    #suspendUser;
-    #editUser;
-    #createTeam;
-    #listAllTeams;
-    #becomeTeamMember;
-    #becomeTeamAdmin;
-    #createBackup;
-    #restoreBackup;
-    #all;
-  };
 
   let noPermissions = {
     suspendUser = false;

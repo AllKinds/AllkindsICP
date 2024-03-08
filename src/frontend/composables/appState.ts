@@ -1,177 +1,177 @@
 import { Effect, pipe } from "effect";
-import type { FrontendEffect, Question, Answer, User, UserPermissions, Friend, UserMatch, TeamStats, TeamUserInfo, QuestionStats } from "~/utils/backend";
+import type { FrontendEffect, Question, Answer, User, UserPermissions, Friend, UserMatch, TeamStats, TeamUserInfo, QuestionStats, UserNotifications } from "~/utils/backend";
 import * as backend from "~/utils/backend";
 import { type FrontendError, notifyWithMsg } from "~/utils/errors";
 import { defineStore } from 'pinia'
 import * as errors from "~/utils/errors";
 
 export type AppState = {
-    user: NetworkData<UserPermissions>,
-    team: string,
-    knownTeams: string[],
-    openQuestions: NetworkData<Question[]>,
-    answeredIds: bigint[],
-    answeredQuestions: NetworkData<[Question, Answer][]>,
-    ownQuestions: NetworkData<Question[]>,
-    friends: NetworkData<Friend[]>,
-    matches: NetworkData<UserMatch[]>,
-    teams: NetworkData<TeamUserInfo[]>,
-    principal: NetworkData<Principal>,
-    teamStats: NetworkData<TeamStats>,
-    questionStats: NetworkData<QuestionStats[]>,
-    teamMembers: NetworkData<User[]>,
-    teamAdmins: NetworkData<User[]>,
-    admins: NetworkData<UserPermissions[]>
-    users: NetworkData<User[]>
-    loadingCounter: number,
-    answeredIdsReset?: any,
+  user: NetworkData<UserPermissions>,
+  team: string,
+  knownTeams: string[],
+  openQuestions: NetworkData<Question[]>,
+  answeredIds: bigint[],
+  answeredQuestions: NetworkData<[Question, Answer][]>,
+  ownQuestions: NetworkData<Question[]>,
+  friends: NetworkData<Friend[]>,
+  matches: NetworkData<UserMatch[]>,
+  teams: NetworkData<TeamUserInfo[]>,
+  principal: NetworkData<Principal>,
+  teamStats: NetworkData<TeamStats>,
+  questionStats: NetworkData<QuestionStats[]>,
+  teamMembers: NetworkData<User[]>,
+  teamAdmins: NetworkData<User[]>,
+  admins: NetworkData<UserPermissions[]>
+  users: NetworkData<UserNotifications[]>
+  loadingCounter: number,
+  answeredIdsReset?: any,
 };
 
 type NotificationLevel = "ok" | "warning" | "error";
 
 export type DataStatus = "init" | "requested" | "error" | "ok";
 export type NetworkData<T> = {
-    status: DataStatus;
-    data?: T;
-    lastOK?: number;
-    err?: FrontendError;
-    errCount: number;
+  status: DataStatus;
+  data?: T;
+  lastOK?: number;
+  err?: FrontendError;
+  errCount: number;
 };
 const dataInit: NetworkData<any> = {
-    status: "init",
-    data: undefined,
-    lastOK: undefined,
-    err: undefined,
-    errCount: 0,
+  status: "init",
+  data: undefined,
+  lastOK: undefined,
+  err: undefined,
+  errCount: 0,
 }
 const networkDataToPromise = <T>(data: NetworkData<T>): Promise<T> => {
-    if (data.status === "ok") return Promise.resolve(data.data!);
-    if (data.status === "error") return Promise.reject(data.err);
+  if (data.status === "ok") return Promise.resolve(data.data!);
+  if (data.status === "error") return Promise.reject(data.err);
 
-    // TODO: how to handle pending?
-    return Promise.reject(data.err);
+  // TODO: how to handle pending?
+  return Promise.reject(data.err);
 }
 
 
 type FrontendEffectToEffect<A> = (effect: FrontendEffect<A>) => FrontendEffect<A>;
 
 const setRequested = <A>(old: NetworkData<A>, reset: boolean): NetworkData<A> => {
-    return {
-        status: "requested",
-        data: reset ? undefined : old.data,
-        err: old.err,
-        errCount: old.errCount,
-    };
+  return {
+    status: "requested",
+    data: reset ? undefined : old.data,
+    err: old.err,
+    errCount: old.errCount,
+  };
 }
 
 const setOk = <A>(data: A): NetworkData<A> => {
-    return {
-        status: "ok",
-        data,
-        lastOK: new Date().valueOf(),
-        errCount: 0,
-    }
+  return {
+    status: "ok",
+    data,
+    lastOK: new Date().valueOf(),
+    errCount: 0,
+  }
 }
 
 const setErr = <A>(old: NetworkData<A>, err: FrontendError): NetworkData<A> => {
-    return {
-        status: "error",
-        err,
-        errCount: 1,
-    }
+  return {
+    status: "error",
+    err,
+    errCount: 1,
+  }
 }
 
 export const storeToData = <A>(old: NetworkData<A>, effect: FrontendEffect<A>, store: (a: NetworkData<A>) => void): FrontendEffect<A> => {
-    store(setRequested(old, false));
-    const before = Effect.sync<void>(() => {
-        console.log("requesting")
-    })
-    const after = Effect.tapBoth<FrontendError, A, FrontendError, never, A, A, FrontendError, never>({
-        onSuccess: (a) => {
-            console.log("request ok")
-            store(setRequested(old, true));
-            setTimeout(() => store(setOk(a)));
-            return Effect.succeed(a);
-        },
-        onFailure: (e) => {
-            console.log("request error")
-            store(setErr(old, e))
-            return Effect.fail(e);
-        },
-    })
-    return pipe(
-        before,
-        () => effect,
-        after
-    )
+  store(setRequested(old, false));
+  const before = Effect.sync<void>(() => {
+    console.log("requesting")
+  })
+  const after = Effect.tapBoth<FrontendError, A, FrontendError, never, A, A, FrontendError, never>({
+    onSuccess: (a) => {
+      console.log("request ok")
+      store(setRequested(old, true));
+      setTimeout(() => store(setOk(a)));
+      return Effect.succeed(a);
+    },
+    onFailure: (e) => {
+      console.log("request error")
+      store(setErr(old, e))
+      return Effect.fail(e);
+    },
+  })
+  return pipe(
+    before,
+    () => effect,
+    after
+  )
 }
 
 export const runStoreNotify = <A>(old: NetworkData<A>, effect: FrontendEffect<A>, store: (a: NetworkData<A>) => void, msg?: string): Promise<A> => {
-    console.log(effect)
-    return Effect.runPromise(
-        storeToData(
-            old,
-            pipe(effect, notifyWithMsg(msg)),
-            store,
-        )
-    );
+  console.log(effect)
+  return Effect.runPromise(
+    storeToData(
+      old,
+      pipe(effect, notifyWithMsg(msg)),
+      store,
+    )
+  );
 }
 
 
 export const runStore = <A>(old: NetworkData<A>, effect: FrontendEffect<A>, store: (a: NetworkData<A>) => void, msg?: string): Promise<A> => {
-    return Effect.runPromise(
-        storeToData(
-            old,
-            effect,
-            store,
-        )
-    );
+  return Effect.runPromise(
+    storeToData(
+      old,
+      effect,
+      store,
+    )
+  );
 }
 
 export const runNotify = <A>(effect: FrontendEffect<A>, msg?: string): Promise<A> => {
-    const dummy: NetworkData<A> = { status: "init", errCount: 0 };
-    return runStoreNotify(dummy, effect, (_) => { }, msg);
+  const dummy: NetworkData<A> = { status: "init", errCount: 0 };
+  return runStoreNotify(dummy, effect, (_) => { }, msg);
 }
 
 const combineNetworkData = <A>(old: NetworkData<A>, newer: NetworkData<A>): NetworkData<A> => {
-    switch (newer.status) {
-        case "ok": return newer;
-        case "error":
-        case "requested": return { ...newer, data: old.data, lastOK: old.lastOK };
-        case "init": throw "combineNetworkData should never be called with init as new value"
-    }
+  switch (newer.status) {
+    case "ok": return newer;
+    case "error":
+    case "requested": return { ...newer, data: old.data, lastOK: old.lastOK };
+    case "init": throw "combineNetworkData should never be called with init as new value"
+  }
 }
 
 export const inBrowser = (fn?: () => unknown): boolean => {
-    if (fn !== undefined) {
-        if (process.client) fn();
-    }
-    return !!process.client
+  if (fn !== undefined) {
+    if (process.client) fn();
+  }
+  return !!process.client
 }
 
 const defaultAppState: () => AppState = () => {
-    return {
-        team: "",
-        knownTeams: ["sandbox", "global", ""],
-        loadingCounter: 0,
-        answeredIdsReset: undefined,
-        answeredIds: [],
+  return {
+    team: "",
+    knownTeams: ["sandbox", "global", ""],
+    loadingCounter: 0,
+    answeredIdsReset: undefined,
+    answeredIds: [],
 
-        user: dataInit,
-        openQuestions: dataInit,
-        answeredQuestions: dataInit,
-        ownQuestions: dataInit,
-        friends: dataInit,
-        matches: dataInit,
-        teams: dataInit,
-        principal: dataInit,
-        teamStats: dataInit,
-        questionStats: dataInit,
-        teamMembers: dataInit,
-        teamAdmins: dataInit,
-        admins: dataInit,
-        users: dataInit,
-    }
+    user: dataInit,
+    openQuestions: dataInit,
+    answeredQuestions: dataInit,
+    ownQuestions: dataInit,
+    friends: dataInit,
+    matches: dataInit,
+    teams: dataInit,
+    principal: dataInit,
+    teamStats: dataInit,
+    questionStats: dataInit,
+    teamMembers: dataInit,
+    teamAdmins: dataInit,
+    admins: dataInit,
+    users: dataInit,
+  }
 };
 
 export const appState = ref<AppState>(defaultAppState());
@@ -179,472 +179,473 @@ export const appState = ref<AppState>(defaultAppState());
 const initData = <T>() => ref<NetworkData<T>>(dataInit);
 
 const appData = {
-    team: "",
-    knownTeams: ["sandbox", "global", ""],
-    loadingCounter: 0,
-    answeredIdsReset: undefined,
-    answeredIds: [],
+  team: "",
+  knownTeams: ["sandbox", "global", ""],
+  loadingCounter: 0,
+  answeredIdsReset: undefined,
+  answeredIds: [],
 
-    admins: initData<UserPermissions[]>(),
-    answeredQuestions: initData<[Question, Answer][]>(),
-    friends: initData<Friend[]>(),
-    matches: initData<UserMatch[]>(),
-    openQuestions: initData<Question[]>(),
-    ownQuestions: initData<Question[]>(),
-    principal: initData<Principal>(),
-    questionStats: initData<QuestionStats[]>(),
-    teamAdmins: initData<User[]>(),
-    teamMembers: initData<User[]>(),
-    teamStats: initData<TeamStats>(),
-    teams: initData<TeamUserInfo[]>(),
-    user: initData<UserPermissions>(),
-    users: initData<User[]>(),
+  admins: initData<UserPermissions[]>(),
+  answeredQuestions: initData<[Question, Answer][]>(),
+  friends: initData<Friend[]>(),
+  matches: initData<UserMatch[]>(),
+  openQuestions: initData<Question[]>(),
+  ownQuestions: initData<Question[]>(),
+  principal: initData<Principal>(),
+  questionStats: initData<QuestionStats[]>(),
+  teamAdmins: initData<User[]>(),
+  teamMembers: initData<User[]>(),
+  teamStats: initData<TeamStats>(),
+  teams: initData<TeamUserInfo[]>(),
+  user: initData<UserPermissions>(),
+  users: initData<UserNotifications[]>(),
 }
 
 export const getAppState = () => {
-    return {
-        user: mk<UserPermissions>(appData.user, backend.loadUser),
-        users: mk<User[]>(appData.users, backend.loadUsers),
-    }
+  return {
+    user: mk<UserPermissions>(appData.user, backend.loadUser),
+    users: mk<UserNotifications[]>(appData.users, backend.loadUsers),
+  }
 };
 
-const mk = <T>(store: Ref<NetworkData<T>>, action: any, empty: any = null) => {
-    const get = (): NetworkData<T> => store.value;
-    const set = (next: NetworkData<T>): void => {
-        const old = get();
-        store.value = { status: "requested", errCount: 0, data: empty };
-        setTimeout(() => store.value = combineNetworkData(old, next));
-    };
-    const load = (maxAgeS?: number): Promise<T> => {
-        const old = get();
-        if (shouldUpdate(old, maxAgeS)) {
-            return runStore(old, action(), set)
-        } else {
-            return networkDataToPromise(old);
+const mk = <T>(store: Ref<NetworkData<T>>, action: () => FrontendEffect<T>, empty: T | null = null) => {
+  const get = (): NetworkData<T> => store.value;
+  const set = (next: NetworkData<T>): void => {
+    const old = get();
+    store.value = { status: "requested", errCount: 0, data: empty as T };
+    setTimeout(() => store.value = combineNetworkData(old, next));
+  };
+  const load = (maxAgeS?: number): Promise<T> => {
+    const old = get();
+    if (shouldUpdate(old, maxAgeS)) {
+      return runStore(old, action(), set)
+    } else {
+      return networkDataToPromise(old);
 
-        };
     };
+  };
 
-    return { get, set, load };
+  return { get, set, load };
 };
 
 let navTarget: string | null = null;
 let navActive: string | null = null;
 export const navTo = (path: string) => {
-    navigateTo(path);
+  navigateTo(path);
+  return;
+  // already set as final target
+  if (navTarget === path) {
+    console.warn("navigation target already set to", path);
     return;
-    // already set as final target
-    if (navTarget === path) {
-        console.warn("navigation target already set to", path);
-        return;
-    }
-    if (navTarget) {
-        console.warn("changing navigation target from", navTarget, "to", path);
-        navTarget = path;
-        return;
-    }
+  }
+  if (navTarget) {
+    console.warn("changing navigation target from", navTarget, "to", path);
+    navTarget = path;
+    return;
+  }
 
-    // already set as current target
-    if (navActive === path) {
-        console.warn("navigation already active to", path);
-        return;
-    }
-    if (navActive) {
-        console.warn("queueing navigation to", path, "while navigation to", navActive, "is active");
-        navTarget = path;
-        return;
-    }
+  // already set as current target
+  if (navActive === path) {
+    console.warn("navigation already active to", path);
+    return;
+  }
+  if (navActive) {
+    console.warn("queueing navigation to", path, "while navigation to", navActive, "is active");
+    navTarget = path;
+    return;
+  }
 
-    navActive = path;
-    navigateTo(path);
-    setTimeout(() => {
-        const nextTarget = navTarget === navActive ? null : navTarget;
-        navActive = null;
-        navTarget = null;
-        if (nextTarget) {
-            navTo(nextTarget);
-        };
-    }, 250);
+  navActive = path;
+  navigateTo(path);
+  setTimeout(() => {
+    const nextTarget = navTarget === navActive ? null : navTarget;
+    navActive = null;
+    navTarget = null;
+    if (nextTarget) {
+      navTo(nextTarget);
+    };
+  }, 250);
 
 }
 
 export const useAppState = defineStore({
-    id: 'app',
-    state: (): AppState => defaultAppState(),
-    actions: {
-        setLoading(p: Promise<unknown>) {
-            this.loadingCounter++;
-            Promise.resolve(p).finally(() => this.loadingCounter--);
-        },
-        getLoading(): number {
-            if (this.loadingCounter < 0) {
-                console.error("loadingCounter was negative: ", this.loadingCounter);
-                this.loadingCounter = 0;
-            }
-            return this.loadingCounter
-        },
-        getOpenQuestions(): NetworkData<Question[]> {
-            return this.openQuestions as NetworkData<Question[]>; // TODO remove `as ...`
-        },
-        setOpenQuestions(qs: NetworkData<Question[]>, noAnswered: boolean = true): void {
-            const { openQuestions } = storeToRefs(this);
-            if (qs.status === 'ok') {
-                const data = qs.data ?? [];
-                qs.data = data.filter((x) => this.answeredIds.indexOf(x.id) < 0);
-
-            }
-            openQuestions.value = combineNetworkData(this.openQuestions, qs);
-        },
-        removeOpenQuestion(q: Question): void {
-            const data = this.openQuestions as NetworkData<Question[]>
-            this.answeredIds.push(q.id);
-            if (this.answeredIdsReset) { clearTimeout(this.answeredIdsReset) }
-            this.answeredIdsReset = setTimeout(() => { this.answeredIds = [] }, 10_000)
-            if (data.data) {
-                const i = data.data.findIndex((x) => x.id === q.id);
-                if (1 >= 0) {
-                    //console.log("index of", q, "is", i, "in", this.openQuestions.data)
-                    data.data.splice(i, 1);
-                }
-            }
-            this.setOpenQuestions({ status: "requested", errCount: 0 });
-            setTimeout(() => this.setOpenQuestions(data));
-        },
-        loadOpenQuestions(maxAgeS?: number, msg?: string): Promise<Question[]> {
-            if (shouldUpdate(this.openQuestions, maxAgeS)) {
-                const old = this.getOpenQuestions();
-                return runStoreNotify(old, backend.loadOpenQuestions(this.team), this.setOpenQuestions, msg)
-            } else {
-                return toPromise(this.getOpenQuestions())
-            }
-        },
-        getAnsweredQuestions(): NetworkData<[Question, Answer][]> {
-            return this.answeredQuestions as NetworkData<[Question, Answer][]>; // TODO remove `as ...`
-        },
-        setAnsweredQuestions(qs: NetworkData<[Question, Answer][]>): void {
-            const { answeredQuestions } = storeToRefs(this)
-            let old = this.answeredQuestions as NetworkData<[Question, Answer][]>;
-            answeredQuestions.value = combineNetworkData(old, qs);
-        },
-        loadAnsweredQuestions(maxAgeS?: number): void {
-            if (shouldUpdate(this.answeredQuestions, maxAgeS)) {
-                const old = this.getAnsweredQuestions();
-                runStoreNotify(old, backend.getAnsweredQuestions(this.team), this.setAnsweredQuestions)
-            }
-        },
-        getOwnQuestions(): NetworkData<Question[]> {
-            return this.ownQuestions as NetworkData<Question[]>; // TODO remove `as ...`
-        },
-        setOwnQuestions(qs: NetworkData<Question[]>): void {
-            const { ownQuestions } = storeToRefs(this)
-            ownQuestions.value = combineNetworkData(this.ownQuestions, qs);
-        },
-        loadOwnQuestions(maxAgeS?: number): void {
-            if (shouldUpdate(this.ownQuestions, maxAgeS)) {
-                const old = this.getOwnQuestions();
-                runStoreNotify(old, backend.getOwnQuestions(this.team), this.setOwnQuestions);
-            }
-        },
-        getPrincipal(): NetworkData<Principal> {
-            return this.principal as NetworkData<Principal>;
-        },
-        setPrincipal(principal: NetworkData<Principal>): void {
-            this.principal = combineNetworkData(this.principal, principal)
-        },
-        loadPrincipal(maxAgeS?: number) {
-            if (shouldUpdate(this.principal, maxAgeS)) {
-                return runStore(this.getPrincipal(), backend.getOwnPrincipal(), this.setPrincipal)
-                    .catch((e) => console.warn("couldn't loadPrincipal " + e));
-            }
-        },
-        getUser(): NetworkData<UserPermissions> {
-            return this.user as NetworkData<UserPermissions>;
-        },
-        setUser(user: NetworkData<UserPermissions>): void {
-            const old = this.getUser();
-            this.user = combineNetworkData(old, user)
-        },
-        loadUser(maxAgeS?: number, orRedirect: boolean = true): Promise<UserPermissions> {
-            const old = this.getUser();
-            if (shouldUpdate(old, maxAgeS)) {
-                return runStore(old, backend.loadUser(false).pipe(Effect.mapError(
-                    (err) => {
-                        if (!orRedirect) return err;
-                        if (errors.is(err, "backend", "notRegistered")) {
-                            console.log("redirect to /register because user is not registered", err)
-                            navTo("/register");
-                        }
-                        else if (errors.is(err, "backend", "notLoggedIn")) {
-                            console.log("redirect to /login because user is not logged in", err)
-                            navTo("/login");
-                        }
-                        return err;
-                    }
-                )), this.setUser)
-            } else {
-                return networkDataToPromise(this.getUser());
-            }
-        },
-        getFriends() {
-            return this.friends as NetworkData<Friend[]>; // TODO remove `as ...`
-        },
-        setFriends(friends: NetworkData<Friend[]>): void {
-            const old = this.friends as NetworkData<Friend[]>
-            this.friends = { status: "requested", errCount: 0, data: [] };
-            setTimeout(() => this.friends = combineNetworkData(old, friends));
-        },
-        loadFriends(maxAgeS?: number) {
-            if (shouldUpdate(this.friends, maxAgeS)) {
-                runStore(this.friends, backend.loadFriends(this.team), this.setFriends)
-                    .catch(console.error);
-            }
-        },
-        getMatches() {
-            return this.matches as NetworkData<UserMatch[]>; // TODO remove `as ...`
-        },
-        setMatches(matches: NetworkData<UserMatch[]>): void {
-            const old = this.matches as NetworkData<UserMatch[]>
-            this.matches = combineNetworkData(old, matches)
-        },
-        loadMatches() {
-            if (shouldUpdate(this.matches)) {
-                runStore(this.matches, backend.loadMatches(this.team), this.setMatches)
-                    .catch(console.error);
-            }
-        },
-        sendFriendRequest(username: string): Promise<void> {
-            return runNotify(backend.sendFriendRequest(this.team, username), "Friend request send")
-        },
-        answerFriendRequest(username: string, accept: boolean): Promise<void> {
-            return runNotify(backend.answerFriendRequest(this.team, username, accept), accept ? "Friend request accepted" : "Friend request rejected")
-        },
-
-        getTeams() {
-            return this.teams as NetworkData<TeamUserInfo[]>; // TODO remove `as ...`
-        },
-        setTeams(teams: NetworkData<TeamUserInfo[]>): void {
-            const old = this.teams as NetworkData<TeamUserInfo[]>
-            this.teams = { status: "requested", errCount: 0, data: [] };
-            setTimeout(() => this.teams = combineNetworkData(old, teams));
-        },
-        loadTeams(maxAgeS?: number, known?: string): Promise<TeamUserInfo[]> {
-            if (known) {
-                this.knownTeams.push(known);
-                // remove duplicates
-                this.knownTeams = [...new Set(this.knownTeams)];
-            }
-            if (shouldUpdate(this.teams, maxAgeS)) {
-                return runStore(this.teams, backend.loadTeams(this.knownTeams), this.setTeams)
-            } else {
-                return networkDataToPromise(this.getTeams());
-            }
-        },
-        setTeam(key: string) {
-            if (inBrowser()) {
-                window.localStorage.setItem("team", key);
-                if (this.team !== key) {
-                    this.knownTeams.push(key);
-                    this.$reset(); // TODO: only reset team specific data
-                    this.team = key;
-                }
-            }
-        },
-        /**
-         * Get team info or return null if selected team is not in teams, or teams are not loaded
-         * 
-         * @param orRedirect Redirect to `/select-team` if team doesn't exist
-         *                         or to `/join/<team>` if current user is not a team member
-         */
-        getTeam(orRedirect: boolean = true): TeamUserInfo | null {
-            let t = null;
-            this.setTeam(inBrowser() ? window.localStorage.getItem("team") || "" : "");
-            if (this.teams.status === "ok") {
-                t = this.teams.data?.find((t) => t.key === this.team) || null;
-                if (!orRedirect) {
-                    // don't redirect
-                } else if (!t) {
-                    navTo("/select-team");
-                } else if (!t.permissions.isMember) {
-                    navTo("/join/" + t.key);
-                };
-            }
-            return t;
-        },
-        checkTeam() {
-            const t = this.getTeam(false);
-            if (t && !t.permissions.isMember) {
-                navTo("/join/" + t.key)
-            }
-        },
-        joinTeam(code: string): Promise<void> {
-            return runNotify(backend.joinTeam(this.team, code), "Welcome to the team!");
-        },
-        leaveTeam(user: string): Promise<void> {
-            return runNotify(backend.leaveTeam(this.team, user));
-        },
-        setTeamAdmin(user: string, admin: boolean): Promise<void> {
-            return runNotify(backend.setTeamAdmin(this.team, user, admin));
-        },
-        createTeam(team: string, name: string, about: string, logo: number[], listed: boolean, code: string): Promise<void> {
-            return runNotify(backend.createTeam(team, name, about, logo, listed, code), "Welcome to the team!");
-        },
-        updateTeam(team: string, name: string, about: string, logo: number[], listed: boolean, code: string): Promise<void> {
-            return runNotify(backend.updateTeam(team, name, about, logo, listed, code), "Welcome to the team!");
-        },
-        deleteQuestion(q: Question) {
-            return runNotify(backend.deleteQuestion(this.team, q), "Question removed")
-        },
-        deleteAnswers(confirm: string) {
-            return runNotify(backend.deleteAnswers(this.team, confirm), "Answers removed")
-        },
-        deleteUser(confirm: string) {
-            return runNotify(backend.deleteUser(confirm), "User removed")
-        },
-
-        getTeamStats() {
-            return this.teamStats as NetworkData<TeamStats>; // TODO remove `as ...`
-        },
-        setTeamStats(teams: NetworkData<TeamStats>): void {
-            const old = this.teamStats as NetworkData<TeamStats>
-            this.teamStats = { status: "requested", errCount: 0, data: undefined };
-            setTimeout(() => this.teamStats = combineNetworkData(old, teams));
-        },
-        loadTeamStats(maxAgeS?: number) {
-            const old = this.getTeamStats();
-            if (shouldUpdate(old, maxAgeS)) {
-                runStore(old, backend.loadTeamStats(this.team), this.setTeamStats)
-                    .catch(console.error);
-            }
-        },
-
-        getQuestionStats() {
-            return this.questionStats as NetworkData<QuestionStats[]>; // TODO remove `as ...`
-        },
-        setQuestionStats(stats: NetworkData<QuestionStats[]>): void {
-            const old = this.getQuestionStats();
-            this.questionStats = { status: "requested", errCount: 0, data: undefined };
-            setTimeout(() => this.questionStats = combineNetworkData(old, stats));
-        },
-        loadQuestionStats(maxAgeS?: number) {
-            const old = this.getQuestionStats();
-            if (shouldUpdate(old, maxAgeS)) {
-                runStore(old, backend.loadQuestionStats(this.team), this.setQuestionStats)
-                    .catch(console.error);
-            }
-        },
-
-        getTeamMembers() {
-            return this.teamMembers as NetworkData<User[]>; // TODO remove `as ...`
-        },
-        setTeamMembers(members: NetworkData<User[]>): void {
-            const old = this.getTeamMembers();
-            this.teamMembers = { status: "requested", errCount: 0, data: [] };
-            setTimeout(() => this.teamMembers = combineNetworkData(old, members));
-        },
-        loadTeamMembers(maxAgeS?: number) {
-            if (shouldUpdate(this.teamMembers, maxAgeS)) {
-                runStore(this.teamMembers, backend.loadTeamMembers(this.team), this.setTeamMembers)
-                    .catch(console.error);
-            }
-        },
-
-        getTeamAdmins() {
-            return this.teamAdmins as NetworkData<User[]>; // TODO remove `as ...`
-        },
-        setTeamAdmins(admins: NetworkData<User[]>): void {
-            const old = this.getTeamAdmins();
-            this.teamAdmins = { status: "requested", errCount: 0, data: [] };
-            setTimeout(() => this.teamAdmins = combineNetworkData(old, admins));
-        },
-        loadTeamAdmins(maxAgeS?: number) {
-            const current = this.getTeamAdmins();
-            if (shouldUpdate(current, maxAgeS)) {
-                runStore(current, backend.loadTeamAdmins(this.team), this.setTeamAdmins)
-                    .catch(console.error);
-            }
-        },
-
-        getAdmins() {
-            return this.admins as NetworkData<UserPermissions[]>; // TODO remove `as ...`
-        },
-        setAdmins(admins: NetworkData<UserPermissions[]>): void {
-            const old = this.getAdmins();
-            this.admins = { status: "requested", errCount: 0, data: [] };
-            setTimeout(() => this.admins = combineNetworkData(old, admins));
-        },
-        loadAdmins(maxAgeS?: number) {
-            if (shouldUpdate(this.getAdmins(), maxAgeS)) {
-                runStore(this.getAdmins(), backend.loadAdmins(), this.setAdmins)
-                    .catch(console.error);
-            }
-        },
-        getUsers() {
-            return this.users as NetworkData<User[]>; // TODO remove `as ...`
-        },
-        setUsers(users: NetworkData<User[]>): void {
-            const old = this.getUsers();
-            this.users = { status: "requested", errCount: 0, data: [] };
-            setTimeout(() => this.users = combineNetworkData(old, users));
-        },
-        loadUsers(maxAgeS?: number) {
-            if (shouldUpdate(this.users, maxAgeS)) {
-                runStore(this.users, backend.loadUsers(), this.setUsers)
-                    .catch(console.error);
-            }
-        },
+  id: 'app',
+  state: (): AppState => defaultAppState(),
+  actions: {
+    setLoading(p: Promise<unknown>) {
+      this.loadingCounter++;
+      Promise.resolve(p).finally(() => this.loadingCounter--);
     },
+    getLoading(): number {
+      if (this.loadingCounter < 0) {
+        console.error("loadingCounter was negative: ", this.loadingCounter);
+        this.loadingCounter = 0;
+      }
+      return this.loadingCounter
+    },
+    getOpenQuestions(): NetworkData<Question[]> {
+      return this.openQuestions as NetworkData<Question[]>; // TODO remove `as ...`
+    },
+    setOpenQuestions(qs: NetworkData<Question[]>, noAnswered: boolean = true): void {
+      const { openQuestions } = storeToRefs(this);
+      if (qs.status === 'ok') {
+        const data = qs.data ?? [];
+        qs.data = data.filter((x) => this.answeredIds.indexOf(x.id) < 0);
+
+      }
+      openQuestions.value = combineNetworkData(this.openQuestions, qs);
+    },
+    removeOpenQuestion(q: Question): void {
+      const data = this.openQuestions as NetworkData<Question[]>
+      this.answeredIds.push(q.id);
+      if (this.answeredIdsReset) { clearTimeout(this.answeredIdsReset) }
+      this.answeredIdsReset = setTimeout(() => { this.answeredIds = [] }, 10_000)
+      if (data.data) {
+        const i = data.data.findIndex((x) => x.id === q.id);
+        if (1 >= 0) {
+          //console.log("index of", q, "is", i, "in", this.openQuestions.data)
+          data.data.splice(i, 1);
+        }
+      }
+      this.setOpenQuestions({ status: "requested", errCount: 0 });
+      setTimeout(() => this.setOpenQuestions(data));
+    },
+    loadOpenQuestions(maxAgeS?: number, msg?: string): Promise<Question[]> {
+
+      if (shouldUpdate(this.openQuestions, maxAgeS)) {
+        const old = this.getOpenQuestions();
+        return runStoreNotify(old, backend.loadOpenQuestions(this.team), this.setOpenQuestions, msg)
+      } else {
+        return toPromise(this.getOpenQuestions())
+      }
+    },
+    getAnsweredQuestions(): NetworkData<[Question, Answer][]> {
+      return this.answeredQuestions as NetworkData<[Question, Answer][]>; // TODO remove `as ...`
+    },
+    setAnsweredQuestions(qs: NetworkData<[Question, Answer][]>): void {
+      const { answeredQuestions } = storeToRefs(this)
+      let old = this.answeredQuestions as NetworkData<[Question, Answer][]>;
+      answeredQuestions.value = combineNetworkData(old, qs);
+    },
+    loadAnsweredQuestions(maxAgeS?: number): void {
+      if (shouldUpdate(this.answeredQuestions, maxAgeS)) {
+        const old = this.getAnsweredQuestions();
+        runStoreNotify(old, backend.getAnsweredQuestions(this.team), this.setAnsweredQuestions)
+      }
+    },
+    getOwnQuestions(): NetworkData<Question[]> {
+      return this.ownQuestions as NetworkData<Question[]>; // TODO remove `as ...`
+    },
+    setOwnQuestions(qs: NetworkData<Question[]>): void {
+      const { ownQuestions } = storeToRefs(this)
+      ownQuestions.value = combineNetworkData(this.ownQuestions, qs);
+    },
+    loadOwnQuestions(maxAgeS?: number): void {
+      if (shouldUpdate(this.ownQuestions, maxAgeS)) {
+        const old = this.getOwnQuestions();
+        runStoreNotify(old, backend.getOwnQuestions(this.team), this.setOwnQuestions);
+      }
+    },
+    getPrincipal(): NetworkData<Principal> {
+      return this.principal as NetworkData<Principal>;
+    },
+    setPrincipal(principal: NetworkData<Principal>): void {
+      this.principal = combineNetworkData(this.principal, principal)
+    },
+    loadPrincipal(maxAgeS?: number) {
+      if (shouldUpdate(this.principal, maxAgeS)) {
+        return runStore(this.getPrincipal(), backend.getOwnPrincipal(), this.setPrincipal)
+          .catch((e) => console.warn("couldn't loadPrincipal " + e));
+      }
+    },
+    getUser(): NetworkData<UserPermissions> {
+      return this.user as NetworkData<UserPermissions>;
+    },
+    setUser(user: NetworkData<UserPermissions>): void {
+      const old = this.getUser();
+      this.user = combineNetworkData(old, user)
+    },
+    loadUser(maxAgeS?: number, orRedirect: boolean = true): Promise<UserPermissions> {
+      const old = this.getUser();
+      if (shouldUpdate(old, maxAgeS)) {
+        return runStore(old, backend.loadUser(false).pipe(Effect.mapError(
+          (err) => {
+            if (!orRedirect) return err;
+            if (errors.is(err, "backend", "notRegistered")) {
+              console.log("redirect to /register because user is not registered", err)
+              navTo("/register");
+            }
+            else if (errors.is(err, "backend", "notLoggedIn")) {
+              console.log("redirect to /login because user is not logged in", err)
+              navTo("/login");
+            }
+            return err;
+          }
+        )), this.setUser)
+      } else {
+        return networkDataToPromise(this.getUser());
+      }
+    },
+    getFriends() {
+      return this.friends as NetworkData<Friend[]>; // TODO remove `as ...`
+    },
+    setFriends(friends: NetworkData<Friend[]>): void {
+      const old = this.friends as NetworkData<Friend[]>
+      this.friends = { status: "requested", errCount: 0, data: [] };
+      setTimeout(() => this.friends = combineNetworkData(old, friends));
+    },
+    loadFriends(maxAgeS?: number) {
+      if (shouldUpdate(this.friends, maxAgeS)) {
+        runStore(this.friends, backend.loadFriends(this.team), this.setFriends)
+          .catch(console.error);
+      }
+    },
+    getMatches() {
+      return this.matches as NetworkData<UserMatch[]>; // TODO remove `as ...`
+    },
+    setMatches(matches: NetworkData<UserMatch[]>): void {
+      const old = this.matches as NetworkData<UserMatch[]>
+      this.matches = combineNetworkData(old, matches)
+    },
+    loadMatches() {
+      if (shouldUpdate(this.matches)) {
+        runStore(this.matches, backend.loadMatches(this.team), this.setMatches)
+          .catch(console.error);
+      }
+    },
+    sendFriendRequest(username: string): Promise<void> {
+      return runNotify(backend.sendFriendRequest(this.team, username), "Friend request send")
+    },
+    answerFriendRequest(username: string, accept: boolean): Promise<void> {
+      return runNotify(backend.answerFriendRequest(this.team, username, accept), accept ? "Friend request accepted" : "Friend request rejected")
+    },
+
+    getTeams() {
+      return this.teams as NetworkData<TeamUserInfo[]>; // TODO remove `as ...`
+    },
+    setTeams(teams: NetworkData<TeamUserInfo[]>): void {
+      const old = this.teams as NetworkData<TeamUserInfo[]>
+      this.teams = { status: "requested", errCount: 0, data: [] };
+      setTimeout(() => this.teams = combineNetworkData(old, teams));
+    },
+    loadTeams(maxAgeS?: number, known?: string): Promise<TeamUserInfo[]> {
+      if (known) {
+        this.knownTeams.push(known);
+        // remove duplicates
+        this.knownTeams = [...new Set(this.knownTeams)];
+      }
+      if (shouldUpdate(this.teams, maxAgeS)) {
+        return runStore(this.teams, backend.loadTeams(this.knownTeams), this.setTeams)
+      } else {
+        return networkDataToPromise(this.getTeams());
+      }
+    },
+    setTeam(key: string) {
+      if (inBrowser()) {
+        window.localStorage.setItem("team", key);
+        if (this.team !== key) {
+          this.knownTeams.push(key);
+          this.$reset(); // TODO: only reset team specific data
+          this.team = key;
+        }
+      }
+    },
+    /**
+     * Get team info or return null if selected team is not in teams, or teams are not loaded
+     * 
+     * @param orRedirect Redirect to `/select-team` if team doesn't exist
+     *                         or to `/join/<team>` if current user is not a team member
+     */
+    getTeam(orRedirect: boolean = true): TeamUserInfo | null {
+      let t = null;
+      this.setTeam(inBrowser() ? window.localStorage.getItem("team") || "" : "");
+      if (this.teams.status === "ok") {
+        t = this.teams.data?.find((t) => t.key === this.team) || null;
+        if (!orRedirect) {
+          // don't redirect
+        } else if (!t) {
+          navTo("/select-team");
+        } else if (!t.permissions.isMember) {
+          navTo("/join/" + t.key);
+        };
+      }
+      return t;
+    },
+    checkTeam() {
+      const t = this.getTeam(false);
+      if (t && !t.permissions.isMember) {
+        navTo("/join/" + t.key)
+      }
+    },
+    joinTeam(code: string): Promise<void> {
+      return runNotify(backend.joinTeam(this.team, code), "Welcome to the team!");
+    },
+    leaveTeam(user: string): Promise<void> {
+      return runNotify(backend.leaveTeam(this.team, user));
+    },
+    setTeamAdmin(user: string, admin: boolean): Promise<void> {
+      return runNotify(backend.setTeamAdmin(this.team, user, admin));
+    },
+    createTeam(team: string, name: string, about: string, logo: number[], listed: boolean, code: string): Promise<void> {
+      return runNotify(backend.createTeam(team, name, about, logo, listed, code), "Welcome to the team!");
+    },
+    updateTeam(team: string, name: string, about: string, logo: number[], listed: boolean, code: string): Promise<void> {
+      return runNotify(backend.updateTeam(team, name, about, logo, listed, code), "Welcome to the team!");
+    },
+    deleteQuestion(q: Question) {
+      return runNotify(backend.deleteQuestion(this.team, q), "Question removed")
+    },
+    deleteAnswers(confirm: string) {
+      return runNotify(backend.deleteAnswers(this.team, confirm), "Answers removed")
+    },
+    deleteUser(confirm: string) {
+      return runNotify(backend.deleteUser(confirm), "User removed")
+    },
+
+    getTeamStats() {
+      return this.teamStats as NetworkData<TeamStats>; // TODO remove `as ...`
+    },
+    setTeamStats(teams: NetworkData<TeamStats>): void {
+      const old = this.teamStats as NetworkData<TeamStats>
+      this.teamStats = { status: "requested", errCount: 0, data: undefined };
+      setTimeout(() => this.teamStats = combineNetworkData(old, teams));
+    },
+    loadTeamStats(maxAgeS?: number) {
+      const old = this.getTeamStats();
+      if (shouldUpdate(old, maxAgeS)) {
+        runStore(old, backend.loadTeamStats(this.team), this.setTeamStats)
+          .catch(console.error);
+      }
+    },
+
+    getQuestionStats() {
+      return this.questionStats as NetworkData<QuestionStats[]>; // TODO remove `as ...`
+    },
+    setQuestionStats(stats: NetworkData<QuestionStats[]>): void {
+      const old = this.getQuestionStats();
+      this.questionStats = { status: "requested", errCount: 0, data: undefined };
+      setTimeout(() => this.questionStats = combineNetworkData(old, stats));
+    },
+    loadQuestionStats(maxAgeS?: number) {
+      const old = this.getQuestionStats();
+      if (shouldUpdate(old, maxAgeS)) {
+        runStore(old, backend.loadQuestionStats(this.team), this.setQuestionStats)
+          .catch(console.error);
+      }
+    },
+
+    getTeamMembers() {
+      return this.teamMembers as NetworkData<User[]>; // TODO remove `as ...`
+    },
+    setTeamMembers(members: NetworkData<User[]>): void {
+      const old = this.getTeamMembers();
+      this.teamMembers = { status: "requested", errCount: 0, data: [] };
+      setTimeout(() => this.teamMembers = combineNetworkData(old, members));
+    },
+    loadTeamMembers(maxAgeS?: number) {
+      if (shouldUpdate(this.teamMembers, maxAgeS)) {
+        runStore(this.teamMembers, backend.loadTeamMembers(this.team), this.setTeamMembers)
+          .catch(console.error);
+      }
+    },
+
+    getTeamAdmins() {
+      return this.teamAdmins as NetworkData<User[]>; // TODO remove `as ...`
+    },
+    setTeamAdmins(admins: NetworkData<User[]>): void {
+      const old = this.getTeamAdmins();
+      this.teamAdmins = { status: "requested", errCount: 0, data: [] };
+      setTimeout(() => this.teamAdmins = combineNetworkData(old, admins));
+    },
+    loadTeamAdmins(maxAgeS?: number) {
+      const current = this.getTeamAdmins();
+      if (shouldUpdate(current, maxAgeS)) {
+        runStore(current, backend.loadTeamAdmins(this.team), this.setTeamAdmins)
+          .catch(console.error);
+      }
+    },
+
+    getAdmins() {
+      return this.admins as NetworkData<UserPermissions[]>; // TODO remove `as ...`
+    },
+    setAdmins(admins: NetworkData<UserPermissions[]>): void {
+      const old = this.getAdmins();
+      this.admins = { status: "requested", errCount: 0, data: [] };
+      setTimeout(() => this.admins = combineNetworkData(old, admins));
+    },
+    loadAdmins(maxAgeS?: number) {
+      if (shouldUpdate(this.getAdmins(), maxAgeS)) {
+        runStore(this.getAdmins(), backend.loadAdmins(), this.setAdmins)
+          .catch(console.error);
+      }
+    },
+    getUsers() {
+      return this.users as NetworkData<UserNotifications[]>; // TODO remove `as ...`
+    },
+    setUsers(users: NetworkData<UserNotifications[]>): void {
+      const old = this.getUsers();
+      this.users = { status: "requested", errCount: 0, data: [] };
+      setTimeout(() => this.users = combineNetworkData(old, users));
+    },
+    loadUsers(maxAgeS?: number) {
+      if (shouldUpdate(this.users, maxAgeS)) {
+        runStore(this.users, backend.loadUsers(), this.setUsers)
+          .catch(console.error);
+      }
+    },
+  },
 });
 
 const shouldUpdate = <T>(data: NetworkData<T>, maxAgeS?: number): boolean => {
-    switch (data.status) {
-        case "init":
-            return true;
+  switch (data.status) {
+    case "init":
+      return true;
 
-        case "requested":
-            return false;
+    case "requested":
+      return false;
 
-        case "error":
-            // TODO?: wait between errors?
-            return true;
+    case "error":
+      // TODO?: wait between errors?
+      return true;
 
-        case "ok":
-            if (maxAgeS === 0) return true;
-            const limit = Date.now().valueOf() - ((maxAgeS || 30) * 1000);
-            if (data.lastOK!.valueOf() < limit) {
-                return true;
-            }
-            return false;
-    }
+    case "ok":
+      if (maxAgeS === 0) return true;
+      const limit = Date.now().valueOf() - ((maxAgeS || 30) * 1000);
+      if (data.lastOK!.valueOf() < limit) {
+        return true;
+      }
+      return false;
+  }
 }
 
 const toPromise = <A>(data: NetworkData<A>): Promise<A> => {
-    if (data.status === "ok") {
-        return Promise.resolve(data.data!)
-    } else if (data.status === "error") {
-        return Promise.reject(data.err)
-    } else {
-        return Promise.reject(data.status)
-    }
+  if (data.status === "ok") {
+    return Promise.resolve(data.data!)
+  } else if (data.status === "error") {
+    return Promise.reject(data.err)
+  } else {
+    return Promise.reject(data.status)
+  }
 }
 
 export const addNotification = (level: NotificationLevel, msg: string): void => {
-    switch (level) {
-        case "ok": console.log("notification (" + level + "): " + msg); break;
-        case "warning": console.warn("notification (" + level + "): " + msg); break;
-        case "error": console.warn("notification (" + level + "): " + msg); break;
-    }
-    if (!process.client) {
-        return;
-    }
-    const toast = useNuxtApp().$toast;
-    switch (level) {
-        case "ok": toast.success(msg, { autoClose: 1000 }); break;
-        case "warning": toast.warning(msg); break;
-        case "error": toast.error(msg); break;
-    }
+  switch (level) {
+    case "ok": console.log("notification (" + level + "): " + msg); break;
+    case "warning": console.warn("notification (" + level + "): " + msg); break;
+    case "error": console.warn("notification (" + level + "): " + msg); break;
+  }
+  if (!process.client) {
+    return;
+  }
+  const toast = useNuxtApp().$toast;
+  switch (level) {
+    case "ok": toast.success(msg, { autoClose: 1000 }); break;
+    case "warning": toast.warning(msg); break;
+    case "error": toast.error(msg); break;
+  }
 }
 
 export const invitePath = (team: string, invite: string) => {
-    const params = new URLSearchParams({ invite });
-    return "/join/" + team + "?" + params.toString();
+  const params = new URLSearchParams({ invite });
+  return "/join/" + team + "?" + params.toString();
 }

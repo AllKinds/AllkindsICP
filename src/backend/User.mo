@@ -18,32 +18,21 @@ import TextHelper "helper/TextHelper";
 import Option "mo:base/Option";
 import TupleHelper "helper/TupleHelper";
 import StableBuffer "mo:StableBuffer/StableBuffer";
+import Types "Types"
 
 module {
 
-  public type IsPublic = Bool;
   let YEAR = 31_556_952_000_000_000; // average length of a year: 365.2425 * 24 * 60 * 60* 1000 * 1000 * 1000
 
-  type Time = Time.Time;
-  type Map<K, V> = Map.Map<K, V>;
-  type Result<T, E> = Result.Result<T, E>;
+  type User = Types.User;
+  type UserDB = Types.UserDB;
+  type UserStats = Types.UserStats;
+  type UserInfo = Types.UserInfo;
+  type RewardableAction = Types.RewardableAction;
   type Iter<T> = Iter.Iter<T>;
+  type Result<T> = Types.Result<T>;
   type Set<T> = Set.Set<T>;
   let { thash; phash } = Map;
-
-  type Error = Error.Error;
-
-  public type RewardableAction = {
-    #createQuestion;
-    #createAnswer : Nat; // boost
-    #findMatch;
-    #custom : Int;
-  };
-
-  public type UserDB = {
-    info : Map<Principal, User>;
-    byUsername : Map<Text, Principal>;
-  };
 
   public func emptyDB() : UserDB = {
     info = Map.new<Principal, User>();
@@ -58,38 +47,7 @@ module {
     Map.entries(users.info);
   };
 
-  /// Information about a user.
-  /// This contains private data and should not be returned to other users directly
-  /// see UserInfo for non sensitive information
-  public type User = {
-    username : Text;
-    displayName : Text;
-    created : Time;
-    about : Text;
-    contact : Text; // contains email or social media links
-    picture : ?Blob;
-    stats : UserStats;
-  };
-
-  public type UserStats = {
-    points : Nat;
-    asked : Nat;
-    answered : Nat;
-    boosts : Nat;
-  };
-
-  /// Public info about a user
-  public type UserInfo = {
-    username : Text;
-    displayName : Text;
-    about : Text;
-    contact : Text;
-    picture : ?Blob;
-  };
-
-  public type UserFilter = {};
-
-  public func add(users : UserDB, displayName : Text, contact : Text, id : Principal) : Result<User, Error> {
+  public func add(users : UserDB, displayName : Text, contact : Text, id : Principal) : Result<User> {
     if (Principal.isAnonymous(id)) return #err(#notLoggedIn);
     let null = get(users, id) else return #err(#alreadyRegistered);
 
@@ -103,7 +61,7 @@ module {
     #ok(user);
   };
 
-  public func delete(users : UserDB, id : Principal, username : Text) : Result<(), Error> {
+  public func delete(users : UserDB, id : Principal, username : Text) : Result<()> {
     let ?user = get(users, id) else return #err(#notRegistered(id));
     let ?principal = getPrincipal(users, username) else return #err(#userNotFound);
     if (principal != id) {
@@ -130,7 +88,7 @@ module {
     get(users, id);
   };
 
-  public func getInfo(users : UserDB, id : Principal, showNonPublic : Bool) : ?UserInfo {
+  public func getInfo(users : UserDB, id : Principal, showNonPublic : Bool) : ?Types.UserInfo {
     let ?u = get(users, id) else return null;
     ?filterUserInfo(u);
   };
@@ -148,7 +106,7 @@ module {
     return true;
   };
 
-  public func update(users : UserDB, user : User, id : Principal) : Result<User, Error> {
+  public func update(users : UserDB, user : User, id : Principal) : Result<User> {
     let ?u = get(users, id) else return #err(#notRegistered(id));
     let newUser : User = {
       username = u.username; // can't be changed by user
@@ -197,7 +155,7 @@ module {
     };
   };
 
-  public func checkFunds(users : UserDB, action : RewardableAction, id : Principal) : Result<Nat, Error> {
+  public func checkFunds(users : UserDB, action : RewardableAction, id : Principal) : Result<Nat> {
     let ?u = get(users, id) else return #err(#notRegistered(id));
 
     let amount : Int = rewardSize(action);
@@ -210,7 +168,7 @@ module {
     #ok(Int.abs(points));
   };
 
-  public func reward(users : UserDB, action : RewardableAction, id : Principal) : Result<User, Error> {
+  public func reward(users : UserDB, action : RewardableAction, id : Principal) : Result<User> {
     let ?u = get(users, id) else return #err(#notRegistered(id));
 
     let amount : Int = rewardSize(action);
@@ -284,7 +242,7 @@ module {
     };
   };
 
-  public func increment(users : UserDB, what : { #answered; #asked; #boost }, id : Principal) : Result<User, Error> {
+  public func increment(users : UserDB, what : { #answered; #asked; #boost }, id : Principal) : Result<User> {
     let ?u = get(users, id) else return #err(#notRegistered(id));
 
     let newStats = switch (what) {

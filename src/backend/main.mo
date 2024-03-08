@@ -41,30 +41,35 @@ import Nat8Extra "helper/Nat8Extra";
 import Performance "Performance";
 
 import TypesV1 "deprecated/TypesV1";
+import Notification "Notification";
+import Types "Types";
 
 actor {
 
   //TYPES INDEX
-  type User = User.User;
-  type Question = Question.Question;
-  type StableQuestion = Question.StableQuestion;
-  type QuestionID = Question.QuestionID;
-  type Answer = Question.Answer;
-  type Skip = Question.Skip;
-  type QuestionStats = Question.QuestionStats;
-  type FriendStatus = Friend.FriendStatus;
+  type User = Types.User;
+  type Question = Types.Question;
+  type StableQuestion = Types.StableQuestion;
+  type QuestionID = Types.QuestionID;
+  type Answer = Types.Answer;
+  type Skip = Types.Skip;
+  type QuestionStats = Types.QuestionStats;
+  type FriendStatus = Types.FriendStatus;
   type Error = Error.Error;
-  type Team = Team.Team;
-  type TeamInfo = Team.TeamInfo;
-  type TeamUserInfo = Team.TeamUserInfo;
-  type TeamStats = Team.TeamStats;
+  type Team = Types.Team;
+  type TeamInfo = Types.TeamInfo;
+  type TeamUserInfo = Types.TeamUserInfo;
+  type TeamStats = Types.TeamStats;
+  type Notification = Types.Notification;
 
-  type MatchingFilter = Matching.MatchingFilter;
   type UserMatch = Matching.UserMatch;
-  type AdminPermissions = Admin.Permissions;
+  type AdminPermission = Types.AdminPermission;
+  type AdminPermissions = Types.AdminPermissions;
 
   type Result<T> = Result.Result<T, Error>;
   type UserPermissions = { user : User; permissions : AdminPermissions };
+
+  type UserNotifications = { user : User; notifications : [Notification] };
 
   let { thash; phash } = Set;
 
@@ -84,17 +89,18 @@ actor {
   type ResultTeams = Result<[TeamUserInfo]>;
   type ResultTeamStats = Result<TeamStats>;
   type ResultQuestionStats = Result<[QuestionStats]>;
+  type ResultUsersNotifications = Result<[UserNotifications]>;
 
   // UTILITY FUNCTIONS
 
   // DATA STORAGE
-  type UserDB = User.UserDB;
-  type QuestionDB = Question.QuestionDB;
-  type AnswerDB = Question.AnswerDB;
-  type SkipDB = Question.SkipDB;
-  type FriendDB = Friend.FriendDB;
-  type TeamDB = Team.TeamDB;
-  type AdminDB = Admin.AdminDB;
+  type UserDB = Types.UserDB;
+  type QuestionDB = Types.QuestionDB;
+  type AnswerDB = Types.AnswerDB;
+  type SkipDB = Types.SkipDB;
+  type FriendDB = Types.FriendDB;
+  type TeamDB = Types.TeamDB;
+  type AdminDB = Types.AdminDB;
 
   type DBv1 = {
     users : UserDB;
@@ -117,7 +123,12 @@ actor {
 
   // Upgrade canister
   system func preupgrade() {
-    // make sure all data is stored in stable memory
+    //     !!!!!!!!!!!!!!!!!!!!!!!
+    //     !!! DO NOT USE THIS !!!
+    //     !!!!!!!!!!!!!!!!!!!!!!!
+    // ANY ERROR HERE CAN LOCK THE CANISTER
+    // AND PREVENT FURTHER UPGRADES WITHOUT
+    // REINSTALL AND ALL DATA WILL BE LOST!
   };
 
   system func postupgrade() {
@@ -177,14 +188,19 @@ actor {
     #ok(Iter.toArray<UserPermissions>(all));
   };
 
-  public shared query ({ caller }) func listUsers() : async ResultUsers {
+  public shared query ({ caller }) func listUsers() : async ResultUsersNotifications {
     assertPermission(caller, #createBackup);
-    let all = Iter.map<(Principal, User), User>(
-      User.list(db.users),
-      func((p, u)) = u,
-    );
 
-    #ok(Iter.toArray<User>(all));
+    func toUserNotifications((p : Principal, u : User)) : UserNotifications {
+      return {
+        user = u;
+        notifications = Notification.getAll(db.teams, p);
+      };
+    };
+
+    let all = Iter.map<(Principal, User), UserNotifications>(User.list(db.users), toUserNotifications);
+
+    #ok(Iter.toArray<UserNotifications>(all));
   };
 
   // Create default new team
@@ -553,7 +569,7 @@ actor {
     };
   };
 
-  func assertPermission(caller : Principal, permission : Admin.Permission) {
+  func assertPermission(caller : Principal, permission : AdminPermission) {
     if (not Admin.hasPermission(admins, caller, permission)) {
       Debug.trap("Access denied!");
     };

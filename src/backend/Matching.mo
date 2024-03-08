@@ -12,35 +12,31 @@ import Trie "mo:base/Trie";
 import Option "mo:base/Option";
 import Debug "mo:base/Debug";
 import Nat "mo:base/Nat";
+import Types "Types";
 
 module {
 
-  type Question = Question.Question;
-  type QuestionDB = Question.QuestionDB;
-  type Answer = Question.Answer;
-  type AnswerDB = Question.AnswerDB;
-  type SkipDB = Question.SkipDB;
-  type AnswerDiff = Question.AnswerDiff;
-  type UserDB = User.UserDB;
-  type Result<T, E> = Result.Result<T, E>;
+  type Question = Types.Question;
+  type QuestionDB = Types.QuestionDB;
+  type Answer = Types.Answer;
+  type AnswerDB = Types.AnswerDB;
+  type SkipDB = Types.SkipDB;
+  type AnswerDiff = Types.AnswerDiff;
+  type UserDB = Types.UserDB;
+  type Result<T> = Types.Result<T>;
   type Error = Error.Error;
-  type UserFilter = User.UserFilter;
   let { nhash } = Map;
-
-  public type MatchingFilter = {
-    users : UserFilter;
-    cohesion : Nat8;
-  };
 
   //returnable object of a user that caller requested
   public type UserMatch = {
-    user : User.UserInfo;
+    user : Types.UserInfo;
     answered : [(Question, AnswerDiff)]; // indicates comparison with caller answer
     uncommon : [Question]; //Questions that user has answered but not caller
     cohesion : Nat8;
+    errors : [Error];
   };
 
-  func score(common : [AnswerDiff]) : Result<Nat8, Error> {
+  func score(common : [AnswerDiff]) : Result<Nat8> {
     if (common.size() < Configuration.matching.minCommonQuestions) return #err(#notEnoughAnswers);
 
     var weights : Nat = 0;
@@ -58,10 +54,9 @@ module {
     return #ok(Nat8.fromIntWrap(s));
   };
 
-  public func getUserMatch(users : UserDB, questions : QuestionDB, answers : AnswerDB, skips : SkipDB, userA : Principal, userB : Principal, showNonPublic : Bool) : Result<UserMatch, Error> {
+  public func getUserMatch(users : UserDB, questions : QuestionDB, answers : AnswerDB, skips : SkipDB, userA : Principal, userB : Principal, showNonPublic : Bool) : Result<UserMatch> {
 
     let common = Question.getCommon(answers, userA, userB);
-    let answersB = Question.getAnswers(answers, userB);
 
     let cohesion = switch (score(common)) {
       case (#ok(s)) s;
@@ -72,6 +67,8 @@ module {
 
     let answered = Array.tabulate<(Question, AnswerDiff)>(common.size(), func i = (Question.getQuestion(questions, common[i].question), common[i]));
     let unanswered : Iter.Iter<Question> = Question.unanswered(questions, answers, skips, userA);
+
+    let answersB = Question.getAnswers(answers, userB);
     let uncommon = Iter.filter<Question>(unanswered, func q = Question.has(answersB, q.id));
 
     let userMatch : UserMatch = {
@@ -79,6 +76,7 @@ module {
       answered; // indicates comparison with caller answer
       uncommon = Iter.toArray(uncommon); // Questions that user has answered but not caller
       cohesion;
+      errors = [];
     };
 
     #ok(userMatch);

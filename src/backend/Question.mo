@@ -10,13 +10,14 @@ import IterTools "mo:itertools/Iter";
 import Iter "mo:base/Iter";
 import Nat "mo:base/Nat";
 import Option "mo:base/Option";
-import Buffer "mo:StableBuffer/StableBuffer";
 import Map "mo:map/Map";
 import Result "mo:base/Result";
 import Bool "mo:base/Bool";
 import Configuration "Configuration";
 import Error "Error";
 import BufferHelper "helper/BufferHelper";
+import Types "Types";
+import Buffer "mo:StableBuffer/StableBuffer";
 
 /// Types and functions related to questions and answers
 module {
@@ -24,73 +25,24 @@ module {
   type Iter<T> = Iter.Iter<T>;
   type Map<K, V> = Map.Map<K, V>;
   type Time = Time.Time;
-  public type QuestionID = Nat;
-  type Buffer<T> = Buffer.StableBuffer<T>;
-
-  public type QuestionDB = Buffer<StableQuestion>; // TODO: consider other data structure as buffer can have bad worst case performance due to resizing
-  public type UserAnswers = Trie.Trie<QuestionID, Answer>;
-  public type UserSkips = Trie.Trie<QuestionID, Skip>;
-  public type AnswerDB = Map<Principal, UserAnswers>;
-  public type SkipDB = Map<Principal, UserSkips>;
-
-  // Color indicates optional background color for the question
-  public type StableQuestion = {
-    id : QuestionID;
-    created : Time;
-    creator : Principal;
-    question : Text;
-    color : Text;
-    points : Int; // type Int because question points should be able to go negative
-    showCreator : Bool;
-    hidden : Bool;
-  };
-
-  // Question that can be returned to the frontend
-  public type Question = {
-    id : QuestionID;
-    created : Time;
-    creator : ?Text;
-    question : Text;
-    color : Text;
-    points : Int; // type Int because question points should be able to go negative
-  };
-
-  public type Answer = {
-    created : Time;
-    question : Nat; // Question ID // TODO? remove because it can be implied by the key in UserAnswers?
-    answer : Bool;
-    weight : Nat;
-  };
-
-  public type Skip = {
-    question : Nat; // Question ID // TODO? remove because it can be implied by the key in UserAnswers?
-    reason : { #skip; #flag };
-  };
-
-  public type AnswerDiff = {
-    question : Nat;
-    sameAnswer : Bool;
-    weight : Nat;
-  };
-
-  public type QuestionStats = {
-    question : Question;
-    answers : Nat;
-    yes : Nat;
-    no : Nat;
-    skips : Nat;
-    boosts : Nat;
-  };
-
-  public type Dismissed = {
-    question : Nat;
-  };
 
   type Error = Error.Error;
 
   type Hash = Hash.Hash;
   type Color = Color.Color;
   type Result<T, E> = Result.Result<T, E>;
+  type QuestionDB = Types.QuestionDB;
+  type AnswerDB = Types.AnswerDB;
+  type SkipDB = Types.SkipDB;
+  type StableQuestion = Types.StableQuestion;
+  type QuestionID = Types.QuestionID;
+  type Answer = Types.Answer;
+  type Question = Types.Question;
+  type Skip = Types.Skip;
+  type QuestionStats = Types.QuestionStats;
+  type AnswerDiff = Types.AnswerDiff;
+  type UserAnswers = Types.UserAnswers;
+  type UserSkips = Types.UserSkips;
 
   public func emptyDB() : QuestionDB = Buffer.init<StableQuestion>();
 

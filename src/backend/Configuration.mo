@@ -28,7 +28,7 @@ module {
   };
 
   public let matching = {
-    minAnswers : Nat = 5; // Users have to answer at least this many questions to start matching or get matched
+    minAnswers : Nat = 4; // Users have to answer at least this many questions to start matching or get matched
     minCommonQuestions : Nat = 4; // number of common questions to consider two users for matching
   };
 
