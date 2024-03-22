@@ -68,7 +68,7 @@ const notifications = (team: string): bigint => {
                 </div>
                 <div class="w-full pl-4">
 
-                    <span v-if="notifications(t.key)" class="float-right badge badge-error px-1">{{
+                    <span v-if="notifications(t.key)" class="float-right text-sm text-red-600 px-1">{{
                         notifications(t.key) }}</span>
 
                     <!--NuxtLink to="/team-info" @click="gotoInfo = true">
