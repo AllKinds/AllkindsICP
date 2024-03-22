@@ -54,6 +54,7 @@ if (inBrowser()) {
         app.setTeam(team);
         app.joinTeam(invite).then(() => {
             app.loadTeams(0);
+            clearInvite();
             navTo("/team-info");
         }, () => {
             // TODO: set verificationFailed on network error

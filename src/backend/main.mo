@@ -41,6 +41,7 @@ import Nat8Extra "helper/Nat8Extra";
 import Performance "Performance";
 
 import TypesV1 "deprecated/TypesV1";
+import TypesV2 "deprecated/TypesV2";
 import Notification "Notification";
 import Types "Types";
 
@@ -67,9 +68,9 @@ actor {
   type AdminPermissions = Types.AdminPermissions;
 
   type Result<T> = Result.Result<T, Error>;
-  type UserPermissions = { user : User; permissions : AdminPermissions };
+  type UserPermissions = Types.UserPermissions;
 
-  type UserNotifications = { user : User; notifications : [Notification] };
+  type UserNotifications = Types.UserNotifications;
 
   let { thash; phash } = Set;
 
@@ -102,19 +103,13 @@ actor {
   type TeamDB = Types.TeamDB;
   type AdminDB = Types.AdminDB;
 
-  type DBv1 = {
-    users : UserDB;
-    teams : TeamDB;
-  };
-
   // Stable vars
-  stable var db_v1 : DBv1 = {
-    users = User.emptyDB();
-    teams = Team.emptyDB();
-  };
+  stable var db_v1 : TypesV2.DBv2 = TypesV2.emptyDBv2();
+  // db_v2 is the same as v1
+  stable var db_v3 : Types.DBv3 = Types.emptyDBv3();
 
-  stable var admins_v1 : TypesV1.AdminDB = TypesV1.emptyDB();
-  stable var admins_v2 : AdminDB = Admin.emptyDB();
+  stable var admins_v1 : TypesV1.AdminDB = TypesV1.emptyAdminDBv1();
+  stable var admins_v2 : AdminDB = TypesV2.emptyAdminDBv2();
 
   // alias for current db version
   var db = db_v1;
@@ -132,14 +127,11 @@ actor {
   };
 
   system func postupgrade() {
-    // transfer data from old db version
+    /// migrations from old db version
     //migrate_DBv1_v2()
-    // Cleanup old stable data
-    //db_v1 := {
-    //  users = User.emptyDB();
-    //  teams = Team.emptyDB();
-    //};
-    admins_v1 := TypesV1.emptyDB();
+
+    /// Cleanup old stable data
+    admins_v1 := TypesV1.emptyAdminDBv1();
   };
 
   var insecureRandom = Prng.SFC64a(); // insecure random numbers
@@ -177,7 +169,7 @@ actor {
 
     func toUserPermissions((principal : Principal, permissions : AdminPermissions)) : ?UserPermissions {
       let ?user = User.get(db.users, principal) else return null;
-      return ?{ permissions; user };
+      return ?{ permissions; user; notifications = [] };
     };
 
     let all = IterTools.mapFilter<(Principal, AdminPermissions), UserPermissions>(
@@ -332,6 +324,7 @@ actor {
         {
           user;
           permissions = Admin.getPermissions(admins, principal);
+          notifications = Notification.getAll(db.teams, principal);
         };
       },
     );
@@ -508,7 +501,7 @@ actor {
     let withScore = IterTools.mapFilter<(Principal, User), UserMatch>(
       withoutFriends,
       func(id, user) {
-        let res = Matching.getUserMatch(db.users, team.questions, team.answers, team.skips, caller, id, false);
+        let res = Matching.getUserMatch(db.users, team.questions, team.answers, team.skips, caller, id);
         Result.toOption(res); // TODO?: handle errors instead of removing them?
       },
     );
@@ -531,7 +524,7 @@ actor {
 
     func toUserMatch((p : Principal, status : FriendStatus)) : ?(UserMatch, FriendStatus) {
       let showNonPublic = (status == #connected or status == #requestReceived);
-      let #ok(userMatch) = Matching.getUserMatch(db.users, team.questions, team.answers, team.skips, caller, p, showNonPublic) else return null;
+      let #ok(userMatch) = Matching.getUserMatch(db.users, team.questions, team.answers, team.skips, caller, p) else return null;
       // TODO?: handle errors instead of removing them?
       ?(userMatch, status);
     };
@@ -622,21 +615,6 @@ actor {
     Iter.toArray(withLimit);
   };
 
-  /// Create a backup of answers
-  public query ({ caller }) func backupAnswers(teamKey : Text, offset : Nat, limit : Nat) : async [StableQuestion] {
-    assertAdmin(caller);
-
-    let team = switch (Team.get(db.teams, teamKey, caller)) {
-      case (#ok(t)) t;
-      case (#err(e)) return Debug.trap("couldn't get team");
-    };
-
-    let all = Question.backup(team.questions);
-    let withOffset = IterTools.skip(all, offset);
-    let withLimit = IterTools.take(withOffset, limit);
-    Iter.toArray(withLimit);
-  };
-
   public shared ({ caller }) func airdrop(user : Text, tokens : Int) : async ResultVoid {
     assertAdmin(caller);
 
@@ -646,18 +624,6 @@ actor {
       case (#ok(_)) #ok;
       case (#err(e)) #err(e);
     };
-  };
-
-  public shared ({ caller }) func selfDestruct(confirm : Text) {
-    assertAdmin(caller);
-
-    if (confirm != "DELETE EVERYTHING!") Debug.trap("canceled");
-
-    db_v1 := {
-      users = User.emptyDB();
-      teams = Team.emptyDB();
-    };
-    db := db_v1;
   };
 
   public shared ({ caller }) func cleanup(teamKey : Text, mode : Nat) : async Result<Text> {
@@ -684,6 +650,8 @@ actor {
 
   public shared ({ caller }) func createTestData(teamKey : Text, questions : Nat, users : Nat) : async Nat {
     assertAdmin(caller);
+
+    if  (not Text.startsWith(teamKey, #text "test_")) Debug.trap("");
 
     let team = switch (Team.get(db.teams, teamKey, caller)) {
       case (#ok(t)) t;

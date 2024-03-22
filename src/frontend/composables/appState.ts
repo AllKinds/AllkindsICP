@@ -1,5 +1,5 @@
 import { Effect, pipe } from "effect";
-import type { FrontendEffect, Question, Answer, User, UserPermissions, Friend, UserMatch, TeamStats, TeamUserInfo, QuestionStats, UserNotifications } from "~/utils/backend";
+import type { Principal, FrontendEffect, Question, Answer, User, UserPermissions, Friend, UserMatch, TeamStats, TeamUserInfo, QuestionStats, UserNotifications } from "~/utils/backend";
 import * as backend from "~/utils/backend";
 import { type FrontendError, notifyWithMsg } from "~/utils/errors";
 import { defineStore } from 'pinia'

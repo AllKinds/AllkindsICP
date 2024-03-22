@@ -20,6 +20,13 @@ export const idlFactory = ({ IDL }) => {
     'invalidColor' : IDL.Null,
   });
   const ResultVoid = IDL.Variant({ 'ok' : IDL.Null, 'err' : Error });
+  const FriendStatus = IDL.Variant({
+    'requestReceived' : IDL.Null,
+    'connected' : IDL.Null,
+    'rejectionSend' : IDL.Null,
+    'rejectionReceived' : IDL.Null,
+    'requestSend' : IDL.Null,
+  });
   const QuestionID__1 = IDL.Nat;
   const Time = IDL.Int;
   const StableQuestion = IDL.Record({
@@ -31,13 +38,6 @@ export const idlFactory = ({ IDL }) => {
     'hidden' : IDL.Bool,
     'showCreator' : IDL.Bool,
     'points' : IDL.Int,
-  });
-  const FriendStatus = IDL.Variant({
-    'requestReceived' : IDL.Null,
-    'connected' : IDL.Null,
-    'rejectionSend' : IDL.Null,
-    'rejectionReceived' : IDL.Null,
-    'requestSend' : IDL.Null,
   });
   const UserStats = IDL.Record({
     'asked' : IDL.Nat,
@@ -81,9 +81,27 @@ export const idlFactory = ({ IDL }) => {
     'restoreBackup' : IDL.Bool,
     'becomeTeamAdmin' : IDL.Bool,
   });
+  const Notification = IDL.Record({
+    'team' : IDL.Text,
+    'event' : IDL.Variant({
+      'rewards' : IDL.Nat,
+      'newQuestions' : IDL.Nat,
+      'friendRequests' : IDL.Nat,
+    }),
+  });
+  const User__1 = IDL.Record({
+    'created' : Time,
+    'contact' : IDL.Text,
+    'about' : IDL.Text,
+    'username' : IDL.Text,
+    'displayName' : IDL.Text,
+    'picture' : IDL.Opt(IDL.Vec(IDL.Nat8)),
+    'stats' : UserStats,
+  });
   const UserPermissions = IDL.Record({
     'permissions' : AdminPermissions,
-    'user' : User,
+    'notifications' : IDL.Vec(Notification),
+    'user' : User__1,
   });
   const ResultUser = IDL.Variant({ 'ok' : UserPermissions, 'err' : Error });
   const Answer = IDL.Record({
@@ -145,6 +163,16 @@ export const idlFactory = ({ IDL }) => {
     'ok' : IDL.Vec(UserMatch),
     'err' : Error,
   });
+  const AdminPermissions__1 = IDL.Record({
+    'becomeTeamMember' : IDL.Bool,
+    'createTeam' : IDL.Bool,
+    'createBackup' : IDL.Bool,
+    'listAllTeams' : IDL.Bool,
+    'suspendUser' : IDL.Bool,
+    'editUser' : IDL.Bool,
+    'restoreBackup' : IDL.Bool,
+    'becomeTeamAdmin' : IDL.Bool,
+  });
   const Question__1 = IDL.Record({
     'id' : QuestionID__1,
     'created' : Time,
@@ -197,17 +225,9 @@ export const idlFactory = ({ IDL }) => {
     'ok' : IDL.Vec(TeamUserInfo),
     'err' : Error,
   });
-  const Notification = IDL.Record({
-    'team' : IDL.Text,
-    'event' : IDL.Variant({
-      'rewards' : IDL.Nat,
-      'newQuestions' : IDL.Nat,
-      'friendRequests' : IDL.Nat,
-    }),
-  });
   const UserNotifications = IDL.Record({
     'notifications' : IDL.Vec(Notification),
-    'user' : User,
+    'user' : User__1,
   });
   const ResultUsersNotifications = IDL.Variant({
     'ok' : IDL.Vec(UserNotifications),
@@ -226,11 +246,6 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Text, IDL.Text, IDL.Bool],
         [ResultVoid],
         [],
-      ),
-    'backupAnswers' : IDL.Func(
-        [IDL.Text, IDL.Nat, IDL.Nat],
-        [IDL.Vec(StableQuestion)],
-        ['query'],
       ),
     'backupConnections' : IDL.Func(
         [IDL.Text, IDL.Nat, IDL.Nat],
@@ -275,7 +290,7 @@ export const idlFactory = ({ IDL }) => {
         [],
         [
           IDL.Record({
-            'permissions' : AdminPermissions,
+            'permissions' : AdminPermissions__1,
             'principal' : IDL.Principal,
             'user' : IDL.Opt(User),
           }),
@@ -301,9 +316,12 @@ export const idlFactory = ({ IDL }) => {
     'listAdmins' : IDL.Func([], [ResultUserPermissions], ['query']),
     'listTeams' : IDL.Func([IDL.Vec(IDL.Text)], [ResultTeams], ['query']),
     'listUsers' : IDL.Func([], [ResultUsersNotifications], ['query']),
-    'selfDestruct' : IDL.Func([IDL.Text], [], ['oneway']),
     'sendFriendRequest' : IDL.Func([IDL.Text, IDL.Text], [ResultVoid], []),
-    'setPermissions' : IDL.Func([IDL.Text, AdminPermissions], [ResultVoid], []),
+    'setPermissions' : IDL.Func(
+        [IDL.Text, AdminPermissions__1],
+        [ResultVoid],
+        [],
+      ),
     'setTeamAdmin' : IDL.Func([IDL.Text, IDL.Text, IDL.Bool], [ResultTeam], []),
     'submitAnswer' : IDL.Func(
         [IDL.Text, QuestionID, IDL.Bool, IDL.Nat],

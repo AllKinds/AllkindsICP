@@ -1,30 +1,23 @@
-import Int "mo:base/Int";
-import Iter "mo:base/Iter";
 import Principal "mo:base/Principal";
+import Time "mo:base/Time";
 import Result "mo:base/Result";
 import Text "mo:base/Text";
-import Time "mo:base/Time";
-import Trie "mo:base/Trie";
 import Map "mo:map/Map";
 import Set "mo:map/Set";
+import Int "mo:base/Int";
+import Error "../Error";
+import Iter "mo:base/Iter";
+import Trie "mo:base/Trie";
 import StableBuffer "mo:StableBuffer/StableBuffer";
-
-import Error "Error";
 
 module {
 
-  /// ========
-  /// DB TYPES
-  /// ========
-
-  public type DBv3 = {
+  public type DBv2 = {
     users : UserDB;
     teams : TeamDB;
   };
 
-  public type AdminDB = Map<Principal, AdminPermissions>;
-
-  public func emptyDBv3() : DBv3 = {
+  public func emptyDBv2() : DBv2 = {
     users = emptyUserDB();
     teams = emptyTeamDB();
   };
@@ -33,10 +26,9 @@ module {
     info = Map.new<Principal, User>();
     byUsername = Map.new<Text, Principal>();
   };
-
   func emptyTeamDB() : TeamDB = Map.new<Text, Team>();
 
-  public func emptyAdminDB() : AdminDB = Map.new<Principal, AdminPermissions>();
+  public func emptyAdminDBv2() : AdminDB = Map.new<Principal, AdminPermissions>();
 
   /// ============
   /// COMMON TYPES
@@ -98,14 +90,6 @@ module {
       #rewards : Nat;
     };
   };
-
-  public type UserPermissions = {
-    user : User;
-    permissions : AdminPermissions;
-    notifications: [Notification];
-  };
-
-  public type UserNotifications = { user : User; notifications : [Notification] };
 
   public type UserDB = {
     info : Map<Principal, User>;
@@ -235,6 +219,8 @@ module {
   /// ===========
   /// Admin Types
   /// ===========
+
+  public type AdminDB = Map<Principal, AdminPermissions>;
 
   public type AdminPermissions = {
     suspendUser : Bool;

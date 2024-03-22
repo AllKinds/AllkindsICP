@@ -1,46 +1,46 @@
 {
-    "canisters": {
-        "backend": {
-            "main": "src/backend/main.mo",
-            "type": "motoko"
-        },
-        "frontend": {
-            "dependencies": [
-                "backend"
-            ],
-            "frontend": {
-                "entrypoint": ".output/public/index.html"
-            },
-            "source": [
-                ".output/public"
-            ],
-            "type": "assets"
-        },
-        "internet_identity": {
-            "type": "custom",
-            "candid": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity.did",
-            "wasm": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity_dev.wasm.gz",
-            "remote": {
-                "id": {
-                    "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
-                }
-            },
-            "frontend": {}
-        }
+  "canisters": {
+    "backend": {
+      "main": "src/backend/main.mo",
+      "type": "motoko"
     },
-    "networks": {
-        "staging": {
-            "providers": [
-                "https://icp0.io"
-            ],
-            "type": "persistent"
-        }
+    "frontend": {
+      "dependencies": [
+        "backend"
+      ],
+      "frontend": {
+        "entrypoint": ".output/public/index.html"
+      },
+      "source": [
+        ".output/public"
+      ],
+      "type": "assets"
     },
-    "defaults": {
-        "build": {
-            "packtool": "mops sources"
+    "internet_identity": {
+      "type": "custom",
+      "candid": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity.did",
+      "wasm": "https://github.com/dfinity/internet-identity/releases/latest/download/internet_identity_dev.wasm.gz",
+      "remote": {
+        "id": {
+          "ic": "rdmx6-jaaaa-aaaaa-aaadq-cai"
         }
-    },
-    "dfx": "0.17.0",
-    "version": 1
+      },
+      "frontend": {}
+    }
+  },
+  "networks": {
+    "staging": {
+      "providers": [
+        "https://icp0.io"
+      ],
+      "type": "persistent"
+    }
+  },
+  "defaults": {
+    "build": {
+      "packtool": "mops sources"
+    }
+  },
+  "dfx": "0.18.0",
+  "version": 1
 }

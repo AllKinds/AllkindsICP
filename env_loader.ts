@@ -22,9 +22,9 @@ if (fs.existsSync(canisterIdFile)) {
 };
 
 const ids = {
-    frontend: canisterIds.frontend[network],
-    backend: canisterIds.backend[network],
-    ii: isDev ? canisterIds.internet_identity[network] : undefined,
+    frontend: (canisterIds.frontend || {})[network],
+    backend: (canisterIds.backend || {})[network],
+    ii: isDev ? (canisterIds.internet_identity || {})[network] : undefined,
 }
 
 const II_URL = isDev ? "http://" + ids.ii + ".localhost:4943" : "https://identity.ic0.app";

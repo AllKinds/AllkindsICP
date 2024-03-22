@@ -1,8 +1,20 @@
-import type { Principal } from '@dfinity/principal';
+import type { PrincipalInternal } from '@dfinity/principal';
 import type { ActorMethod } from '@dfinity/agent';
 import type { IDL } from '@dfinity/candid';
 
+export type Principal = Omit<PrincipalInternal, "_arr">;
+
 export interface AdminPermissions {
+  'becomeTeamMember': boolean,
+  'createTeam': boolean,
+  'createBackup': boolean,
+  'listAllTeams': boolean,
+  'suspendUser': boolean,
+  'editUser': boolean,
+  'restoreBackup': boolean,
+  'becomeTeamAdmin': boolean,
+}
+export interface AdminPermissions__1 {
   'becomeTeamMember': boolean,
   'createTeam': boolean,
   'createBackup': boolean,
@@ -39,7 +51,7 @@ export type Error = { 'notInTeam': null } |
 { 'teamNotFound': null } |
 { 'alreadyRegistered': null } |
 { 'friendRequestAlreadySend': null } |
-{ 'notRegistered': Omit<Principal, "_arr"> } |
+{ 'notRegistered': Principal } |
 { 'invalidColor': null };
 export type Error__1 = { 'notInTeam': null } |
 { 'notLoggedIn': null } |
@@ -57,7 +69,7 @@ export type Error__1 = { 'notInTeam': null } |
 { 'teamNotFound': null } |
 { 'alreadyRegistered': null } |
 { 'friendRequestAlreadySend': null } |
-{ 'notRegistered': Omit<Principal, "_arr"> } |
+{ 'notRegistered': Principal } |
 { 'invalidColor': null };
 export type Friend = [UserMatch, FriendStatus];
 export type FriendStatus = { 'requestReceived': null } |
@@ -201,11 +213,12 @@ export interface UserMatch {
 }
 export interface UserNotifications {
   'notifications': Array<Notification>,
-  'user': User,
+  'user': User__1,
 }
 export interface UserPermissions {
   'permissions': AdminPermissions,
-  'user': User,
+  'notifications': Array<Notification>,
+  'user': User__1,
 }
 export interface UserStats {
   'asked': bigint,
@@ -213,13 +226,18 @@ export interface UserStats {
   'boosts': bigint,
   'points': bigint,
 }
+export interface User__1 {
+  'created': Time,
+  'contact': string,
+  'about': string,
+  'username': string,
+  'displayName': string,
+  'picture': [] | [Uint8Array | number[]],
+  'stats': UserStats,
+}
 export interface _SERVICE {
   'airdrop': ActorMethod<[string, bigint], ResultVoid>,
   'answerFriendRequest': ActorMethod<[string, string, boolean], ResultVoid>,
-  'backupAnswers': ActorMethod<
-    [string, bigint, bigint],
-    Array<StableQuestion>
-  >,
   'backupConnections': ActorMethod<
     [string, bigint, bigint],
     Array<[Principal, Principal, FriendStatus]>
@@ -247,7 +265,7 @@ export interface _SERVICE {
   'getPermissions': ActorMethod<
     [],
     {
-      'permissions': AdminPermissions,
+      'permissions': AdminPermissions__1,
       'principal': Principal,
       'user': [] | [User],
     }
@@ -263,9 +281,8 @@ export interface _SERVICE {
   'listAdmins': ActorMethod<[], ResultUserPermissions>,
   'listTeams': ActorMethod<[Array<string>], ResultTeams>,
   'listUsers': ActorMethod<[], ResultUsersNotifications>,
-  'selfDestruct': ActorMethod<[string], undefined>,
   'sendFriendRequest': ActorMethod<[string, string], ResultVoid>,
-  'setPermissions': ActorMethod<[string, AdminPermissions], ResultVoid>,
+  'setPermissions': ActorMethod<[string, AdminPermissions__1], ResultVoid>,
   'setTeamAdmin': ActorMethod<[string, string, boolean], ResultTeam>,
   'submitAnswer': ActorMethod<
     [string, QuestionID, boolean, bigint],
@@ -277,4 +294,4 @@ export interface _SERVICE {
   'whoami': ActorMethod<[], Principal>,
 }
 export declare const idlFactory: IDL.InterfaceFactory;
-export declare const init: ({ IDL }: { IDL: IDL }) => IDL.Type[];
+export declare const init: (args: { IDL: typeof IDL }) => IDL.Type[];

@@ -23,7 +23,7 @@ async function login(provider: Provider) {
         auth.setClient(!!res.val);
         navTo("/logged-in");
     } else {
-        addNotification('error', "Log in failed:\n" + res.err); // TODO format error
+        addNotification('error', "Log in failed:\n" + res.err); // TODO: format error
     }
 }
 

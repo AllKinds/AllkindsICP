@@ -7,10 +7,6 @@ import Nat8 "mo:base/Nat8";
 import Error "Error";
 import Array "mo:base/Array";
 import Iter "mo:base/Iter";
-import Map "mo:map/Map";
-import Trie "mo:base/Trie";
-import Option "mo:base/Option";
-import Debug "mo:base/Debug";
 import Nat "mo:base/Nat";
 import Types "Types";
 
@@ -25,7 +21,6 @@ module {
   type UserDB = Types.UserDB;
   type Result<T> = Types.Result<T>;
   type Error = Error.Error;
-  let { nhash } = Map;
 
   //returnable object of a user that caller requested
   public type UserMatch = {
@@ -54,7 +49,7 @@ module {
     return #ok(Nat8.fromIntWrap(s));
   };
 
-  public func getUserMatch(users : UserDB, questions : QuestionDB, answers : AnswerDB, skips : SkipDB, userA : Principal, userB : Principal, showNonPublic : Bool) : Result<UserMatch> {
+  public func getUserMatch(users : UserDB, questions : QuestionDB, answers : AnswerDB, skips : SkipDB, userA : Principal, userB : Principal) : Result<UserMatch> {
 
     let common = Question.getCommon(answers, userA, userB);
 
@@ -63,7 +58,7 @@ module {
       case (#err(e)) return #err(e);
     };
 
-    let ?user = User.getInfo(users, userB, showNonPublic) else return #err(#userNotFound);
+    let ?user = User.getInfo(users, userB) else return #err(#userNotFound);
 
     let answered = Array.tabulate<(Question, AnswerDiff)>(common.size(), func i = (Question.getQuestion(questions, common[i].question), common[i]));
     let unanswered : Iter.Iter<Question> = Question.unanswered(questions, answers, skips, userA);

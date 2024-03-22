@@ -1,8 +1,5 @@
-import List "mo:base/List";
-import TrieMap "mo:base/TrieMap";
 import Principal "mo:base/Principal";
 import Time "mo:base/Time";
-import Array "mo:base/Array";
 import Result "mo:base/Result";
 import Configuration "Configuration";
 import Char "mo:base/Char";
@@ -10,19 +7,13 @@ import Text "mo:base/Text";
 import Map "mo:map/Map";
 import Set "mo:map/Set";
 import Int "mo:base/Int";
-import Error "Error";
 import Iter "mo:base/Iter";
-import Debug "mo:base/Debug";
-import Nat8 "mo:base/Nat8";
 import TextHelper "helper/TextHelper";
-import Option "mo:base/Option";
-import TupleHelper "helper/TupleHelper";
-import StableBuffer "mo:StableBuffer/StableBuffer";
 import Types "Types"
 
 module {
 
-  let YEAR = 31_556_952_000_000_000; // average length of a year: 365.2425 * 24 * 60 * 60* 1000 * 1000 * 1000
+  //let YEAR = 31_556_952_000_000_000; // average length of a year: 365.2425 * 24 * 60 * 60* 1000 * 1000 * 1000
 
   type User = Types.User;
   type UserDB = Types.UserDB;
@@ -33,11 +24,6 @@ module {
   type Result<T> = Types.Result<T>;
   type Set<T> = Set.Set<T>;
   let { thash; phash } = Map;
-
-  public func emptyDB() : UserDB = {
-    info = Map.new<Principal, User>();
-    byUsername = Map.new<Text, Principal>();
-  };
 
   public func backup(users : UserDB) : Iter<(Principal, User)> {
     Map.entries(users.info);
@@ -62,7 +48,7 @@ module {
   };
 
   public func delete(users : UserDB, id : Principal, username : Text) : Result<()> {
-    let ?user = get(users, id) else return #err(#notRegistered(id));
+    let ?_user = get(users, id) else return #err(#notRegistered(id));
     let ?principal = getPrincipal(users, username) else return #err(#userNotFound);
     if (principal != id) {
       return #err(#validationError);
@@ -88,7 +74,7 @@ module {
     get(users, id);
   };
 
-  public func getInfo(users : UserDB, id : Principal, showNonPublic : Bool) : ?Types.UserInfo {
+  public func getInfo(users : UserDB, id : Principal) : ?Types.UserInfo {
     let ?u = get(users, id) else return null;
     ?filterUserInfo(u);
   };
@@ -138,7 +124,8 @@ module {
         return ?(p, u);
       };
     };
-    //Map.entries(users.info);
+
+    return iter;
   };
 
   /// Check how much an action is rewarded or costs
@@ -300,5 +287,6 @@ module {
       contact = user.contact;
       picture = user.picture;
     };
+    return info;
   };
 };

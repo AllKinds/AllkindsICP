@@ -1,23 +1,6 @@
-import List "mo:base/List";
-import TrieMap "mo:base/TrieMap";
 import Principal "mo:base/Principal";
-import Time "mo:base/Time";
-import Array "mo:base/Array";
-import Result "mo:base/Result";
-import Configuration "Configuration";
-import Char "mo:base/Char";
-import Text "mo:base/Text";
 import Map "mo:map/Map";
-import Set "mo:map/Set";
-import Int "mo:base/Int";
-import Error "Error";
 import Iter "mo:base/Iter";
-import Debug "mo:base/Debug";
-import Nat8 "mo:base/Nat8";
-import TextHelper "helper/TextHelper";
-import Option "mo:base/Option";
-import TupleHelper "helper/TupleHelper";
-import StableBuffer "mo:StableBuffer/StableBuffer";
 import Types "Types";
 
 module {
@@ -26,7 +9,7 @@ module {
   type AdminDB = Types.AdminDB;
   type Permission = Types.AdminPermission;
   type Permissions = Types.AdminPermissions;
-  let { thash; phash } = Map;
+  let { phash } = Map;
 
   let noPermissions = {
     suspendUser = false;
@@ -76,8 +59,6 @@ module {
     let ?permissions = Map.get(admins, phash, user) else return noPermissions;
     permissions;
   };
-
-  public func emptyDB() : AdminDB = Map.new<Principal, Permissions>();
 
   public func setPermissions(admins : AdminDB, user : Principal, permissions : Permissions) {
     ignore Map.put(admins, phash, user, permissions);

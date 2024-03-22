@@ -6,12 +6,9 @@ import Char "mo:base/Char";
 import Debug "mo:base/Debug";
 import Iter "mo:base/Iter";
 import Array "mo:base/Array";
-import Nat "mo:base/Nat";
 import Set "mo:map/Set";
 import Question "Question";
-import User "User";
 import Friend "Friend";
-import Matching "Matching";
 import Error "Error";
 import Types "Types";
 
@@ -33,8 +30,6 @@ module {
   type TeamUserInfo = Types.TeamUserInfo;
 
   let { thash; phash } = Map;
-
-  public func emptyDB() : TeamDB = Map.new<Text, Team>();
 
   public func create(teams : TeamDB, key : Text, invite : Text, info : TeamInfo, admin : Principal) : Result<TeamInfo> {
     if (Map.has(teams, thash, key)) {
@@ -78,7 +73,7 @@ module {
       skips = old.skips;
       friends = old.friends;
     };
-    let ?t = Map.put(teams, thash, key, team) else Debug.trap("Team must exist");
+    let ?_t = Map.put(teams, thash, key, team) else Debug.trap("Team must exist");
     return #ok(info);
 
   };

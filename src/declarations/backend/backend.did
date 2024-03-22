@@ -1,3 +1,13 @@
+type User__1 = 
+ record {
+   about: text;
+   contact: text;
+   created: Time;
+   displayName: text;
+   picture: opt blob;
+   stats: UserStats;
+   username: text;
+ };
 type UserStats = 
  record {
    answered: nat;
@@ -7,13 +17,14 @@ type UserStats =
  };
 type UserPermissions = 
  record {
+   notifications: vec Notification;
    permissions: AdminPermissions;
-   user: User;
+   user: User__1;
  };
 type UserNotifications = 
  record {
    notifications: vec Notification;
-   user: User;
+   user: User__1;
  };
 type UserMatch = 
  record {
@@ -287,6 +298,17 @@ type Answer =
    question: nat;
    weight: nat;
  };
+type AdminPermissions__1 = 
+ record {
+   becomeTeamAdmin: bool;
+   becomeTeamMember: bool;
+   createBackup: bool;
+   createTeam: bool;
+   editUser: bool;
+   listAllTeams: bool;
+   restoreBackup: bool;
+   suspendUser: bool;
+ };
 type AdminPermissions = 
  record {
    becomeTeamAdmin: bool;
@@ -301,8 +323,6 @@ type AdminPermissions =
 service : {
   airdrop: (text, int) -> (ResultVoid);
   answerFriendRequest: (text, text, bool) -> (ResultVoid);
-  /// Create a backup of answers
-  backupAnswers: (text, nat, nat) -> (vec StableQuestion) query;
   /// Create a backup of friend status
   backupConnections: (text, nat, nat) ->
    (vec record {
@@ -334,7 +354,7 @@ service : {
   getOwnQuestions: (text, nat) -> (vec Question) query;
   getPermissions: () ->
    (record {
-      permissions: AdminPermissions;
+      permissions: AdminPermissions__1;
       "principal": principal;
       user: opt User;
     }) query;
@@ -349,10 +369,9 @@ service : {
   listAdmins: () -> (ResultUserPermissions) query;
   listTeams: (vec text) -> (ResultTeams) query;
   listUsers: () -> (ResultUsersNotifications) query;
-  selfDestruct: (text) -> () oneway;
   /// Send a friend request to a user
   sendFriendRequest: (text, text) -> (ResultVoid);
-  setPermissions: (text, AdminPermissions) -> (ResultVoid);
+  setPermissions: (text, AdminPermissions__1) -> (ResultVoid);
   setTeamAdmin: (text, text, bool) -> (ResultTeam);
   submitAnswer: (text, QuestionID, bool, nat) -> (ResultAnswer);
   submitSkip: (text, nat) -> (ResultSkip);

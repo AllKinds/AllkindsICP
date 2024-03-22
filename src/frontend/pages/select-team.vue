@@ -33,6 +33,18 @@ const canCreate = () => {
     return u.data?.permissions.createTeam;
 }
 
+const notifications = (team: string): bigint => {
+    const ns = app.getUser().data?.notifications;
+    if (!ns) return 0n;
+    let count = 0n;
+    for (let n of ns) {
+        if (n.team === team) {
+            count += Object.values(n.event)[0];
+        }
+    }
+    return count;
+}
+
 </script>
 
 <template>
@@ -55,6 +67,9 @@ const canCreate = () => {
                     <img :src="toDataUrl(t.info.logo)" height="100" width="100" class="rounded-md" />
                 </div>
                 <div class="w-full pl-4">
+
+                    <span v-if="notifications(t.key)" class="float-right badge badge-error px-1">{{
+                        notifications(t.key) }}</span>
 
                     <!--NuxtLink to="/team-info" @click="gotoInfo = true">
                         <Icon name="tabler:info-hexagon" size="2em" class="float-right text-white" />

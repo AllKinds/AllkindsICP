@@ -1,11 +1,9 @@
 import { backend } from "~~/src/declarations/backend";
-export type { Principal } from "@dfinity/principal";
 export type * from "~~/src/declarations/backend/backend.did";
 export type BackendActor = typeof backend;
 import { Effect } from "effect";
-import type { Principal } from "@dfinity/principal";
 import { type BackendError, type FrontendError, toBackendError, toNetworkError } from "../utils/errors";
-import type { Question, Answer, User, Skip, Friend, UserMatch, TeamUserInfo, TeamStats, QuestionStats, FriendStatus, UserPermissions, UserNotifications } from "~~/src/declarations/backend/backend.did";
+import type { Principal, Question, Answer, User, Skip, Friend, UserMatch, TeamUserInfo, TeamStats, QuestionStats, FriendStatus, UserPermissions, UserNotifications } from "~~/src/declarations/backend/backend.did";
 import { useAuthState } from "../composables/authState";
 
 type BackendEffect<T> = Effect.Effect<T, BackendError, never>
@@ -20,7 +18,7 @@ export const resultToEffect = <T>(result: { err: BackendError } | { ok: T }): Ba
 }
 
 const effectify = <T>(fn: (actor: BackendActor) => Promise<T>, orRedirect: boolean = true): FrontendEffect<T> => {
-  return Effect.gen(function* (_) {
+  return Effect.gen(function*(_) {
     yield* _(Effect.tryPromise({
       try: () => checkAuth(orRedirect),
       catch: toNetworkError
@@ -41,7 +39,7 @@ const effectify = <T>(fn: (actor: BackendActor) => Promise<T>, orRedirect: boole
 }
 
 const effectifyAnon = <T>(fn: (actor: BackendActor) => Promise<T>): FrontendEffect<T> => {
-  return Effect.gen(function* (_) {
+  return Effect.gen(function*(_) {
     yield* _(Effect.tryPromise({
       try: () => checkAuth(false),
       catch: toNetworkError
@@ -57,14 +55,14 @@ const effectifyAnon = <T>(fn: (actor: BackendActor) => Promise<T>): FrontendEffe
 }
 
 const effectifyResult = <T>(fn: (actor: BackendActor) => Promise<{ ok: T } | { err: BackendError }>, orRedirect: boolean = true): FrontendEffect<T> => {
-  return Effect.gen(function* (_) {
+  return Effect.gen(function*(_) {
     const res = yield* _(effectify(fn, orRedirect));
     return yield* _(resultToEffect(res).pipe(Effect.mapError(toBackendError)));
   })
 }
 
 const effectifyAnonResult = <T>(fn: (actor: BackendActor) => Promise<{ ok: T } | { err: BackendError }>): FrontendEffect<T> => {
-  return Effect.gen(function* (_) {
+  return Effect.gen(function*(_) {
     const res = yield* _(effectifyAnon(fn));
     return yield* _(resultToEffect(res).pipe(Effect.mapError(toBackendError)));
   })
