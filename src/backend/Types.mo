@@ -10,7 +10,7 @@ import Set "mo:map/Set";
 import StableBuffer "mo:StableBuffer/StableBuffer";
 
 import Error "Error";
-import TypesV3 "types/TypesV3";
+import TypesV1 "types/TypesV3";
 
 module {
 
@@ -32,9 +32,9 @@ module {
     teams = emptyTeamDB();
   };
 
-  public func migrateV3(v3 : TypesV3.DB) : DB = {
-    users = v3.users;
-    teams = migrateTeamDBV3(v3.teams);
+  public func migrateV1(v1 : TypesV1.DB) : DB = {
+    users = v1.users;
+    teams = migrateTeamDBV1(v1.teams);
   };
 
   public func emptyUserDB() : UserDB = {
@@ -44,22 +44,22 @@ module {
 
   func emptyTeamDB() : TeamDB = Map.new<Text, Team>();
 
-  func migrateTeamDBV3(v3 : TypesV3.TeamDB) : TeamDB {
-    Map.map<Text, TypesV3.Team, Team>(v3, thash, func(_id, team) = migrateTeamV3(team));
+  func migrateTeamDBV1(v1 : TypesV1.TeamDB) : TeamDB {
+    Map.map<Text, TypesV1.Team, Team>(v1, thash, func(_id, team) = migrateTeamV1(team));
   };
 
   public func emptyAdminDB() : AdminDB = Map.new<Principal, AdminPermissions>();
 
-  func migrateTeamV3(v3 : TypesV3.Team) : Team = {
-    info = v3.info;
-    invite = v3.invite;
-    members = v3.members;
-    admins = v3.admins;
+  func migrateTeamV1(v1 : TypesV1.Team) : Team = {
+    info = v1.info;
+    invite = v1.invite;
+    members = v1.members;
+    admins = v1.admins;
 
-    questions = v3.questions;
-    answers = v3.answers;
-    skips = v3.skips;
-    friends = v3.friends;
+    questions = v1.questions;
+    answers = v1.answers;
+    skips = v1.skips;
+    friends = v1.friends;
 
     userSettings : TeamUserSettingsDB = Map.new();
   };

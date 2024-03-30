@@ -11,7 +11,7 @@ section "Migrations";
 
 test "from v3";
 
-let dbv3 = gen.testDBv3();
-let db = Types.migrateV3(dbv3);
+let dbv1 = gen.testDBv3();
+let db = Types.migrateV1(dbv1);
 
 Debug.print(debug_show (db));

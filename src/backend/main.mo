@@ -141,11 +141,7 @@ actor {
 
     db_version := 3;// TODO: remove, this is just for testing
     if (db_version < 4) {
-      db_v4 := TypesV4.migrateV3(db_v3);
-      Debug.print("db_v3");
-      Debug.print(debug_show(db_v3));
-      Debug.print("db_v4");
-      Debug.print(debug_show(db_v4));
+      db_v4 := TypesV4.migrateV1(db_v1);
       //keeping old db_v3 around for now as a backup in case anything goes wrong with the migration
     };
     db_version := 4;

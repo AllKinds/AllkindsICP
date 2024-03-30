@@ -13,10 +13,10 @@ import TypesV3 "../types/TypesV3";
 import Map "mo:map/Map";
 import Set "mo:map/Set";
 import StableBuffer "mo:StableBuffer/StableBuffer";
-import Question "../v3/Question";
-import Friend "../v3/Friend";
-import Team "../v3/Team";
-import User "../v3/User";
+import Question "../v1/Question";
+import Friend "../v1/Friend";
+import Team "../v1/Team";
+import User "../v1/User";
 /// This file contains all test data that is too bulky to include directly into the tests
 
 type User = TypesV3.User;
