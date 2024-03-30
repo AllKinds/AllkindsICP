@@ -33,11 +33,11 @@ module {
     Map.entries(users.info);
   };
 
-  public func add(users : UserDB, displayName : Text, about : Text, contact : Text, id : Principal) : Result<User> {
+  public func add(users : UserDB, displayName : Text, contact : Text, id : Principal) : Result<User> {
     if (Principal.isAnonymous(id)) return #err(#notLoggedIn);
     let null = get(users, id) else return #err(#alreadyRegistered);
 
-    let user = create(displayName, about, contact);
+    let user = create(displayName, contact);
 
     let true = validateName(user.username) else return #err(#validationError);
     let null = getByName(users, user.username) else return #err(#nameNotAvailable);
@@ -245,12 +245,12 @@ module {
     #ok(newUser);
   };
 
-  public func create(displayName : Text, about : Text, contact : Text) : User {
+  public func create(displayName : Text, contact : Text) : User {
     return {
       username = toUsername(displayName);
       displayName;
       created = Time.now();
-      about;
+      about = "";
       contact;
       picture = null;
       stats = initStats;

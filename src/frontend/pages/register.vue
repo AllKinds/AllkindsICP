@@ -8,6 +8,7 @@ definePageMeta({
     layout: 'default'
 });
 const username = ref("");
+const about = ref("");
 const contact = ref("");
 const loading = ref(false);
 const app = useAppState();
@@ -35,7 +36,7 @@ async function createUser() {
 
     const prog = pipe(
         validateUsername(username.value),
-        () => backend.createUser(username.value, contact.value),
+        () => backend.createUser(username.value, about.value, contact.value),
         Effect.tapBoth({
             onSuccess: (a) => {
                 navTo("/intro-1");
@@ -73,23 +74,26 @@ if (inBrowser()) {
         <AllkindsTitle>Register</AllkindsTitle>
 
         <TextBlock align="text-left">
-            Your nickname can be anything
+            Nickname
         </TextBlock>
 
-        <TextInput name="handle" v-model.trim="username" placeholder="username" required class="w-full m-2"
+        <TextInput name="handle" v-model.trim="username" placeholder="" required class="w-full m-2"
             :class="{ 'input-disabled': loading }" />
 
         <TextBlock align="text-left">
-            Provide your email if you wish to be contacted by others. 
-            We will also notify you when others connect with you.
-            <br />
-            Email
+            A few words about yourself
         </TextBlock>
 
-        <TextInput name="handle" v-model.trim="contact" placeholder="Contact" required class="w-full m-2"
+        <TextArea name="about" v-model.trim="about" placeholder="" required class="w-full m-2"
+            :class="{ 'input-disabled': loading }" />
+
+        <TextBlock align="text-left">
+            Any contact
+        </TextBlock>
+
+        <TextInput name="handle" v-model.trim="contact" placeholder="e.g. john@example.com" required class="w-full m-2"
             :class="{ 'input-disabled': loading }" @keyup.enter="createUser()" />
 
-        <div class="grow" />
         <div class="grow" />
 
         <Btn class="mt-12" :class="{ 'btn-disabled': username === '' }" @click="createUser()">

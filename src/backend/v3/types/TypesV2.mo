@@ -1,68 +1,34 @@
-import Int "mo:base/Int";
-import Iter "mo:base/Iter";
 import Principal "mo:base/Principal";
+import Time "mo:base/Time";
 import Result "mo:base/Result";
 import Text "mo:base/Text";
-import Time "mo:base/Time";
-import Trie "mo:base/Trie";
 import Map "mo:map/Map";
 import Set "mo:map/Set";
+import Int "mo:base/Int";
+import Error "../Error";
+import Iter "mo:base/Iter";
+import Trie "mo:base/Trie";
 import StableBuffer "mo:StableBuffer/StableBuffer";
 
-import Error "Error";
-import TypesV3 "types/TypesV3";
-
 module {
-
-  let { thash; phash } = Map;
-
-  /// ========
-  /// DB TYPES
-  /// ========
 
   public type DB = {
     users : UserDB;
     teams : TeamDB;
   };
 
-  public type AdminDB = Map<Principal, AdminPermissions>;
-
   public func emptyDB() : DB = {
     users = emptyUserDB();
     teams = emptyTeamDB();
   };
 
-  public func migrateV3(v3 : TypesV3.DB) : DB = {
-    users = v3.users;
-    teams = migrateTeamDBV3(v3.teams);
-  };
-
-  public func emptyUserDB() : UserDB = {
+  func emptyUserDB() : UserDB = {
     info = Map.new<Principal, User>();
     byUsername = Map.new<Text, Principal>();
   };
-
   func emptyTeamDB() : TeamDB = Map.new<Text, Team>();
 
-  func migrateTeamDBV3(v3 : TypesV3.TeamDB) : TeamDB {
-    Map.map<Text, TypesV3.Team, Team>(v3, thash, func(_id, team) = migrateTeamV3(team));
-  };
-
   public func emptyAdminDB() : AdminDB = Map.new<Principal, AdminPermissions>();
-
-  func migrateTeamV3(v3 : TypesV3.Team) : Team = {
-    info = v3.info;
-    invite = v3.invite;
-    members = v3.members;
-    admins = v3.admins;
-
-    questions = v3.questions;
-    answers = v3.answers;
-    skips = v3.skips;
-    friends = v3.friends;
-
-    userSettings : TeamUserSettingsDB = Map.new();
-  };
 
   /// ============
   /// COMMON TYPES
@@ -123,17 +89,6 @@ module {
       #newQuestions : Nat;
       #rewards : Nat;
     };
-  };
-
-  public type UserPermissions = {
-    user : User;
-    permissions : AdminPermissions;
-    notifications : [Notification];
-  };
-
-  public type UserNotifications = {
-    user : User;
-    notifications : [Notification];
   };
 
   public type UserDB = {
@@ -234,7 +189,6 @@ module {
     answers : AnswerDB;
     skips : SkipDB;
     friends : FriendDB;
-    userSettings : TeamUserSettingsDB;
   };
 
   public type TeamInfo = {
@@ -258,21 +212,15 @@ module {
     connections : Nat;
   };
 
-  public type TeamUserSettings = {
-    stared : [QuestionID];
-    invitedBy : ?Principal;
-  };
-
   public type Permissions = { isMember : Bool; isAdmin : Bool };
 
   public type TeamDB = Map<Text, Team>;
 
-  public type TeamUserSettingsDB = Map<TeamUserSettings, Team>;
-  public func emptyTeamUserSettingsDB() : TeamUserSettingsDB = Map.new<TeamUserSettings, Team>();
-
   /// ===========
   /// Admin Types
   /// ===========
+
+  public type AdminDB = Map<Principal, AdminPermissions>;
 
   public type AdminPermissions = {
     suspendUser : Bool;

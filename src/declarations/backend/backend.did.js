@@ -270,7 +270,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'createTeam' : IDL.Func([IDL.Text, IDL.Text, TeamInfo], [ResultTeam], []),
     'createTestData' : IDL.Func([IDL.Text, IDL.Nat, IDL.Nat], [IDL.Nat], []),
-    'createUser' : IDL.Func([IDL.Text, IDL.Text], [ResultUser], []),
+    'createUser' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [ResultUser], []),
     'deleteAnswers' : IDL.Func([IDL.Text, IDL.Text], [ResultVoid], []),
     'deleteQuestion' : IDL.Func([IDL.Text, Question], [ResultVoid], []),
     'deleteUser' : IDL.Func([IDL.Text], [ResultVoid], []),

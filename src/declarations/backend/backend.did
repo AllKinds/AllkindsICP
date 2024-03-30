@@ -341,7 +341,7 @@ service : {
   createQuestion: (text, text, text) -> (ResultQuestion);
   createTeam: (text, text, TeamInfo) -> (ResultTeam);
   createTestData: (text, nat, nat) -> (nat);
-  createUser: (text, text) -> (ResultUser);
+  createUser: (text, text, text) -> (ResultUser);
   deleteAnswers: (text, text) -> (ResultVoid);
   deleteQuestion: (text, Question) -> (ResultVoid);
   deleteUser: (text) -> (ResultVoid);

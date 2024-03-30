@@ -40,10 +40,8 @@ import TextHelper "helper/TextHelper";
 import Nat8Extra "helper/Nat8Extra";
 import Performance "Performance";
 
-import TypesV1 "types/TypesV1";
-import TypesV2 "types/TypesV2";
-import TypesV3 "types/TypesV3";
-import TypesV4 "Types"; // TODO: copy to types/TypesV4.mo
+import TypesV1 "deprecated/TypesV1";
+import TypesV2 "deprecated/TypesV2";
 import Notification "Notification";
 import Types "Types";
 
@@ -106,16 +104,15 @@ actor {
   type AdminDB = Types.AdminDB;
 
   // Stable vars
-  stable var db_v1 : TypesV2.DB = TypesV2.emptyDB();
+  stable var db_v1 : TypesV2.DBv2 = TypesV2.emptyDBv2();
   // db_v2 is the same as v1
-  stable var db_v3 : TypesV3.DB = TypesV3.emptyDB();
-  stable var db_v4 : TypesV4.DB = TypesV4.emptyDB();
+  stable var db_v3 : Types.DBv3 = Types.emptyDBv3();
 
-  stable var admins_v1 : TypesV1.AdminDB = TypesV1.emptyAdminDB();
-  stable var admins_v2 : AdminDB = TypesV2.emptyAdminDB();
+  stable var admins_v1 : TypesV1.AdminDB = TypesV1.emptyAdminDBv1();
+  stable var admins_v2 : AdminDB = TypesV2.emptyAdminDBv2();
 
   // alias for current db version
-  var db : Types.DB = db_v4;
+  var db = db_v1;
   var admins = admins_v2;
   let performance = Performance.emptyDB();
 
@@ -129,27 +126,15 @@ actor {
     // REINSTALL AND ALL DATA WILL BE LOST!
   };
 
-  stable var db_version : Nat = 0;
   system func postupgrade() {
     /// migrations from old db version
     //migrate_DBv1_v2()
 
     /// Cleanup old stable data
-    if (db_version < 2) {
-      admins_v1 := TypesV1.emptyAdminDB();
-    };
-
-    db_version := 3;// TODO: remove, this is just for testing
-    if (db_version < 4) {
-      db_v4 := TypesV4.migrateV3(db_v3);
-      Debug.print("db_v3");
-      Debug.print(debug_show(db_v3));
-      Debug.print("db_v4");
-      Debug.print(debug_show(db_v4));
-      //keeping old db_v3 around for now as a backup in case anything goes wrong with the migration
-    };
-    db_version := 4;
+    admins_v1 := TypesV1.emptyAdminDBv1();
   };
+
+  var insecureRandom = Prng.SFC64a(); // insecure random numbers
 
   // PUBLIC API
 
@@ -295,7 +280,7 @@ actor {
       func(p) {
         let u = switch (User.get(db.users, p)) {
           case (?value) { value };
-          case (null) { User.create(Principal.toText(p), "N/A", "") };
+          case (null) { User.create(Principal.toText(p), "N/A") };
         };
         u;
       },
@@ -317,7 +302,7 @@ actor {
       func(p) {
         let u = switch (User.get(db.users, p)) {
           case (?value) { value };
-          case (null) { User.create(Principal.toText(p), "N/A", "") };
+          case (null) { User.create(Principal.toText(p), "N/A") };
         };
         u;
       },
@@ -327,8 +312,8 @@ actor {
   };
 
   // Create default new user with only a username
-  public shared ({ caller }) func createUser(displayName : Text, about : Text, contact : Text) : async ResultUser {
-    let u = User.add(db.users, displayName, about, contact, caller);
+  public shared ({ caller }) func createUser(displayName : Text, contact : Text) : async ResultUser {
+    let u = User.add(db.users, displayName, contact, caller);
     userWithPermissions(u, caller);
   };
 
@@ -673,7 +658,7 @@ actor {
       case (#err(e)) return Debug.trap("couldn't get team");
     };
 
-    let res = User.add(db.users, "admin", "test user", "admin@allkinds", caller);
+    let res = User.add(db.users, "admin", "admin@allkinds", caller);
 
     for (i in Iter.range(1, questions)) {
       let text = "Question " # Nat.toText(i) # "?";
@@ -693,7 +678,7 @@ actor {
       let name = "User." # Nat.toText(i);
 
       let principal = Principal.fromBlob(Blob.fromArray([Nat8.fromNat(i % 256), Nat8.fromNat((i / 256) % 256), 0x03]));
-      let res = User.add(db.users, name, "test user", name # "@allkinds", principal);
+      let res = User.add(db.users, name, name # "@allkinds", principal);
       switch (res) {
         case (#ok(_)) {};
         case (#err(error)) {

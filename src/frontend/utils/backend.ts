@@ -96,8 +96,8 @@ export const createQuestion = (team: string, q: string, c: ColorName): FrontendE
   return effectifyResult((actor) => actor.createQuestion(team, q, c))
 }
 
-export const createUser = (name: string, contact: string): FrontendEffect<void> => {
-  return effectifyResult((actor) => actor.createUser(name, contact))
+export const createUser = (name: string, about: string, contact: string): FrontendEffect<void> => {
+  return effectifyResult((actor) => actor.createUser(name, about, contact))
 }
 
 export const answerQuestion = (team: string, q: BigInt, a: boolean, boost: number): FrontendEffect<Answer> => {

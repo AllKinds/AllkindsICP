@@ -28,7 +28,6 @@ module {
   type TeamInfo = Types.TeamInfo;
   type TeamStats = Types.TeamStats;
   type TeamUserInfo = Types.TeamUserInfo;
-  type TeamUserSettingsDB = Types.TeamUserSettingsDB;
 
   let { thash; phash } = Map;
 
@@ -54,7 +53,6 @@ module {
       answers = Question.emptyAnswerDB();
       skips = Question.emptySkipDB();
       friends = Friend.emptyDB();
-      userSettings = Types.emptyTeamUserSettingsDB();
     };
     let null = Map.put(teams, thash, key, team) else Debug.trap("Team must not exist");
     return #ok(info);
@@ -74,7 +72,6 @@ module {
       answers = old.answers;
       skips = old.skips;
       friends = old.friends;
-      userSettings = old.userSettings;
     };
     let ?_t = Map.put(teams, thash, key, team) else Debug.trap("Team must exist");
     return #ok(info);
