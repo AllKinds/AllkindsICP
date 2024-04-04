@@ -1,4 +1,5 @@
-import type { Principal } from '@dfinity/principal';
+import type { Principal as PrincipalInternal} from "@dfinity/principal";
+export type Principal = Omit<Principal, "_arr">;
 import type { ActorMethod } from '@dfinity/agent';
 import type { IDL } from '@dfinity/candid';
 
@@ -183,6 +184,7 @@ export interface TeamUserInfo {
   'key' : string,
   'permissions' : Permissions,
   'info' : TeamInfo__1,
+  'userInvite' : [] | [string],
   'invite' : [] | [string],
 }
 export type Time = bigint;
@@ -274,7 +276,7 @@ export interface _SERVICE {
   'getTeamStats' : ActorMethod<[string], ResultTeamStats>,
   'getUnansweredQuestions' : ActorMethod<[string, bigint], Array<Question>>,
   'getUser' : ActorMethod<[], ResultUser>,
-  'joinTeam' : ActorMethod<[string, string], ResultTeam>,
+  'joinTeam' : ActorMethod<[string, string, [] | [string]], ResultTeam>,
   'leaveTeam' : ActorMethod<[string, string], ResultVoid>,
   'listAdmins' : ActorMethod<[], ResultUserPermissions>,
   'listTeams' : ActorMethod<[Array<string>], ResultTeams>,

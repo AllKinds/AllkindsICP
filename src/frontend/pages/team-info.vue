@@ -13,23 +13,6 @@ if (inBrowser()) {
     app.loadTeamStats(0);
 }
 
-const invite = (): string | undefined => {
-    const team = app.getTeam();
-    if (!team) return undefined;
-    const code = app.getTeam()?.invite;
-    if (!code?.length) return undefined;
-    return document.location.origin + invitePath(app.getTeam()?.key || "", code[0]);
-}
-const copy = () => {
-    const link = invite();
-    if (link) {
-        navigator.clipboard.writeText(link);
-        addNotification('ok', "Invite link copied.")
-    } else {
-        addNotification('error', "Couldn't generate invite link.\nDo you have admin permissions?")
-    }
-}
-
 const stats = () => {
     return app.getTeamStats().data
 }
@@ -76,7 +59,7 @@ const stats = () => {
                 <Btn class="w-80" to="update-team" v-if="app.getTeam()?.permissions.isAdmin">
                     Edit team
                 </Btn>
-                <Btn class="w-80" @click="copy()" v-if="app.getTeam()?.permissions.isAdmin">Copy invite link</Btn>
+                <Btn class="w-80" @click="copyInvite()" v-if="app.getTeam()?.permissions.isAdmin">Copy invite link</Btn>
                 <Btn class="w-80" to="/questions">Ask and answer questions</Btn>
                 <Btn class="w-80" to="/team-members" v-if="app.getTeam()?.permissions.isAdmin">Team members</Btn>
                 <Btn class="w-80" to="/question-stats" v-if="app.getTeam()?.permissions.isAdmin">Manage questions</Btn>
@@ -85,3 +68,4 @@ const stats = () => {
         </NetworkDataContainer>
     </div>
 </template>
+

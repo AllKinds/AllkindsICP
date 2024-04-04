@@ -11,6 +11,7 @@ const auth = useAuthState();
 
 let team: string | undefined = undefined;
 let invite: string | undefined = undefined;
+let invitedBy: string | null = null;
 
 let isValid = ref(false);
 
@@ -39,9 +40,10 @@ const getTeam = () => app.getTeam(false);
 
 if (inBrowser()) {
     try {
-        const obj: { team: string, invite: string } = JSON.parse(window.localStorage.getItem("invite") || "");
+        const obj: { team: string, invite: string, invitedBy: string | undefined } = JSON.parse(window.localStorage.getItem("invite") || "");
         team = obj.team;
         invite = obj.invite;
+        invitedBy = obj.invitedBy || null;
     } catch (e) {
         console.warn("Failed to parse invite:", e);
         clearInvite();
@@ -52,7 +54,7 @@ if (inBrowser()) {
         clearInvite();
     } else if ((team !== undefined) && (invite !== undefined)) {
         app.setTeam(team);
-        app.joinTeam(invite).then(() => {
+        app.joinTeam(invite, invitedBy).then(() => {
             app.loadTeams(0);
             clearInvite();
             navTo("/team-info");
@@ -100,7 +102,7 @@ if (inBrowser()) {
         <Icon v-if="loading()" name="line-md:loading-alt-loop" size="3em" />
 
         <div v-if="isValid"> Invite is valid. You successfully joined the team! </div>
-        <div v-if="isInvalid !== null"> Invite is invalid. (invite code: '{{ isInvalid }}') </div>
+        <div v-if="isInvalid !== null"> Invite is invalid. (invite code: '{{ isInvalid }}' {{ invitedBy }}) </div>
         <div v-if="!hasInvite"> Invite was not set. </div>
         <div v-if="isMember()"> You are already a member of this team. </div>
 

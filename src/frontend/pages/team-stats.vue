@@ -14,13 +14,6 @@ if (inBrowser()) {
     app.loadQuestionStats(0);
 }
 
-const invite = (): string | undefined => {
-    const team = app.getTeam();
-    if (!team) return undefined;
-    const code = app.getTeam()?.invite;
-    if (!code?.length) return undefined;
-    return document.location.origin + invitePath(app.getTeam()?.key || "", code[0]);
-}
 const copy = () => {
     const link = invite();
     if (link) {

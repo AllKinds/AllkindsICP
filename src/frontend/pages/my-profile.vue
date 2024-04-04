@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { copyPersonalInvite } from '~/composables/appState';
 import { withDefault, type UserPermissions } from '../utils/backend';
 
 definePageMeta({
@@ -15,6 +16,7 @@ const user = () => {
 
 if (inBrowser()) {
     app.getTeam();
+    app.loadTeams();
     app.loadUser(0);
     app.loadAnsweredQuestions();
     app.loadOwnQuestions();
@@ -48,6 +50,16 @@ if (inBrowser()) {
             <div>
                 <span class="font-bold">{{ user().stats.boosts }}</span>
                 people boosted your question
+            </div>
+        </div>
+
+        <div class="w-full mt-4">
+            <div class="text-xl font-bold">
+                Invite others to join the tribe
+            </div>
+            People invited via this link will be asked your questions first.
+            <div class="w-full text-center">
+                <Btn class="w-72" @click="copyPersonalInvite()">Copy personal invite link</Btn>
             </div>
         </div>
 

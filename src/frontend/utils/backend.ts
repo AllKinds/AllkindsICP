@@ -3,7 +3,8 @@ export type * from "~~/src/declarations/backend/backend.did";
 export type BackendActor = typeof backend;
 import { Effect } from "effect";
 import { type BackendError, type FrontendError, toBackendError, toNetworkError } from "../utils/errors";
-import type { Principal, Question, Answer, User, Skip, Friend, UserMatch, TeamUserInfo, TeamStats, QuestionStats, FriendStatus, UserPermissions, UserNotifications } from "~~/src/declarations/backend/backend.did";
+import type { Question, Answer, User, Skip, Friend, UserMatch, TeamUserInfo, TeamStats, QuestionStats, FriendStatus, UserPermissions, UserNotifications } from "~~/src/declarations/backend/backend.did";
+import type { Principal } from '@dfinity/principal';
 import { useAuthState } from "../composables/authState";
 
 type BackendEffect<T> = Effect.Effect<T, BackendError, never>
@@ -209,8 +210,8 @@ export const answerFriendRequest = (team: string, username: string, accept: bool
   return effectifyResult((actor) => actor.answerFriendRequest(team, username, accept))
 }
 
-export const joinTeam = (team: string, code: string): FrontendEffect<void> => {
-  return effectifyResult((actor) => actor.joinTeam(team, code))
+export const joinTeam = (team: string, code: string, invitedBy: string | null): FrontendEffect<void> => {
+  return effectifyResult((actor) => actor.joinTeam(team, code, invitedBy ? [invitedBy] : []))
 }
 
 export const leaveTeam = (team: string, user: string): FrontendEffect<void> => {

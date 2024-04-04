@@ -62,6 +62,7 @@ type TeamUserInfo =
    invite: opt text;
    key: text;
    permissions: Permissions;
+   userInvite: opt text;
  };
 type TeamStats = 
  record {
@@ -364,7 +365,7 @@ service : {
   getTeamStats: (text) -> (ResultTeamStats) query;
   getUnansweredQuestions: (text, nat) -> (vec Question) query;
   getUser: () -> (ResultUser) query;
-  joinTeam: (text, text) -> (ResultTeam);
+  joinTeam: (text, text, opt text) -> (ResultTeam);
   leaveTeam: (text, text) -> (ResultVoid);
   listAdmins: () -> (ResultUserPermissions) query;
   listTeams: (vec text) -> (ResultTeams) query;

@@ -137,12 +137,14 @@ actor {
     /// Cleanup old stable data
     if (db_version < 2) {
       admins_v1 := TypesV1.emptyAdminDB();
+      Debug.print("upgraded to v2");
     };
 
-    db_version := 3;// TODO: remove, this is just for testing
     if (db_version < 4) {
       db_v4 := TypesV4.migrateV1(db_v1);
       //keeping old db_v3 around for now as a backup in case anything goes wrong with the migration
+      //Debug.print(debug_show(db_v4.users.byUsername));
+      Debug.print("upgraded to v3");
     };
     db_version := 4;
   };
@@ -217,9 +219,16 @@ actor {
     Team.update(db.teams, teamKey, invite, info, caller);
   };
 
-  public shared ({ caller }) func joinTeam(teamKey : Text, invite : Text) : async ResultTeam {
+  public shared ({ caller }) func joinTeam(teamKey : Text, invite : Text, invitedBy : ?Text) : async ResultTeam {
     if (Principal.isAnonymous(caller)) return #err(#notLoggedIn);
-    Team.addMember(db.teams, teamKey, invite, caller);
+    let inviter : ?Principal = switch (invitedBy) {
+      case (?user) {
+        let ?u = User.getPrincipal(db.users, user) else return #err(#userNotFound);
+        ?u;
+      };
+      case (null) null;
+    };
+    Team.addMember(db.teams, teamKey, invite, caller, inviter);
   };
 
   public shared ({ caller }) func setTeamAdmin(teamKey : Text, user : Text, admin : Bool) : async ResultTeam {
@@ -697,7 +706,7 @@ actor {
         };
       };
 
-      let res2 = Team.addMember(db.teams, teamKey, team.invite, principal);
+      let res2 = Team.addMember(db.teams, teamKey, team.invite, principal, null);
       switch (res2) {
         case (#ok(_)) {};
         case (#err(error)) {

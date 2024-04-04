@@ -4,12 +4,12 @@ definePageMeta({
     title: "Invited",
     layout: 'default'
 });
-
-
+ 
 const app = useAppState();
 const auth = useAuthState();
 const route = useRoute();
 const invite = useState<string>("invite-code", () => "");
+const invitedBy = ref<string|undefined>(undefined);
 var inviteSet = false;
 var team: string;
 
@@ -36,6 +36,7 @@ const storeInvite = () => {
     window.localStorage.setItem("invite", JSON.stringify({
         team: team,
         invite: invite.value,
+        invitedBy: invitedBy.value,
     }));
 }
 
@@ -60,6 +61,10 @@ if (inBrowser()) {
         if (c !== null) {
             invite.value = c;
             inviteSet = true;
+        }
+        const b = params.get("by");
+        if (b !== null) {
+            invitedBy.value = b;
         }
         app.setTeam(route.params.team + "");
         app.getTeam(false);

@@ -8,7 +8,10 @@
         "generate": "nuxt generate",
         "preview": "nuxt preview",
         "postinstall": "nuxt prepare",
-        "dfx-generate": "dfx generate && sed -i '/^export const backend/d' src/declarations/backend/index.js"
+        "dfx-generate": "dfx generate && npm run patch1 && npm run patch2 && npm run patch3",
+        "patch1": "sed -i '/^import type . Principal/d' src/declarations/backend/backend.did.d.ts",
+        "patch2": "sed -i '1s/^/import type { Principal as PrincipalInternal} from \"@dfinity\\/principal\";\\n/' src/declarations/backend/backend.did.d.ts",
+        "patch3": "sed -i '2s/^/export type Principal = Omit<Principal, \"_arr\">;\\n/' src/declarations/backend/backend.did.d.ts"
     },
     "devDependencies": {
         "@dfinity/auth-client": "^1.0.1",

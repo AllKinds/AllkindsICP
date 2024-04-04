@@ -6,11 +6,13 @@ import Char "mo:base/Char";
 import Debug "mo:base/Debug";
 import Iter "mo:base/Iter";
 import Array "mo:base/Array";
+import Nat32 "mo:base/Nat32";
 import Set "mo:map/Set";
 import Question "Question";
 import Friend "Friend";
 import Error "Error";
 import Types "Types";
+import Prng "mo:prng";
 
 module {
   type Map<K, V> = Map.Map<K, V>;
@@ -48,13 +50,14 @@ module {
     let team : Team = {
       info;
       invite;
+      userInvites = Map.new();
       members = Set.new();
       admins = Set.make(phash, admin);
       questions = Question.emptyDB();
       answers = Question.emptyAnswerDB();
       skips = Question.emptySkipDB();
       friends = Friend.emptyDB();
-      userSettings = Types.emptyTeamUserSettingsDB();
+      userSettings : TeamUserSettingsDB = Map.new();
     };
     let null = Map.put(teams, thash, key, team) else Debug.trap("Team must not exist");
     return #ok(info);
@@ -68,6 +71,7 @@ module {
     let team : Team = {
       info;
       invite;
+      userInvites = old.userInvites;
       members = old.members;
       admins;
       questions = old.questions;
@@ -102,10 +106,12 @@ module {
       func((key, x)) {
         let isAdmin = Set.has(x.admins, phash, user);
         let isMember = Set.has(x.members, phash, user);
+        let userInvite = Map.get(x.userInvites, phash, user);
         return {
           key;
           info = x.info;
           invite = if isAdmin ?x.invite else null;
+          userInvite;
           permissions = {
             isMember;
             isAdmin;
@@ -128,6 +134,15 @@ module {
     #ok(Iter.toArray(visible));
   };
 
+  func generateUserInvite(user:Principal, teamname:Text):Text{
+    let insecureRandom = Prng.SFC32a(); // insecure random numbers
+    let seed1 : Nat32 = Text.hash(teamname);
+    let seed : Nat32 = Principal.hash(user);
+    insecureRandom.init(seed1 ^ seed);
+    let invite = Nat32.toText(insecureRandom.next());
+    return invite;
+  };
+
   public func get(teams : TeamDB, key : Text, user : Principal) : Result<Team> {
     let ?team = Map.get(teams, thash, key) else return #err(#teamNotFound);
     if (team.info.listed or Set.has(team.members, phash, user)) {
@@ -136,12 +151,21 @@ module {
     return #err(#notInTeam);
   };
 
-  public func addMember(teams : TeamDB, key : Text, invite : Text, caller : Principal) : Result<TeamInfo> {
+  public func addMember(teams : TeamDB, key : Text, invite : Text, caller : Principal, invitedBy : ?Principal) : Result<TeamInfo> {
     let ?team = Map.get(teams, thash, key) else return #err(#teamNotFound);
 
-    if (team.invite != invite) { return #err(#invalidInvite) };
+    switch (invitedBy) {
+      case (?inviter) {
+        let ?userInvite = Map.get(team.userInvites, phash, inviter) else return #err(#invalidInvite);
+        if (userInvite != invite) { return #err(#invalidInvite) };
+      };
+      case (null) {
+        if (team.invite != invite) { return #err(#invalidInvite) };
+      };
+    };
 
     let false = Set.put(team.members, phash, caller) else return #err(#alreadyRegistered);
+    Map.set(team.userInvites, phash, caller, generateUserInvite(caller, team.info.name));
 
     #ok(team.info);
   };
@@ -154,6 +178,7 @@ module {
     // delete answers of the user
     Map.delete(team.answers, phash, user);
     Map.delete(team.skips, phash, user);
+    Map.delete(team.userInvites, phash, user);
 
     // delete friends
     let userFriends = Friend.get(team.friends, user);

@@ -477,8 +477,8 @@ export const useAppState = defineStore({
         navTo("/join/" + t.key)
       }
     },
-    joinTeam(code: string): Promise<void> {
-      return runNotify(backend.joinTeam(this.team, code), "Welcome to the team!");
+    joinTeam(code: string, invitedBy : string | null): Promise<void> {
+      return runNotify(backend.joinTeam(this.team, code, invitedBy), "Welcome to the team!");
     },
     leaveTeam(user: string): Promise<void> {
       return runNotify(backend.leaveTeam(this.team, user));
@@ -645,7 +645,44 @@ export const addNotification = (level: NotificationLevel, msg: string): void => 
   }
 }
 
-export const invitePath = (team: string, invite: string) => {
-  const params = new URLSearchParams({ invite });
+export const invitePath = (team: string, invite: string, user : string | null) : string => {
+  const params = user ? new URLSearchParams({invite, by: user}) : new URLSearchParams({ invite });
   return "/join/" + team + "?" + params.toString();
 }
+
+export const invite = (personal: boolean): string | undefined => {
+  const app = useAppState();
+  const team = app.getTeam();
+  if (!team) return undefined;
+  const user = app.getUser().data?.user.username ?? null;
+  let code = app.getTeam()?.invite;
+  let path = "";
+
+  if(personal){
+    code = team.userInvite
+    if (!user || !code[0]) return undefined;
+    path = invitePath(app.getTeam()?.key || "", code[0], user);
+  } else {
+    if (!code?.length) return undefined;
+    path = invitePath(app.getTeam()?.key || "", code[0], null);
+  }
+
+  return document.location.origin + path;
+}
+
+export const copyInvite = (personal : boolean = false) => {
+    const link = invite(personal);
+    if (link) {
+        navigator.clipboard.writeText(link);
+        addNotification('ok', "Invite link copied.")
+    } else if (personal) {
+        addNotification('error', "Couldn't generate invite link.")
+    } else {
+        addNotification('error', "Couldn't generate invite link.\nDo you have admin permissions?")
+    }
+}
+
+export const copyPersonalInvite = () => {
+  return copyInvite(true);
+}
+

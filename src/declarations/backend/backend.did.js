@@ -219,6 +219,7 @@ export const idlFactory = ({ IDL }) => {
     'key' : IDL.Text,
     'permissions' : Permissions,
     'info' : TeamInfo__1,
+    'userInvite' : IDL.Opt(IDL.Text),
     'invite' : IDL.Opt(IDL.Text),
   });
   const ResultTeams = IDL.Variant({
@@ -311,7 +312,11 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'getUser' : IDL.Func([], [ResultUser], ['query']),
-    'joinTeam' : IDL.Func([IDL.Text, IDL.Text], [ResultTeam], []),
+    'joinTeam' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Opt(IDL.Text)],
+        [ResultTeam],
+        [],
+      ),
     'leaveTeam' : IDL.Func([IDL.Text, IDL.Text], [ResultVoid], []),
     'listAdmins' : IDL.Func([], [ResultUserPermissions], ['query']),
     'listTeams' : IDL.Func([IDL.Vec(IDL.Text)], [ResultTeams], ['query']),

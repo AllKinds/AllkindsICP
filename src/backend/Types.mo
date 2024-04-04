@@ -8,6 +8,8 @@ import Trie "mo:base/Trie";
 import Map "mo:map/Map";
 import Set "mo:map/Set";
 import StableBuffer "mo:StableBuffer/StableBuffer";
+import Prng "mo:prng";
+import Nat32 "mo:base/Nat32";
 
 import Error "Error";
 import TypesV1 "types/TypesV3";
@@ -50,18 +52,36 @@ module {
 
   public func emptyAdminDB() : AdminDB = Map.new<Principal, AdminPermissions>();
 
-  func migrateTeamV1(v1 : TypesV1.Team) : Team = {
-    info = v1.info;
-    invite = v1.invite;
-    members = v1.members;
-    admins = v1.admins;
+  func migrateTeamV1(v1 : TypesV1.Team) : Team {
+    let seed1 = Text.hash(v1.info.name);
+    {
+      info = v1.info;
+      invite = v1.invite;
+      userInvites : UserInviteDB = invitesFromMembers(v1.members, seed1);
+      members = v1.members;
+      admins = v1.admins;
 
-    questions = v1.questions;
-    answers = v1.answers;
-    skips = v1.skips;
-    friends = v1.friends;
+      questions = v1.questions;
+      answers = v1.answers;
+      skips = v1.skips;
+      friends = v1.friends;
 
-    userSettings : TeamUserSettingsDB = Map.new();
+      userSettings : TeamUserSettingsDB = Map.new();
+    };
+  };
+
+  func invitesFromMembers(members : Set<Principal>, seed1 : Nat32) : UserInviteDB {
+    let invites : UserInviteDB = Map.new();
+    let insecureRandom = Prng.SFC32a(); // insecure random numbers
+
+    for (member : Principal in Set.keys(members)) {
+     let seed : Nat32 = Principal.hash(member);
+      insecureRandom.init(seed1 ^ seed);
+      let invite = Nat32.toText(insecureRandom.next());
+      Map.set(invites, phash, member, invite);
+   };
+
+    return invites;
   };
 
   /// ============
@@ -227,6 +247,7 @@ module {
   public type Team = {
     info : TeamInfo;
     invite : Text; // secret to prevent unauthorized users from joining the team
+    userInvites : UserInviteDB;
     members : Set<Principal>;
     admins : Set<Principal>;
 
@@ -249,6 +270,7 @@ module {
     info : TeamInfo;
     permissions : Permissions;
     invite : ?Text;
+    userInvite : ?Text;
   };
 
   public type TeamStats = {
@@ -267,8 +289,9 @@ module {
 
   public type TeamDB = Map<Text, Team>;
 
-  public type TeamUserSettingsDB = Map<TeamUserSettings, Team>;
-  public func emptyTeamUserSettingsDB() : TeamUserSettingsDB = Map.new<TeamUserSettings, Team>();
+  public type TeamUserSettingsDB = Map<Principal, TeamUserSettings>;
+
+  public type UserInviteDB = Map<Principal, Text>;
 
   /// ===========
   /// Admin Types
