@@ -29,6 +29,7 @@ const getUsernameError = (u: string): FrontendError | null => {
     return null;
 }
 
+var redirect = true;
 // TODO: move to backend.ts
 async function createUser() {
     const err = getUsernameError(username.value);
@@ -39,6 +40,7 @@ async function createUser() {
         () => backend.createUser(username.value, about.value, contact.value),
         Effect.tapBoth({
             onSuccess: (a) => {
+                redirect = false;
                 navTo("/intro-1");
                 return Effect.succeed(a);
             },
@@ -55,7 +57,7 @@ async function createUser() {
 }
 
 const checkUser = () => {
-    if ((app.getUser().data?.user.username.length || 0) > 1) {
+    if ((app.getUser().data?.user.username.length || 0) > 1 && redirect) {
         navTo("/logged-in")
     }
 }
