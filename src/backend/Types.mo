@@ -75,11 +75,11 @@ module {
     let insecureRandom = Prng.SFC32a(); // insecure random numbers
 
     for (member : Principal in Set.keys(members)) {
-     let seed : Nat32 = Principal.hash(member);
+      let seed : Nat32 = Principal.hash(member);
       insecureRandom.init(seed1 ^ seed);
       let invite = Nat32.toText(insecureRandom.next());
       Map.set(invites, phash, member, invite);
-   };
+    };
 
     return invites;
   };

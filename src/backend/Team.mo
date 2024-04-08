@@ -134,7 +134,7 @@ module {
     #ok(Iter.toArray(visible));
   };
 
-  func generateUserInvite(user:Principal, teamname:Text):Text{
+  func generateUserInvite(user : Principal, teamname : Text) : Text {
     let insecureRandom = Prng.SFC32a(); // insecure random numbers
     let seed1 : Nat32 = Text.hash(teamname);
     let seed : Nat32 = Principal.hash(user);
@@ -166,6 +166,14 @@ module {
 
     let false = Set.put(team.members, phash, caller) else return #err(#alreadyRegistered);
     Map.set(team.userInvites, phash, caller, generateUserInvite(caller, team.info.name));
+
+    // try to create friend request
+    switch (invitedBy) {
+      case (?inviter) {
+        ignore Friend.request(team.friends, caller, inviter, true);
+      };
+      case (null) {};
+    };
 
     #ok(team.info);
   };
