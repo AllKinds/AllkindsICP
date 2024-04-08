@@ -34,16 +34,19 @@ async function login(provider: Provider) {
         <AllkindsTitle class="py-16" />
 
         <div class="text-4xl p-8 text-center">
-            <div class="lexend-big">
-                Discover allkinds<br>of like-minded <br>people.
+            <div class="lexend-big leading-normal">
+                    Your<br>
+                    Digital<br>
+                    Pesonality<br>
+                    Identity
             </div>
         </div>
 
+        <div class="grow"/>
 
         <div class="grow flex flex-col items-center">
+            Web3 Private Social Network
         </div>
-
-        <Btn to="/intro-1" class="w-80"> Learn more </Btn>
 
         <Btn v-if="auth.loggedIn && hasInvite()" class="w-80 mt-2" to="/logged-in">
             Join
@@ -57,6 +60,8 @@ async function login(provider: Provider) {
         <Btn v-else class="w-80 mt-2" @click="login('II')">
             Join with Internet&nbsp;Identity
         </Btn>
+
+        <Btn to="/about" class="w-80">About the project</Btn>
 
         <ICFooter />
     </div>
