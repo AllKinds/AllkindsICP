@@ -170,7 +170,7 @@ module {
     // try to create friend request
     switch (invitedBy) {
       case (?inviter) {
-        ignore Friend.request(team.friends, caller, inviter, true);
+        ignore Friend.request(team.friends, inviter, caller, true);
       };
       case (null) {};
     };
