@@ -1,4 +1,3 @@
-import Principal "mo:base/Principal";
 import Hash "mo:base/Hash";
 import List "mo:base/List";
 import HashMap "mo:base/HashMap";

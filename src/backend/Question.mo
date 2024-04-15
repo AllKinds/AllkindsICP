@@ -216,6 +216,7 @@ module {
 
     let all = BufferHelper.valsReverse(questions);
     // filter out deleted questions
+    // TODO: move filter to frontend
     let visable = Iter.filter<StableQuestion>(all, func(q) = not q.hidden);
 
     let qs = Iter.filter<StableQuestion>(visable, func q = q.creator == user);

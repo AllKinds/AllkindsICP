@@ -50,6 +50,47 @@ body.debug {
   scrollbar-width: none;
 }
 
+.chat-messages: {
+  max-height: calc(100vh - 7em);
+  background: red;
+}
+
+.chat-message {
+  background: gray;
+  padding: 1em 1.5em 0.2em 1.5em;
+  margin: 0.1em;
+}
+
+.chat-self {
+  align-self: flex-end;
+  border-radius: 1.5em 1.5em 0em 1.5em;
+  background: #5A7A8F;
+}
+
+.chat-other {
+  align-self: flex-start;
+  border-radius: 1.5em 1.5em 1.5em 0em;
+  background: #1D2E3D;
+}
+
+.scrollbar::-webkit-scrollbar-track
+{
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+  background-color: #000000;
+}
+
+.scrollbar::-webkit-scrollbar
+{
+  width: 3px;
+  background-color: #F5F5F5;
+}
+
+.scrollbar::-webkit-scrollbar-thumb
+{
+  background-color: #000000;
+  border: 2px solid #555555;
+}
+
 .menu-active {
     color: #06FF6E;
 }
