@@ -21,7 +21,7 @@ if (inBrowser()) {
     userChat.load(team, 0);
     app.friends.load(0);
 
-    setInterval(() => userChat.update(team, 10).catch(()=>null), 10000);
+    setInterval(() => userChat.update(team, 10).catch(() => null), 10000);
 };
 
 const sendMessage = async () => {
@@ -59,8 +59,6 @@ const formatDate = (date: bigint) => {
             </NuxtLink>
         </AllkindsTitle>
 
-        {{ userChat.get().status }}
-
         <div class="chat-messages flex-grow flex flex-col-reverse font-light h-20 pb-2 overflow-y-auto scrollbar">
             <NetworkDataContainer :networkdata="userChat.get()">
             </NetworkDataContainer>
@@ -73,7 +71,7 @@ const formatDate = (date: bigint) => {
             <div v-for="msg in userChat.get().data?.slice().reverse()" class="chat-message"
                 :class="msg.sender ? 'chat-self' : 'chat-other'">
                 {{ msg.content }}
-                <div class="text-sm font-light w-full text-right text-gray-400">
+                <div class="text-sm font-light w-full text-gray-400" :class="msg.sender ? 'text-right' : 'text-left'">
                     {{ formatDate(msg.time) }}
                 </div>
             </div>

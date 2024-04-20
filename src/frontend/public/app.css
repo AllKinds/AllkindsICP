@@ -51,8 +51,7 @@ body.debug {
 }
 
 .chat-messages: {
-  max-height: calc(100vh - 7em);
-  background: red;
+  /* max-height: calc(100vh - 7em); */
 }
 
 .chat-message {
