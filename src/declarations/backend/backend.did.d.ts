@@ -45,6 +45,7 @@ export type Error = { 'notInTeam' : null } |
   { 'notEnoughAnswers' : null } |
   { 'tooShort' : null } |
   { 'friendAlreadyConnected' : null } |
+  { 'notAFriend' : null } |
   { 'nameNotAvailable' : null } |
   { 'invalidInvite' : null } |
   { 'teamNotFound' : null } |
@@ -63,6 +64,7 @@ export type Error__1 = { 'notInTeam' : null } |
   { 'notEnoughAnswers' : null } |
   { 'tooShort' : null } |
   { 'friendAlreadyConnected' : null } |
+  { 'notAFriend' : null } |
   { 'nameNotAvailable' : null } |
   { 'invalidInvite' : null } |
   { 'teamNotFound' : null } |
@@ -76,6 +78,11 @@ export type FriendStatus = { 'requestReceived' : null } |
   { 'rejectionSend' : null } |
   { 'rejectionReceived' : null } |
   { 'requestSend' : null };
+export interface Message {
+  'content' : string,
+  'time' : Time,
+  'sender' : boolean,
+}
 export interface Notification {
   'team' : string,
   'event' : { 'rewards' : bigint } |
@@ -122,6 +129,8 @@ export type Result = { 'ok' : string } |
 export type ResultAnswer = { 'ok' : Answer } |
   { 'err' : Error };
 export type ResultFriends = { 'ok' : Array<Friend> } |
+  { 'err' : Error };
+export type ResultMessages = { 'ok' : Array<Message> } |
   { 'err' : Error };
 export type ResultQuestion = { 'ok' : Question } |
   { 'err' : Error };
@@ -261,6 +270,7 @@ export interface _SERVICE {
   >,
   'getFriends' : ActorMethod<[string], ResultFriends>,
   'getMatches' : ActorMethod<[string], ResultUserMatches>,
+  'getMessages' : ActorMethod<[string, string], ResultMessages>,
   'getOwnQuestions' : ActorMethod<[string, bigint], Array<Question>>,
   'getPermissions' : ActorMethod<
     [],
@@ -282,6 +292,7 @@ export interface _SERVICE {
   'listTeams' : ActorMethod<[Array<string>], ResultTeams>,
   'listUsers' : ActorMethod<[], ResultUsersNotifications>,
   'sendFriendRequest' : ActorMethod<[string, string], ResultVoid>,
+  'sendMessage' : ActorMethod<[string, string, string], ResultVoid>,
   'setPermissions' : ActorMethod<[string, AdminPermissions__1], ResultVoid>,
   'setTeamAdmin' : ActorMethod<[string, string, boolean], ResultTeam>,
   'submitAnswer' : ActorMethod<

@@ -35,7 +35,7 @@ let match = { user: { username: "" } };
             </div>
 
             <NuxtLink v-for="[match, status] in app.getFriends().data?.slice().reverse()"
-                :to="'/contacts/' + match.user.username" class="flex flex-row w-full text-xl font-bold">
+                :to="'/chat/' + match.user.username" class="flex flex-row w-full text-xl font-bold">
                 <div class="m-2">
                     {{ match.user.username }}:
                 </div>

@@ -1,4 +1,3 @@
-
 <script lang="ts" setup>
 
 const props = defineProps<{
@@ -10,7 +9,7 @@ const status = () => props.networkdata.status;
 </script>
 
 <template>
-    <div v-if="status() === 'ok'" class="">
+    <div v-if="status() === 'ok'">
         <slot />
     </div>
     <div v-else-if="status() === 'requested'" class="text-center">

@@ -1,5 +1,5 @@
 import { Effect, pipe } from "effect";
-import type { Principal, FrontendEffect, Question, Answer, User, UserPermissions, Friend, UserMatch, TeamStats, TeamUserInfo, QuestionStats, UserNotifications } from "~/utils/backend";
+import type { Principal, FrontendEffect, Message, Question, Answer, User, UserPermissions, Friend, UserMatch, TeamStats, TeamUserInfo, QuestionStats, UserNotifications } from "~/utils/backend";
 import * as backend from "~/utils/backend";
 import { type FrontendError, notifyWithMsg } from "~/utils/errors";
 import { defineStore } from 'pinia'
@@ -47,6 +47,7 @@ const dataInit: NetworkData<any> = {
 const networkDataToPromise = <T>(data: NetworkData<T>): Promise<T> => {
   if (data.status === "ok") return Promise.resolve(data.data!);
   if (data.status === "error") return Promise.reject(data.err);
+  if (data.status === "requested" && data.lastOK) return Promise.reject(data.data!);
 
   // TODO: how to handle pending?
   return Promise.reject(data.err);
@@ -81,15 +82,15 @@ const setErr = <A>(old: NetworkData<A>, err: FrontendError): NetworkData<A> => {
   }
 }
 
-export const storeToData = <A>(old: NetworkData<A>, effect: FrontendEffect<A>, store: (a: NetworkData<A>) => void): FrontendEffect<A> => {
-  store(setRequested(old, false));
+export const storeToData = <A>(old: NetworkData<A>, effect: FrontendEffect<A>, store: (a: NetworkData<A>) => void, silent: boolean = false): FrontendEffect<A> => {
+  if (!silent) store(setRequested(old, false));
   const before = Effect.sync<void>(() => {
     console.log("requesting")
   })
   const after = Effect.tapBoth<FrontendError, A, FrontendError, never, A, A, FrontendError, never>({
     onSuccess: (a) => {
       console.log("request ok")
-      store(setRequested(old, true));
+      if (!silent) store(setRequested(old, true));
       setTimeout(() => store(setOk(a)));
       return Effect.succeed(a);
     },
@@ -118,12 +119,13 @@ export const runStoreNotify = <A>(old: NetworkData<A>, effect: FrontendEffect<A>
 }
 
 
-export const runStore = <A>(old: NetworkData<A>, effect: FrontendEffect<A>, store: (a: NetworkData<A>) => void, msg?: string): Promise<A> => {
+export const runStore = <A>(old: NetworkData<A>, effect: FrontendEffect<A>, store: (a: NetworkData<A>) => void, silent: boolean = false): Promise<A> => {
   return Effect.runPromise(
     storeToData(
       old,
       effect,
       store,
+      silent,
     )
   );
 }
@@ -149,6 +151,7 @@ export const inBrowser = (fn?: () => unknown): boolean => {
   return !!process.client
 }
 
+/// @deprecated: use appData instead
 const defaultAppState: () => AppState = () => {
   return {
     team: "",
@@ -171,43 +174,136 @@ const defaultAppState: () => AppState = () => {
     teamAdmins: dataInit,
     admins: dataInit,
     users: dataInit,
+
   }
 };
 
+/// @deprecated use getAppState() instead
 export const appState = ref<AppState>(defaultAppState());
 
 const initData = <T>() => ref<NetworkData<T>>(dataInit);
+interface DataBy<T> { get: (group: string) => Ref<NetworkData<T>> };
+const initDataBy = <T>(): DataBy<T> => {
+  const store: { [group: string]: Ref<NetworkData<T>> } = {};
+  return {
+    get: (group: string) => {
+      store[group] = store[group] ?? ref<NetworkData<T>>(dataInit);
+      return store[group];
+    },
+  };
+};
 
-const appData = {
-  team: "",
-  knownTeams: ["sandbox", "global", ""],
-  loadingCounter: 0,
-  answeredIdsReset: undefined,
-  answeredIds: [],
 
-  admins: initData<UserPermissions[]>(),
-  answeredQuestions: initData<[Question, Answer][]>(),
-  friends: initData<Friend[]>(),
-  matches: initData<UserMatch[]>(),
-  openQuestions: initData<Question[]>(),
-  ownQuestions: initData<Question[]>(),
-  principal: initData<Principal>(),
-  questionStats: initData<QuestionStats[]>(),
-  teamAdmins: initData<User[]>(),
-  teamMembers: initData<User[]>(),
-  teamStats: initData<TeamStats>(),
-  teams: initData<TeamUserInfo[]>(),
-  user: initData<UserPermissions>(),
-  users: initData<UserNotifications[]>(),
+const initAppData = () => {
+  return {
+    team: "",
+    knownTeams: ["sandbox", "global", ""],
+    loadingCounter: 0,
+    answeredIdsReset: undefined,
+    answeredIds: [],
+    knowTeams: [],
+
+    admins: initData<UserPermissions[]>(),
+    answeredQuestions: initData<[Question, Answer][]>(),
+    friends: initData<Friend[]>(),
+    matches: initData<UserMatch[]>(),
+    openQuestions: initData<Question[]>(),
+    ownQuestions: initData<Question[]>(),
+    principal: initData<Principal>(),
+    questionStats: initData<QuestionStats[]>(),
+    teamAdmins: initData<User[]>(),
+    teamMembers: initData<User[]>(),
+    teamStats: initData<TeamStats>(),
+    teams: initData<TeamUserInfo[]>(),
+    user: initData<UserPermissions>(),
+    users: initData<UserNotifications[]>(),
+
+    chat: initDataBy<Message[]>(),
+  }
 }
+let appData = initAppData();
 
 export const getAppState = () => {
   return {
     user: mk<UserPermissions>(appData.user, backend.loadUser),
     users: mk<UserNotifications[]>(appData.users, backend.loadUsers),
+    teams: mk<TeamUserInfo[]>(appData.teams, () => backend.loadTeams(appData.knowTeams)),
+    friends: mk<Friend[]>(appData.friends, () => backend.loadFriends(appData.team)),
+    chat: mkBy1<Message[], string>(appData.chat, (user: string) => ((team: string) => backend.getMessages(team, user))),
+
+    setTeam(key: string) {
+      if (inBrowser()) {
+        window.localStorage.setItem("team", key);
+        if (appData.team !== key) {
+          appData.knownTeams.push(key);
+          appData = initAppData(); // TODO: only reset team specific data
+          appData.team = key;
+        }
+      }
+    },
+    /**
+     * Get team info or return null if selected team is not in teams, or teams are not loaded
+     * 
+     * @param orRedirect Redirect to `/select-team` if team doesn't exist
+     *                         or to `/join/<team>` if current user is not a team member
+     */
+    getTeam(orRedirect: boolean = true): TeamUserInfo | null {
+      let t = null;
+      this.setTeam(inBrowser() ? window.localStorage.getItem("team") || "" : "");
+      if (appData.teams.value.status === "ok") {
+        t = appData.teams.value.data?.find((t) => t.key === appData.team) || null;
+        if (!orRedirect) {
+          // don't redirect
+        } else if (!t) {
+          navTo("/select-team");
+        } else if (!t.permissions.isMember) {
+          navTo("/join/" + t.key);
+        };
+      }
+      return t;
+    },
+    getTeamKey(): string {
+      let t = null;
+      this.setTeam(inBrowser() ? window.localStorage.getItem("team") || "" : "");
+      return appData.team;
+    },
+    checkTeam() {
+      const t = this.getTeam(false);
+      if (t && !t.permissions.isMember) {
+        navTo("/join/" + t.key)
+      }
+    },
+    joinTeam(code: string, invitedBy: string | null): Promise<void> {
+      return runNotify(backend.joinTeam(appData.team, code, invitedBy), "Welcome to the team!");
+    },
+    leaveTeam(user: string): Promise<void> {
+      return runNotify(backend.leaveTeam(appData.team, user));
+    },
+    setTeamAdmin(user: string, admin: boolean): Promise<void> {
+      return runNotify(backend.setTeamAdmin(appData.team, user, admin));
+    },
+    createTeam(team: string, name: string, about: string, logo: number[], listed: boolean, code: string): Promise<void> {
+      return runNotify(backend.createTeam(team, name, about, logo, listed, code), "Welcome to the team!");
+    },
+    updateTeam(team: string, name: string, about: string, logo: number[], listed: boolean, code: string): Promise<void> {
+      return runNotify(backend.updateTeam(team, name, about, logo, listed, code), "Welcome to the team!");
+    },
+    deleteQuestion(q: Question) {
+      return runNotify(backend.deleteQuestion(appData.team, q), "Question removed")
+    },
+    deleteAnswers(confirm: string) {
+      return runNotify(backend.deleteAnswers(appData.team, confirm), "Answers removed")
+    },
+    deleteUser(confirm: string) {
+      return runNotify(backend.deleteUser(confirm), "User removed")
+    },
+    sendMessage(user: string, message: string) {
+      return runNotify(backend.sendMessage(appData.team, user, message))
+    },
   }
 };
 
+/// create get/set/load function for a data storer
 const mk = <T>(store: Ref<NetworkData<T>>, action: () => FrontendEffect<T>, empty: T | null = null) => {
   const get = (): NetworkData<T> => store.value;
   const set = (next: NetworkData<T>): void => {
@@ -221,11 +317,64 @@ const mk = <T>(store: Ref<NetworkData<T>>, action: () => FrontendEffect<T>, empt
       return runStore(old, action(), set)
     } else {
       return networkDataToPromise(old);
-
+    };
+  };
+  /// like load but doesn't set the status to requested while loading
+  const update = (maxAgeS?: number): Promise<T> => {
+    const old = get();
+    if (shouldUpdate(old, maxAgeS)) {
+      return runStore(old, action(), set, true)
+    } else {
+      return networkDataToPromise(old);
     };
   };
 
-  return { get, set, load };
+
+  return { get, set, load, update };
+};
+
+/// create get/set/load function for a data storer with one parameter
+const mk1 = <T, P1>(store: Ref<NetworkData<T>>, action: (p1: P1) => FrontendEffect<T>, empty: T | null = null) => {
+  const get = (): NetworkData<T> => store.value;
+  const set = (next: NetworkData<T>): void => {
+    const old = get();
+    store.value = { status: "requested", errCount: 0, data: empty as T };
+    setTimeout(() => store.value = combineNetworkData(old, next));
+  };
+  const load = (p1: P1, maxAgeS?: number): Promise<T> => {
+    const old = get();
+    if (shouldUpdate(old, maxAgeS)) {
+      return runStore(old, action(p1), set)
+    } else {
+      return networkDataToPromise(old);
+
+    };
+  };
+  /// like load but doesn't set the status to requested while loading
+  const update = (p1: P1, maxAgeS?: number): Promise<T> => {
+    const old = get();
+    if (shouldUpdate(old, maxAgeS)) {
+      return runStore(old, action(p1), set, true)
+    } else {
+      return networkDataToPromise(old);
+    };
+  };
+
+  return { get, set, load, update };
+};
+
+
+const mkBy1 = <T, P1>(store: DataBy<T>, action: (a: string) => (p1: P1) => FrontendEffect<T>, empty: T | null = null) => {
+  const x: any = null;
+  const _dummy = mk1<T, P1>(x, x);
+  const all: { [group: string]: typeof _dummy } = {};
+  return {
+    get: (group: string) => {
+      const ref = store.get(group);
+      all[group] = all[group] ?? mk1<T, P1>(ref, action(group), empty);
+      return all[group];
+    }
+  }
 };
 
 let navTarget: string | null = null;
@@ -477,7 +626,7 @@ export const useAppState = defineStore({
         navTo("/join/" + t.key)
       }
     },
-    joinTeam(code: string, invitedBy : string | null): Promise<void> {
+    joinTeam(code: string, invitedBy: string | null): Promise<void> {
       return runNotify(backend.joinTeam(this.team, code, invitedBy), "Welcome to the team!");
     },
     leaveTeam(user: string): Promise<void> {
@@ -645,8 +794,8 @@ export const addNotification = (level: NotificationLevel, msg: string): void => 
   }
 }
 
-export const invitePath = (team: string, invite: string, user : string | null) : string => {
-  const params = user ? new URLSearchParams({invite, by: user}) : new URLSearchParams({ invite });
+export const invitePath = (team: string, invite: string, user: string | null): string => {
+  const params = user ? new URLSearchParams({ invite, by: user }) : new URLSearchParams({ invite });
   return "/join/" + team + "?" + params.toString();
 }
 
@@ -658,7 +807,7 @@ export const invite = (personal: boolean): string | undefined => {
   let code = app.getTeam()?.invite;
   let path = "";
 
-  if(personal){
+  if (personal) {
     code = team.userInvite
     if (!user || !code[0]) return undefined;
     path = invitePath(app.getTeam()?.key || "", code[0], user);
@@ -670,16 +819,16 @@ export const invite = (personal: boolean): string | undefined => {
   return document.location.origin + path;
 }
 
-export const copyInvite = (personal : boolean = false) => {
-    const link = invite(personal);
-    if (link) {
-        navigator.clipboard.writeText(link);
-        addNotification('ok', "Invite link copied.")
-    } else if (personal) {
-        addNotification('error', "Couldn't generate invite link.")
-    } else {
-        addNotification('error', "Couldn't generate invite link.\nDo you have admin permissions?")
-    }
+export const copyInvite = (personal: boolean = false) => {
+  const link = invite(personal);
+  if (link) {
+    navigator.clipboard.writeText(link);
+    addNotification('ok', "Invite link copied.")
+  } else if (personal) {
+    addNotification('error', "Couldn't generate invite link.")
+  } else {
+    addNotification('error', "Couldn't generate invite link.\nDo you have admin permissions?")
+  }
 }
 
 export const copyPersonalInvite = () => {

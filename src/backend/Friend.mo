@@ -123,6 +123,12 @@ module {
     Map.entries(getFriends(friends, user));
   };
 
+  /// Check if userA has any friend status set to #connected with userB
+  public func isConnected(friends : FriendDB, userA : Principal, userB : Principal) : Bool {
+    let ?status = Map.get(getFriends(friends, userA), phash, userB) else return false;
+    return status == #connected;
+  };
+
   /// Check if userA has any friend status set with userB (including rejected and pending requests)
   public func has(friends : FriendDB, userA : Principal, userB : Principal) : Bool {
     Map.has(getFriends(friends, userA), phash, userB);

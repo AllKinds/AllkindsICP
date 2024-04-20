@@ -33,6 +33,7 @@ import Error "Error";
 import Iter "mo:base/Iter";
 import Prng "mo:prng";
 import Nat64 "mo:base/Nat64";
+import Principal "mo:base/Principal";
 import Set "mo:map/Set";
 import Map "mo:map/Map";
 import TextHelper "helper/TextHelper";
@@ -45,6 +46,7 @@ import TypesV3 "types/TypesV3";
 import TypesV4 "Types"; // TODO: copy to types/TypesV4.mo
 import Notification "Notification";
 import Types "Types";
+import Chat "Chat";
 
 actor {
 
@@ -72,6 +74,7 @@ actor {
   type UserPermissions = Types.UserPermissions;
 
   type UserNotifications = Types.UserNotifications;
+  type Message = Types.Message;
 
   let { thash; phash } = Set;
 
@@ -92,6 +95,7 @@ actor {
   type ResultTeamStats = Result<TeamStats>;
   type ResultQuestionStats = Result<[QuestionStats]>;
   type ResultUsersNotifications = Result<[UserNotifications]>;
+  type ResultMessages = Result<[Message]>;
 
   // UTILITY FUNCTIONS
 
@@ -103,6 +107,7 @@ actor {
   type FriendDB = Types.FriendDB;
   type TeamDB = Types.TeamDB;
   type AdminDB = Types.AdminDB;
+  type MessageDB = Types.MessageDB;
 
   // Stable vars
   stable var db_v1 : TypesV2.DB = TypesV2.emptyDB();
@@ -113,9 +118,12 @@ actor {
   stable var admins_v1 : TypesV1.AdminDB = TypesV1.emptyAdminDB();
   stable var admins_v2 : AdminDB = TypesV2.emptyAdminDB();
 
+  stable var messageDB_v1 : MessageDB = TypesV4.emptyMessageDB();
+
   // alias for current db version
   var db : Types.DB = db_v4;
   var admins = admins_v2;
+  var messageDB = messageDB_v1;
   let performance = Performance.emptyDB();
 
   // Upgrade canister
@@ -579,6 +587,31 @@ actor {
     } else {
       Friend.request(team.friends, caller, id, false);
     };
+  };
+
+  public shared ({ caller }) func sendMessage(teamKey : Text, username : Text, message : Text) : async ResultVoid {
+    let team = switch (Team.get(db.teams, teamKey, caller)) {
+      case (#ok(t)) t;
+      case (#err(e)) return #err(e);
+    };
+    let ?id = User.getPrincipal(db.users, username) else return #err(#userNotFound);
+    let true = Friend.isConnected(team.friends, caller, id) else return #err(#notAFriend);
+
+    Chat.sendMessage(messageDB, caller, id, message);
+
+    return #ok;
+  };
+
+  public shared ({ caller }) func getMessages(teamKey : Text, username : Text) : async ResultMessages {
+    let team = switch (Team.get(db.teams, teamKey, caller)) {
+      case (#ok(t)) t;
+      case (#err(e)) return #err(e);
+    };
+    let ?id = User.getPrincipal(db.users, username) else return #err(#userNotFound);
+    let true = Friend.isConnected(team.friends, caller, id) else return #err(#notAFriend);
+
+    let msgs = Chat.getMessages(messageDB, caller, id);
+    return #ok(msgs);
   };
 
   func assertPermission(caller : Principal, permission : AdminPermission) {

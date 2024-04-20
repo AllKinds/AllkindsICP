@@ -11,6 +11,7 @@ export const idlFactory = ({ IDL }) => {
     'notEnoughAnswers' : IDL.Null,
     'tooShort' : IDL.Null,
     'friendAlreadyConnected' : IDL.Null,
+    'notAFriend' : IDL.Null,
     'nameNotAvailable' : IDL.Null,
     'invalidInvite' : IDL.Null,
     'teamNotFound' : IDL.Null,
@@ -142,6 +143,7 @@ export const idlFactory = ({ IDL }) => {
     'notEnoughAnswers' : IDL.Null,
     'tooShort' : IDL.Null,
     'friendAlreadyConnected' : IDL.Null,
+    'notAFriend' : IDL.Null,
     'nameNotAvailable' : IDL.Null,
     'invalidInvite' : IDL.Null,
     'teamNotFound' : IDL.Null,
@@ -161,6 +163,15 @@ export const idlFactory = ({ IDL }) => {
   const ResultFriends = IDL.Variant({ 'ok' : IDL.Vec(Friend), 'err' : Error });
   const ResultUserMatches = IDL.Variant({
     'ok' : IDL.Vec(UserMatch),
+    'err' : Error,
+  });
+  const Message = IDL.Record({
+    'content' : IDL.Text,
+    'time' : Time,
+    'sender' : IDL.Bool,
+  });
+  const ResultMessages = IDL.Variant({
+    'ok' : IDL.Vec(Message),
     'err' : Error,
   });
   const AdminPermissions__1 = IDL.Record({
@@ -282,6 +293,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'getFriends' : IDL.Func([IDL.Text], [ResultFriends], ['query']),
     'getMatches' : IDL.Func([IDL.Text], [ResultUserMatches], ['query']),
+    'getMessages' : IDL.Func([IDL.Text, IDL.Text], [ResultMessages], []),
     'getOwnQuestions' : IDL.Func(
         [IDL.Text, IDL.Nat],
         [IDL.Vec(Question)],
@@ -322,6 +334,7 @@ export const idlFactory = ({ IDL }) => {
     'listTeams' : IDL.Func([IDL.Vec(IDL.Text)], [ResultTeams], ['query']),
     'listUsers' : IDL.Func([], [ResultUsersNotifications], ['query']),
     'sendFriendRequest' : IDL.Func([IDL.Text, IDL.Text], [ResultVoid], []),
+    'sendMessage' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [ResultVoid], []),
     'setPermissions' : IDL.Func(
         [IDL.Text, AdminPermissions__1],
         [ResultVoid],

@@ -63,13 +63,13 @@ body.debug {
 
 .chat-self {
   align-self: flex-end;
-  border-radius: 1.5em 1.5em 0em 1.5em;
+  border-radius: 1.5em 1.5em 1em 1.5em;
   background: #5A7A8F;
 }
 
 .chat-other {
   align-self: flex-start;
-  border-radius: 1.5em 1.5em 1.5em 0em;
+  border-radius: 1.5em 1.5em 1.5em 1em;
   background: #1D2E3D;
 }
 

@@ -16,6 +16,7 @@ export type ErrorKey =
   | "insufficientFunds"
   | "notEnoughAnswers"
   | "tooShort"
+  | "notAFriend"
   | "friendAlreadyConnected"
   | "nameNotAvailable"
   | "alreadyRegistered"
@@ -44,6 +45,8 @@ export function formatBackendError(err: BackendError): string {
       return "You need to answer at least 5 questions to see people here."
     case "invalidInvite":
       return "Invite is not valid"
+    case "notAFriend":
+      return "Not connected to user"
 
     // TODO: format other errors
 

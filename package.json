@@ -34,6 +34,7 @@
     "dependencies": {
         "@pinia/nuxt": "^0.5.1",
         "effect": "^2.4.0",
+        "moment": "^2.30.1",
         "pinia": "^2.1.7",
         "posthog-js": "^1.97.1",
         "theme-change": "^2.5.0",

@@ -14,6 +14,7 @@ module {
     #friendRequestAlreadySend;
     #friendAlreadyConnected;
     #notEnoughAnswers;
+    #notAFriend;
 
     #insufficientFunds;
     #tooShort;

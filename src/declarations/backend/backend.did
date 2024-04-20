@@ -164,6 +164,11 @@ type ResultQuestion =
    err: Error;
    ok: Question;
  };
+type ResultMessages = 
+ variant {
+   err: Error;
+   ok: vec Message;
+ };
 type ResultFriends = 
  variant {
    err: Error;
@@ -231,6 +236,12 @@ type Notification =
           };
    team: text;
  };
+type Message = 
+ record {
+   content: text;
+   sender: bool;
+   time: Time;
+ };
 type FriendStatus = 
  variant {
    connected;
@@ -253,6 +264,7 @@ type Error__1 =
    invalidColor;
    invalidInvite;
    nameNotAvailable;
+   notAFriend;
    notEnoughAnswers;
    notInTeam;
    notLoggedIn;
@@ -274,6 +286,7 @@ type Error =
    invalidColor;
    invalidInvite;
    nameNotAvailable;
+   notAFriend;
    notEnoughAnswers;
    notInTeam;
    notLoggedIn;
@@ -352,6 +365,7 @@ service : {
                                             }) query;
   getFriends: (text) -> (ResultFriends) query;
   getMatches: (text) -> (ResultUserMatches) query;
+  getMessages: (text, text) -> (ResultMessages);
   getOwnQuestions: (text, nat) -> (vec Question) query;
   getPermissions: () ->
    (record {
@@ -372,6 +386,7 @@ service : {
   listUsers: () -> (ResultUsersNotifications) query;
   /// Send a friend request to a user
   sendFriendRequest: (text, text) -> (ResultVoid);
+  sendMessage: (text, text, text) -> (ResultVoid);
   setPermissions: (text, AdminPermissions__1) -> (ResultVoid);
   setTeamAdmin: (text, text, bool) -> (ResultTeam);
   submitAnswer: (text, QuestionID, bool, nat) -> (ResultAnswer);

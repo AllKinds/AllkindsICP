@@ -319,4 +319,21 @@ module {
     #restoreBackup;
     #all;
   };
+
+  // ==========
+  // Chat Types
+  // ==========
+
+  public type Message = {
+    content : Text;
+    time : Time;
+    sender : Bool;
+  };
+
+  public type MessageKey = (Principal, Principal);
+
+  public type Messages = Buffer<Message>;
+  public type MessageDB = Map<MessageKey, Messages>;
+  public func emptyMessageDB() : MessageDB = Map.new();
+
 };

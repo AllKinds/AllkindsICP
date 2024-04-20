@@ -30,6 +30,8 @@ export const icons = [
     { to: "/settings", icon: "ph-gear" },
     { to: "/", icon: "gg:shape-hexagon" },
     { to: "x", icon: "ph:x" },
+    { to: "back", icon: "ic:round-arrow-back" },
+    { to: "loading", icon: "line-md:loading-alt-loop" },
 ];
 
 export const getIcon = (path: string): Icon => {
