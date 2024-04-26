@@ -75,6 +75,7 @@ actor {
 
   type UserNotifications = Types.UserNotifications;
   type Message = Types.Message;
+  type ChatStatus = Types.ChatStatus;
 
   let { thash; phash } = Set;
 
@@ -95,7 +96,7 @@ actor {
   type ResultTeamStats = Result<TeamStats>;
   type ResultQuestionStats = Result<[QuestionStats]>;
   type ResultUsersNotifications = Result<[UserNotifications]>;
-  type ResultMessages = Result<[Message]>;
+  type ResultMessages = Result<{ messages : [Message]; status : ChatStatus }>;
 
   // UTILITY FUNCTIONS
 
@@ -206,7 +207,7 @@ actor {
     func toUserNotifications((p : Principal, u : User)) : UserNotifications {
       return {
         user = u;
-        notifications = Notification.getAll(db.teams, p);
+        notifications = Notification.getAll(db.users, db.teams, messageDB, p);
       };
     };
 
@@ -351,7 +352,7 @@ actor {
         {
           user;
           permissions = Admin.getPermissions(admins, principal);
-          notifications = Notification.getAll(db.teams, principal);
+          notifications = Notification.getAll(db.users, db.teams, messageDB, principal);
         };
       },
     );
@@ -360,6 +361,7 @@ actor {
 
   public shared query ({ caller }) func getUser() : async ResultUser {
     let ?user = User.get(db.users, caller) else return #err(#notRegistered(caller));
+    Debug.print(debug_show (messageDB));
     userWithPermissions(#ok(user), caller);
   };
 
@@ -602,7 +604,7 @@ actor {
     return #ok;
   };
 
-  public shared ({ caller }) func getMessages(teamKey : Text, username : Text) : async ResultMessages {
+  public shared ({ caller }) func getMessages(teamKey : Text, username : Text, markRead : Bool) : async ResultMessages {
     let team = switch (Team.get(db.teams, teamKey, caller)) {
       case (#ok(t)) t;
       case (#err(e)) return #err(e);
@@ -610,7 +612,7 @@ actor {
     let ?id = User.getPrincipal(db.users, username) else return #err(#userNotFound);
     let true = Friend.isConnected(team.friends, caller, id) else return #err(#notAFriend);
 
-    let msgs = Chat.getMessages(messageDB, caller, id);
+    let msgs = Chat.getMessages(messageDB, caller, id, markRead);
     return #ok(msgs);
   };
 

@@ -8,14 +8,14 @@ const notification = (category: "newQuestions" | "friendRequests" | "rewards", t
     console.log("user", u)
     let count = 0n;
     for (let n of u.notifications) {
-        if (!team || n.team === team) {
+        if (!team || n.team.indexOf(team) >= 0) {
             const ev: any = n.event;
             if (category in ev) {
                 count += ev[category] || 0n;
             }
         }
     }
-    console.log("count", count)
+    console.log("count", count, category)
     return count
 }
 
@@ -28,7 +28,7 @@ if (inBrowser()) {
         <NuxtLink to="/questions" :class="{ 'menu-active': $route.path === '/questions' }"
             class="p-[7px] w-auto m-0 flex flex-col items-center hover:text-black hover:bg-white rounded-lg relative">
             <span v-if="notification('newQuestions', app.team)" class="absolute right-2 text-sm text-red-600 px-5">{{
-                notification('newQuestions', app.team) }}</span>
+            notification('newQuestions', app.team) }}</span>
             <Icon :name="getIcon('/questions').icon" size="2rem" class="mt-2" />
             Questions
         </NuxtLink>
@@ -40,7 +40,7 @@ if (inBrowser()) {
         <NuxtLink to="/contacts" :class="{ 'menu-active': $route.path === '/contacts' }"
             class="p-[7px] w-auto m-0 flex flex-col items-center hover:text-black hover:bg-white rounded-lg relative">
             <span v-if="notification('friendRequests', app.team)" class="absolute right-2 text-sm text-red-600 px-5">{{
-                notification('friendRequests', app.team) }}</span>
+            notification('friendRequests', app.team) }}</span>
             <Icon :name="getIcon('/contacts').icon" size="2rem" class="mt-2" />
             My&nbsp;contacts
         </NuxtLink>

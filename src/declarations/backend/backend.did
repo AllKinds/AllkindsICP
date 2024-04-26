@@ -167,7 +167,10 @@ type ResultQuestion =
 type ResultMessages = 
  variant {
    err: Error;
-   ok: vec Message;
+   ok: record {
+         messages: vec Message;
+         status: ChatStatus;
+       };
  };
 type ResultFriends = 
  variant {
@@ -229,12 +232,18 @@ type Permissions =
  };
 type Notification = 
  record {
-   event: variant {
-            friendRequests: nat;
-            newQuestions: nat;
-            rewards: nat;
-          };
-   team: text;
+   event:
+    variant {
+      chat: record {
+              latest: text;
+              unread: nat;
+              user: text;
+            };
+      friendRequests: nat;
+      newQuestions: nat;
+      rewards: nat;
+    };
+   team: vec text;
  };
 type Message = 
  record {
@@ -299,6 +308,7 @@ type Error =
    userNotFound;
    validationError;
  };
+type ChatStatus = record {unread: nat;};
 type AnswerDiff = 
  record {
    question: nat;
@@ -365,7 +375,7 @@ service : {
                                             }) query;
   getFriends: (text) -> (ResultFriends) query;
   getMatches: (text) -> (ResultUserMatches) query;
-  getMessages: (text, text) -> (ResultMessages);
+  getMessages: (text, text, bool) -> (ResultMessages);
   getOwnQuestions: (text, nat) -> (vec Question) query;
   getPermissions: () ->
    (record {

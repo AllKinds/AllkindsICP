@@ -3,7 +3,7 @@ export type * from "~~/src/declarations/backend/backend.did";
 export type BackendActor = typeof backend;
 import { Effect } from "effect";
 import { type BackendError, type FrontendError, toBackendError, toNetworkError } from "../utils/errors";
-import type { Question, Answer, User, Skip, Friend, UserMatch, TeamUserInfo, TeamStats, QuestionStats, FriendStatus, UserPermissions, UserNotifications, Message } from "~~/src/declarations/backend/backend.did";
+import type { Question, Answer, User, Skip, Friend, UserMatch, TeamUserInfo, TeamStats, QuestionStats, FriendStatus, UserPermissions, UserNotifications, Message, ChatStatus } from "~~/src/declarations/backend/backend.did";
 import type { Principal } from '@dfinity/principal';
 import { useAuthState } from "../composables/authState";
 
@@ -250,9 +250,9 @@ export const sendMessage = (team: string, user: string, message: string): Fronte
   return effectifyResult((actor) => actor.sendMessage(team, user, message))
 }
 
-export const getMessages = (team: string, user: string): FrontendEffect<Message[]> => {
+export const getMessages = (team: string, user: string, markRead: boolean): FrontendEffect<{ messages: Message[], status: ChatStatus }> => {
   console.log("requesting messages from", user, "in team", team);
-  return effectifyResult((actor) => actor.getMessages(team, user))
+  return effectifyResult((actor) => actor.getMessages(team, user, markRead))
 }
 
 

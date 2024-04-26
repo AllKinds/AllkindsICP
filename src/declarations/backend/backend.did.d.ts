@@ -34,6 +34,7 @@ export interface AnswerDiff {
   'question' : bigint,
   'sameAnswer' : boolean,
 }
+export interface ChatStatus { 'unread' : bigint }
 export type Error = { 'notInTeam' : null } |
   { 'notLoggedIn' : null } |
   { 'validationError' : null } |
@@ -84,8 +85,11 @@ export interface Message {
   'sender' : boolean,
 }
 export interface Notification {
-  'team' : string,
-  'event' : { 'rewards' : bigint } |
+  'team' : Array<string>,
+  'event' : {
+      'chat' : { 'user' : string, 'latest' : string, 'unread' : bigint }
+    } |
+    { 'rewards' : bigint } |
     { 'newQuestions' : bigint } |
     { 'friendRequests' : bigint },
 }
@@ -130,7 +134,9 @@ export type ResultAnswer = { 'ok' : Answer } |
   { 'err' : Error };
 export type ResultFriends = { 'ok' : Array<Friend> } |
   { 'err' : Error };
-export type ResultMessages = { 'ok' : Array<Message> } |
+export type ResultMessages = {
+    'ok' : { 'status' : ChatStatus, 'messages' : Array<Message> }
+  } |
   { 'err' : Error };
 export type ResultQuestion = { 'ok' : Question } |
   { 'err' : Error };
@@ -270,7 +276,7 @@ export interface _SERVICE {
   >,
   'getFriends' : ActorMethod<[string], ResultFriends>,
   'getMatches' : ActorMethod<[string], ResultUserMatches>,
-  'getMessages' : ActorMethod<[string, string], ResultMessages>,
+  'getMessages' : ActorMethod<[string, string, boolean], ResultMessages>,
   'getOwnQuestions' : ActorMethod<[string, bigint], Array<Question>>,
   'getPermissions' : ActorMethod<
     [],

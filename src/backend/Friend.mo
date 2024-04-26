@@ -123,6 +123,12 @@ module {
     Map.entries(getFriends(friends, user));
   };
 
+  public func getConnected(friends : FriendDB, user : Principal) : Iter<Principal> {
+    let all = Map.entries(getFriends(friends, user));
+    let filtered = Iter.filter<(Principal, FriendStatus)>(all, func((p, status)) = status == #connected);
+    Iter.map<(Principal, FriendStatus), Principal>(filtered, func((p, _status)) = p);
+  };
+
   /// Check if userA has any friend status set to #connected with userB
   public func isConnected(friends : FriendDB, userA : Principal, userB : Principal) : Bool {
     let ?status = Map.get(getFriends(friends, userA), phash, userB) else return false;

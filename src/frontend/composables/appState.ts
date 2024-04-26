@@ -1,5 +1,5 @@
 import { Effect, pipe } from "effect";
-import type { Principal, FrontendEffect, Message, Question, Answer, User, UserPermissions, Friend, UserMatch, TeamStats, TeamUserInfo, QuestionStats, UserNotifications } from "~/utils/backend";
+import type { Principal, FrontendEffect, Message, ChatStatus, Question, Answer, User, UserPermissions, Friend, UserMatch, TeamStats, TeamUserInfo, QuestionStats, UserNotifications } from "~/utils/backend";
 import * as backend from "~/utils/backend";
 import { type FrontendError, notifyWithMsg } from "~/utils/errors";
 import { defineStore } from 'pinia'
@@ -218,7 +218,7 @@ const initAppData = () => {
     user: initData<UserPermissions>(),
     users: initData<UserNotifications[]>(),
 
-    chat: initDataBy<Message[]>(),
+    chat: initDataBy<{ messages: Message[], status: ChatStatus }>(),
   }
 }
 let appData = initAppData();
@@ -229,7 +229,7 @@ export const getAppState = () => {
     users: mk<UserNotifications[]>(appData.users, backend.loadUsers),
     teams: mk<TeamUserInfo[]>(appData.teams, () => backend.loadTeams(appData.knowTeams)),
     friends: mk<Friend[]>(appData.friends, () => backend.loadFriends(appData.team)),
-    chat: mkBy1<Message[], string>(appData.chat, (user: string) => ((team: string) => backend.getMessages(team, user))),
+    chat: mkBy2<{ messages: Message[], status: ChatStatus }, string, boolean>(appData.chat, (user: string) => ((team: string, markRead: boolean) => backend.getMessages(team, user, markRead))),
 
     setTeam(key: string) {
       if (inBrowser()) {
@@ -362,6 +362,34 @@ const mk1 = <T, P1>(store: Ref<NetworkData<T>>, action: (p1: P1) => FrontendEffe
 
   return { get, set, load, update };
 };
+const mk2 = <T, P1, P2>(store: Ref<NetworkData<T>>, action: (p1: P1, p2: P2) => FrontendEffect<T>, empty: T | null = null) => {
+  const get = (): NetworkData<T> => store.value;
+  const set = (next: NetworkData<T>): void => {
+    const old = get();
+    store.value = { status: "requested", errCount: 0, data: empty as T };
+    setTimeout(() => store.value = combineNetworkData(old, next));
+  };
+  const load = (p1: P1, p2: P2, maxAgeS?: number): Promise<T> => {
+    const old = get();
+    if (shouldUpdate(old, maxAgeS)) {
+      return runStore(old, action(p1, p2), set)
+    } else {
+      return networkDataToPromise(old);
+
+    };
+  };
+  /// like load but doesn't set the status to requested while loading
+  const update = (p1: P1, p2: P2, maxAgeS?: number): Promise<T> => {
+    const old = get();
+    if (shouldUpdate(old, maxAgeS)) {
+      return runStore(old, action(p1, p2), set, true)
+    } else {
+      return networkDataToPromise(old);
+    };
+  };
+
+  return { get, set, load, update };
+};
 
 
 const mkBy1 = <T, P1>(store: DataBy<T>, action: (a: string) => (p1: P1) => FrontendEffect<T>, empty: T | null = null) => {
@@ -377,44 +405,24 @@ const mkBy1 = <T, P1>(store: DataBy<T>, action: (a: string) => (p1: P1) => Front
   }
 };
 
-let navTarget: string | null = null;
-let navActive: string | null = null;
+
+const mkBy2 = <T, P1, P2>(store: DataBy<T>, action: (a: string) => (p1: P1, p2: P2) => FrontendEffect<T>, empty: T | null = null) => {
+  const x: any = null;
+  const _dummy = mk2<T, P1, P2>(x, x, x);
+  const all: { [group: string]: typeof _dummy } = {};
+  return {
+    get: (group: string) => {
+      const ref = store.get(group);
+      all[group] = all[group] ?? mk2<T, P1, P2>(ref, action(group), empty);
+      return all[group];
+    }
+  }
+};
+
+// TODO: remove indirection by using navigateTo directly
 export const navTo = (path: string) => {
   navigateTo(path);
   return;
-  // already set as final target
-  if (navTarget === path) {
-    console.warn("navigation target already set to", path);
-    return;
-  }
-  if (navTarget) {
-    console.warn("changing navigation target from", navTarget, "to", path);
-    navTarget = path;
-    return;
-  }
-
-  // already set as current target
-  if (navActive === path) {
-    console.warn("navigation already active to", path);
-    return;
-  }
-  if (navActive) {
-    console.warn("queueing navigation to", path, "while navigation to", navActive, "is active");
-    navTarget = path;
-    return;
-  }
-
-  navActive = path;
-  navigateTo(path);
-  setTimeout(() => {
-    const nextTarget = navTarget === navActive ? null : navTarget;
-    navActive = null;
-    navTarget = null;
-    if (nextTarget) {
-      navTo(nextTarget);
-    };
-  }, 250);
-
 }
 
 export const useAppState = defineStore({

@@ -18,10 +18,10 @@ const message = ref("");
 const pending = ref("");
 
 if (inBrowser()) {
-    userChat.load(team, 0);
+    userChat.load(team, false, 0);
     app.friends.load(0);
 
-    setInterval(() => userChat.update(team, 10).catch(() => null), 10000);
+    setInterval(() => userChat.update(team, true, 10).catch(() => null), 10000);
 };
 
 const sendMessage = async () => {
@@ -31,14 +31,12 @@ const sendMessage = async () => {
     if (content.trim().length > 0) {
         pending.value = content;
         await app.sendMessage(user, content);
-        await userChat.load(team, 0);
+        await userChat.load(team, true, 0);
         pending.value = "";
     } else {
         console.log("message must not be empty");
     }
 };
-
-const pageLoad = moment();
 
 const formatDate = (date: bigint) => {
     const now = moment();
@@ -68,7 +66,7 @@ const formatDate = (date: bigint) => {
                     <Icon name="line-md:loading-alt-loop" />
                 </div>
             </div>
-            <div v-for="msg in userChat.get().data?.slice().reverse()" class="chat-message"
+            <div v-for="msg in userChat.get().data?.messages.slice().reverse()" class="chat-message"
                 :class="msg.sender ? 'chat-self' : 'chat-other'">
                 {{ msg.content }}
                 <div class="text-sm font-light w-full text-gray-400" :class="msg.sender ? 'text-right' : 'text-left'">

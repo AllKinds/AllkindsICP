@@ -134,6 +134,35 @@ module {
     #ok(Iter.toArray(visible));
   };
 
+  public func listCommon(teams : TeamDB, user1 : Principal, user2 : Principal) : [TeamUserInfo] {
+    let all = Map.entries(teams);
+    let visible = Iter.filter<(Text, Team)>(
+      all,
+      func((key, team)) {
+        return key != "" and Set.has(team.members, phash, user1) and Set.has(team.members, phash, user2);
+      },
+    );
+    let mapped = Iter.map<(Text, Team), TeamUserInfo>(
+      visible,
+      func((key, x)) {
+        let isAdmin = Set.has(x.admins, phash, user1);
+        let isMember = Set.has(x.members, phash, user1);
+        let userInvite = Map.get(x.userInvites, phash, user1);
+        return {
+          key;
+          info = x.info;
+          invite = if isAdmin ?x.invite else null;
+          userInvite;
+          permissions = {
+            isMember;
+            isAdmin;
+          };
+        };
+      },
+    );
+    Iter.toArray(mapped);
+  };
+
   func generateUserInvite(user : Principal, teamname : Text) : Text {
     let insecureRandom = Prng.SFC32a(); // insecure random numbers
     let seed1 : Nat32 = Text.hash(teamname);

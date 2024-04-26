@@ -137,11 +137,12 @@ module {
   };
 
   public type Notification = {
-    team : Text;
+    team : [Text];
     event : {
       #friendRequests : Nat;
       #newQuestions : Nat;
       #rewards : Nat;
+      #chat : { unread : Nat; user : Text; latest : Text };
     };
   };
 
@@ -333,7 +334,13 @@ module {
   public type MessageKey = (Principal, Principal);
 
   public type Messages = Buffer<Message>;
-  public type MessageDB = Map<MessageKey, Messages>;
+  public type ChatStatus = { unread : Nat };
+  public type MessageDbEntry = {
+    messages : Messages;
+    status1 : ChatStatus;
+    status2 : ChatStatus;
+  };
+  public type MessageDB = Map<MessageKey, MessageDbEntry>;
   public func emptyMessageDB() : MessageDB = Map.new();
 
 };

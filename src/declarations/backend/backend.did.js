@@ -83,8 +83,13 @@ export const idlFactory = ({ IDL }) => {
     'becomeTeamAdmin' : IDL.Bool,
   });
   const Notification = IDL.Record({
-    'team' : IDL.Text,
+    'team' : IDL.Vec(IDL.Text),
     'event' : IDL.Variant({
+      'chat' : IDL.Record({
+        'user' : IDL.Text,
+        'latest' : IDL.Text,
+        'unread' : IDL.Nat,
+      }),
       'rewards' : IDL.Nat,
       'newQuestions' : IDL.Nat,
       'friendRequests' : IDL.Nat,
@@ -165,13 +170,14 @@ export const idlFactory = ({ IDL }) => {
     'ok' : IDL.Vec(UserMatch),
     'err' : Error,
   });
+  const ChatStatus = IDL.Record({ 'unread' : IDL.Nat });
   const Message = IDL.Record({
     'content' : IDL.Text,
     'time' : Time,
     'sender' : IDL.Bool,
   });
   const ResultMessages = IDL.Variant({
-    'ok' : IDL.Vec(Message),
+    'ok' : IDL.Record({ 'status' : ChatStatus, 'messages' : IDL.Vec(Message) }),
     'err' : Error,
   });
   const AdminPermissions__1 = IDL.Record({
@@ -293,7 +299,11 @@ export const idlFactory = ({ IDL }) => {
       ),
     'getFriends' : IDL.Func([IDL.Text], [ResultFriends], ['query']),
     'getMatches' : IDL.Func([IDL.Text], [ResultUserMatches], ['query']),
-    'getMessages' : IDL.Func([IDL.Text, IDL.Text], [ResultMessages], []),
+    'getMessages' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Bool],
+        [ResultMessages],
+        [],
+      ),
     'getOwnQuestions' : IDL.Func(
         [IDL.Text, IDL.Nat],
         [IDL.Vec(Question)],

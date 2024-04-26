@@ -38,10 +38,11 @@ const notifications = (team: string): bigint => {
     if (!ns) return 0n;
     let count = 0n;
     for (let n of ns) {
-        if (n.team === team) {
+        if (n.team.indexOf(team) >= 0) {
             count += Object.values(n.event)[0];
         }
     }
+    console.log("notifications", ns);
     return count;
 }
 
@@ -69,7 +70,7 @@ const notifications = (team: string): bigint => {
                 <div class="w-full pl-4">
 
                     <span v-if="notifications(t.key)" class="float-right text-sm text-red-600 px-1">{{
-                        notifications(t.key) }}</span>
+            notifications(t.key) }}</span>
 
                     <!--NuxtLink to="/team-info" @click="gotoInfo = true">
                         <Icon name="tabler:info-hexagon" size="2em" class="float-right text-white" />
