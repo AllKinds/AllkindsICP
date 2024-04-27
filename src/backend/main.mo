@@ -81,6 +81,7 @@ actor {
 
   // Aliases to get deterministic names for use in frontend code
   type ResultVoid = Result<()>;
+  type ResultNat = Result<Nat>;
   type ResultUser = Result<UserPermissions>;
   type ResultUsers = Result<[User]>;
   type ResultUserPermissions = Result<[UserPermissions]>;
@@ -361,7 +362,6 @@ actor {
 
   public shared query ({ caller }) func getUser() : async ResultUser {
     let ?user = User.get(db.users, caller) else return #err(#notRegistered(caller));
-    Debug.print(debug_show (messageDB));
     userWithPermissions(#ok(user), caller);
   };
 
@@ -604,7 +604,7 @@ actor {
     return #ok;
   };
 
-  public shared ({ caller }) func getMessages(teamKey : Text, username : Text, markRead : Bool) : async ResultMessages {
+  public shared query ({ caller }) func getMessages(teamKey : Text, username : Text) : async ResultMessages {
     let team = switch (Team.get(db.teams, teamKey, caller)) {
       case (#ok(t)) t;
       case (#err(e)) return #err(e);
@@ -612,8 +612,21 @@ actor {
     let ?id = User.getPrincipal(db.users, username) else return #err(#userNotFound);
     let true = Friend.isConnected(team.friends, caller, id) else return #err(#notAFriend);
 
-    let msgs = Chat.getMessages(messageDB, caller, id, markRead);
+    let msgs = Chat.getMessages(messageDB, caller, id);
+    Debug.print(debug_show (messageDB));
     return #ok(msgs);
+  };
+
+  public shared ({ caller }) func markMessageRead(teamKey : Text, username : Text) : async ResultNat {
+    let team = switch (Team.get(db.teams, teamKey, caller)) {
+      case (#ok(t)) t;
+      case (#err(e)) return #err(e);
+    };
+    let ?other = User.getPrincipal(db.users, username) else return #err(#userNotFound);
+    let true = Friend.isConnected(team.friends, caller, other) else return #err(#notAFriend);
+
+    let unread = Chat.markRead(messageDB, caller, other);
+    return #ok(unread);
   };
 
   func assertPermission(caller : Principal, permission : AdminPermission) {

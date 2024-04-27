@@ -251,6 +251,7 @@ export const idlFactory = ({ IDL }) => {
     'ok' : IDL.Vec(UserNotifications),
     'err' : Error,
   });
+  const ResultNat = IDL.Variant({ 'ok' : IDL.Nat, 'err' : Error });
   const QuestionID = IDL.Nat;
   const ResultAnswer = IDL.Variant({ 'ok' : Answer, 'err' : Error });
   const Skip = IDL.Record({
@@ -299,11 +300,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'getFriends' : IDL.Func([IDL.Text], [ResultFriends], ['query']),
     'getMatches' : IDL.Func([IDL.Text], [ResultUserMatches], ['query']),
-    'getMessages' : IDL.Func(
-        [IDL.Text, IDL.Text, IDL.Bool],
-        [ResultMessages],
-        [],
-      ),
+    'getMessages' : IDL.Func([IDL.Text, IDL.Text], [ResultMessages], ['query']),
     'getOwnQuestions' : IDL.Func(
         [IDL.Text, IDL.Nat],
         [IDL.Vec(Question)],
@@ -343,6 +340,7 @@ export const idlFactory = ({ IDL }) => {
     'listAdmins' : IDL.Func([], [ResultUserPermissions], ['query']),
     'listTeams' : IDL.Func([IDL.Vec(IDL.Text)], [ResultTeams], ['query']),
     'listUsers' : IDL.Func([], [ResultUsersNotifications], ['query']),
+    'markMessageRead' : IDL.Func([IDL.Text, IDL.Text], [ResultNat], []),
     'sendFriendRequest' : IDL.Func([IDL.Text, IDL.Text], [ResultVoid], []),
     'sendMessage' : IDL.Func([IDL.Text, IDL.Text, IDL.Text], [ResultVoid], []),
     'setPermissions' : IDL.Func(

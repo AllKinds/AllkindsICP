@@ -229,7 +229,7 @@ export const getAppState = () => {
     users: mk<UserNotifications[]>(appData.users, backend.loadUsers),
     teams: mk<TeamUserInfo[]>(appData.teams, () => backend.loadTeams(appData.knowTeams)),
     friends: mk<Friend[]>(appData.friends, () => backend.loadFriends(appData.team)),
-    chat: mkBy2<{ messages: Message[], status: ChatStatus }, string, boolean>(appData.chat, (user: string) => ((team: string, markRead: boolean) => backend.getMessages(team, user, markRead))),
+    chat: mkBy1<{ messages: Message[], status: ChatStatus }, string>(appData.chat, (user: string) => ((team: string) => backend.getMessages(team, user))),
 
     setTeam(key: string) {
       if (inBrowser()) {
@@ -299,6 +299,9 @@ export const getAppState = () => {
     },
     sendMessage(user: string, message: string) {
       return runNotify(backend.sendMessage(appData.team, user, message))
+    },
+    markMessageRead(user: string) {
+      return runNotify(backend.markMessageRead(appData.team, user))
     },
   }
 };

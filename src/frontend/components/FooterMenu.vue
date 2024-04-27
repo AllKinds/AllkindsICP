@@ -2,16 +2,20 @@
 
 const app = useAppState();
 const user = () => app.getUser().data;
-const notification = (category: "newQuestions" | "friendRequests" | "rewards", team?: string) => {
+const notification = (category: "newQuestions" | "friendRequests" | "rewards" | "chat", team?: string): bigint => {
     const u = user();
-    if (!u) return 0;
+    if (!u) return 0n;
     console.log("user", u)
     let count = 0n;
     for (let n of u.notifications) {
         if (!team || n.team.indexOf(team) >= 0) {
             const ev: any = n.event;
             if (category in ev) {
-                count += ev[category] || 0n;
+                if (category === "chat") {
+                    count += ev[category].unread || 0n;
+                } else {
+                    count += ev[category] || 1n;
+                }
             }
         }
     }
@@ -39,8 +43,10 @@ if (inBrowser()) {
         </NuxtLink>
         <NuxtLink to="/contacts" :class="{ 'menu-active': $route.path === '/contacts' }"
             class="p-[7px] w-auto m-0 flex flex-col items-center hover:text-black hover:bg-white rounded-lg relative">
-            <span v-if="notification('friendRequests', app.team)" class="absolute right-2 text-sm text-red-600 px-5">{{
-            notification('friendRequests', app.team) }}</span>
+            <span v-if="notification('friendRequests', app.team) + notification('chat', app.team)"
+                class="absolute right-2 text-sm text-red-600 px-5">
+                {{ notification('friendRequests', app.team) + notification('chat', app.team) }}
+            </span>
             <Icon :name="getIcon('/contacts').icon" size="2rem" class="mt-2" />
             My&nbsp;contacts
         </NuxtLink>

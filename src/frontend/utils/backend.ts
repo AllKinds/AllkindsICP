@@ -19,7 +19,7 @@ export const resultToEffect = <T>(result: { err: BackendError } | { ok: T }): Ba
 }
 
 const effectify = <T>(fn: (actor: BackendActor) => Promise<T>, orRedirect: boolean = true): FrontendEffect<T> => {
-  return Effect.gen(function*(_) {
+  return Effect.gen(function* (_) {
     yield* _(Effect.tryPromise({
       try: () => checkAuth(orRedirect),
       catch: toNetworkError
@@ -40,7 +40,7 @@ const effectify = <T>(fn: (actor: BackendActor) => Promise<T>, orRedirect: boole
 }
 
 const effectifyAnon = <T>(fn: (actor: BackendActor) => Promise<T>): FrontendEffect<T> => {
-  return Effect.gen(function*(_) {
+  return Effect.gen(function* (_) {
     yield* _(Effect.tryPromise({
       try: () => checkAuth(false),
       catch: toNetworkError
@@ -56,14 +56,14 @@ const effectifyAnon = <T>(fn: (actor: BackendActor) => Promise<T>): FrontendEffe
 }
 
 const effectifyResult = <T>(fn: (actor: BackendActor) => Promise<{ ok: T } | { err: BackendError }>, orRedirect: boolean = true): FrontendEffect<T> => {
-  return Effect.gen(function*(_) {
+  return Effect.gen(function* (_) {
     const res = yield* _(effectify(fn, orRedirect));
     return yield* _(resultToEffect(res).pipe(Effect.mapError(toBackendError)));
   })
 }
 
 const effectifyAnonResult = <T>(fn: (actor: BackendActor) => Promise<{ ok: T } | { err: BackendError }>): FrontendEffect<T> => {
-  return Effect.gen(function*(_) {
+  return Effect.gen(function* (_) {
     const res = yield* _(effectifyAnon(fn));
     return yield* _(resultToEffect(res).pipe(Effect.mapError(toBackendError)));
   })
@@ -250,9 +250,13 @@ export const sendMessage = (team: string, user: string, message: string): Fronte
   return effectifyResult((actor) => actor.sendMessage(team, user, message))
 }
 
-export const getMessages = (team: string, user: string, markRead: boolean): FrontendEffect<{ messages: Message[], status: ChatStatus }> => {
+export const markMessageRead = (team: string, user: string): FrontendEffect<bigint> => {
+  return effectifyResult((actor) => actor.markMessageRead(team, user))
+}
+
+export const getMessages = (team: string, user: string): FrontendEffect<{ messages: Message[], status: ChatStatus }> => {
   console.log("requesting messages from", user, "in team", team);
-  return effectifyResult((actor) => actor.getMessages(team, user, markRead))
+  return effectifyResult((actor) => actor.getMessages(team, user))
 }
 
 

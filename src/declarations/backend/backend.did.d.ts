@@ -138,6 +138,8 @@ export type ResultMessages = {
     'ok' : { 'status' : ChatStatus, 'messages' : Array<Message> }
   } |
   { 'err' : Error };
+export type ResultNat = { 'ok' : bigint } |
+  { 'err' : Error };
 export type ResultQuestion = { 'ok' : Question } |
   { 'err' : Error };
 export type ResultQuestionStats = { 'ok' : Array<QuestionStats> } |
@@ -276,7 +278,7 @@ export interface _SERVICE {
   >,
   'getFriends' : ActorMethod<[string], ResultFriends>,
   'getMatches' : ActorMethod<[string], ResultUserMatches>,
-  'getMessages' : ActorMethod<[string, string, boolean], ResultMessages>,
+  'getMessages' : ActorMethod<[string, string], ResultMessages>,
   'getOwnQuestions' : ActorMethod<[string, bigint], Array<Question>>,
   'getPermissions' : ActorMethod<
     [],
@@ -297,6 +299,7 @@ export interface _SERVICE {
   'listAdmins' : ActorMethod<[], ResultUserPermissions>,
   'listTeams' : ActorMethod<[Array<string>], ResultTeams>,
   'listUsers' : ActorMethod<[], ResultUsersNotifications>,
+  'markMessageRead' : ActorMethod<[string, string], ResultNat>,
   'sendFriendRequest' : ActorMethod<[string, string], ResultVoid>,
   'sendMessage' : ActorMethod<[string, string, string], ResultVoid>,
   'setPermissions' : ActorMethod<[string, AdminPermissions__1], ResultVoid>,

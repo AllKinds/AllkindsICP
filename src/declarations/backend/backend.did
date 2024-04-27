@@ -164,6 +164,11 @@ type ResultQuestion =
    err: Error;
    ok: Question;
  };
+type ResultNat = 
+ variant {
+   err: Error;
+   ok: nat;
+ };
 type ResultMessages = 
  variant {
    err: Error;
@@ -375,7 +380,7 @@ service : {
                                             }) query;
   getFriends: (text) -> (ResultFriends) query;
   getMatches: (text) -> (ResultUserMatches) query;
-  getMessages: (text, text, bool) -> (ResultMessages);
+  getMessages: (text, text) -> (ResultMessages) query;
   getOwnQuestions: (text, nat) -> (vec Question) query;
   getPermissions: () ->
    (record {
@@ -394,6 +399,7 @@ service : {
   listAdmins: () -> (ResultUserPermissions) query;
   listTeams: (vec text) -> (ResultTeams) query;
   listUsers: () -> (ResultUsersNotifications) query;
+  markMessageRead: (text, text) -> (ResultNat);
   /// Send a friend request to a user
   sendFriendRequest: (text, text) -> (ResultVoid);
   sendMessage: (text, text, text) -> (ResultVoid);

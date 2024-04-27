@@ -29,7 +29,6 @@ const setTeam = (t: TeamUserInfo) => {
 const canCreate = () => {
     const u = app.getUser();
     if (u.status !== 'ok') return false;
-
     return u.data?.permissions.createTeam;
 }
 
@@ -39,12 +38,17 @@ const notifications = (team: string): bigint => {
     let count = 0n;
     for (let n of ns) {
         if (n.team.indexOf(team) >= 0) {
-            count += Object.values(n.event)[0];
+            if ("chat" in n.event) {
+                count += Object.values(n.event)[0].unread;
+            } else {
+                count += Object.values(n.event)[0];
+            }
         }
     }
     console.log("notifications", ns);
     return count;
 }
+
 
 </script>
 

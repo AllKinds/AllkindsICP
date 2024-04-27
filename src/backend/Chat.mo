@@ -21,7 +21,7 @@ module {
 
   public func emptyDB() : MessageDB = Map.new();
 
-  public func sendMessage(db : MessageDB, self : Principal, other : Principal, content : Text) : () {
+  public func sendMessage(db : MessageDB, self : Principal, other : Principal, content : Text) {
     let key = keyFromPrincipals(self, other);
     let (msgs, statusSelf, statusOther) = getMsgs(db, self, other, key);
     let sender = self < other;
@@ -41,7 +41,6 @@ module {
       status2 = if (self < other) status else statusSelf;
     };
     Map.set(db, khash, key, entry);
-
   };
 
   func keyFromPrincipals(a : Principal, b : Principal) : Key {
@@ -62,8 +61,8 @@ module {
 
   public func getMsgs(db : MessageDB, self : Principal, other : Principal, key : Key) : (Messages, ChatStatus, ChatStatus) {
     switch (Map.get<Key, Entry>(db, khash, key), (self < other)) {
-      case (?data, true) { (data.messages, data.status1, data.status2) };
-      case (?data, false) { (data.messages, data.status2, data.status1) };
+      case (?data, false) { (data.messages, data.status1, data.status2) };
+      case (?data, true) { (data.messages, data.status2, data.status1) };
       case (null, _) {
         // instert a new one if none is found
         let buf = Buffer.init<Message>();
@@ -84,6 +83,7 @@ module {
     unread : Nat;
     latest : Text;
   };
+
   public func getPending(db : MessageDB, self : Principal) : [Unread] {
     let out = Buffer.init<Unread>();
     for ((p1, p2) in Map.keys(db)) {
@@ -126,22 +126,12 @@ module {
     return Buffer.toArray(out);
   };
 
-  public func getMessages(db : MessageDB, self : Principal, other : Principal, markRead : Bool) : {
+  public func getMessages(db : MessageDB, self : Principal, other : Principal) : {
     messages : [Message];
     status : ChatStatus;
   } {
     let key = keyFromPrincipals(self, other);
-    let (msgs, statusSelf, statusOther) = getMsgs(db, self, other, key);
-
-    if (markRead and statusSelf.unread > 0) {
-      let status : ChatStatus = { unread = 0 };
-      let entry : Entry = {
-        messages = msgs;
-        status1 = if (self < other) status else statusOther;
-        status2 = if (self < other) statusOther else status;
-      };
-      Map.set(db, khash, key, entry);
-    };
+    let (msgs, statusSelf, _) = getMsgs(db, self, other, key);
 
     if (self < other) {
       return { messages = Buffer.toArray(msgs); status = statusSelf };
@@ -151,6 +141,21 @@ module {
       messages = Array.map<Message, Message>(Buffer.toArray(msgs), func(m) = { sender = not m.sender; content = m.content; time = m.time });
       status = statusSelf;
     };
+  };
+
+  public func markRead(db : MessageDB, self : Principal, other : Principal) : Nat {
+    let key = keyFromPrincipals(self, other);
+    let (msgs, statusSelf, statusOther) = getMsgs(db, self, other, key);
+    if (statusSelf.unread > 0) {
+      let statusReset : ChatStatus = { unread = 0 };
+      let entry : Entry = {
+        messages = msgs;
+        status1 = if (self < other) statusReset else statusOther;
+        status2 = if (self < other) statusOther else statusReset;
+      };
+      Map.set(db, khash, key, entry);
+    };
+    return statusSelf.unread;
   };
 
 };

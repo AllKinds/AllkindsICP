@@ -16,13 +16,19 @@ const team = app.getTeamKey();
 
 const message = ref("");
 const pending = ref("");
+let chatLoader: any = undefined;
 
 if (inBrowser()) {
-    userChat.load(team, false, 0);
+    userChat.load(team, 0);
     app.friends.load(0);
 
-    setInterval(() => userChat.update(team, true, 10).catch(() => null), 10000);
+    chatLoader = setInterval(() => userChat.update(team, 10).catch(() => null), 10000);
 };
+
+onBeforeRouteLeave(() => {
+    console.log("onBeforeRouteLeave")
+    if (chatLoader) clearInterval(chatLoader);
+});
 
 const sendMessage = async () => {
     const content = message.value;
@@ -31,7 +37,7 @@ const sendMessage = async () => {
     if (content.trim().length > 0) {
         pending.value = content;
         await app.sendMessage(user, content);
-        await userChat.load(team, true, 0);
+        await userChat.load(team, 0);
         pending.value = "";
     } else {
         console.log("message must not be empty");
