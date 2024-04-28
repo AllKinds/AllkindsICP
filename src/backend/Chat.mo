@@ -3,6 +3,7 @@ import Hash "mo:base/Hash";
 import Principal "mo:base/Principal";
 import Array "mo:base/Array";
 import Iter "mo:base/Iter";
+import Nat32 "mo:base/Nat32";
 import Map "mo:map/Map";
 
 import Buffer "mo:StableBuffer/StableBuffer";
@@ -23,22 +24,22 @@ module {
 
   public func sendMessage(db : MessageDB, self : Principal, other : Principal, content : Text) {
     let key = keyFromPrincipals(self, other);
-    let (msgs, statusSelf, statusOther) = getMsgs(db, self, other, key);
-    let sender = self < other;
+    let msgs = getMsgs(db, self, other, key);
+    let senderIs1 = isSelf1(self, other);
 
     let msg : Message = {
-      sender;
+      sender = senderIs1;
       content;
       time = Time.now();
     };
 
-    Buffer.add(msgs, msg);
+    Buffer.add(msgs.messages, msg);
 
-    let status : ChatStatus = { unread = statusOther.unread + 1 };
+    let status : ChatStatus = { unread = msgs.other.unread + 1 };
     let entry : Entry = {
-      messages = msgs;
-      status1 = if (self < other) statusSelf else status;
-      status2 = if (self < other) status else statusSelf;
+      messages = msgs.messages;
+      status1 = if (senderIs1) msgs.self else status;
+      status2 = if (senderIs1) status else msgs.self;
     };
     Map.set(db, khash, key, entry);
   };
@@ -50,19 +51,29 @@ module {
 
   func keyHash(key : Key) : Hash.Hash {
     let (a, b) = key;
-    return Principal.hash(a) + Principal.hash(b);
+    return Nat32.addWrap(Principal.hash(a), Principal.hash(b));
   };
 
   func keyEqual(a : Key, b : Key) : Bool {
     a == b;
   };
 
+  func isSelf1(self : Principal, other : Principal) : Bool = self < other;
+
   let khash : Map.HashUtils<Key> = (keyHash, keyEqual);
 
-  public func getMsgs(db : MessageDB, self : Principal, other : Principal, key : Key) : (Messages, ChatStatus, ChatStatus) {
-    switch (Map.get<Key, Entry>(db, khash, key), (self < other)) {
-      case (?data, false) { (data.messages, data.status1, data.status2) };
-      case (?data, true) { (data.messages, data.status2, data.status1) };
+  public func getMsgs(db : MessageDB, self : Principal, other : Principal, key : Key) : {
+    messages : Messages;
+    self : ChatStatus;
+    other : ChatStatus;
+  } {
+    switch (Map.get<Key, Entry>(db, khash, key), isSelf1(self, other)) {
+      case (?data, true) {
+        { messages = data.messages; self = data.status1; other = data.status2 };
+      };
+      case (?data, false) {
+        { messages = data.messages; self = data.status2; other = data.status1 };
+      };
       case (null, _) {
         // instert a new one if none is found
         let buf = Buffer.init<Message>();
@@ -73,7 +84,7 @@ module {
           status2 = status;
         };
         Map.set(db, khash, key, entry);
-        (buf, status, status);
+        { messages = buf; self = status; other = status };
       };
     };
   };
@@ -81,23 +92,25 @@ module {
   public type Unread = {
     from : Principal;
     unread : Nat;
-    latest : Text;
+    latest : Message;
   };
 
-  public func getPending(db : MessageDB, self : Principal) : [Unread] {
+  public func getPending(db : MessageDB, self : Principal, showNonPending : Bool) : [Unread] {
     let out = Buffer.init<Unread>();
     for ((p1, p2) in Map.keys(db)) {
       if (p1 == self or p2 == self) {
-        let key = keyFromPrincipals(p1, p2);
-        let (msgs, statusSelf, _) = getMsgs(db, p1, p2, key);
-        if (statusSelf.unread > 0) {
+        let other = if (p1 == self) p2 else p1;
+        let key = keyFromPrincipals(self, other);
+        let msgs = getMsgs(db, self, other, key);
+        if ((showNonPending and Buffer.size(msgs.messages) > 0) or msgs.self.unread > 0) {
+          let latest = Buffer.get(msgs.messages, Buffer.size(msgs.messages) - 1 : Nat);
           Buffer.add<Unread>(
             out,
             {
-              from = if (p1 == self) p2 else p1;
-              unread = statusSelf.unread;
+              from = other;
+              unread = msgs.self.unread;
               // implicit assert of msgs.size >= 1 because unread is > 0. Otherwise the next line would trap
-              latest = Buffer.get(msgs, Buffer.size(msgs) - 1 : Nat).content;
+              latest = fixSender(latest, isSelf1(self, other));
             },
           );
         };
@@ -106,19 +119,21 @@ module {
     return Buffer.toArray(out);
   };
 
-  public func getPendingWithUsers(db : MessageDB, self : Principal, users : Iter.Iter<Principal>) : [Unread] {
+  /// Get number of pending messages and the content of the lates message
+  /// showNonPending: if false, only return entries where at least one message is pending
+  public func getPendingWithUsers(db : MessageDB, self : Principal, users : Iter.Iter<Principal>, showNonPending : Bool) : [Unread] {
     let out = Buffer.init<Unread>();
     for (other in users) {
       let key = keyFromPrincipals(self, other);
-      let (msgs, statusSelf, _) = getMsgs(db, self, other, key);
-      if (statusSelf.unread > 0) {
+      let msgs = getMsgs(db, self, other, key);
+      if ((showNonPending and Buffer.size(msgs.messages) > 0) or msgs.self.unread > 0) {
+        let latest = Buffer.get(msgs.messages, Buffer.size(msgs.messages) - 1 : Nat);
         Buffer.add<Unread>(
           out,
           {
             from = other;
-            unread = statusSelf.unread;
-            // implicit assert of msgs.size >= 1 because unread is > 0. Otherwise the next line would trap
-            latest = Buffer.get(msgs, Buffer.size(msgs) - 1 : Nat).content;
+            unread = msgs.self.unread;
+            latest = fixSender(latest, isSelf1(self, other));
           },
         );
       };
@@ -131,31 +146,40 @@ module {
     status : ChatStatus;
   } {
     let key = keyFromPrincipals(self, other);
-    let (msgs, statusSelf, _) = getMsgs(db, self, other, key);
+    let msgs = getMsgs(db, self, other, key);
 
-    if (self < other) {
-      return { messages = Buffer.toArray(msgs); status = statusSelf };
+    if (isSelf1(self, other)) {
+      return { messages = Buffer.toArray(msgs.messages); status = msgs.self };
     };
     // invert sender before returning
     return {
-      messages = Array.map<Message, Message>(Buffer.toArray(msgs), func(m) = { sender = not m.sender; content = m.content; time = m.time });
-      status = statusSelf;
+      messages = Array.map<Message, Message>(Buffer.toArray(msgs.messages), func(m) = fixSender(m, false));
+      status = msgs.self;
+    };
+  };
+
+  func fixSender(msg : Message, selfIs1 : Bool) : Message {
+    if (selfIs1) return msg;
+    return {
+      time = msg.time;
+      sender = not msg.sender;
+      content = msg.content;
     };
   };
 
   public func markRead(db : MessageDB, self : Principal, other : Principal) : Nat {
     let key = keyFromPrincipals(self, other);
-    let (msgs, statusSelf, statusOther) = getMsgs(db, self, other, key);
-    if (statusSelf.unread > 0) {
+    let msgs = getMsgs(db, self, other, key);
+    if (msgs.self.unread > 0) {
       let statusReset : ChatStatus = { unread = 0 };
       let entry : Entry = {
-        messages = msgs;
-        status1 = if (self < other) statusReset else statusOther;
-        status2 = if (self < other) statusOther else statusReset;
+        messages = msgs.messages;
+        status1 = if (isSelf1(self, other)) statusReset else msgs.other;
+        status2 = if (isSelf1(self, other)) msgs.other else statusReset;
       };
       Map.set(db, khash, key, entry);
     };
-    return statusSelf.unread;
+    return msgs.self.unread;
   };
 
 };

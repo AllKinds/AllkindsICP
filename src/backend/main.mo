@@ -1,52 +1,50 @@
+import Array "mo:base/Array";
+import Blob "mo:base/Blob";
+import Buffer "mo:base/Buffer";
+import Debug "mo:base/Debug";
+import Cycles "mo:base/ExperimentalCycles";
+import Float "mo:base/Float";
 import Hash "mo:base/Hash";
-import List "mo:base/List";
 import HashMap "mo:base/HashMap";
 import Int "mo:base/Int";
-import Text "mo:base/Text";
-import Result "mo:base/Result";
-import Time "mo:base/Time";
-import Option "mo:base/Option";
-import Buffer "mo:base/Buffer";
-import Nat32 "mo:base/Nat32";
-import Nat8 "mo:base/Nat8";
-import Nat "mo:base/Nat";
-import Int8 "mo:base/Int8";
 import Int32 "mo:base/Int32";
-import Array "mo:base/Array";
-import Float "mo:base/Float";
-import Order "mo:base/Order";
+import Int8 "mo:base/Int8";
+import Iter "mo:base/Iter";
+import List "mo:base/List";
+import Nat "mo:base/Nat";
+import Nat32 "mo:base/Nat32";
+import Nat64 "mo:base/Nat64";
+import Nat8 "mo:base/Nat8";
 import None "mo:base/None";
-import Cycles "mo:base/ExperimentalCycles";
-import Blob "mo:base/Blob";
-import Debug "mo:base/Debug";
-
+import Option "mo:base/Option";
+import Order "mo:base/Order";
+import Principal "mo:base/Principal";
+import Result "mo:base/Result";
+import Text "mo:base/Text";
+import Time "mo:base/Time";
 import IterTools "mo:itertools/Iter";
+import Map "mo:map/Map";
+import Set "mo:map/Set";
+import Prng "mo:prng";
 
-import Question "Question";
-import User "User";
-import Friend "Friend";
-import Team "Team";
 import Admin "Admin";
-import Matching "Matching";
+import Chat "Chat";
 import Configuration "Configuration";
 import Error "Error";
-import Iter "mo:base/Iter";
-import Prng "mo:prng";
-import Nat64 "mo:base/Nat64";
-import Principal "mo:base/Principal";
-import Set "mo:map/Set";
-import Map "mo:map/Map";
-import TextHelper "helper/TextHelper";
+import Friend "Friend";
 import Nat8Extra "helper/Nat8Extra";
+import TextHelper "helper/TextHelper";
+import Matching "Matching";
+import Notification "Notification";
 import Performance "Performance";
-
+import Question "Question";
+import Team "Team";
+import TypesV4 "Types";
+import Types "Types";
 import TypesV1 "types/TypesV1";
 import TypesV2 "types/TypesV2";
 import TypesV3 "types/TypesV3";
-import TypesV4 "Types"; // TODO: copy to types/TypesV4.mo
-import Notification "Notification";
-import Types "Types";
-import Chat "Chat";
+import User "User";
 
 actor {
 
@@ -208,7 +206,7 @@ actor {
     func toUserNotifications((p : Principal, u : User)) : UserNotifications {
       return {
         user = u;
-        notifications = Notification.getAll(db.users, db.teams, messageDB, p);
+        notifications = Notification.getAll(db.users, db.teams, messageDB, p, false);
       };
     };
 
@@ -353,7 +351,7 @@ actor {
         {
           user;
           permissions = Admin.getPermissions(admins, principal);
-          notifications = Notification.getAll(db.users, db.teams, messageDB, principal);
+          notifications = Notification.getAll(db.users, db.teams, messageDB, principal, true);
         };
       },
     );
@@ -613,7 +611,6 @@ actor {
     let true = Friend.isConnected(team.friends, caller, id) else return #err(#notAFriend);
 
     let msgs = Chat.getMessages(messageDB, caller, id);
-    Debug.print(debug_show (messageDB));
     return #ok(msgs);
   };
 

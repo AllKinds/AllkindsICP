@@ -3,7 +3,9 @@ const mapping = [
     { path: "/team", pos: "/main0.0" },
     { path: "/questions", pos: "/main1.0" },
     { path: "/discover", pos: "/main2.0" },
+    { path: "/contacts/", pos: "/main3.2" },
     { path: "/contacts", pos: "/main3.0" },
+    { path: "/chat/", pos: "/main3.1" },
     { path: "/my-profile", pos: "/main4.0" },
     { path: "/settings", pos: "/main4.1" },
 ]

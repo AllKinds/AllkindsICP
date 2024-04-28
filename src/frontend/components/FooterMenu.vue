@@ -2,6 +2,7 @@
 
 const app = useAppState();
 const user = () => app.getUser().data;
+
 const notification = (category: "newQuestions" | "friendRequests" | "rewards" | "chat", team?: string): bigint => {
     const u = user();
     if (!u) return 0n;

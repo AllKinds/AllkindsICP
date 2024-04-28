@@ -173,7 +173,7 @@ type ResultMessages =
  variant {
    err: Error;
    ok: record {
-         messages: vec Message;
+         messages: vec Message__1;
          status: ChatStatus;
        };
  };
@@ -240,7 +240,7 @@ type Notification =
    event:
     variant {
       chat: record {
-              latest: text;
+              latest: Message;
               unread: nat;
               user: text;
             };
@@ -249,6 +249,12 @@ type Notification =
       rewards: nat;
     };
    team: vec text;
+ };
+type Message__1 = 
+ record {
+   content: text;
+   sender: bool;
+   time: Time;
  };
 type Message = 
  record {

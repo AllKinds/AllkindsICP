@@ -16,9 +16,9 @@ module {
   type Buffer<T> = Buffer.Buffer<T>;
   type Iter<T> = Iter.Iter<T>;
 
-  public func getAll(users : UserDB, teams : Types.TeamDB, chat : Types.MessageDB, principal : Principal) : [Notification] {
+  public func getAll(users : UserDB, teams : Types.TeamDB, chat : Types.MessageDB, principal : Principal, showNonPending : Bool) : [Notification] {
     let buffer = Buffer.Buffer<Notification>(8);
-    buffer.append(Buffer.fromArray(getChat(teams, users, chat, principal)));
+    buffer.append(Buffer.fromArray(getChat(teams, users, chat, principal, showNonPending)));
     for ((key, team) in Map.entries(teams)) {
       buffer.append(Buffer.fromArray(getTeam(key, team, users, chat, principal)));
     };
@@ -35,42 +35,43 @@ module {
     return teams;
   };
 
-  func toToNotification(teamsDB : Types.TeamDB, users : UserDB, principal : Principal) : (msg : Chat.Unread) -> Notification {
+  func toToNotification(teamsDB : Types.TeamDB, users : UserDB, self : Principal) : (msg : Chat.Unread) -> Notification {
     func(msg : Chat.Unread) : Notification {
       let teams = Array.map<Types.TeamUserInfo, Text>(
-        getTeams(teamsDB, principal, msg.from),
+        getTeams(teamsDB, self, msg.from),
         func(t) : Text = t.info.name,
       );
 
-      return toNotification(users, principal, teams, msg);
-    };
-  };
-  func toToNotificationInTeam(team : Team, users : UserDB, principal : Principal) : (msg : Chat.Unread) -> Notification {
-    let teams = [team.info.name];
-    return func(msg : Chat.Unread) : Notification {
-      toNotification(users, principal, teams, msg);
+      return toNotification(users, teams, msg);
     };
   };
 
-  func toNotification(users : UserDB, principal : Principal, teams : [Text], msg : Chat.Unread) : Notification {
+  func toToNotificationInTeam(team : Team, users : UserDB) : (msg : Chat.Unread) -> Notification {
+    let teams = [team.info.name];
+    return func(msg : Chat.Unread) : Notification {
+      toNotification(users, teams, msg);
+    };
+  };
+
+  func toNotification(users : UserDB, teams : [Text], msg : Chat.Unread) : Notification {
     return {
       event = #chat({
         unread = msg.unread;
-        user = getUsername(users, principal);
+        user = getUsername(users, msg.from);
         latest = msg.latest;
       });
       team = teams;
     };
   };
 
-  public func getChat(teamsDB : Types.TeamDB, users : UserDB, chat : Types.MessageDB, principal : Principal) : [Notification] {
-    let msgs = Chat.getPending(chat, principal);
+  public func getChat(teamsDB : Types.TeamDB, users : UserDB, chat : Types.MessageDB, principal : Principal, showNonPending : Bool) : [Notification] {
+    let msgs = Chat.getPending(chat, principal, showNonPending);
     Array.map(msgs, toToNotification(teamsDB, users, principal));
   };
 
   public func getChatInTeam(team : Team, users : UserDB, chat : Types.MessageDB, principal : Principal, friends : Iter<Principal>) : [Notification] {
-    let msgs = Chat.getPendingWithUsers(chat, principal, friends);
-    let a = Array.map(msgs, toToNotificationInTeam(team, users, principal));
+    let msgs = Chat.getPendingWithUsers(chat, principal, friends, true);
+    let a = Array.map(msgs, toToNotificationInTeam(team, users));
     return a;
   };
 

@@ -142,7 +142,7 @@ module {
       #friendRequests : Nat;
       #newQuestions : Nat;
       #rewards : Nat;
-      #chat : { unread : Nat; user : Text; latest : Text };
+      #chat : { unread : Nat; user : Text; latest : Message };
     };
   };
 

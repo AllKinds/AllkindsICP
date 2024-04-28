@@ -84,10 +84,15 @@ export interface Message {
   'time' : Time,
   'sender' : boolean,
 }
+export interface Message__1 {
+  'content' : string,
+  'time' : Time,
+  'sender' : boolean,
+}
 export interface Notification {
   'team' : Array<string>,
   'event' : {
-      'chat' : { 'user' : string, 'latest' : string, 'unread' : bigint }
+      'chat' : { 'user' : string, 'latest' : Message, 'unread' : bigint }
     } |
     { 'rewards' : bigint } |
     { 'newQuestions' : bigint } |
@@ -135,7 +140,7 @@ export type ResultAnswer = { 'ok' : Answer } |
 export type ResultFriends = { 'ok' : Array<Friend> } |
   { 'err' : Error };
 export type ResultMessages = {
-    'ok' : { 'status' : ChatStatus, 'messages' : Array<Message> }
+    'ok' : { 'status' : ChatStatus, 'messages' : Array<Message__1> }
   } |
   { 'err' : Error };
 export type ResultNat = { 'ok' : bigint } |

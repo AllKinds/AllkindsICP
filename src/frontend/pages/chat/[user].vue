@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import moment from 'moment';
+import { formatDate } from "../../utils/utils";
 
 definePageMeta({
     title: "Allkinds",
@@ -18,11 +18,26 @@ const message = ref("");
 const pending = ref("");
 let chatLoader: any = undefined;
 
+const tick = async () => {
+    console.log("tick");
+    userChat.update(team, 10).then(
+        () => {
+            let pending = userChat.get().data?.status.unread;
+            console.log("pending", pending);
+            if (pending && pending > 0) {
+                console.log("mark messages read")
+                app.markMessageRead(user);
+            }
+        }
+    ).catch(() => null)
+};
+
 if (inBrowser()) {
     userChat.load(team, 0);
     app.friends.load(0);
 
-    chatLoader = setInterval(() => userChat.update(team, 10).catch(() => null), 10000);
+    setTimeout(tick, 100);
+    chatLoader = setInterval(tick, 10000);
 };
 
 onBeforeRouteLeave(() => {
@@ -44,20 +59,11 @@ const sendMessage = async () => {
     }
 };
 
-const formatDate = (date: bigint) => {
-    const now = moment();
-    const time = moment(Number(date / 1000000n));
-    if (now.isBefore(time)) {
-        return "now";
-    }
-    return time.fromNow();
-}
-
 </script>
 
 <template>
     <div class="w-full flex-grow flex flex-col">
-        <AllkindsTitle class="w-full" logo="back" :linkTo="'/contacts/' + user">
+        <AllkindsTitle class="w-full" logo="back" :linkTo="'/contacts'">
             <NuxtLink :to="'/contacts/' + user" class="m-auto">
                 {{ user }}
             </NuxtLink>

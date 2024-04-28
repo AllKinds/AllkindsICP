@@ -82,12 +82,17 @@ export const idlFactory = ({ IDL }) => {
     'restoreBackup' : IDL.Bool,
     'becomeTeamAdmin' : IDL.Bool,
   });
+  const Message = IDL.Record({
+    'content' : IDL.Text,
+    'time' : Time,
+    'sender' : IDL.Bool,
+  });
   const Notification = IDL.Record({
     'team' : IDL.Vec(IDL.Text),
     'event' : IDL.Variant({
       'chat' : IDL.Record({
         'user' : IDL.Text,
-        'latest' : IDL.Text,
+        'latest' : Message,
         'unread' : IDL.Nat,
       }),
       'rewards' : IDL.Nat,
@@ -171,13 +176,16 @@ export const idlFactory = ({ IDL }) => {
     'err' : Error,
   });
   const ChatStatus = IDL.Record({ 'unread' : IDL.Nat });
-  const Message = IDL.Record({
+  const Message__1 = IDL.Record({
     'content' : IDL.Text,
     'time' : Time,
     'sender' : IDL.Bool,
   });
   const ResultMessages = IDL.Variant({
-    'ok' : IDL.Record({ 'status' : ChatStatus, 'messages' : IDL.Vec(Message) }),
+    'ok' : IDL.Record({
+      'status' : ChatStatus,
+      'messages' : IDL.Vec(Message__1),
+    }),
     'err' : Error,
   });
   const AdminPermissions__1 = IDL.Record({

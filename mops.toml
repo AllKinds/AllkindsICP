@@ -1,11 +1,11 @@
 [dependencies]
-base = "0.10.4"
+base = "0.11.1"
 itertools = "0.2.1"
-StableBuffer = "https://github.com/f0i/StableBuffer#main"
+StableBuffer = "https://github.com/f0i/StableBuffer#main@abc2d0862a97e6344b630e08aee384a963efba26"
 map = "9.0.1"
 prng = "0.0.3"
 bench = "1.0.0"
 
 [toolchain]
-moc = "0.10.4"
+moc = "0.11.1"
 pocket-ic = "1.0.0"

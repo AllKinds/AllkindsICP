@@ -1,3 +1,5 @@
+import moment from "moment";
+
 
 export const toDataUrl = (image: number[] | Uint8Array, mode: "team" | "user" = "team", name: string = "") => {
     if (!image || image.length < 10) {
@@ -22,3 +24,14 @@ export const circleDataUrl = (c: string) => {
     return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'" +
         "%3E%3Ccircle cx='5' cy='5' r='5' fill='%23" + c + "'/%3E%3C/svg%3E"
 }
+
+
+export const formatDate = (date: bigint) => {
+    const now = moment();
+    const time = moment(Number(date / 1000000n));
+    if (now.isBefore(time)) {
+        return "now";
+    }
+    return time.fromNow();
+}
+
