@@ -35,25 +35,40 @@ module {
     return teams;
   };
 
-  func toToNotification(teamsDB : Types.TeamDB, users : UserDB, self : Principal) : (msg : Chat.Unread) -> Notification {
+  func toToNotification(teamsDB : Types.TeamDB, users : UserDB, self : Principal, hideContent : Bool) : (msg : Chat.Unread) -> Notification {
     func(msg : Chat.Unread) : Notification {
       let teams = Array.map<Types.TeamUserInfo, Text>(
         getTeams(teamsDB, self, msg.from),
         func(t) : Text = t.info.name,
       );
 
-      return toNotification(users, teams, msg);
+      return toNotification(users, teams, msg, hideContent);
     };
   };
 
-  func toToNotificationInTeam(team : Team, users : UserDB) : (msg : Chat.Unread) -> Notification {
+  func toToNotificationInTeam(team : Team, users : UserDB, hideContent : Bool) : (msg : Chat.Unread) -> Notification {
     let teams = [team.info.name];
     return func(msg : Chat.Unread) : Notification {
-      toNotification(users, teams, msg);
+      toNotification(users, teams, msg, hideContent);
     };
   };
 
-  func toNotification(users : UserDB, teams : [Text], msg : Chat.Unread) : Notification {
+  func toNotification(users : UserDB, teams : [Text], msg : Chat.Unread, hideContent : Bool) : Notification {
+    if (hideContent) {
+      // content filtered to only include data which is safe to show to admins or third party notification system
+      return {
+        event = #chat({
+          unread = msg.unread;
+          user = "<hidden>";
+          latest = {
+            content = "<hidden>";
+            time = msg.latest.time;
+            sender = false;
+          };
+        });
+        team = teams;
+      };
+    };
     return {
       event = #chat({
         unread = msg.unread;
@@ -66,12 +81,13 @@ module {
 
   public func getChat(teamsDB : Types.TeamDB, users : UserDB, chat : Types.MessageDB, principal : Principal, showNonPending : Bool) : [Notification] {
     let msgs = Chat.getPending(chat, principal, showNonPending);
-    Array.map(msgs, toToNotification(teamsDB, users, principal));
+    let hideContent = not showNonPending;
+    Array.map(msgs, toToNotification(teamsDB, users, principal, hideContent));
   };
 
   public func getChatInTeam(team : Team, users : UserDB, chat : Types.MessageDB, principal : Principal, friends : Iter<Principal>) : [Notification] {
     let msgs = Chat.getPendingWithUsers(chat, principal, friends, true);
-    let a = Array.map(msgs, toToNotificationInTeam(team, users));
+    let a = Array.map(msgs, toToNotificationInTeam(team, users, false));
     return a;
   };
 
