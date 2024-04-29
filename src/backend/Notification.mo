@@ -63,7 +63,7 @@ module {
           latest = {
             content = "<hidden>";
             time = msg.latest.time;
-            sender = false;
+            sender = msg.latest.sender;
           };
         });
         team = teams;

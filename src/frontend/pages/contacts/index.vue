@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import type { FriendStatus } from "~/utils/backend";
 import { formatDate } from "../../utils/utils";
 
 definePageMeta({
@@ -25,6 +26,14 @@ const getMessage = (other: string) => {
 };
 
 let match = { user: { username: "" } };
+
+const linkUser = (username: string, status : FriendStatus) => {
+    const key = friendStatusToKey(status);
+    if (key === "connected") {
+        return '/chat/' + username;
+    }
+    return '/contacts/' + username;
+}
 </script>
 
 
@@ -43,7 +52,7 @@ let match = { user: { username: "" } };
             </div>
 
             <NuxtLink v-for="[match, status] in app.getFriends().data?.slice().reverse()"
-                :to="'/chat/' + match.user.username" class="w-full text-xl font-bold">
+                :to="linkUser(match.user.username, status)" class="w-full text-xl font-bold">
                 <div class="flex flex-row w-full space-x-2">
                     <div>
                         {{ match.user.username }}:
