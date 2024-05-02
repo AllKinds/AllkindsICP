@@ -26,6 +26,7 @@ const getMessage = (other: string) => {
 };
 
 let match = { user: { username: "" } };
+match = match;
 
 const linkUser = (username: string, status : FriendStatus) => {
     const key = friendStatusToKey(status);
@@ -46,9 +47,9 @@ const linkUser = (username: string, status : FriendStatus) => {
             </NuxtLink>
         </AllkindsTitle>
 
-        <NetworkDataContainer :networkdata="app.getFriends()" class="w-full">
+        <NetworkDataContainer :networkdata="app.getFriends()" class="w-full flex flex-col space-y-8">
             <div v-if="app.getFriends().data?.length === 0">
-                You have no connections yet. <!-- TODO: add instructions to find friends -->
+                You have no connections yet.
             </div>
 
             <NuxtLink v-for="[match, status] in app.getFriends().data?.slice().reverse()"
