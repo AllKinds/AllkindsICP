@@ -64,7 +64,7 @@ if (inBrowser()) {
                 <Icon name="line-md:loading-alt-loop" size="5em" class="absolute mt-8" style="margin-left: -2.5em;" />
             </div>
             <TextArea :min-height="30" @ctrl-enter="create" v-model="question" placeholder="Ask a Yes/No question…"
-                :class="[{ 'input-disabled': loading }, getColor(color).color]" />
+                :class="[{ 'input-disabled': loading }, getColor(color).color]" class="text-3xl" />
         </div>
 
         <div class="grow w-full" :class="getColor(color).color" />

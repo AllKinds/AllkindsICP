@@ -33,7 +33,7 @@ onUpdated(() => resize(el.value));
 </script>
 
 <template>
-    <textarea ref="el" class="textarea textarea-bordered w-full bg-transparent textarea-lg text-3xl"
+    <textarea ref="el" class="textarea textarea-bordered w-full bg-transparent textarea-lg"
         @input="$emit('update:modelValue', ($event.target as any).value); false" :value="modelValue"
         @keyup.ctrl.enter="$emit('ctrl-enter', modelValue)" :placeholder="placeholder">{{ modelValue }}</textarea>
 </template>

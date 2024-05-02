@@ -86,7 +86,7 @@ if (inBrowser()) {
             A few words about yourself
         </TextBlock>
 
-        <TextArea name="about" v-model.trim="about" placeholder="" required class="w-full m-2"
+        <TextArea name="about" v-model.trim="about" placeholder="" required class="w-full m-2 text-md"
             :class="{ 'input-disabled': loading }" />
 
         <TextBlock align="text-left">
