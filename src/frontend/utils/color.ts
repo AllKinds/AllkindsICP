@@ -32,9 +32,32 @@ export const icons = [
     { to: "x", icon: "ph:x" },
     { to: "back", icon: "ic:round-arrow-back" },
     { to: "loading", icon: "line-md:loading-alt-loop" },
+    { to: "remove-user", icon: "prime:user-minus" },
+    { to: "plus", icon: "ph:plus-circle"},
+    { to: "minus", icon: "ph:minus-circle"},
+    { to: "kin", icon: "gg:shape-hexagon"},
+    { to: "kin-small", icon: "mdi:hexagon-outline"},
+    { to: "info", icon: "tabler:info-hexagon"},
+    { to: "loading", icon: "line-md:loading-alt-loop"},
+    { to: ">", icon: "material-symbols:arrow-forward-ios"},
+    { to: "users", icon: "prime:users"},
+    { to: "checkedbox", icon: "tabler:checkbox"},
+    { to: "checkbox", icon: "ci:checkbox-unchecked"},
+    { to: "gear", icon: "ph:gear"},
+    { to: "admin", icon: "tabler:user-shield"},
+    { to: "user-confirmed", icon: "tabler:user-check"},
+    { to: "delete", icon: "tabler:trash"},
+    { to: "refresh", icon: "charm:refresh"},
+    { to: "user-add", icon: "prime:user-plus"},
+    { to: "user-remove", icon: "prime:user-minus"},
+    { to: "team-select", icon: "mynaui:layers-three"},
+    { to: "star-empty", icon: "oui:star-empty-space"},
+    { to: "star", icon: "oui:star-filled-space"},
 ];
 
 export const getIcon = (path: string): Icon => {
     const i = icons.find((x) => path.startsWith(x.to));
-    return i ?? { to: "", icon: "gg:shape-hexagon" };
+    if(i) return i;
+    console.error("invalid icon name", path, "not found in", icons);
+    return { to: "", icon: "gg:shape-hexagon" };
 }

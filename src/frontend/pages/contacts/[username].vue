@@ -55,7 +55,7 @@ if (inBrowser()) {
     app.loadFriends(0);
 }
 
-let diff = {}
+let dotmenu = ref(false);
 
 </script>
 
@@ -63,6 +63,29 @@ let diff = {}
     <div class="w-full flex-grow flex flex-col">
         <AllkindsTitle class="w-full" logo="x" linkTo="/contacts">
             <span />
+            <template #action>
+                <div v-if="dotmenu" class="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm"></div>
+                <div class="relative">
+                    <button class="hover:invert bg-black rounded-full p-2" @click="dotmenu = !dotmenu">
+                        <Icon name="ph:dots-three-outline-duotone" size="1.5em"/>
+                    </button>
+                    <div v-if="dotmenu" class="absolute right-0 z-10 bg-black rounded-lg px-5 flex flex-col items-center space-y-5 py-5">
+                        <span>
+                            Status: {{ formatFriendStatus(m()[1]) }}
+                        </span>
+                        <Btn @click="navigateTo('/chat/' + m()[0].user.username)" v-if="isConnected(m()[1])" class="w-72">
+                            Send private messages 
+                            <!-- IconFor logo="chat" size="1.6em" /-->
+                        </Btn>
+                        <Btn @click="connect(m()[0].user.username)" v-if="canSendFriendRequest(m()[1])" class="w-72">
+                            Connect <IconFor logo="user-remove" size="1.6em" />
+                        </Btn>
+                        <Btn @click="disconnect(m()[0].user.username)" v-if="canSendRemoveFriendRequest(m()[1])" class="w-72 bg-red-600">
+                            Remove connection <IconFor logo="user-remove" size="1.6em" />
+                        </Btn>
+                    </div>
+                </div>
+            </template>
         </AllkindsTitle>
 
         <div class="p-3 w-full">
@@ -70,18 +93,27 @@ let diff = {}
                 v-if="canSendFriendRequest(m()[1])">
                 <Icon name="prime:user-plus" size="3em" />
             </NuxtLink>
-            <NuxtLink class="float-right cursor-pointer" @click="disconnect(m()[0].user.username)"
-                v-if="canSendRemoveFriendRequest(m()[1])">
-                <Icon name="prime:user-minus" size="3em" />
-            </NuxtLink>
-            <div class="text-xl font-bold">
-                {{ m()[0].user.displayName }} ({{ formatFriendStatus(m()[1]) }})
-            </div>
-            <div>
-                Cohesion score: {{ m()[0].cohesion }}% on {{ m()[0].answered.length }} questions
-            </div>
-            <div v-if="friendStatusToKey(m()[1]) === 'connected'">
-                Contact: {{ m()[0].user.contact }}
+            <div class="grid grid-cols-2">
+                <div class="text-xl font-bold">
+                    {{ m()[0].user.displayName }}
+                </div>
+                <div class="text-xl font-bold flex flex-row">
+                    <div class="mr-4">{{ m()[0].cohesion }}%</div>
+                    <div><IconFor logo="star" size="1.7em" class="pb-1 text-amber-300" /></div>
+                    <div><IconFor logo="star" size="1.7em" class="pb-1 text-amber-300" /></div>
+                    <div><IconFor logo="star" size="1.7em" class="pb-1 text-amber-300" /></div>
+                    <div><IconFor logo="star-empty" size="1.7em" class="pb-1 block" /></div>
+                </div>
+                <div class="whitespace-pre-wrap font-normal">
+                    {{ m()[0].user.about }}
+                </div>
+                <div class="font-normal">
+                    <span class="text-green-500 font-bold">{{ Math.round( m()[0].answered.length * m()[0].cohesion / 100) }}</span> same answers from <br>
+                    {{ m()[0].answered.length }} questions
+                </div>
+                <div v-if="friendStatusToKey(m()[1]) === 'connected'" class="mt-4">
+                    Contact: {{ m()[0].user.contact }}
+                </div>
             </div>
         </div>
 

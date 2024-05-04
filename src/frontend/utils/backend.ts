@@ -200,6 +200,10 @@ export const canSendRemoveFriendRequest = (status: FriendStatus): boolean => {
   }
 }
 
+export const isConnected = (status: FriendStatus): boolean => {
+  return friendStatusToKey(status) === "connected";
+};
+
 
 
 export const sendFriendRequest = (team: string, username: string): FrontendEffect<void> => {
