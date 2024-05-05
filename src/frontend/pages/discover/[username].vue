@@ -111,7 +111,7 @@ let filter = ref("all");
 
 
         <div v-if="filter === 'all' || filter === 'same'" v-for="[q, diff] in m().answered.filter(([q, diff]) => diff.sameAnswer)">
-            <Question :question="q" />
+            <Question :question="q" class="blur-lg" />
         </div>
 
         <Question v-if="filter === 'all' || filter === 'unanswered'" v-for="(q, i) in m().uncommon" :question="q" :link="true" />
