@@ -109,7 +109,7 @@ let filter = ref("all");
                     {{ m()[0].user.about }}
                 </div>
                 <div class="font-normal">
-                    <span class="text-green-500 font-bold">{{ Math.round( m()[0].answered.length * m()[0].cohesion / 100) }}</span> same answers from <br>
+                    <span class="text-green-500 font-bold">{{m()[0].answered.filter(([q, diff]) => diff.sameAnswer).length }}</span> same answers from <br>
                     {{ m()[0].answered.length }} questions
                 </div>
                 <div v-if="friendStatusToKey(m()[1]) === 'connected'" class="mt-4">

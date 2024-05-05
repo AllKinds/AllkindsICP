@@ -93,7 +93,7 @@ let filter = ref("all");
                     {{ m().user.about }}
                 </div>
                 <div class="font-normal">
-                    <span class="text-green-500 font-bold">{{ Math.round( m().answered.length * m().cohesion / 100) }}</span> same answers from <br>
+                    <span class="text-green-500 font-bold">{{m().answered.filter(([q, diff]) => diff.sameAnswer).length }}</span> same answers from <br>
                     {{ m().answered.length }} questions
                 </div>
             </div>
