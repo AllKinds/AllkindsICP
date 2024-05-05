@@ -504,7 +504,7 @@ actor {
     };
 
     let s : Skip = { question; reason = #skip };
-    let prev = Question.putSkip(team.skips, s, caller);
+    ignore Question.putSkip(team.skips, s, caller);
     Question.changePoints(team.questions, question, Configuration.question.skipReward);
     #ok(s);
   };
@@ -520,6 +520,8 @@ actor {
     };
 
     let userFiltered = User.find(db.users, team.members);
+    let hideAll = true;
+    let hideUncommon = true;
 
     // remove caller and friends
     let withoutSelf = Iter.filter<(Principal, User)>(userFiltered, func(p, u) = p != caller);
@@ -528,7 +530,7 @@ actor {
     let withScore = IterTools.mapFilter<(Principal, User), UserMatch>(
       withoutFriends,
       func(id, user) {
-        let res = Matching.getUserMatch(db.users, team.questions, team.answers, team.skips, caller, id);
+        let res = Matching.getUserMatch(db.users, team.questions, team.answers, team.skips, caller, id, hideAll, hideUncommon);
         Result.toOption(res); // TODO?: handle errors instead of removing them?
       },
     );
@@ -550,8 +552,10 @@ actor {
     let userFriends = Friend.get(team.friends, caller);
 
     func toUserMatch((p : Principal, status : FriendStatus)) : ?(UserMatch, FriendStatus) {
-      let showNonPublic = (status == #connected or status == #requestReceived);
-      let #ok(userMatch) = Matching.getUserMatch(db.users, team.questions, team.answers, team.skips, caller, p) else return null;
+      let hideAll = not (status == #connected or status == #requestReceived);
+      let hideUncommon = true;
+
+      let #ok(userMatch) = Matching.getUserMatch(db.users, team.questions, team.answers, team.skips, caller, p, hideAll, hideUncommon) else return null;
       // TODO?: handle errors instead of removing them?
       ?(userMatch, status);
     };

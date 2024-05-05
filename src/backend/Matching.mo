@@ -49,7 +49,18 @@ module {
     return #ok(Nat8.fromIntWrap(s));
   };
 
-  public func getUserMatch(users : UserDB, questions : QuestionDB, answers : AnswerDB, skips : SkipDB, userA : Principal, userB : Principal) : Result<UserMatch> {
+  func hideQuestion(question : Question) : Question {
+    return {
+      id = 0;
+      created = 0;
+      creator = ?"hidden";
+      question = "hidden";
+      color = question.color;
+      points = 0;
+    };
+  };
+
+  public func getUserMatch(users : UserDB, questions : QuestionDB, answers : AnswerDB, skips : SkipDB, userA : Principal, userB : Principal, hideAll : Bool, hideUncommon : Bool) : Result<UserMatch> {
 
     let common = Question.getCommon(answers, userA, userB);
 
@@ -60,7 +71,16 @@ module {
 
     let ?user = User.getInfo(users, userB) else return #err(#userNotFound);
 
-    let answered = Array.tabulate<(Question, AnswerDiff)>(common.size(), func i = (Question.getQuestion(questions, common[i].question), common[i]));
+    func toQuestion(i : Nat) : ((Question, AnswerDiff)) {
+      let q = Question.getQuestion(questions, common[i].question);
+      if (hideAll or (hideUncommon and not common[i].sameAnswer)) {
+        return (hideQuestion(q), { question = 0; sameAnswer = common[i].sameAnswer; weight = 1 });
+      } else {
+        return (q, common[i]);
+      };
+    };
+
+    let answered = Array.tabulate<(Question, AnswerDiff)>(common.size(), toQuestion);
     let unanswered : Iter.Iter<Question> = Question.unanswered(questions, answers, skips, userA);
 
     let answersB = Question.getAnswers(answers, userB);

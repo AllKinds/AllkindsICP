@@ -204,8 +204,6 @@ export const isConnected = (status: FriendStatus): boolean => {
   return friendStatusToKey(status) === "connected";
 };
 
-
-
 export const sendFriendRequest = (team: string, username: string): FrontendEffect<void> => {
   return effectifyResult((actor) => actor.sendFriendRequest(team, username))
 }
