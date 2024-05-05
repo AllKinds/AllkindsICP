@@ -57,6 +57,8 @@ if (inBrowser()) {
 
 let dotmenu = ref(false);
 
+let filter = ref("all");
+
 </script>
 
 <template>
@@ -93,16 +95,18 @@ let dotmenu = ref(false);
                 v-if="canSendFriendRequest(m()[1])">
                 <Icon name="prime:user-plus" size="3em" />
             </NuxtLink>
-            <div class="grid grid-cols-2">
-                <div class="text-xl font-bold">
+            <div class="grid grid-cols-2 gap-4">
+                <div class="text-3xl font-bold">
                     {{ m()[0].user.displayName }}
                 </div>
-                <div class="text-xl font-bold flex flex-row">
+                <div class="text-3xl font-bold flex flex-row align-top">
                     <div class="mr-4">{{ m()[0].cohesion }}%</div>
-                    <div><IconFor logo="star" size="1.7em" class="pb-1 text-amber-300" /></div>
-                    <div><IconFor logo="star" size="1.7em" class="pb-1 text-amber-300" /></div>
-                    <div><IconFor logo="star" size="1.7em" class="pb-1 text-amber-300" /></div>
-                    <div><IconFor logo="star-empty" size="1.7em" class="pb-1 block" /></div>
+                    <div class="text-xl mt-[-5px] font-bold flex flex-row">
+                        <div><IconFor logo="star" class="text-amber-300" /></div>
+                        <div><IconFor logo="star" class="text-amber-300" /></div>
+                        <div><IconFor logo="star" class="text-amber-300" /></div>
+                        <div><IconFor logo="star-empty" class="" /></div>
+                    </div>
                 </div>
                 <div class="whitespace-pre-wrap font-normal">
                     {{ m()[0].user.about }}
@@ -115,11 +119,19 @@ let dotmenu = ref(false);
                     Contact: {{ m()[0].user.contact }}
                 </div>
             </div>
+            <!-- Filter bar -->
+            <div class="flex flex-row space-x-4">
+                <BtnSmall class="grow" :class="{ 'bg-white text-black': filter==='all'}" @click="filter='all'">All</BtnSmall>
+                <BtnSmall class="grow" :class="{ 'bg-white text-black': filter==='same'}" @click="filter='same'">Same</BtnSmall>
+                <BtnSmall class="grow" :class="{ 'bg-white text-black': filter==='unanswered'}" @click="filter='unanswered'">Unanswered</BtnSmall>
+            </div>
         </div>
 
-        <Question v-for="[q, diff] in m()[0].answered" :question="q" :color="diff.sameAnswer ? 'green' : 'black'" />
+        <div v-if="filter === 'all' || filter === 'same'" v-for="[q, diff] in m()[0].answered.filter(([q, diff]) => diff.sameAnswer)">
+            <Question :question="q" />
+        </div>
 
-        <Question v-for="(q, i) in m()[0].uncommon" :question="q" :link="true" />
+        <Question v-if="filter === 'all' || filter === 'unanswered'" v-for="(q, i) in m()[0].uncommon" :question="q" :link="true" />
 
         <div class="p-12">
         </div>
