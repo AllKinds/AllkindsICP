@@ -1,9 +1,10 @@
 <script lang="ts" setup>
+import type { FriendStatus, UserMatch } from '../../utils/backend';
+
 definePageMeta({
     title: "Contacts",
     layout: 'default'
 });
-import type { FriendStatus, UserMatch } from '../../utils/backend';
 
 
 const route = useRoute();
@@ -56,13 +57,13 @@ if (inBrowser()) {
 }
 
 let dotmenu = ref(false);
-
 let filter = ref("all");
 
 </script>
 
 <template>
     <div class="w-full flex-grow flex flex-col">
+
         <AllkindsTitle class="w-full" logo="x" linkTo="/contacts">
             <span />
             <template #action>
@@ -80,7 +81,7 @@ let filter = ref("all");
                             <!-- IconFor logo="chat" size="1.6em" /-->
                         </Btn>
                         <Btn @click="connect(m()[0].user.username)" v-if="canSendFriendRequest(m()[1])" class="w-72">
-                            Connect <IconFor logo="user-remove" size="1.6em" />
+                            Connect <IconFor logo="user-add" size="1.6em" />
                         </Btn>
                         <Btn @click="disconnect(m()[0].user.username)" v-if="canSendRemoveFriendRequest(m()[1])" class="w-72 bg-red-600">
                             Remove connection <IconFor logo="user-remove" size="1.6em" />
@@ -90,11 +91,7 @@ let filter = ref("all");
             </template>
         </AllkindsTitle>
 
-        <div class="p-3 w-full">
-            <NuxtLink class="float-right cursor-pointer" @click="connect(m()[0].user.username)"
-                v-if="canSendFriendRequest(m()[1])">
-                <Icon name="prime:user-plus" size="3em" />
-            </NuxtLink>
+        <div class="p-3 w-full flex flex-col">
             <div class="grid grid-cols-2 gap-4">
                 <div class="text-3xl font-bold">
                     {{ m()[0].user.displayName }}
@@ -105,7 +102,7 @@ let filter = ref("all");
                         <div><IconFor logo="star" class="text-amber-300" /></div>
                         <div><IconFor logo="star" class="text-amber-300" /></div>
                         <div><IconFor logo="star" class="text-amber-300" /></div>
-                        <div><IconFor logo="star-empty" class="" /></div>
+                        <div><IconFor logo="star-empty" /></div>
                     </div>
                 </div>
                 <div class="whitespace-pre-wrap font-normal">
@@ -119,6 +116,11 @@ let filter = ref("all");
                     Contact: {{ m()[0].user.contact }}
                 </div>
             </div>
+            <Btn class="place-self-center mt-8 mb-5" @click="connect(m()[0].user.username)"
+                v-if="canSendFriendRequest(m()[1])">
+                Connect
+                <Icon name="prime:user-plus" size="1.5em" />
+            </Btn>
             <!-- Filter bar -->
             <div class="flex flex-row space-x-4">
                 <BtnSmall class="grow" :class="{ 'bg-white text-black': filter==='all'}" @click="filter='all'">All</BtnSmall>
