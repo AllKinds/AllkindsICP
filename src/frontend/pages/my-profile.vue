@@ -18,8 +18,11 @@ const user = () => {
 const deleteQuestion = (q: any) => { // TODO: replace type any with Question
     if (confirm("Hide this question?\n\nUsers who already answered the question will still see it."))
         return app.deleteQuestion(q).then(
-            () => app.loadQuestionStats(0)
-        )
+            () => app.loadQuestionStats(0),
+            console.error,
+        ).then(
+            () => console.error("Question", q, "deleted"),
+            );
 }
 
 

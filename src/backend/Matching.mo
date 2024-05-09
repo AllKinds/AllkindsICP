@@ -57,6 +57,7 @@ module {
       question = "hidden";
       color = question.color;
       points = 0;
+      deleted = question.deleted;
     };
   };
 

@@ -16,12 +16,14 @@ const q = props.question;
 
 <template>
     <NuxtLink :to="props.link ? '/answer-question/' + q.id : ''"
-        :class="getColor(props.color || q.color as ColorName).color"
+        :class="[getColor(props.color || q.color as ColorName).color, {'line-through': q.deleted, 'opacity-75': q.deleted}]"
         class="border p-4 w-full my-2 rounded-lg block text-2xl font-medium text-ellipsis">
         {{ q.question }}
 
-        <Icon v-if="props.deleteable" name="tabler:trash" class="float-right cursor-pointer"
-            @click.stop="$emit('delete', props.question);" />
+        <NuxtLink to="#">
+            <Icon v-if="props.deleteable" name="tabler:trash" class="float-right cursor-pointer"
+                @click.stop="$emit('delete', props.question);" />
+        </NuxtLink>
 
         <span v-if="props.showScore" class="float-right text-sm">{{ q.points }}
             <Icon name="gg:shape-hexagon" />

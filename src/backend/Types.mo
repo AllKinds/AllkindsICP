@@ -194,6 +194,7 @@ module {
     question : Text;
     color : Text;
     points : Int; // type Int because question points should be able to go negative
+    deleted : Bool;
   };
 
   public type Answer = {

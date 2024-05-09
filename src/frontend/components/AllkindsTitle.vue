@@ -5,8 +5,6 @@ const props = defineProps<{
     logoUrl?: string,
 }>();
 
-const icon = props.logo ?? getIcon(props.linkTo ?? "").icon;
-
 </script>
 <template>
     <div class="font-bold flex flex-row items-center w-full py-1 px-0 ml-0 text-xl min-h-20">

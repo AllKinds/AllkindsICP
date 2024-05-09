@@ -435,7 +435,7 @@ actor {
       case (#err(e)) return #err(e);
     };
 
-    let iter = Question.getQuestionStats(team.questions, team.answers, team.skips);
+    let iter = Question.getQuestionStats(team.questions, team.answers, team.skips, /* showHidden = */ false);
     let limited = IterTools.take(iter, Nat.min(limit, Configuration.api.maxPageSize));
 
     #ok(Iter.toArray(limited));
@@ -447,7 +447,7 @@ actor {
       case (#err(e)) return [];
     };
 
-    let iter = Question.getByCreator(team.questions, caller);
+    let iter = Question.getByCreator(team.questions, caller, /* showHidden = */ true);
     let limited = IterTools.take(iter, Nat.min(limit, Configuration.api.maxPageSize));
     Iter.toArray(limited);
   };

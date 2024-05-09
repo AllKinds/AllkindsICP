@@ -109,6 +109,7 @@ module {
       question = q.question;
       color = q.color;
       points = q.points;
+      deleted = q.hidden;
     };
   };
 
@@ -202,7 +203,6 @@ module {
   public func answered(questions : QuestionDB, answers : AnswerDB, user : Principal) : Iter<(Question, Answer)> {
     let userAnswers = Trie.iter(getAnswers(answers, user));
 
-    // TODO?: hide deleted questions?
     // map answers to questions
     let own = Iter.map<(QuestionID, Answer), (Question, Answer)>(
       userAnswers,
@@ -212,12 +212,11 @@ module {
     own;
   };
 
-  public func getByCreator(questions : QuestionDB, user : Principal) : Iter<Question> {
+  public func getByCreator(questions : QuestionDB, user : Principal, showHidden : Bool) : Iter<Question> {
 
     let all = BufferHelper.valsReverse(questions);
     // filter out deleted questions
-    // TODO: move filter to frontend
-    let visable = Iter.filter<StableQuestion>(all, func(q) = not q.hidden);
+    let visable = if (showHidden) all else Iter.filter<StableQuestion>(all, func(q) = not q.hidden);
 
     let qs = Iter.filter<StableQuestion>(visable, func q = q.creator == user);
 
@@ -309,9 +308,9 @@ module {
     return total;
   };
 
-  public func getQuestionStats(questions : QuestionDB, answers : AnswerDB, skips : SkipDB) : Iter<QuestionStats> {
+  public func getQuestionStats(questions : QuestionDB, answers : AnswerDB, skips : SkipDB, showHidden : Bool) : Iter<QuestionStats> {
     let all = BufferHelper.valsReverse(questions);
-    let visable = Iter.filter<StableQuestion>(all, func(q) = not q.hidden);
+    let visable = if (showHidden) all else Iter.filter<StableQuestion>(all, func(q) = not q.hidden);
 
     Iter.map<StableQuestion, QuestionStats>(visable, func q = toQuestionStats(q, answers, skips));
   };

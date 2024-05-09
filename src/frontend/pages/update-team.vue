@@ -51,7 +51,7 @@ const loadTeam = () => {
         listed.value = t.info.listed;
         loading.value = false;
         invite.value = t.invite + "";
-        //TODO: draw image preview to canvas
+        // draw image preview to canvas
         setTimeout(() => {
             drawImage(toDataUrl(t.info.logo), false);
         }, 200);

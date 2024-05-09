@@ -197,6 +197,7 @@ type Question__2 =
    color: text;
    created: Time;
    creator: opt text;
+   deleted: bool;
    id: QuestionID__1;
    points: int;
    question: text;
@@ -206,6 +207,7 @@ type Question__1 =
    color: text;
    created: Time;
    creator: opt text;
+   deleted: bool;
    id: QuestionID__1;
    points: int;
    question: text;
@@ -226,6 +228,7 @@ type Question =
    color: text;
    created: Time;
    creator: opt text;
+   deleted: bool;
    id: QuestionID__1;
    points: int;
    question: text;
