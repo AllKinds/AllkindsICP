@@ -20,7 +20,7 @@ const q = props.question;
         class="border p-4 w-full my-2 rounded-lg block text-2xl font-medium text-ellipsis">
         {{ q.question }}
 
-        <NuxtLink to="#">
+        <NuxtLink to="#" v-if="!q.deleted">
             <Icon v-if="props.deleteable" name="tabler:trash" class="float-right cursor-pointer"
                 @click.stop="$emit('delete', props.question);" />
         </NuxtLink>

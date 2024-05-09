@@ -213,7 +213,6 @@ module {
   };
 
   public func getByCreator(questions : QuestionDB, user : Principal, showHidden : Bool) : Iter<Question> {
-
     let all = BufferHelper.valsReverse(questions);
     // filter out deleted questions
     let visable = if (showHidden) all else Iter.filter<StableQuestion>(all, func(q) = not q.hidden);
