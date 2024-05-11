@@ -388,7 +388,7 @@ actor {
     #ok(q);
   };
 
-  public shared ({ caller }) func deleteQuestion(teamKey : Text, question : Question) : async ResultVoid {
+  public shared ({ caller }) func deleteQuestion(teamKey : Text, question : Question, hide : Bool) : async ResultVoid {
     let team = switch (Team.get(db.teams, teamKey, caller)) {
       case (#ok(t)) t;
       case (#err(e)) return #err(e);
@@ -401,7 +401,7 @@ actor {
     // verify that it is the same question
     if (q.created != question.created) return #err(#questionNotFound);
 
-    Question.hide(team.questions, question.id, true);
+    Question.hide(team.questions, question.id, hide);
 
     #ok;
   };

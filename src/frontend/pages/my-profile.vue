@@ -16,13 +16,21 @@ const user = () => {
 
 
 const deleteQuestion = (q: any) => { // TODO: replace type any with Question
-    if (confirm("Hide this question?\n\nUsers who already answered the question will still see it."))
-        return app.deleteQuestion(q).then(
-            () => app.loadQuestionStats(0),
+    if (confirm("Hide this question?\n\nUsers who already answered the question will still see it.")){
+        return app.deleteQuestion(q, true).then(
+            () => app.loadOwnQuestions(0),
             console.error,
-        ).then(
-            () => console.error("Question", q, "deleted"),
-            );
+        );
+    }
+}
+
+const recoverQuestion = (q: any) => { // TODO: replace type any with Question
+    if (confirm("Recover this question?")){
+        return app.deleteQuestion(q, false).then(
+            () => app.loadOwnQuestions(0),
+            console.error,
+        );
+    }
 }
 
 
@@ -77,7 +85,7 @@ if (inBrowser()) {
         <div class="w-full text-xl font-bold mt-4">Your questions</div>
         <NetworkDataContainer :networkdata="app.getOwnQuestions()" class="grow mt-4 w-full">
             <Question v-for="(q, _i) in app.getOwnQuestions().data" :question="q" :showScore="true" :link="true"
-                :deleteable="true" @delete="deleteQuestion">
+                :deleteable="true" @delete="deleteQuestion" @recover="recoverQuestion">
             </Question>
             <div v-if="app.getOwnQuestions().data?.length === 0" class="w-full">
                 You have not asked a question yet.

@@ -263,7 +263,6 @@ export const getAppState = () => {
       return t;
     },
     getTeamKey(): string {
-      let t = null;
       this.setTeam(inBrowser() ? window.localStorage.getItem("team") || "" : "");
       return appData.team;
     },
@@ -288,8 +287,8 @@ export const getAppState = () => {
     updateTeam(team: string, name: string, about: string, logo: number[], listed: boolean, code: string): Promise<void> {
       return runNotify(backend.updateTeam(team, name, about, logo, listed, code), "Welcome to the team!");
     },
-    deleteQuestion(q: Question) {
-      return runNotify(backend.deleteQuestion(appData.team, q), "Question removed")
+    deleteQuestion(q: Question, hide: boolean) {
+      return runNotify(backend.deleteQuestion(appData.team, q, hide), hide ? "Question removed" : "Question recovered")
     },
     deleteAnswers(confirm: string) {
       return runNotify(backend.deleteAnswers(appData.team, confirm), "Answers removed")
@@ -652,8 +651,8 @@ export const useAppState = defineStore({
     updateTeam(team: string, name: string, about: string, logo: number[], listed: boolean, code: string): Promise<void> {
       return runNotify(backend.updateTeam(team, name, about, logo, listed, code), "Welcome to the team!");
     },
-    deleteQuestion(q: Question) {
-      return runNotify(backend.deleteQuestion(this.team, q), "Question removed")
+    deleteQuestion(q: Question, hide: boolean) {
+      return runNotify(backend.deleteQuestion(this.team, q, hide), hide ? "Question removed" : "Question recovered")
     },
     deleteAnswers(confirm: string) {
       return runNotify(backend.deleteAnswers(this.team, confirm), "Answers removed")

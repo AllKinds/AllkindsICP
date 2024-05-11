@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { type Question } from '~/utils/backend';
-const emit = defineEmits(["answered", "answering", "delete"]);
+const emit = defineEmits(["answered", "answering", "delete", "recover"]);
 
 const props = defineProps<{
     question: Question,
@@ -23,6 +23,10 @@ const q = props.question;
         <NuxtLink to="#" v-if="!q.deleted">
             <Icon v-if="props.deleteable" name="tabler:trash" class="float-right cursor-pointer"
                 @click.stop="$emit('delete', props.question);" />
+        </NuxtLink>
+        <NuxtLink to="#" v-if="q.deleted">
+            <Icon v-if="props.deleteable" name="tabler:trash-off" class="float-right cursor-pointer"
+                @click.stop="$emit('recover', props.question);" />
         </NuxtLink>
 
         <span v-if="props.showScore" class="float-right text-sm">{{ q.points }}

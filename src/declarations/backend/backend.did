@@ -381,7 +381,7 @@ service : {
   createTestData: (text, nat, nat) -> (nat);
   createUser: (text, text, text) -> (ResultUser);
   deleteAnswers: (text, text) -> (ResultVoid);
-  deleteQuestion: (text, Question) -> (ResultVoid);
+  deleteQuestion: (text, Question, bool) -> (ResultVoid);
   deleteUser: (text) -> (ResultVoid);
   getAnsweredQuestions: (text, nat) -> (vec record {
                                               Question;

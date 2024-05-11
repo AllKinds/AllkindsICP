@@ -278,7 +278,7 @@ export interface _SERVICE {
   'createTestData' : ActorMethod<[string, bigint, bigint], bigint>,
   'createUser' : ActorMethod<[string, string, string], ResultUser>,
   'deleteAnswers' : ActorMethod<[string, string], ResultVoid>,
-  'deleteQuestion' : ActorMethod<[string, Question], ResultVoid>,
+  'deleteQuestion' : ActorMethod<[string, Question, boolean], ResultVoid>,
   'deleteUser' : ActorMethod<[string], ResultVoid>,
   'getAnsweredQuestions' : ActorMethod<
     [string, bigint],

@@ -232,8 +232,8 @@ export const updateTeam = (team: string, name: string, about: string, logo: numb
   return effectifyResult((actor) => actor.updateTeam(team, code, { name, about, logo, listed }))
 }
 
-export const deleteQuestion = (team: string, question: Question): FrontendEffect<void> => {
-  return effectifyResult((actor) => actor.deleteQuestion(team, question))
+export const deleteQuestion = (team: string, question: Question, hide: boolean): FrontendEffect<void> => {
+  return effectifyResult((actor) => actor.deleteQuestion(team, question, hide))
 }
 
 export const deleteAnswers = (team: string, user: string): FrontendEffect<void> => {
