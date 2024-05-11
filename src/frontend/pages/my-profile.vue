@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { copyPersonalInvite } from '~/composables/appState';
-import { withDefault, type UserPermissions } from '../utils/backend';
+import { withDefault, type Question, type UserPermissions } from '../utils/backend';
 
 definePageMeta({
     title: "Allkinds",
@@ -8,6 +8,8 @@ definePageMeta({
 });
 
 const app = useAppState();
+
+const loading = ref<Question|null>(null);
 
 const user = () => {
     const dummy = { user: { stats: {} }, permissions: {} } as UserPermissions;
@@ -17,18 +19,24 @@ const user = () => {
 
 const deleteQuestion = (q: any) => { // TODO: replace type any with Question
     if (confirm("Hide this question?\n\nUsers who already answered the question will still see it.")){
+        loading.value = q;
         return app.deleteQuestion(q, true).then(
             () => app.loadOwnQuestions(0),
             console.error,
+        ).finally(
+            () => { loading.value = null }
         );
     }
 }
 
 const recoverQuestion = (q: any) => { // TODO: replace type any with Question
     if (confirm("Recover this question?")){
+        loading.value = q;
         return app.deleteQuestion(q, false).then(
             () => app.loadOwnQuestions(0),
             console.error,
+        ).finally(
+            () => { loading.value = null }
         );
     }
 }
@@ -85,7 +93,7 @@ if (inBrowser()) {
         <div class="w-full text-xl font-bold mt-4">Your questions</div>
         <NetworkDataContainer :networkdata="app.getOwnQuestions()" class="grow mt-4 w-full">
             <Question v-for="(q, _i) in app.getOwnQuestions().data" :question="q" :showScore="true" :link="true"
-                :deleteable="true" @delete="deleteQuestion" @recover="recoverQuestion">
+                :deleteable="true" @delete="deleteQuestion" @recover="recoverQuestion" :loading="q.id === loading?.id">
             </Question>
             <div v-if="app.getOwnQuestions().data?.length === 0" class="w-full">
                 You have not asked a question yet.

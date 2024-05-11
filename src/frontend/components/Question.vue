@@ -8,6 +8,7 @@ const props = defineProps<{
     color?: ColorName,
     showScore?: boolean,
     deleteable?: boolean,
+    loading?: boolean,
 }>();
 
 const q = props.question;
@@ -20,11 +21,12 @@ const q = props.question;
         class="border p-4 w-full my-2 rounded-lg block text-2xl font-medium text-ellipsis">
         {{ q.question }}
 
-        <NuxtLink to="#" v-if="!q.deleted">
+        <Icon v-if="props.loading" :name="getIcon('loading').icon" class="float-right"></Icon>
+        <NuxtLink to="#" v-if="!q.deleted && !props.loading">
             <Icon v-if="props.deleteable" name="tabler:trash" class="float-right cursor-pointer"
                 @click.stop="$emit('delete', props.question);" />
         </NuxtLink>
-        <NuxtLink to="#" v-if="q.deleted">
+        <NuxtLink to="#" v-if="q.deleted && !props.loading">
             <Icon v-if="props.deleteable" name="tabler:trash-off" class="float-right cursor-pointer"
                 @click.stop="$emit('recover', props.question);" />
         </NuxtLink>
