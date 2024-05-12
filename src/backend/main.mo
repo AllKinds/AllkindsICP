@@ -138,15 +138,13 @@ actor {
     // REINSTALL AND ALL DATA WILL BE LOST!
   };
 
-  stable var db_version : Nat = 0;
   system func postupgrade() {
-    if (true) {
+    if (false) {
       db_v5 := TypesV5.migrateV4(db_v4);
       //keeping old db_v3 around for now as a backup in case anything goes wrong with the migration
       //Debug.print(debug_show(db_v4.users.byUsername));
       Debug.print("upgraded to v5");
     };
-    db_version := 5;
   };
 
   // PUBLIC API
