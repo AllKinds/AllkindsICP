@@ -6,7 +6,7 @@ import Error "Error";
 import Iter "mo:base/Iter";
 import IterTools "mo:itertools/Iter";
 import Debug "mo:base/Debug";
-import Types "Types";
+import Types "types/Types";
 
 module {
 

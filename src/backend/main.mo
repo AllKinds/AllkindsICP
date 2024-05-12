@@ -39,11 +39,12 @@ import Notification "Notification";
 import Performance "Performance";
 import Question "Question";
 import Team "Team";
-import TypesV4 "Types";
-import Types "Types";
 import TypesV1 "types/TypesV1";
 import TypesV2 "types/TypesV2";
 import TypesV3 "types/TypesV3";
+import TypesV4 "types/TypesV4";
+import TypesV5 "types/Types";
+import Types "types/Types";
 import User "User";
 
 actor {
@@ -114,6 +115,7 @@ actor {
   // db_v2 is the same as v1
   stable var db_v3 : TypesV3.DB = TypesV3.emptyDB();
   stable var db_v4 : TypesV4.DB = TypesV4.emptyDB();
+  stable var db_v5 : TypesV5.DB = TypesV5.emptyDB();
 
   stable var admins_v1 : TypesV1.AdminDB = TypesV1.emptyAdminDB();
   stable var admins_v2 : AdminDB = TypesV2.emptyAdminDB();
@@ -121,7 +123,7 @@ actor {
   stable var messageDB_v1 : MessageDB = TypesV4.emptyMessageDB();
 
   // alias for current db version
-  var db : Types.DB = db_v4;
+  var db : Types.DB = db_v5;
   var admins = admins_v2;
   var messageDB = messageDB_v1;
   let performance = Performance.emptyDB();
@@ -138,22 +140,13 @@ actor {
 
   stable var db_version : Nat = 0;
   system func postupgrade() {
-    /// migrations from old db version
-    //migrate_DBv1_v2()
-
-    /// Cleanup old stable data
-    if (db_version < 2) {
-      admins_v1 := TypesV1.emptyAdminDB();
-      Debug.print("upgraded to v2");
-    };
-
-    if (db_version < 4) {
-      db_v4 := TypesV4.migrateV1(db_v1);
+    if (true) {
+      db_v5 := TypesV5.migrateV4(db_v4);
       //keeping old db_v3 around for now as a backup in case anything goes wrong with the migration
       //Debug.print(debug_show(db_v4.users.byUsername));
-      Debug.print("upgraded to v3");
+      Debug.print("upgraded to v5");
     };
-    db_version := 4;
+    db_version := 5;
   };
 
   // PUBLIC API
@@ -295,7 +288,7 @@ actor {
   };
 
   public shared query ({ caller }) func getTeamMembers(teamKey : Text) : async ResultUsers {
-    let team = switch (Team.get(db.teams, teamKey, caller)) {
+    let team = switch (Team.get(db.teams, teamKey, caller, true)) {
       case (#ok(t)) t;
       case (#err(e)) return #err(e);
     };
@@ -317,7 +310,7 @@ actor {
   };
 
   public shared query ({ caller }) func getTeamAdmins(teamKey : Text) : async ResultUsers {
-    let team = switch (Team.get(db.teams, teamKey, caller)) {
+    let team = switch (Team.get(db.teams, teamKey, caller, false)) {
       case (#ok(t)) t;
       case (#err(e)) return #err(e);
     };
@@ -374,7 +367,7 @@ actor {
       case (#err(e)) return #err(e);
     };
 
-    let team = switch (Team.get(db.teams, teamKey, caller)) {
+    let team = switch (Team.get(db.teams, teamKey, caller, true)) {
       case (#ok(t)) t;
       case (#err(e)) return #err(e);
     };
@@ -389,7 +382,7 @@ actor {
   };
 
   public shared ({ caller }) func deleteQuestion(teamKey : Text, question : Question, hide : Bool) : async ResultVoid {
-    let team = switch (Team.get(db.teams, teamKey, caller)) {
+    let team = switch (Team.get(db.teams, teamKey, caller, true)) {
       case (#ok(t)) t;
       case (#err(e)) return #err(e);
     };
@@ -407,7 +400,7 @@ actor {
   };
 
   public shared query ({ caller }) func getUnansweredQuestions(teamKey : Text, limit : Nat) : async [Question] {
-    let team = switch (Team.get(db.teams, teamKey, caller)) {
+    let team = switch (Team.get(db.teams, teamKey, caller, true)) {
       case (#ok(t)) t;
       case (#err(e)) return [];
     };
@@ -419,7 +412,7 @@ actor {
 
   // TODO? remove Answer from return type?
   public shared query ({ caller }) func getAnsweredQuestions(teamKey : Text, limit : Nat) : async [(Question, Answer)] {
-    let team = switch (Team.get(db.teams, teamKey, caller)) {
+    let team = switch (Team.get(db.teams, teamKey, caller, true)) {
       case (#ok(t)) t;
       case (#err(e)) return [];
     };
@@ -430,7 +423,7 @@ actor {
   };
 
   public shared query ({ caller }) func getQuestionStats(teamKey : Text, limit : Nat) : async ResultQuestionStats {
-    let team = switch (Team.get(db.teams, teamKey, caller)) {
+    let team = switch (Team.get(db.teams, teamKey, caller, true)) {
       case (#ok(t)) t;
       case (#err(e)) return #err(e);
     };
@@ -442,7 +435,7 @@ actor {
   };
 
   public shared query ({ caller }) func getOwnQuestions(teamKey : Text, limit : Nat) : async [Question] {
-    let team = switch (Team.get(db.teams, teamKey, caller)) {
+    let team = switch (Team.get(db.teams, teamKey, caller, true)) {
       case (#ok(t)) t;
       case (#err(e)) return [];
     };
@@ -461,7 +454,7 @@ actor {
       case (#err(e)) return #err(e);
     };
 
-    let team = switch (Team.get(db.teams, teamKey, caller)) {
+    let team = switch (Team.get(db.teams, teamKey, caller, true)) {
       case (#ok(t)) t;
       case (#err(e)) return #err(e);
     };
@@ -498,7 +491,7 @@ actor {
 
   // Add a skip
   public shared ({ caller }) func submitSkip(teamKey : Text, question : Nat) : async ResultSkip {
-    let team = switch (Team.get(db.teams, teamKey, caller)) {
+    let team = switch (Team.get(db.teams, teamKey, caller, true)) {
       case (#ok(t)) t;
       case (#err(e)) return #err(e);
     };
@@ -510,7 +503,7 @@ actor {
   };
 
   public shared query ({ caller }) func getMatches(teamKey : Text) : async ResultUserMatches {
-    let team = switch (Team.get(db.teams, teamKey, caller)) {
+    let team = switch (Team.get(db.teams, teamKey, caller, true)) {
       case (#ok(t)) t;
       case (#err(e)) return #err(e);
     };
@@ -544,7 +537,7 @@ actor {
 
   // returns both approved and unapproved friends
   public shared query ({ caller }) func getFriends(teamKey : Text) : async ResultFriends {
-    let team = switch (Team.get(db.teams, teamKey, caller)) {
+    let team = switch (Team.get(db.teams, teamKey, caller, true)) {
       case (#ok(t)) t;
       case (#err(e)) return #err(e);
     };
@@ -570,7 +563,7 @@ actor {
 
   /// Send a friend request to a user
   public shared ({ caller }) func sendFriendRequest(teamKey : Text, username : Text) : async ResultVoid {
-    let team = switch (Team.get(db.teams, teamKey, caller)) {
+    let team = switch (Team.get(db.teams, teamKey, caller, true)) {
       case (#ok(t)) t;
       case (#err(e)) return #err(e);
     };
@@ -580,7 +573,7 @@ actor {
   };
 
   public shared ({ caller }) func answerFriendRequest(teamKey : Text, username : Text, accept : Bool) : async ResultVoid {
-    let team = switch (Team.get(db.teams, teamKey, caller)) {
+    let team = switch (Team.get(db.teams, teamKey, caller, true)) {
       case (#ok(t)) t;
       case (#err(e)) return #err(e);
     };
@@ -594,7 +587,7 @@ actor {
   };
 
   public shared ({ caller }) func sendMessage(teamKey : Text, username : Text, message : Text) : async ResultVoid {
-    let team = switch (Team.get(db.teams, teamKey, caller)) {
+    let team = switch (Team.get(db.teams, teamKey, caller, true)) {
       case (#ok(t)) t;
       case (#err(e)) return #err(e);
     };
@@ -607,7 +600,7 @@ actor {
   };
 
   public shared query ({ caller }) func getMessages(teamKey : Text, username : Text) : async ResultMessages {
-    let team = switch (Team.get(db.teams, teamKey, caller)) {
+    let team = switch (Team.get(db.teams, teamKey, caller, true)) {
       case (#ok(t)) t;
       case (#err(e)) return #err(e);
     };
@@ -619,7 +612,7 @@ actor {
   };
 
   public shared ({ caller }) func markMessageRead(teamKey : Text, username : Text) : async ResultNat {
-    let team = switch (Team.get(db.teams, teamKey, caller)) {
+    let team = switch (Team.get(db.teams, teamKey, caller, true)) {
       case (#ok(t)) t;
       case (#err(e)) return #err(e);
     };
@@ -657,7 +650,7 @@ actor {
   public query ({ caller }) func backupConnections(teamKey : Text, offset : Nat, limit : Nat) : async [(Principal, Principal, FriendStatus)] {
     assertAdmin(caller);
 
-    let team = switch (Team.get(db.teams, teamKey, caller)) {
+    let team = switch (Team.get(db.teams, teamKey, caller, true)) {
       case (#ok(t)) t;
       case (#err(e)) return Debug.trap("couldn't get team");
     };
@@ -672,7 +665,7 @@ actor {
   public query ({ caller }) func backupQuestions(teamKey : Text, offset : Nat, limit : Nat) : async [StableQuestion] {
     assertAdmin(caller);
 
-    let team = switch (Team.get(db.teams, teamKey, caller)) {
+    let team = switch (Team.get(db.teams, teamKey, caller, false)) {
       case (#ok(t)) t;
       case (#err(e)) return Debug.trap("couldn't get team");
     };
@@ -681,6 +674,21 @@ actor {
     let withOffset = IterTools.skip(all, offset);
     let withLimit = IterTools.take(withOffset, limit);
     Iter.toArray(withLimit);
+  };
+
+  public shared ({ caller }) func setCategory(teamKey : Text, data : [{ questionId : Nat; category : Text }]) : async ResultVoid {
+    assertAdmin(caller);
+
+    let team = switch (Team.get(db.teams, teamKey, caller, false)) {
+      case (#ok(t)) t;
+      case (#err(e)) return Debug.trap("couldn't get team");
+    };
+
+    for (d in data.vals()) {
+      Question.setCategory(team.questions, d.questionId, d.category);
+    };
+
+    return #ok;
   };
 
   public shared ({ caller }) func airdrop(user : Text, tokens : Int) : async ResultVoid {
@@ -721,7 +729,7 @@ actor {
 
     if (not Text.startsWith(teamKey, #text "test_")) Debug.trap("");
 
-    let team = switch (Team.get(db.teams, teamKey, caller)) {
+    let team = switch (Team.get(db.teams, teamKey, caller, false)) {
       case (#ok(t)) t;
       case (#err(e)) return Debug.trap("couldn't get team");
     };

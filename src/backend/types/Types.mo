@@ -8,10 +8,16 @@ import Trie "mo:base/Trie";
 import Map "mo:map/Map";
 import Set "mo:map/Set";
 import StableBuffer "mo:StableBuffer/StableBuffer";
+import Prng "mo:prng";
+import Nat32 "mo:base/Nat32";
 
 import Error "../Error";
+import TypesV1 "TypesV3";
+import TypesV4 "TypesV4";
 
 module {
+
+  let { thash; phash } = Map;
 
   /// ========
   /// DB TYPES
@@ -29,14 +35,59 @@ module {
     teams = emptyTeamDB();
   };
 
-  func emptyUserDB() : UserDB = {
+  public func migrateV4(v4 : TypesV4.DB) : DB = {
+    users = v4.users;
+    teams = migrateTeamDBV4(v4.teams);
+  };
+
+  public func emptyUserDB() : UserDB = {
     info = Map.new<Principal, User>();
     byUsername = Map.new<Text, Principal>();
   };
 
   func emptyTeamDB() : TeamDB = Map.new<Text, Team>();
 
+  func migrateTeamDBV4(v4 : TypesV4.TeamDB) : TeamDB {
+    Map.map<Text, TypesV4.Team, Team>(v4, thash, func(_id, team) = migrateTeamV4(team));
+  };
+
   public func emptyAdminDB() : AdminDB = Map.new<Principal, AdminPermissions>();
+
+  func migrateTeamV4(v4 : TypesV4.Team) : Team {
+    {
+      info = v4.info;
+      invite = v4.invite;
+      userInvites = v4.userInvites;
+      members = v4.members;
+      admins = v4.admins;
+
+      questions = migrateQuestionsV4(v4.questions);
+      answers = v4.answers;
+      skips = v4.skips;
+      friends = v4.friends;
+
+      userSettings = v4.userSettings;
+    };
+  };
+
+  func migrateQuestionsV4(v4 : TypesV4.QuestionDB) : QuestionDB {
+    StableBuffer.map<TypesV4.StableQuestion, StableQuestion>(
+      v4,
+      func(old : TypesV4.StableQuestion) : StableQuestion {
+        return {
+          id = old.id;
+          created = old.created;
+          creator = old.creator;
+          question = old.question;
+          color = old.color;
+          points = old.points;
+          showCreator = old.showCreator;
+          hidden = old.hidden;
+          category : Text = "";
+        };
+      },
+    );
+  };
 
   /// ============
   /// COMMON TYPES
@@ -91,11 +142,12 @@ module {
   };
 
   public type Notification = {
-    team : Text;
+    team : [Text];
     event : {
       #friendRequests : Nat;
       #newQuestions : Nat;
       #rewards : Nat;
+      #chat : { unread : Nat; user : Text; latest : Message };
     };
   };
 
@@ -137,6 +189,7 @@ module {
     points : Int; // type Int because question points should be able to go negative
     showCreator : Bool;
     hidden : Bool;
+    category : Text;
   };
 
   // Question that can be returned to the frontend
@@ -147,6 +200,8 @@ module {
     question : Text;
     color : Text;
     points : Int; // type Int because question points should be able to go negative
+    deleted : Bool;
+    category : Text;
   };
 
   public type Answer = {
@@ -201,6 +256,7 @@ module {
   public type Team = {
     info : TeamInfo;
     invite : Text; // secret to prevent unauthorized users from joining the team
+    userInvites : UserInviteDB;
     members : Set<Principal>;
     admins : Set<Principal>;
 
@@ -208,6 +264,7 @@ module {
     answers : AnswerDB;
     skips : SkipDB;
     friends : FriendDB;
+    userSettings : TeamUserSettingsDB;
   };
 
   public type TeamInfo = {
@@ -222,6 +279,7 @@ module {
     info : TeamInfo;
     permissions : Permissions;
     invite : ?Text;
+    userInvite : ?Text;
   };
 
   public type TeamStats = {
@@ -231,9 +289,18 @@ module {
     connections : Nat;
   };
 
+  public type TeamUserSettings = {
+    stared : [QuestionID];
+    invitedBy : ?Principal;
+  };
+
   public type Permissions = { isMember : Bool; isAdmin : Bool };
 
   public type TeamDB = Map<Text, Team>;
+
+  public type TeamUserSettingsDB = Map<Principal, TeamUserSettings>;
+
+  public type UserInviteDB = Map<Principal, Text>;
 
   /// ===========
   /// Admin Types
@@ -261,4 +328,27 @@ module {
     #restoreBackup;
     #all;
   };
+
+  // ==========
+  // Chat Types
+  // ==========
+
+  public type Message = {
+    content : Text;
+    time : Time;
+    sender : Bool;
+  };
+
+  public type MessageKey = (Principal, Principal);
+
+  public type Messages = Buffer<Message>;
+  public type ChatStatus = { unread : Nat };
+  public type MessageDbEntry = {
+    messages : Messages;
+    status1 : ChatStatus;
+    status2 : ChatStatus;
+  };
+  public type MessageDB = Map<MessageKey, MessageDbEntry>;
+  public func emptyMessageDB() : MessageDB = Map.new();
+
 };

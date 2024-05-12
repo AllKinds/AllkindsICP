@@ -1,34 +1,88 @@
+import Int "mo:base/Int";
+import Iter "mo:base/Iter";
 import Principal "mo:base/Principal";
-import Time "mo:base/Time";
 import Result "mo:base/Result";
 import Text "mo:base/Text";
+import Time "mo:base/Time";
+import Trie "mo:base/Trie";
 import Map "mo:map/Map";
 import Set "mo:map/Set";
-import Int "mo:base/Int";
-import Error "../Error";
-import Iter "mo:base/Iter";
-import Trie "mo:base/Trie";
 import StableBuffer "mo:StableBuffer/StableBuffer";
+import Prng "mo:prng";
+import Nat32 "mo:base/Nat32";
+
+import Error "../Error";
+import TypesV1 "TypesV3";
 
 module {
+
+  let { thash; phash } = Map;
+
+  /// ========
+  /// DB TYPES
+  /// ========
 
   public type DB = {
     users : UserDB;
     teams : TeamDB;
   };
 
+  public type AdminDB = Map<Principal, AdminPermissions>;
+
   public func emptyDB() : DB = {
     users = emptyUserDB();
     teams = emptyTeamDB();
   };
 
-  func emptyUserDB() : UserDB = {
+  public func migrateV1(v1 : TypesV1.DB) : DB = {
+    users = v1.users;
+    teams = migrateTeamDBV1(v1.teams);
+  };
+
+  public func emptyUserDB() : UserDB = {
     info = Map.new<Principal, User>();
     byUsername = Map.new<Text, Principal>();
   };
+
   func emptyTeamDB() : TeamDB = Map.new<Text, Team>();
 
+  func migrateTeamDBV1(v1 : TypesV1.TeamDB) : TeamDB {
+    Map.map<Text, TypesV1.Team, Team>(v1, thash, func(_id, team) = migrateTeamV1(team));
+  };
+
   public func emptyAdminDB() : AdminDB = Map.new<Principal, AdminPermissions>();
+
+  func migrateTeamV1(v1 : TypesV1.Team) : Team {
+    let seed1 = Text.hash(v1.info.name);
+    {
+      info = v1.info;
+      invite = v1.invite;
+      userInvites : UserInviteDB = invitesFromMembers(v1.members, seed1);
+      members = v1.members;
+      admins = v1.admins;
+
+      questions = v1.questions;
+      answers = v1.answers;
+      skips = v1.skips;
+      friends = v1.friends;
+
+      userSettings : TeamUserSettingsDB = Map.new();
+    };
+  };
+
+  func invitesFromMembers(members : Set<Principal>, seed1 : Nat32) : UserInviteDB {
+    let invites : UserInviteDB = Map.new();
+    let insecureRandom = Prng.SFC32a(); // insecure random numbers
+
+    for (member : Principal in Set.keys(members)) {
+      let seed : Nat32 = Principal.hash(member);
+      insecureRandom.init(seed1 ^ seed);
+      let invite = Nat32.toText(insecureRandom.next());
+      Map.set(invites, phash, member, invite);
+    };
+
+    return invites;
+  };
 
   /// ============
   /// COMMON TYPES
@@ -83,12 +137,24 @@ module {
   };
 
   public type Notification = {
-    team : Text;
+    team : [Text];
     event : {
       #friendRequests : Nat;
       #newQuestions : Nat;
       #rewards : Nat;
+      #chat : { unread : Nat; user : Text; latest : Message };
     };
+  };
+
+  public type UserPermissions = {
+    user : User;
+    permissions : AdminPermissions;
+    notifications : [Notification];
+  };
+
+  public type UserNotifications = {
+    user : User;
+    notifications : [Notification];
   };
 
   public type UserDB = {
@@ -128,6 +194,7 @@ module {
     question : Text;
     color : Text;
     points : Int; // type Int because question points should be able to go negative
+    deleted : Bool;
   };
 
   public type Answer = {
@@ -182,6 +249,7 @@ module {
   public type Team = {
     info : TeamInfo;
     invite : Text; // secret to prevent unauthorized users from joining the team
+    userInvites : UserInviteDB;
     members : Set<Principal>;
     admins : Set<Principal>;
 
@@ -189,6 +257,7 @@ module {
     answers : AnswerDB;
     skips : SkipDB;
     friends : FriendDB;
+    userSettings : TeamUserSettingsDB;
   };
 
   public type TeamInfo = {
@@ -203,6 +272,7 @@ module {
     info : TeamInfo;
     permissions : Permissions;
     invite : ?Text;
+    userInvite : ?Text;
   };
 
   public type TeamStats = {
@@ -212,15 +282,22 @@ module {
     connections : Nat;
   };
 
+  public type TeamUserSettings = {
+    stared : [QuestionID];
+    invitedBy : ?Principal;
+  };
+
   public type Permissions = { isMember : Bool; isAdmin : Bool };
 
   public type TeamDB = Map<Text, Team>;
 
+  public type TeamUserSettingsDB = Map<Principal, TeamUserSettings>;
+
+  public type UserInviteDB = Map<Principal, Text>;
+
   /// ===========
   /// Admin Types
   /// ===========
-
-  public type AdminDB = Map<Principal, AdminPermissions>;
 
   public type AdminPermissions = {
     suspendUser : Bool;
@@ -244,4 +321,27 @@ module {
     #restoreBackup;
     #all;
   };
+
+  // ==========
+  // Chat Types
+  // ==========
+
+  public type Message = {
+    content : Text;
+    time : Time;
+    sender : Bool;
+  };
+
+  public type MessageKey = (Principal, Principal);
+
+  public type Messages = Buffer<Message>;
+  public type ChatStatus = { unread : Nat };
+  public type MessageDbEntry = {
+    messages : Messages;
+    status1 : ChatStatus;
+    status2 : ChatStatus;
+  };
+  public type MessageDB = Map<MessageKey, MessageDbEntry>;
+  public func emptyMessageDB() : MessageDB = Map.new();
+
 };

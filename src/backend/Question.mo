@@ -16,7 +16,7 @@ import Bool "mo:base/Bool";
 import Configuration "Configuration";
 import Error "Error";
 import BufferHelper "helper/BufferHelper";
-import Types "Types";
+import Types "types/Types";
 import Buffer "mo:StableBuffer/StableBuffer";
 
 /// Types and functions related to questions and answers
@@ -110,6 +110,7 @@ module {
       color = q.color;
       points = q.points;
       deleted = q.hidden;
+      category = q.category;
     };
   };
 
@@ -138,6 +139,7 @@ module {
       points = 0;
       showCreator = false;
       hidden = false;
+      category = "";
     };
   };
 
@@ -156,6 +158,7 @@ module {
       points = q.points;
       showCreator = q.showCreator;
       hidden; // set hidden
+      category = q.category;
     };
     Buffer.put(questions, id, new);
   };
@@ -171,6 +174,23 @@ module {
       points = q.points + pointsDiff; // add points
       showCreator = q.showCreator;
       hidden = q.hidden;
+      category = q.category;
+    };
+    Buffer.put(questions, id, new);
+  };
+
+  public func setCategory(questions : QuestionDB, id : QuestionID, category : Text) {
+    let q = Buffer.get(questions, id);
+    let new : StableQuestion = {
+      id;
+      created = q.created;
+      creator = q.creator;
+      question = q.question;
+      color = q.color;
+      points = q.points;
+      showCreator = q.showCreator;
+      hidden = q.hidden;
+      category; // set category
     };
     Buffer.put(questions, id, new);
   };

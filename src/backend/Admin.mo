@@ -1,7 +1,7 @@
 import Principal "mo:base/Principal";
 import Map "mo:map/Map";
 import Iter "mo:base/Iter";
-import Types "Types";
+import Types "types/Types";
 
 module {
   type Iter<T> = Iter.Iter<T>;

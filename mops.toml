@@ -1,7 +1,7 @@
 [dependencies]
 base = "0.11.1"
 itertools = "0.2.1"
-StableBuffer = "https://github.com/f0i/StableBuffer#main@abc2d0862a97e6344b630e08aee384a963efba26"
+StableBuffer = "https://github.com/canscale/StableBuffer#master@acdde6bb5b939227997cebdbb8919d2e6da8691c"
 map = "9.0.1"
 prng = "0.0.3"
 bench = "1.0.0"

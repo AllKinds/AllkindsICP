@@ -8,7 +8,7 @@ import Error "Error";
 import Array "mo:base/Array";
 import Iter "mo:base/Iter";
 import Nat "mo:base/Nat";
-import Types "Types";
+import Types "types/Types";
 
 module {
 
@@ -58,6 +58,7 @@ module {
       color = question.color;
       points = 0;
       deleted = question.deleted;
+      category = "hidden";
     };
   };
 

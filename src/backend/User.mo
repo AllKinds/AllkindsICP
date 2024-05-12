@@ -9,7 +9,7 @@ import Set "mo:map/Set";
 import Int "mo:base/Int";
 import Iter "mo:base/Iter";
 import TextHelper "helper/TextHelper";
-import Types "Types"
+import Types "types/Types"
 
 module {
 

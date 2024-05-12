@@ -11,7 +11,7 @@ import Set "mo:map/Set";
 import Question "Question";
 import Friend "Friend";
 import Error "Error";
-import Types "Types";
+import Types "types/Types";
 import Prng "mo:prng";
 
 module {
@@ -172,9 +172,9 @@ module {
     return invite;
   };
 
-  public func get(teams : TeamDB, key : Text, user : Principal) : Result<Team> {
+  public func get(teams : TeamDB, key : Text, user : Principal, checkMembership : Bool) : Result<Team> {
     let ?team = Map.get(teams, thash, key) else return #err(#teamNotFound);
-    if (team.info.listed or Set.has(team.members, phash, user)) {
+    if (team.info.listed or not checkMembership or Set.has(team.members, phash, user)) {
       return #ok(team);
     };
     return #err(#notInTeam);

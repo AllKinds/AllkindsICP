@@ -7,7 +7,7 @@ import Nat32 "mo:base/Nat32";
 import Map "mo:map/Map";
 
 import Buffer "mo:StableBuffer/StableBuffer";
-import Types "Types";
+import Types "types/Types";
 
 module {
   type Time = Time.Time;
